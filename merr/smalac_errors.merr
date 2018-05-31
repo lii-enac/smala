@@ -1,0 +1,22 @@
+Component root() {
+  Button b("Quit", 0, 0)
+}
+:::component definition outside of _main_ or _define_
+_define_
+Component root() {
+  Button b("Quit", 0, 0)
+}
+:::'_define_' should not be followed by 'Component'
+_define_
+paging {
+:::missing parenthesis in component definition
+_define_
+root() {
+  Button ("Quit", 0, 0)
+}
+:::missing identifier
+_define_
+foo() {
+    r = loadXML ("file:///Users/letondal/Documents/Projets/AIRTIUS/dev/essais_djnn/sandbox/button.svg")
+}
+:::unknown loadXML, did you mean loadFromXML?

@@ -1,0 +1,23 @@
+{
+	"shell_cmd": "make -j -s",
+	"file_regex": "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$",
+	"working_dir": "${folder:${project_path:${file_path}}}",
+	"selector": "source.makefile",
+	//"syntax": "Packages/Makefile/Make Output.sublime-syntax",
+	"keyfiles": ["Makefile", "makefile"],
+	// Recognize ANSI colors in the output,
+    "target": "ansi_color_build",
+    "syntax": "Packages/ANSIescape/ANSI.tmLanguage",
+
+	"variants":
+	[
+		{
+			"name": "Clean",
+			"shell_cmd": "make clean"
+		},
+		{
+			"name": "Test",
+			"shell_cmd": "make -j -s test"
+		}
+	]
+}

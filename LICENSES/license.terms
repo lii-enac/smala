@@ -1,0 +1,67 @@
+TERMS OF USE OF THE SMALA SOFTWARE
+
+
+0. PREAMBLE
+
+The smala software is copyrighted by ENAC. The following terms apply to
+all binary files of smala, and to all source files of smala originating
+from ENAC.
+
+The Smala compiler is available under two licensing options:
+
+- the SLEEPYCAT LICENSE below is appropriate for open source software
+  developers who can comply with its terms. In the Sleepycat license,
+  "uses" covers all possible technical methods, including static and
+  dynamic linking, code generation, and the delivery of services
+  through networks. And "redistribution" also covers all possible
+  methods and recipients, including distributing sources, binaries,
+  and physical objects that include binaries. In other words, under
+  this license you are allowed to use smala for writing or executing
+  open source code, and only that. ENAC and its partners grant no
+  other right, explicit or implicit, through this license.
+
+ - alternatively, licensees holding valid commercial smala licenses may
+  use this software in accordance with the written agreement they have
+  signed with ENAC. This is appropriate for development projects where
+  you do not want to share the totality of your source code. Write to
+  contact@smala.io for more information about commercial licensing.
+
+
+
+1. SLEEPYCAT LICENSE
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+ - Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the
+   distribution.
+
+ - Redistributions in any form must be accompanied by information on
+   how to obtain complete source code for the smala software and any
+   accompanying software that uses the smala software. The source code
+   must either be included in the distribution or be available for no
+   more than the cost of distribution plus a nominal fee, and must be
+   freely redistributable under reasonable conditions. For an
+   executable file, complete source code means the source code for all
+   modules it contains. It does not include source code for modules or
+   files that typically accompany the major components of the
+   operating system on which the executable file runs.
+
+THIS SOFTWARE IS PROVIDED BY ENAC ``AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+NON-INFRINGEMENT, ARE DISCLAIMED. IN NO EVENT SHALL ENAC
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

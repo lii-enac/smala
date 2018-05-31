@@ -1,0 +1,5 @@
+ERR(1, 1, "component definition outside of _main_ or _define_")
+ERR(2, 12, "'_define_' should not be followed by 'Component'")
+ERR(2, 115, "missing parenthesis in component definition")
+ERR(3, 84, "missing identifier")
+ERR(4, 84, "unknown loadXML, did you mean loadFromXML?")

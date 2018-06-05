@@ -865,6 +865,9 @@ connector: full_expression connector_symbol dst_list
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
   }
+  for (auto n: expression) {
+    n->set_in_expression (true);
+  }
   expression.clear ();
 }
 

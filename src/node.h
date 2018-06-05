@@ -97,15 +97,15 @@ public:
     void set_has_arguments (bool v);
     bool duplicate_warning ();
     void set_duplicate_warning (bool v);
-    bool in_assignment_expression () { return m_in_assignment_expression; }
-    void set_in_assignment_expression (bool v) { m_in_assignment_expression = v; }
+    bool in_expression () { return m_in_expression; }
+    void set_in_expression (bool v) { m_in_expression = v; }
 private:
     Node * m_parent;
     std::string m_djnn_type;
     std::string m_name;
     std::string m_build_name;
     std::vector< std::pair<ParamType, std::string> > m_args;
-    bool m_has_arguments, m_duplicate_warning, m_in_assignment_expression;
+    bool m_has_arguments, m_duplicate_warning, m_in_expression;
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
 };

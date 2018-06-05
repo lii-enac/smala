@@ -914,7 +914,7 @@ assignment: full_expression assignment_symbol dst_list is_model
     }
   }
   for (auto n: expression) {
-  	n->set_in_assignment_expression (true);
+  	n->set_in_expression (true);
   }
   expression.clear ();
 }
@@ -937,7 +937,7 @@ NAME_OR_PATH SIMPLE_EQ full_expression assignment_symbol NAME_OR_PATH is_model
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
   }
   for (auto n: expression) {
-  	n->set_in_assignment_expression (true);
+  	n->set_in_expression (true);
   }
   expression.clear ();
 }

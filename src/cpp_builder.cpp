@@ -512,7 +512,7 @@ namespace Smala
         << vright << ");\n";
     check_and_build_connector (os, left, new_name, "\"left\"");
     check_and_build_connector (os, right, new_name, "\"right\"");
-    if (node->in_assignment_expression ()) {
+    if (node->in_expression ()) {
       indent (os);
       os << "new Activator (" << m_parent_list.back ().name () << ", \"\", "
           << new_name << ", \"action\");\n";
@@ -534,7 +534,7 @@ namespace Smala
     os << "Process *" << new_name << " = new " << constructor << " ("
         << m_parent_list.back ().name () << ", \"\", " << vright << ");\n";
     check_and_build_connector (os, right, new_name, "\"input\"");
-    if (node->in_assignment_expression ()) {
+    if (node->in_expression ()) {
       indent (os);
       os << "new Activator (" << m_parent_list.back ().name () << ", \"\", "
           << new_name << ", \"action\");\n";

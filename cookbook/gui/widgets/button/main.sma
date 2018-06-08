@@ -31,8 +31,20 @@ Component root {
   Frame f ("my frame", 0, 0, 400, 600)
   Exit ex (0, 1)
   f.close -> ex
-  svg = loadFromXML("file:///Users/magnaudet/Dev/smala/volta-hmi-graphic-design_6.svg")
-  g << svg.layer1
+
+  NativeAction na (myFunc, 1)
+
+  myList = clone (n=5) {
+    Button b (f, "myButton", 10, n * 100)
+    b.click->na
+  }
+
+  e = find (myList.1.b)
+  e.x = 100.0
+  Button b2 (f, "myVeryLongButton", 10, 150)
+  b2.click->ex
+
+  f.width > 200 ? 100 : 10 => b2.x
 }
 
 run root

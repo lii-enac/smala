@@ -158,7 +158,28 @@ namespace Smala
         } else
           os << cpnt_name << "->deactivation ();\n";
       } else if (n->name ().compare ("Delete") == 0) {
-        os << "delete " << cpnt_name << ";\n";
+
+        /* delete first.second */
+        if (arg.second.compare (m_null_string) != 0) {
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "Process *" << new_name << " = " << cpnt_name << ";\n";
+          indent (os);
+          os << new_name << "->deactivation ();\n";
+          indent (os);
+          os << arg.first << "->remove_child (" << new_name << ");\n";
+          indent (os);
+          os << "delete " << new_name << ";\n";
+        }
+        /*  delete first */
+        else {
+          os << arg.first << "->deactivation ();\n";
+          indent (os);
+          os << "if (" << arg.first << "->get_parent ())\n";
+          indent (os); indent (os);
+          os << arg.first << "->get_parent ()->remove_child (" << arg.first << ");\n";
+          indent (os);
+          os << "delete " << arg.first << ";\n";
+        }
       }
     }
   }

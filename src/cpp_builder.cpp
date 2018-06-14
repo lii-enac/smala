@@ -520,23 +520,34 @@ namespace Smala
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *left = op->left ();
     Node *right = op->right ();
-    std::string vleft = left->node_type () == LITERAL ? left->name () : "0";
-    std::string vright = right->node_type () == LITERAL ? right->name () : "0";
+    std::string prefix = "var_";
+    std::string left_sym = m_parent_list.back ().get_symbol (left->name ());
+    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    bool left_is_var = left_sym.substr (0, prefix.size ()) == prefix;
+    if (left_is_var) {
+      left->set_name (left_sym);
+    }
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
+    if (right_is_var) {
+      right->set_name (right_sym);
+    }
+    std::string vleft = left->node_type () == LITERAL || left_is_var ? left->name () : "0";
+    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ().add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "Process *" << new_name << " = new " << constructor << " ("
-        << m_parent_list.back ().name () << ", \"\", " << vleft << ", "
-        << vright << ");\n";
-    check_and_build_connector (os, left, new_name, "\"left\"");
-    check_and_build_connector (os, right, new_name, "\"right\"");
+    os << "Process *" << new_name << " = new " << constructor << " (" << m_parent_list.back ().name () << ", \"\", "
+        << vleft << ", " << vright << ");\n";
+    if (!left_is_var)
+      check_and_build_connector (os, left, new_name, "\"left\"");
+    if (!right_is_var)
+      check_and_build_connector (os, right, new_name, "\"right\"");
     if (node->in_expression ()) {
       indent (os);
-      os << "new Activator (" << m_parent_list.back ().name () << ", \"\", "
-          << new_name << ", \"action\");\n";
+      os << "new Activator (" << m_parent_list.back ().name () << ", \"\", " << new_name << ", \"action\");\n";
     }
   }
 
@@ -545,51 +556,54 @@ namespace Smala
   {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *right = op->right ();
-    std::string vright = right->node_type () == LITERAL ? right->name () : "0";
+    std::string prefix = "var_";
+    bool right_is_var = right->name ().substr (0, prefix.size ()) == prefix;
+    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ().add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "Process *" << new_name << " = new " << constructor << " ("
-        << m_parent_list.back ().name () << ", \"\", " << vright << ");\n";
-    check_and_build_connector (os, right, new_name, "\"input\"");
+    os << "Process *" << new_name << " = new " << constructor << " (" << m_parent_list.back ().name () << ", \"\", "
+        << vright << ");\n";
+    if (!right_is_var)
+      check_and_build_connector (os, right, new_name, "\"input\"");
     if (node->in_expression ()) {
       indent (os);
-      os << "new Activator (" << m_parent_list.back ().name () << ", \"\", "
-          << new_name << ", \"action\");\n";
+      os << "new Activator (" << m_parent_list.back ().name () << ", \"\", " << new_name << ", \"action\");\n";
     }
   }
 
   void
-  CPPBuilder::check_and_build_connector (std::ofstream &os, Node *n,
-                                         const std::string &name,
-                                         const std::string &side)
+  CPPBuilder::check_and_build_connector (std::ofstream &os, Node *n, const std::string &name, const std::string &side)
   {
     std::pair<std::string, std::string> p;
-    switch (n->node_type ()) {
-      case PATH: {
-        p = parse_symbol (n->name ());
-        break;
-      }
-      case BINARY_OP: {
-        p = parse_symbol (n->build_name ());
-        p.second = "\"result\"";
-        break;
-      }
-      case UNARY_OP: {
-        p = parse_symbol (n->build_name ());
-        p.second = "\"output\"";
-        break;
-      }
+    switch (n->node_type ())
+      {
+      case PATH:
+        {
+          p = parse_symbol (n->name ());
+          break;
+        }
+      case BINARY_OP:
+        {
+          p = parse_symbol (n->build_name ());
+          p.second = "\"result\"";
+          break;
+        }
+      case UNARY_OP:
+        {
+          p = parse_symbol (n->build_name ());
+          p.second = "\"output\"";
+          break;
+        }
       default:
         return;
-    }
+      }
     indent (os);
-    os << "new Connector (" << m_parent_list.back ().name () << ", \"\", "
-        << p.first << ", " << p.second << ", " << name << ", " << side
-        << ");\n";
+    os << "new Connector (" << m_parent_list.back ().name () << ", \"\", " << p.first << ", " << p.second << ", "
+        << name << ", " << side << ");\n";
   }
 
   void

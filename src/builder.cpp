@@ -453,6 +453,17 @@ namespace Smala {
           src.second = m_null_string;
         } else if (!ctrl->in ()->name ().empty ()) {
           src = parse_symbol (ctrl->in ()->name ());
+          std::string prefix = "var_";
+          bool _is_var = src.first.substr (0, prefix.size()) == prefix;
+	  if (_is_var) {
+	    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+	    indent (os);
+	    print_start_component (os, new_name, get_constructor ("Double"));
+	    os << "(" << node->parent ()->build_name () << ", " << m_null_string << ", " << src.first
+		<< ");\n";
+	    src.first = new_name;
+	    src.second = m_null_string;
+	  }
         } else {
           print_error_message (error_level::warning,
                                "anonymous component in input of control node",

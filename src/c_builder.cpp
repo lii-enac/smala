@@ -442,39 +442,53 @@ namespace Smala {
   }
 
   void
-  CBuilder::build_binary_node (std::ofstream &os, Node *node) {
+  CBuilder::build_binary_node (std::ofstream &os, Node *node)
+  {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *left = op->left ();
     Node *right = op->right ();
-    std::string vleft = left->node_type () == LITERAL ? left->name () : "0";
-    std::string vright = right->node_type () == LITERAL ? right->name () : "0";
+    std::string prefix = "var_";
+    std::string left_sym = m_parent_list.back ().get_symbol (left->name ());
+    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    bool left_is_var = left_sym.substr (0, prefix.size ()) == prefix;
+    if (left_is_var) {
+      left->set_name (left_sym);
+    }
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
+    if (right_is_var) {
+      right->set_name (right_sym);
+    }
+    std::string vleft = left->node_type () == LITERAL || left_is_var ? left->name () : "0";
+    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ().add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "djnComponent *" << new_name << " = " << constructor << " ("
-        << m_parent_list.back ().name () << ", 0, " << vleft << ", " << vright
-        << ");\n";
-    check_and_build_connector (os, left, new_name, "\"left\"");
-    check_and_build_connector (os, right, new_name, "\"right\"");
+    os << "djnComponent *" << new_name << " = " << constructor << " (" << m_parent_list.back ().name () << ", 0, "
+	<< vleft << ", " << vright << ");\n";
+    if (!left_is_var) check_and_build_connector (os, left, new_name, "\"left\"");
+    if (!right_is_var) check_and_build_connector (os, right, new_name, "\"right\"");
   }
 
   void
-  CBuilder::build_unary_node (std::ofstream &os, Node *node) {
+  CBuilder::build_unary_node (std::ofstream &os, Node *node)
+  {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *right = op->right ();
-    std::string vright = right->node_type () == LITERAL ? right->name () : "0";
+    std::string prefix = "var_";
+    bool right_is_var = right->name ().substr (0, prefix.size()) == prefix;
+    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ().add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "djnComponent *" << new_name << " = " << constructor << " ("
-        << m_parent_list.back ().name () << ", 0, " << vright << ");\n";
-    check_and_build_connector (os, right, new_name, "\"input\"");
+    os << "djnComponent *" << new_name << " = " << constructor << " (" << m_parent_list.back ().name () << ", 0, "
+	<< vright << ");\n";
+    if (!right_is_var) check_and_build_connector (os, right, new_name, "\"input\"");
   }
 
   void

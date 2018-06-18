@@ -523,11 +523,11 @@ namespace Smala
     std::string prefix = "var_";
     std::string left_sym = m_parent_list.back ().get_symbol (left->name ());
     std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
-    bool left_is_var = left_sym.substr (0, prefix.size ()) == prefix;
+    bool left_is_var = (left_sym.substr (0, prefix.size ())) == prefix && (left_sym.find ('.') == string::npos);
     if (left_is_var) {
       left->set_name (left_sym);
     }
-    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix && (right_sym.find ('.') == string::npos);
     if (right_is_var) {
       right->set_name (right_sym);
     }
@@ -557,7 +557,8 @@ namespace Smala
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *right = op->right ();
     std::string prefix = "var_";
-    bool right_is_var = right->name ().substr (0, prefix.size ()) == prefix;
+    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix && (right_sym.find ('.') == string::npos);
     std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 

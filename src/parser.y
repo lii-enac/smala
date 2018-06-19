@@ -135,6 +135,7 @@
 %token PAUSED_ASSIGNMENT "::"
 %token ASSIGNMENT_CPNT "Assignment"
 %token COMPONENT "Component"
+%token PROCESS "Process"
 %token STRING_CPNT "String"
 %token <string> CONTAINER "<container>"
 %token <string> POLY "<poly>"
@@ -381,6 +382,10 @@ type: INT_T
   $$ = STRING;
 }
 | COMPONENT
+{
+  $$ = NAME;
+}
+| PROCESS
 {
   $$ = NAME;
 }

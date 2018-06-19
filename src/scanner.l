@@ -97,6 +97,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "State"               { return Smala::Parser::make_STATE (Smala::location()); }
 "PixmapCache"         { return Smala::Parser::make_PIXMAP_CACHE (Smala::location()); }
 "Component"           { return Smala::Parser::make_COMPONENT (Smala::location()); }
+"Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
 "String"              { return Smala::Parser::make_STRING_CPNT (Smala::location()); }
 {CONTAINER}           { return Smala::Parser::make_CONTAINER (yytext, Smala::location ()); }
 {POLY}                { return Smala::Parser::make_POLY (yytext, Smala::location ()); }

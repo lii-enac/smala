@@ -471,7 +471,11 @@ namespace Smala {
       std::pair<ParamType, std::string> arg = node->args ().at (j);
       os << ", ";
       print_type (os, arg.first);
-      std::string new_name ("var_" + std::to_string (m_var_num++));
+      std::string new_name;
+      if (arg.first != NAME)
+        new_name = "var_" + std::to_string (m_var_num++);
+      else
+        new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       os << " " << new_name;
       if (m_parent_list.back ().add_entry (arg.second, new_name) == 1)
         print_error_message (error_level::warning,
@@ -538,8 +542,19 @@ namespace Smala {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *left = op->left ();
     Node *right = op->right ();
-    std::string vleft = left->node_type () == LITERAL ? left->name () : "0";
-    std::string vright = right->node_type () == LITERAL ? right->name () : "0";
+    std::string prefix = "var_";
+    std::string left_sym = m_parent_list.back ().get_symbol (left->name ());
+    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    bool left_is_var = left_sym.substr (0, prefix.size ()) == prefix;
+    if (left_is_var) {
+      left->set_name (left_sym);
+    }
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
+    if (right_is_var) {
+      right->set_name (right_sym);
+    }
+    std::string vleft = left->node_type () == LITERAL || left_is_var ? left->name () : "0";
+    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -549,14 +564,17 @@ namespace Smala {
     os << "Component " << new_name << " = new " << constructor << " ("
         << m_parent_list.back ().name () << ", null, " << vleft << ", "
         << vright << ");\n";
-    check_and_build_connector (os, left, new_name, "\"left\"");
-    check_and_build_connector (os, right, new_name, "\"right\"");
+    if (!left_is_var) check_and_build_connector (os, left, new_name, "\"left\"");
+    if (!right_is_var) check_and_build_connector (os, right, new_name, "\"right\"");
   }
 
   void
   JBuilder::build_unary_node (std::ofstream &os, Node *node) {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *right = op->right ();
+    std::string prefix = "var_";
+    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
     std::string vright = right->node_type () == LITERAL ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
@@ -566,7 +584,7 @@ namespace Smala {
     indent (os);
     os << "Component " << new_name << " = new " << constructor << " ("
         << m_parent_list.back ().name () << ", null, " << vright << ");\n";
-    check_and_build_connector (os, right, new_name, "\"input\"");
+    if (!right_is_var) check_and_build_connector (os, right, new_name, "\"input\"");
   }
 
   void

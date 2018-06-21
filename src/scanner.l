@@ -45,7 +45,7 @@ INT [0-9]+
 CONTAINER ("Set"|"List")
 POLY ("Polygon"|"Polyline")
 PATH ("Path"|"PathClip")
-PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath")
+PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
 GRADIENT ("LinearGradient"|"RadialGradient")
 ACTION ("run"|"stop"|"dump"|"notify"|"delete"|"XMLSerialize")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"

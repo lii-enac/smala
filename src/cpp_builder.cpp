@@ -223,7 +223,7 @@ namespace Smala
   void
   CPPBuilder::get_property (std::ofstream &os, Node *node)
   {
-    std::string var_name ("var_" + std::to_string (m_var_num++));
+    std::string var_name ("pr_var_" + std::to_string (m_var_num++));
     if (m_parent_list.back ().add_entry (node->name (), var_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
@@ -368,14 +368,23 @@ namespace Smala
   CPPBuilder::add_children_to (std::ofstream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    indent (os);
     std::pair<std::string, std::string> s = parse_symbol (node->name ());
-    os << "Process *" << new_name << " = " << s.first
-        << "->find_component (" << s.second << ");\n";
-    m_parent_list.push_back (
+
+    if (s.second.empty ()) {
+      indent (os);
+      os << "Process *" << new_name << " = " << s.first
+      << "->find_component (" << s.second << ");\n";
+      m_parent_list.push_back (
         BuildNode (new_name, m_parent_list.back ().sym_table ()));
     /* FIXME dirty trick to set the parent name of the enclosed nodes*/
-    node->set_build_name (new_name);
+      node->set_build_name (new_name);
+    }
+    else {
+      m_parent_list.push_back (
+        BuildNode (s.first, m_parent_list.back ().sym_table ()));
+    /* FIXME dirty trick to set the parent name of the enclosed nodes*/
+      node->set_build_name (s.first);
+    }
   }
 
   void

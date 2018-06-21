@@ -370,7 +370,7 @@ namespace Smala
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::pair<std::string, std::string> s = parse_symbol (node->name ());
 
-    if (s.second.empty ()) {
+    if (!s.second.empty ()) {
       indent (os);
       os << "Process *" << new_name << " = " << s.first
       << "->find_component (" << s.second << ");\n";

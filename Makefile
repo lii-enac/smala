@@ -9,6 +9,7 @@
 #	Contributors:
 #		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #		Stéphane Conversy <stephane.conversy@enac.fr>
+#		Mathieu Poirier	  <mathieu.poirier@enac.fr>
 #
 
 default: config.mk smalac
@@ -40,19 +41,25 @@ LIBS = -lboost_system
 # https://stackoverflow.com/a/33589760
 debugger := /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 
-ifndef OS
-OS := $(shell uname -s)
+ifndef os
+os := $(shell uname -s)
 endif
 
-ifeq ($(OS),Linux)
+ifeq ($(os),Linux)
 CXXFLAGS +=
 YACC = bison -d
 endif
 
-ifeq ($(OS),Darwin)
+ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
 #CFLAGS += -std=c++11
 endif
+
+ifeq ($(os),MINGW64_NT-10.0)
+YACC = bison -d
+endif
+
+
 LEX = flex
 
 # -----------

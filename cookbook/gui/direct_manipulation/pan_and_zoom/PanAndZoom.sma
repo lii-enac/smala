@@ -44,7 +44,7 @@ PanAndZoom (Component f) {
       f.press.y =: tempPos.y
 
       // define sequence of assignments to activate on mouse move
-      Component sequence {
+      AssignmentSequence sequence (1) {
         xpan + (f.move.x - tempPos.x) / zoom =: xpan
         ypan + (f.move.y - tempPos.y) / zoom =: ypan
         f.move.x =: tempPos.x
@@ -69,7 +69,7 @@ PanAndZoom (Component f) {
       Double p1y (0) // mouse y in screen coord system after zoom
 
       // define sequence of assignments to activate on mouse wheel
-      Component sequence {
+      AssignmentSequence sequence (1) {
         // remember mouse pos in local coord system before zoom
         // (as a local coord it won't change after zoom is applied)
         f.move.x / zoom - xpan =: p0x

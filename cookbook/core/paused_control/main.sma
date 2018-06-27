@@ -30,11 +30,13 @@ Component root {
 
   Incr incr (1)
   
-  // explicit sequence
-  set1 = t_prev.text =: t_prev_prev.text : 1 // 1st assignment to activate explicitly
-  set2 = t_cur.text =: t_prev.text : 1       // 2nd assignment to activate explicitly
-  f.press -> set1
-  set1 -> set2
+  // sequence of assignments to activate on mouse press
+  // (0 = lazy mode -> not activated when instanciated)
+  AssignmentSequence seq (0) {
+    t_prev.text =: t_prev_prev.text
+    t_cur.text =: t_prev.text
+  }
+  f.press -> seq
 
   // data flow (no need to sequence)
   t_prev.text -> incr       // everytime the sequence ends, activate incr...

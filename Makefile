@@ -191,6 +191,7 @@ endef
 
 #find * -type d -mindepth 1 -maxdepth 2 | xargs echo
 cookbook_apps := core/debug \
+	core/paused_control \
 	core/switch \
 	core/text_cat \
 	gui/direct_manipulation/simplest \

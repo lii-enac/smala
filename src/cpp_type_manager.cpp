@@ -180,6 +180,7 @@ namespace Smala {
       {"List", "List"},
       {"Set", "Set"},
       {"Component", "Component"},
+      {"AssignmentSequence", "AssignmentSequence"},
       {"Binding", "Binding"},
 //      {"Watcher", "djnCreateWatcher"},
       {"Assignment", "Assignment"},

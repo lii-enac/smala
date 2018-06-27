@@ -132,6 +132,7 @@
 %token PAUSED_CONNECTOR "::>"
 %token CONNECTOR_CPNT "Connector"
 %token ASSIGNMENT "=:"
+%token ASSIGNMENT_SEQUENCE "AssignmentSequence"
 %token PAUSED_ASSIGNMENT "::"
 %token ASSIGNMENT_CPNT "Assignment"
 %token COMPONENT "Component"
@@ -213,6 +214,7 @@
 %token <string> URI "URI"
 
 %type <int> items
+%type <int> assignment_items
 %type <int> points
 %type <int> path_points
 %type <int> gradient_stops
@@ -228,6 +230,7 @@
 %type <Node*> fsm_items
 %type <Node*> component_decl
 %type <Node*> container_decl
+%type <Node*> assignment_seq_decl
 %type <Node*> switch_decl
 %type <Node*> pixmap_cache_decl
 %type <Node*> poly_decl
@@ -1146,7 +1149,7 @@ right_side: full_expression
 //------------------------------------------------
 
 container: generic_container | poly | path | gradient | switch | fsm | pixmap_cache | component 
-| add_children_to
+| add_children_to | assignment_sequence
 
 add_children_to: start_add_children_to LCB item_list RCB
 {
@@ -1345,6 +1348,40 @@ switch_decl: SWITCH NAME_OR_PATH LP NAME_OR_PATH RP
 
   $$ = node;
 }
+
+assignment_sequence: assignment_seq_decl assignment_items
+{
+  Node *node = new Node ();
+  node->set_node_type (END_CONTAINER);
+  driver.add_node (node);
+  parent_list.pop_back ();
+}
+
+assignment_seq_decl: ASSIGNMENT_SEQUENCE NAME_OR_PATH LP INT RP
+{
+  Node *node = new Node ("AssignmentSequence", $2);
+  node->set_has_arguments (true);
+  node->set_node_type (CONTAINER);
+  node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  parent_list.push_back (node);
+  driver.add_node (node);
+
+  ArgNode *n = new ArgNode (VALUE, $4);
+  driver.add_node (n);
+  n = new ArgNode (END, "");
+  driver.add_node (n);
+
+  $$ = node;
+}
+
+assignment_items:  { $$ = 0; } |
+LCB assignment_item_list RCB
+{
+  $$ = 1;
+}
+
+assignment_item_list:
+| assignment_item_list assignment
 
 fsm: fsm_decl fsm_items
 {

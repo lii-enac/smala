@@ -89,6 +89,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "CCall"|"NativeCall"  { return Smala::Parser::make_NATIVE_CALL (Smala::location ()); }
 "aka"                 { return Smala::Parser::make_AKA (Smala::location ()); }
 "Assignment"          { return Smala::Parser::make_ASSIGNMENT_CPNT (Smala::location()); }
+"AssignmentSequence"  { return Smala::Parser::make_ASSIGNMENT_SEQUENCE (Smala::location()); }
 "Binding"             { return Smala::Parser::make_BINDING_CPNT (Smala::location()); }
 "Connector"           { return Smala::Parser::make_CONNECTOR_CPNT (Smala::location()); }
 "DashArray"           { return Smala::Parser::make_DASHARRAY (Smala::location()); }

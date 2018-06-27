@@ -190,9 +190,17 @@ deps += $$($1_app_objs:.o=.d)
 endef
 
 #find * -type d -mindepth 1 -maxdepth 2 | xargs echo
-cookbook_apps := core/text_cat core/switch core/debug \
-	gui/direct_manipulation/simplest gui/direct_manipulation/hysteresis \
-	gui/widgets/checkbox gui/widgets/tab gui/widgets/dial gui/widgets/button
+cookbook_apps := core/debug \
+	core/switch \
+	core/text_cat \
+	gui/direct_manipulation/simplest \
+	gui/direct_manipulation/hysteresis \
+	gui/direct_manipulation/pan_and_zoom \
+	gui/widgets/checkbox \
+	gui/widgets/tab \
+	gui/widgets/dial \
+	gui/widgets/button \
+	network/helloIvy
 
 cookbook_apps: $(notdir $(cookbook_apps))
 .PHONY: cookbook_apps $(notdir $(cookbook_apps))

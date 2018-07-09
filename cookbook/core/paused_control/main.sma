@@ -33,15 +33,14 @@ Component root {
   // sequence of assignments to activate on mouse press
   // (0 = lazy mode -> not activated when instanciated)
   AssignmentSequence seq (0) {
-    t_prev.text =: t_prev_prev.text
-    t_cur.text =: t_prev.text
+    t_prev.text :: t_prev_prev.text // paused assignment
+    t_cur.text =: t_prev.text       // assignment with propagation
   }
   f.press -> seq
 
   // data flow (no need to sequence)
-  t_prev.text -> incr       // everytime the sequence ends, activate incr...
-  incr.state => t_cur.text // ...and connect the increment value to current text...
-  // this connection can also be made without propagation (::>) in order to avoid a potential loop
+  t_prev.text -> incr      // everytime the sequence ends, activate incr...
+  incr.state => t_cur.text // ...and connect the increment value to current text.
 
 }
 

@@ -198,6 +198,7 @@ cookbook_apps := core/debug \
 	gui/direct_manipulation/hysteresis \
 	gui/direct_manipulation/pan_and_zoom \
 	gui/direct_manipulation/sketching_simple \
+	gui/direct_manipulation/sketching_advanced \
 	gui/widgets/checkbox \
 	gui/widgets/tab \
 	gui/widgets/dial \

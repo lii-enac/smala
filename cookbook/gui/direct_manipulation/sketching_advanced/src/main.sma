@@ -29,7 +29,7 @@ clearContent (Component src1, Component data1)
 
     addChildrenTo root {
         Component content {
-            FillColor fillColor (255, 255, 255)
+            NoFill nf
             OutlineColor outlineColor (255,255,255)
             OutlineWidth outlineWidth (2)
         }
@@ -111,7 +111,7 @@ Component root {
 
     // content (sketches are drawn here)
     Component content {
-        FillColor fillColor (255, 255, 255)
+        NoFill nf
         OutlineColor outlineColor (255,255,255)
         OutlineWidth outlineWidth (2)
     }

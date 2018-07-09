@@ -22,7 +22,7 @@ import Button
 _action_
 myFunc (Component c) 
 %{
-  printf ("my code\n");
+  cout << ("Button clicked") << endl;
 %}
 
 
@@ -36,15 +36,15 @@ Component root {
 
   myList = clone (n=5) {
     Button b (f, "myButton", 10, n * 100)
-    b.click->na
+    b.click -> na
   }
 
   e = find (myList.1.b)
   e.x = 100.0
-  Button b2 (f, "myVeryLongButton", 10, 150)
-  b2.click->ex
 
-  f.width > 200 ? 100 : 10 => b2.x
+  Button b2 (f, "myVeryLongButton", 10, 150)
+  b2.click -> ex
+  f.width > 200 ? 150 : 10 => b2.x
 }
 
 run root

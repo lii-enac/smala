@@ -17,28 +17,33 @@ use gui
 
 _define_
 Button (Component frame, string label, double x_, double y_) {
-  Component click
   Translation t (x_, y_)
 
+  /*----- interface -----*/
   x aka t.tx
   y aka t.ty
+  Spike click
+  /*----- interface -----*/
+
+  FillColor fc (50, 50, 50)
+  Rectangle r (0, 0, 100, 70, 10, 10)
 
   FSM fsm {
     State idle {
-      FillColor fc (50, 50, 50)
-      Rectangle r (0, 0, 100, 70, 10, 10)
+      50 =: fc.r
     }
     State pressed {
-      FillColor fc (150, 50, 50)
-      Rectangle r (0, 0, 100, 70, 10, 10)
+      150 =: fc.r
     }
-    idle->pressed (idle.r.press)
-    pressed->idle (pressed.r.release, click)
+    idle->pressed (r.press)
+    pressed->idle (r.release, click)
     pressed->idle (frame.release)
   }
+
   FillColor w (255, 255, 255)
   Text thisLabel (10, 10, label)
-  fsm.idle.r.height / 2 =: thisLabel.y
-  thisLabel.width + 20 => fsm.idle.r.width
-  thisLabel.width + 20 => fsm.pressed.r.width
+
+  r.height / 2 =: thisLabel.y
+  thisLabel.width + 20 => r.width
+  thisLabel.width + 20 => r.width
 }

@@ -32,7 +32,7 @@ reorder_tabs_action (Component c)
 	unselect->activation ();
 	// get its original index...
 	int old_selected_index = ((IntProperty*) old_selected_tab->find_component ("index"))->get_value ();
-	sprintf (spec, "<%d", old_selected_index+1); // FIXME: PBLM IN LIST INDICES IN insert() -> REMOVE +1 WHEN PBLM FIXED
+	sprintf (spec, "<%d", old_selected_index);
 	// ...and move it back to its original place
 	tabs_list->remove_child (old_selected_tab);
 	tabs_list->insert (old_selected_tab, spec);

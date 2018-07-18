@@ -65,24 +65,21 @@ PanAndZoom (Component f) {
 
       Double p0x (0) // mouse x in local coord system before zoom
       Double p0y (0) // mouse y in local coord system before zoom
-      Double p1x (0) // mouse x in screen coord system after zoom
-      Double p1y (0) // mouse y in screen coord system after zoom
 
       // define sequence of assignments to activate on mouse wheel
-      AssignmentSequence sequence (1) {
+      AssignmentSequence sequence (0) {
         // remember mouse pos in local coord system before zoom
         // (as a local coord it won't change after zoom is applied)
         f.move.x / zoom - xpan =: p0x
         f.move.y / zoom - ypan =: p0y
         // apply new zoom
         zoom * scaleFactor =: zoom
-        // compute the new position (after zoom is applied) of the 
-        // initial pointed point in screen coord system
-        (p0x + xpan) * zoom =: p1x
-        (p0y + ypan) * zoom =: p1y
-        // translate to make believe that zoom is mouse centered
-        xpan + (f.move.x - p1x) / zoom =: xpan
-        ypan + (f.move.y - p1y) / zoom =: ypan
+        // After the zoom is applied, p0 has become p1 = p0 * scaleFactor
+        // So to make believe that zoom is mouse centered, we must apply
+        // a new translation (p0 - p1) taking the scaleFactor into account
+        // i.e replace pan by (pan + p0 - p1)/scaleFactor
+        (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
+        (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
       }
       f.wheel -> sequence, cl
     }

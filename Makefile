@@ -191,9 +191,8 @@ endef
 
 #find * -type d -mindepth 1 -maxdepth 2 | xargs echo
 cookbook_apps := core/text_cat core/switch core/debug \
-	gui/direct_manipulation/hysteresis \
-	gui/widgets/checkbox gui/widgets/tab gui/widgets/dial gui/widgets/button \
-	network/helloIvy
+	gui/direct_manipulation/simplest gui/direct_manipulation/hysteresis \
+	gui/widgets/checkbox gui/widgets/tab gui/widgets/dial gui/widgets/button
 
 cookbook_apps: $(notdir $(cookbook_apps))
 .PHONY: cookbook_apps $(notdir $(cookbook_apps))

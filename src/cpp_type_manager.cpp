@@ -35,10 +35,10 @@ namespace Smala {
     displayGlobalSymbols = displayGS;
 
     type_entry inputGS[] = {
-#if 0
       {"InputDevices", "djnInputDevices"},
       {"Mice", "djnMice"},
       {"TouchPanels", "djnTouchPanels"},
+#if 0
       {"Styluses", "djnStyluses"},
       {"RawPointers", "djnRawPointers"},
       {"Joysticks", "djnJoysticks"},

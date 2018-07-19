@@ -192,6 +192,11 @@ namespace Smala
       os << "mouse_tracking = " << node->args ().at (0).second << ";\n";
       return;
     }
+    if (node->name ().compare ("fullScreen") == 0) {
+      indent (os);
+      os << "full_screen = " << node->args ().at (0).second << ";\n";
+      return;
+    }
     indent (os);
     os << "((" << node->djnn_type ().substr (3) << "Property*) ";
     std::pair<std::string, std::string> arg = parse_symbol (node->name ());

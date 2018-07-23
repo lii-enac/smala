@@ -463,10 +463,11 @@ namespace Smala
     /* init modules from use */
     for (int i = 0; i < size; ++i) {
       std::string str = m_ast.preamble ().use ().at (i);
-      if (str.compare ("gui") == 0 || str.compare ("core") == 0 || str.compare ("input") == 0) {
-        indent (os);
-        os << "init_" << str << " ();\n";
-      }
+     
+      /* add cpp init_MODULE corresponding */
+      indent (os);
+      os << "init_" << str << " ();\n";
+    
     }
   }
 

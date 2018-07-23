@@ -1058,9 +1058,7 @@ start_alternative: full_expression QUESTION_MARK
   AlternativeNode *alt = new AlternativeNode ();
 
   for (auto n: expression) {
-    Node *a = new ActivatorNode (n);
-    driver.add_node (a);
-    a->set_parent (parent_list.back ());
+    n->set_in_expression (true);
   }
   expression.clear ();
   string s = "\"undef\"";

@@ -151,6 +151,16 @@ namespace Smala {
           get_property (os, node);
           break;
         }
+      case MACRO:
+        {
+          if (!node->name ().empty () && !node->djnn_type ().empty ()) {
+             if (m_parent_list.back ().add_entry (node->djnn_type (), node->name ()) == 1
+                 && node->duplicate_warning ())
+               print_error_message (error_level::warning,
+                                    "duplicated macro: " + node->djnn_type (), 0);
+           }
+          break;
+        }
       case ALIAS:
         {
           alias (os, node);

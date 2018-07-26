@@ -934,7 +934,7 @@ NAME_OR_PATH SIMPLE_EQ full_expression assignment_symbol NAME_OR_PATH is_model
 {
   string type = $4 == 1 ? "Assignment" : "PausedAssignment";
   if ($3->node_type () == ALTERNATIVE) {
-    cerr << "error: Alternaive cannot be named \n";
+    cerr << "error: Alternative cannot be named \n";
     driver.set_error ();
   } else {
     vector< pair<ParamType, string> > params;

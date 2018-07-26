@@ -51,6 +51,7 @@ namespace Smala {
     LITERAL,
     LOAD_XML,
     LOCAL_NODE,
+    MACRO,
     MERGE,
     NATIVE_ACTION,
     NATIVE_ACTION_CPNT,

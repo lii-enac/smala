@@ -221,6 +221,7 @@
 %type <int> arguments
 %type <int> connector_symbol
 %type <int> assignment_symbol
+%type <string> literal
 %type <string> cpnt_type
 %type <string> is_model
 %type <string> clone_arg
@@ -405,7 +406,30 @@ item_list:
 | item_list item
 
 item: simple_component | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | clone | remove | string_cat | rough_code
+  | find | native | c_call | action | merge | clone | remove | string_cat | rough_code | macro
+
+macro : NAME_OR_PATH COLON literal
+{
+  Node *n = new Node ($1, $3);
+  driver.add_node (n);
+  n->set_node_type (MACRO);
+}
+
+literal:
+INT
+{
+  $$ = $1;
+}
+|
+DOUBLE
+{
+  $$ = $1;
+}
+|
+STRING
+{
+  $$ = $1;
+}
 
 string_cat: STRING_CPNT NAME_OR_PATH SIMPLE_EQ cat_expression
 {

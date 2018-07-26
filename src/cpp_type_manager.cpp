@@ -113,6 +113,7 @@ namespace Smala {
       {"Log10", "Log10"},
       {"Pow", "Pow"},
       {"Sqrt", "Sqrt"},
+      {"Abs", "Abs"},
 //      {"Normalizer", "djnCreateNormalizer"},
       {"ArcCosine", "ArcCosine"},
       {"ArcSine", "ArcSine"},

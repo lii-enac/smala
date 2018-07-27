@@ -1006,7 +1006,7 @@ full_expression :
 | full_expression EQ full_expression { $$ = make_BINARY_OP(driver, "EqualityComparator", $1, $3); }
 | full_expression NEQ full_expression { $$ = make_BINARY_OP_INVERT(driver, "EqualityComparator", $1, $3); }
 | MINUS full_expression %prec NOT { $$ = make_UNARY_OP(driver, "SignInverter", $2); }
-| NOT full_expression { $$ = make_UNARY_OP(driver, "SignInverter", $2); }
+| NOT full_expression { $$ = make_UNARY_OP(driver, "Not", $2); }
 | alternative { $$ = $1; }
 | expression_term { $$ = $1; }
 ;

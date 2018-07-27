@@ -65,6 +65,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "*"                   { return Smala::Parser::make_TIMES (Smala::location ()); }
 "/"                   { return Smala::Parser::make_DIVIDE (Smala::location ()); }
 "?"                   { return Smala::Parser::make_QUESTION_MARK (Smala::location ()); }
+"!"                   { return Smala::Parser::make_NOT (Smala::location ()); }
 ":"                   { return Smala::Parser::make_COLON (Smala::location ()); }
 "=>"                  { return Smala::Parser::make_CONNECTOR (Smala::location ()); }
 "::>"                 { return Smala::Parser::make_PAUSED_CONNECTOR (Smala::location ()); }

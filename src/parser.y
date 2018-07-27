@@ -240,7 +240,7 @@
 %type <Node*> path_point_decl
 %type <Node*> simple_component_decl
 %type <Node*> string_decl
-%type < vector<string> > dst_list
+%type < vector<string> > process_list
 %type <Node*> full_expression
 %type <Node*> expression_term
 %type <Node*> cat_expression
@@ -483,7 +483,7 @@ STRING
   $$ = node;
 }
 
-action: ACTION dst_list
+action: ACTION process_list
 {
   $1[0] = std::toupper ($1[0]);
   InstructionNode *node = new InstructionNode ($1);
@@ -870,7 +870,7 @@ comma: COMMA
 
 //------------------------------------------------
 
-connector: full_expression connector_symbol dst_list
+connector: full_expression connector_symbol process_list
 {
   string type;
   if ($2 == 1)
@@ -905,7 +905,7 @@ connector: full_expression connector_symbol dst_list
 
 connector_symbol: CONNECTOR { $$ = 1; } | PAUSED_CONNECTOR { $$ = 0; }
 
-binding: NAME_OR_PATH ARROW dst_list
+binding: NAME_OR_PATH ARROW process_list
 {
   for (int i = 0; i < $3.size (); ++i) {
     CtrlNode *node = new CtrlNode ("Binding", "");
@@ -920,7 +920,7 @@ binding: NAME_OR_PATH ARROW dst_list
     }
 }
 
-assignment: full_expression assignment_symbol dst_list is_model
+assignment: full_expression assignment_symbol process_list is_model
 {
   string type = $2 == 1 ? "Assignment" : "PausedAssignment";
   for (int i = 0; i < $3.size (); ++i) {
@@ -981,8 +981,8 @@ assignment_symbol: ASSIGNMENT { $$ = 1; } | PAUSED_ASSIGNMENT { $$ = 0; }
 
 is_model: { $$ = "0"; } | COLON INT { $$ = $2; }
 
-dst_list: NAME_OR_PATH { vector<string> dst; dst.push_back ($1); $$ = dst;}
-| dst_list COMMA NAME_OR_PATH
+process_list: NAME_OR_PATH { vector<string> dst; dst.push_back ($1); $$ = dst;}
+| process_list COMMA NAME_OR_PATH
 {
   $1.push_back ($3);
   $$ = $1;
@@ -1483,7 +1483,41 @@ transition: NAME_OR_PATH ARROW NAME_OR_PATH LP NAME_OR_PATH RP
   driver.add_node (node);
   node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 }
+| LCB process_list RCB ARROW NAME_OR_PATH LP NAME_OR_PATH RP
+{
+  for (auto s: $2) {
+    vector< pair<ParamType, string> >args;
+    args.push_back (make_pair (NAME, $7));
+    CtrlNode *node = new CtrlNode ("FSMTransition", "", args);
+    Node *in = new Node ("Name", s);
+    in->set_node_type (PATH);
+    node->set_in (in);
+    Node *out = new Node ("Name", $5);
+    out->set_node_type (PATH);
+    node->set_out (out);
+    driver.add_node (node);
+    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  }
+}
+| LCB process_list RCB ARROW NAME_OR_PATH LP NAME_OR_PATH COMMA NAME_OR_PATH RP
+{
+  for (auto s: $2) {
+    vector< pair<ParamType, string> >args;
+    args.push_back (make_pair (NAME, $7));
+    args.push_back (make_pair (NAME, $9));
+    CtrlNode *node = new CtrlNode ("FSMTransition", "", args);
 
+    Node *in = new Node ("Name", s);
+    in->set_node_type (PATH);
+    node->set_in (in);
+    Node *out = new Node ("Name", $5);
+    out->set_node_type (PATH);
+    node->set_out (out);
+
+    driver.add_node (node);
+    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  }
+}
 
 pixmap_cache: pixmap_cache_decl items
 {

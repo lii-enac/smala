@@ -104,7 +104,7 @@ namespace Smala {
       {"Modulo", "Modulo"},
       {"Multiplier", "Multiplier"},
       {"SignInverter", "SignInverter"},
-      {"Predecessor", "Predecessor"},
+      {"Previous", "Previous"},
       {"StrictAscendingComparator", "StrictAscendingComparator"},
       {"Subtractor", "Subtractor"},
       {"HermiteCurve", "HermiteCurve"},

@@ -190,6 +190,7 @@ namespace Smala {
 //      {"Watcher", "djnCreateWatcher"},
       {"Assignment", "Assignment"},
       {"PausedAssignment", "PausedAssignment"},
+      {"Timer", "Timer"},
 //      {"LibraryLoader", "djnCreateLibraryLoader"},
 //      {"NativeThread", "djnCreateNativeThread"},
       {"0", "0"}

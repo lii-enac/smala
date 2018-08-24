@@ -78,6 +78,7 @@ namespace Smala {
 
     type_entry animation_t[] = {
       {"SlowInSlowOutInterpolator","SlowInSlowOutInterpolator"},
+      {"Oscillator", "Oscillator"},
       {"0", "0"}
     };
     animation_types = animation_t;

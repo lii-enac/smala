@@ -38,9 +38,6 @@ CFLAGS = -g -MMD
 CXXFLAGS = $(CFLAGS) -std=c++14
 LIBS = -lboost_system
 
-# https://stackoverflow.com/a/33589760
-debugger := /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
-
 ifndef os
 os := $(shell uname -s)
 endif
@@ -49,12 +46,15 @@ ifeq ($(os),Linux)
 CXXFLAGS +=
 YACC = bison -d
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
+debugger := gdb
 endif
 
 ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
 #CFLAGS += -std=c++11
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
+# https://stackoverflow.com/a/33589760
+debugger := /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 endif
 
 ifeq ($(os),MINGW64_NT-10.0)
@@ -256,6 +256,7 @@ $(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
 # -----------
 
 test: $(cookbook_app_for_make_test)_test
+dbg: $(cookbook_app_for_make_test)_dbg
 .PHONY: test
 
 tgz: #clean

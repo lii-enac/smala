@@ -48,11 +48,13 @@ endif
 ifeq ($(os),Linux)
 CXXFLAGS +=
 YACC = bison -d
+LD_LIBRARY_PATH=LD_LIBRARY_PATH
 endif
 
 ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
 #CFLAGS += -std=c++11
+LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 endif
 
 ifeq ($(os),MINGW64_NT-10.0)
@@ -172,9 +174,9 @@ $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
 $$(notdir $1)_test: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env DYLD_LIBRARY_PATH=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env DYLD_LIBRARY_PATH=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
 
 
 .PHONY: $1 $1_test $1_dbg

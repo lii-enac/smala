@@ -185,6 +185,7 @@ namespace Smala {
  //     {"NativeResource", "djnCreateNativeResource"},
       {"List", "List"},
       {"Set", "Set"},
+      {"SetIterator", "SetIterator"},
       {"Component", "Component"},
       {"AssignmentSequence", "AssignmentSequence"},
       {"Binding", "Binding"},

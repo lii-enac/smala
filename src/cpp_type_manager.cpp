@@ -186,6 +186,7 @@ namespace Smala {
       {"List", "List"},
       {"Set", "Set"},
       {"SetIterator", "SetIterator"},
+      {"ListIterator", "ListIterator"},
       {"Component", "Component"},
       {"AssignmentSequence", "AssignmentSequence"},
       {"Binding", "Binding"},

@@ -25,7 +25,8 @@ help:
 	@echo "experiment make -j !!"
 
 config.mk:
-	cp config.mk.default config.mk
+	cp config.default.mk config.mk
+include config.default.mk
 -include config.mk
 
 # remove builtin rules : speed up build process and help debug

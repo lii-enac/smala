@@ -32,8 +32,17 @@ config.mk:
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
-#CC = gcc
-#CXX = g++
+# cross-compile support
+ifndef cross_prefix
+cross_prefix := llvm-g
+#cross_prefix := g
+#cross_prefix := arm-none-eabi-
+#cross_prefix := em
+#cross_prefix := i686-w64-mingw32-
+endif
+
+CC := $(cross_prefix)cc
+CXX := $(cross_prefix)++
 CFLAGS = -g -MMD
 CXXFLAGS = $(CFLAGS) -std=c++14
 LIBS = -lboost_system
@@ -59,6 +68,17 @@ endif
 
 ifeq ($(os),MINGW64_NT-10.0)
 YACC = bison -d
+endif
+
+ifeq ($(cross_prefix),em)
+EMFLAGS := -s USE_SDL=2 -s FULL_ES2=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_ALL=1 #-s SIMD=1 
+CFLAGS += $(EMFLAGS) \
+	-I/usr/local/include -I/usr/local/Cellar/expat/2.2.6/include -I/usr/local/Cellar/curl/7.61.0/include
+LDFLAGS += $(EMFLAGS) \
+	-L../expat-2.2.6/lib/.libs -L../curl-7.61.0/lib/.libs
+
+os := em
+EXE := .html
 endif
 
 
@@ -153,7 +173,7 @@ $1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
 #$1_app_objs := $$($1_app_srcs:.sma=.o)
 $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
-$1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app
+$1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 
 ifeq ($$(lang_cookbook_app),c)
@@ -268,8 +288,13 @@ clean_not_deps:
 	find build -type f -not -name "*.d" | xargs rm
 .PHONY: clean_not_deps
 
+clean_tests:
+	rm -rf $(build_dir)/cookbook
+.PHONY: clean_test
+
+
 distclean clear clean:
-	rm -rf build
+	rm -rf $(build_dir)
 .PHONY: distclean clear clean
 
 truc:

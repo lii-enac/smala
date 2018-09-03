@@ -85,7 +85,6 @@ namespace Smala {
 
 
     type_entry base_t[] = {
-//      {"LogPrinter", "djnCreateLogPrinter"},
 //      {"RegexpFilter", "djnCreateRegexpFilter"},
 //      {"PN", "djnCreatePN"},
 //      {"PNPlace", "djnCreatePNPlace"},
@@ -93,7 +92,6 @@ namespace Smala {
 //      {"PNInputTransition", "djnCreatePNInputTransition"},
 //      {"PNArc", "djnCreatePNArc"},
 //      {"Noop", "djnCreateNoop"},
-//      {"Counter", "djnCreateCounter"},
  //     {"JsonSerializeComponent", "djnJsonSerializeComponent"},
       {"Abs", "Abs"},
       {"Adder", "Adder"},
@@ -109,6 +107,7 @@ namespace Smala {
       {"Clock", "Clock"},
       {"Connector", "Connector"},
       {"Cosine", "Cosine"},
+      {"Counter", "Counter"},
       {"Divider", "Divider"},
       {"DoubleFormatter", "DoubleFormatter"},
       {"EqualityComparator", "EqualityComparator"},
@@ -126,6 +125,7 @@ namespace Smala {
       {"Incr", "Incr"},
       {"Log", "Log"},
       {"Log10", "Log10"},
+      {"LogPrinter", "LogPrinter"},
       {"Max", "Max"},
       {"Min", "Min"},
       {"Modulo", "Modulo"},

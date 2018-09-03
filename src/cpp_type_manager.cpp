@@ -92,6 +92,7 @@ namespace Smala {
       {"FSMState", "FSMState"},
       {"FSMTransition", "FSMTransition"},
       {"Switch", "Switch"},
+      {"SwitchList", "SwitchList"},
       {"Or", "Or"},
       {"Xor", "Xor"},
       {"And", "And"},

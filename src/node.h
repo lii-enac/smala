@@ -57,6 +57,7 @@ namespace Smala {
     NATIVE_ACTION_CPNT,
     NATIVE_CODE,
     NATIVE_JAVA,
+    NEW_LINE,
     PATH,
     REMOVE,
     SET_PARENT,

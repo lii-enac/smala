@@ -52,6 +52,10 @@ namespace Smala {
     void build_unary_node (std::ofstream &os, Node *node) override;
     void build_transition_node (std::ofstream &os, CtrlNode *ctrl) override;
     void build_smala_native (std::ofstream &os, Node *node) override;
+    void build_new_line (std::ofstream &os, NewLineNode *n) override {
+        Builder::build_new_line (os, n);
+        os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
+    }
     void check_and_build_connector (std::ofstream &os, Node *n, const std::string &name, const std::string &side);
     void print_native_code (std::ofstream &os);
     void print_component_decl (std::ofstream &os, const std::string &name) override;

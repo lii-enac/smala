@@ -269,7 +269,7 @@ program: preamble body
 preamble:
 | preamble use
 | preamble import
-| preamble native_code
+| preamble native_code { driver.end_debug (); }
 
 use: USE NAME_OR_PATH
 {
@@ -283,7 +283,7 @@ import: IMPORT NAME_OR_PATH
 
 native_code: native_action | smala_action | rough_code | native_java
 
-native_java: NATIVE_JAVA CODE{
+native_java: NATIVE_JAVA CODE {
   string str = $2.substr (2, $2.length () - 4);
   driver.add_native_java (str);
 }
@@ -303,6 +303,7 @@ smala_action: smala_native_start LCB item_list RCB
 
 smala_native_start: NATIVE_ACTION NAME_OR_PATH LP COMPONENT NAME_OR_PATH COMMA COMPONENT NAME_OR_PATH RP
 {
+  driver.start_debug ();
   SmalaNative *native = new SmalaNative ($2, $5, $8);
   driver.add_node (native);
 }
@@ -313,7 +314,7 @@ rough_code: NATIVE_CODE CODE
   driver.add_native_code (str);
 }
 
-body: start_main item action_list | define_list
+body: start_main item action_list { driver.end_debug (); } | define_list { driver.end_debug (); }
 
 define_list:
 | define_list define
@@ -335,6 +336,7 @@ action_list:
 start_main: MAIN
 {
   driver.end_preamble ();
+  driver.start_debug ();
   Node *start = new Node ();
   start->set_node_type (START_MAIN);
   driver.add_node (start);
@@ -344,6 +346,7 @@ start_main: MAIN
 start_define: DEFINE NAME_OR_PATH LP parameters RP
 {
   driver.end_preamble ();
+  driver.start_debug ();
   driver.set_is_main (false);
   Node *node = new Node  ("define_start", $2, $4);
   node->set_node_type (START_DEFINE);

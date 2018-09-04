@@ -15,6 +15,8 @@
 #include "driver.h"
 
 #include "node.h"
+#include "new_line_node.h"
+
 
 using namespace Smala;
 
@@ -110,6 +112,14 @@ Driver::end_preamble ()
 {
   m_ast.end_preamble ();
 }
+
+
+void
+Driver::new_line ()
+{
+  m_ast.add_node(new NewLineNode(m_file, m_line));
+}
+
 
 const Ast&
 Driver::ast ()

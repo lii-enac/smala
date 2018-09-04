@@ -44,6 +44,11 @@ public:
     void set_is_main (bool val);
     void set_error ();
     void end_preamble ();
+    void new_line();
+    void start_debug () { _debug = true; }
+    void end_debug () { _debug = false; }
+    bool debug () { return _debug; }
+
     const Ast& ast ();
     smala::ErrorLocation* location () const;
 
@@ -58,6 +63,7 @@ private:
     std::string m_file;
     Ast m_ast;
     int m_error;
+    bool _debug;
 };
 
 }

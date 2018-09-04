@@ -139,7 +139,9 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {NAME}(("."({NAME}|{INT}))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }
 <<EOF>>               { return yyterminate (); }
-[\t \n;\.]+             {}
+[\t ;\.]+             {}
+[\n]                  { if (m_driver.debug())
+                          m_driver.new_line(); }
 %%
 
 ////("+"|"-")?{INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }

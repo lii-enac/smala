@@ -29,7 +29,7 @@ class Preamble;
 
 class Driver {
 public:
-    Driver ();
+    Driver (bool debug_mode);
     ~Driver ();
     int parse();
     void set_stream (std::istream *is, const std::string& filename);
@@ -64,6 +64,7 @@ private:
     Ast m_ast;
     int m_error;
     bool _debug;
+    bool m_debug_mode;
 };
 
 }

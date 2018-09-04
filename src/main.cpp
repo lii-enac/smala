@@ -28,7 +28,7 @@ using namespace std;
 
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
-	Driver driver;
+	Driver driver (arg.debug());
 	Builder *b;
 	int error = 0;
 	switch (arg.lang ()) {

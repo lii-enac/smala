@@ -19,7 +19,7 @@ namespace Smala
 {
 
   Argument::Argument (int argc, const char** argv) :
-    _lang (CPP)
+    _lang (CPP), _debug (false)
     {
     int i;
     m_program_name = argv[0];
@@ -54,6 +54,9 @@ namespace Smala
             usage ();
             return;
           }
+        }
+        else if (str.compare ("-g") == 0) {
+          _debug = true;
         }
       }
     }

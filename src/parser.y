@@ -314,13 +314,14 @@ rough_code: NATIVE_CODE CODE
   driver.add_native_code (str);
 }
 
-body: start_main item action_list { driver.end_debug (); } | define_list { driver.end_debug (); }
+body: start_main item action_list { driver.end_debug (); } | define_list
 
 define_list:
 | define_list define
 
 define: start_define LCB item_list RCB
 {
+  driver.end_debug ();
   Node *end = new Node ();
   end->set_node_type (END_DEFINE);
   driver.add_node (end);

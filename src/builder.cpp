@@ -280,6 +280,11 @@ namespace Smala {
           build_activator (os, n);
           break;
         }
+      case NEW_LINE:
+        {
+          build_new_line (os, static_cast<NewLineNode*> (node));
+          break;
+        }
       default:
         return;
       }

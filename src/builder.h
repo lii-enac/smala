@@ -21,6 +21,8 @@
 #include "ctrl_node.h"
 #include "type_manager.h"
 #include "ast.h"
+#include "new_line_node.h"
+
 
 namespace Smala {
 
@@ -108,6 +110,10 @@ namespace Smala {
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
     virtual void build_binary_node (std::ofstream &os, Node *n) = 0;
     virtual void build_unary_node (std::ofstream &os, Node *n) = 0;
+    virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
+        os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
+    }
+    
   };
 
 }

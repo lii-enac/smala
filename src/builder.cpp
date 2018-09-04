@@ -641,7 +641,7 @@ Builder::print_error_message (error_level::level_t level,
                               const std::string& message, int error) {
   const std::string error_level_str[] =
     { "log", "warning", "error" };
-  std::cerr << m_curloc->file () << ":" << m_curloc->line () - 1 << ": "
+  std::cerr << m_curloc->file () << ":" << m_curloc->line () << ":" << m_curloc->position () << ": "
       << error_level_str[(int) level] << ": " << message << std::endl;
   m_error |= error;
 }

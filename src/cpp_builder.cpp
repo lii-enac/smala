@@ -53,6 +53,7 @@ namespace Smala
     m_parent_list.push_back (BuildNode ("nullptr")); // the first parent is null
     if (!ast.is_main ())
       build_define (prefix);
+    m_filename = std::string (prefix) + ".cpp";
     std::ofstream os (prefix + ".cpp");
     os << "#include <iostream>\n";
     os << "#include \"core/core-dev.h\"\n";

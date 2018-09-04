@@ -63,6 +63,9 @@ int main (int argc, const char **argv) {
 				prefix = filename.substr(0, filename.size() - 4);	
 			}
 			error |= b->build (driver.ast (), arg.get_option("builddir"), prefix);
+			if (error) {
+			  remove (b->filename ().c_str());
+			}
 		} else {
 			std::cerr << "could not open " << filename << std::endl;
 			error = 1;

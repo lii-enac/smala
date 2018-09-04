@@ -1,7 +1,3 @@
-Component root() {
-  Button b("Quit", 0, 0)
-}
-:::component definition outside of _main_ or _define_
 _define_
 Component root() {
   Button b("Quit", 0, 0)
@@ -20,3 +16,7 @@ foo() {
     r = loadXML ("file:///Users/letondal/Documents/Projets/AIRTIUS/dev/essais_djnn/sandbox/button.svg")
 }
 :::unknown loadXML, did you mean loadFromXML?
+Component root() {
+  Button b("Quit", 0, 0)
+}
+:::component definition outside of _main_ or _define_

@@ -33,7 +33,7 @@ public:
 	const std::map<std::string, std::string>& options () const;
 
 	Language lang () { return _lang; }
-
+	bool debug () { return _debug; }
   std::string get_option (const std::string& key);
 	void usage ();
 
@@ -42,6 +42,7 @@ private:
 	std::map<std::string, std::string> m_options;
 	Language _lang;
 	std::string m_program_name;
+	bool _debug;
 };
 
 } /* namespace Smala */

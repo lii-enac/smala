@@ -20,8 +20,8 @@
 
 using namespace Smala;
 
-Driver::Driver () :
-    m_scanner (*this), m_parser (m_scanner, *this), m_line (0), m_pos (0), m_error (0)
+Driver::Driver (bool debug_mode) :
+    m_scanner (*this), m_parser (m_scanner, *this), m_line (0), m_pos (0), m_error (0), _debug (false), m_debug_mode (debug_mode)
 {
 }
 
@@ -117,7 +117,8 @@ Driver::end_preamble ()
 void
 Driver::new_line ()
 {
-  m_ast.add_node(new NewLineNode(m_file, m_line));
+  if (m_debug_mode)
+    m_ast.add_node(new NewLineNode(m_file, m_line));
 }
 
 

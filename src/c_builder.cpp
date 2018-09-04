@@ -49,6 +49,7 @@ namespace Smala {
     m_parent_list.push_back (BuildNode ("0")); // the first parent is null
     if (!ast.is_main ())
       build_define (prefix);
+    m_filename = std::string (prefix) + ".c";
     std::ofstream os (prefix + ".c");
 
     build_preamble (os);

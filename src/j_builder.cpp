@@ -61,6 +61,7 @@ namespace Smala {
       }
     }
 
+    m_filename = std::string (builddir) + "/" + m_class_name + ".java";
     std::ofstream os (builddir + "/" + m_class_name + ".java");
     if (!os.good ()) {
       std::cout << "Unable to create java file "

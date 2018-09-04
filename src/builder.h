@@ -58,11 +58,11 @@ namespace Smala {
     }
     virtual ~Builder () {};
     virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix) = 0;
-
+    string filename () { return m_filename; }
   protected:
     smala::ErrorLocation *m_curloc;
     int m_indent, m_cpnt_num, m_var_num, m_error;
-    std::string m_null_symbol, m_null_string;
+    std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
     std::vector<BuildNode> m_parent_list;

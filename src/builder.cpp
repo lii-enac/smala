@@ -385,7 +385,11 @@ namespace Smala {
     std::string constructor = get_constructor (node->djnn_type ());
     std::string name =
         node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
+
+    if (node->name ().compare ("_") == 0)
+      node->set_name ("");
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+
     node->set_build_name (new_name);
     if (!node->name ().empty ()) {
       if (m_parent_list.back ().add_entry (node->name (), new_name) == 1

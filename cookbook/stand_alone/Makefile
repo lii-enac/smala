@@ -69,7 +69,7 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(srcs_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(shell pwd)/$(exe))
+	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(shell pwd)/$(exe))
 .PHONY: test
 
 CXXFLAGS ?= -g -std=c++14

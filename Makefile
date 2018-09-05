@@ -130,7 +130,7 @@ $(build_dir)/src/main.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/c_builde
 
 
 # ------------
-# merr error reporting tool
+# merr error reporting tool for smalac
 
 merr := $(build_dir)/merr/merr
 merr_objs := merr.o
@@ -233,27 +233,6 @@ cookbook_apps: $(notdir $(cookbook_apps))
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 
-
-# from sources
-
-$(build_dir)/%.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(build_dir)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# for generated .c
-$(build_dir)/%.o: $(build_dir)/%.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# for generated .cpp
-$(build_dir)/%.o: $(build_dir)/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
@@ -270,7 +249,25 @@ $(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
 	@mv $*.c $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
+# from .c user sources
+$(build_dir)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
+# from .cpp user sources
+$(build_dir)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# for .c generated sources
+$(build_dir)/%.o: $(build_dir)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# for .cpp generated sources
+$(build_dir)/%.o: $(build_dir)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
 

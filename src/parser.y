@@ -293,6 +293,12 @@ native_action: NATIVE_ACTION NAME_OR_PATH LP COMPONENT NAME_OR_PATH RP CODE
   string str = $7.substr (2, $7.length () - 4);
   driver.add_native_action ($2, $5, str);
 }
+|
+NATIVE_ACTION NAME_OR_PATH LP PROCESS NAME_OR_PATH RP CODE
+{
+  string str = $7.substr (2, $7.length () - 4);
+  driver.add_native_action ($2, $5, str);
+}
 
 smala_action: smala_native_start LCB item_list RCB 
 {
@@ -302,6 +308,13 @@ smala_action: smala_native_start LCB item_list RCB
 }
 
 smala_native_start: NATIVE_ACTION NAME_OR_PATH LP COMPONENT NAME_OR_PATH COMMA COMPONENT NAME_OR_PATH RP
+{
+  driver.start_debug ();
+  SmalaNative *native = new SmalaNative ($2, $5, $8);
+  driver.add_node (native);
+}
+|
+NATIVE_ACTION NAME_OR_PATH LP PROCESS NAME_OR_PATH COMMA PROCESS NAME_OR_PATH RP
 {
   driver.start_debug ();
   SmalaNative *native = new SmalaNative ($2, $5, $8);

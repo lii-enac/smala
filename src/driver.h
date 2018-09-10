@@ -43,6 +43,7 @@ public:
     void add_define_node (Node *node);
     void set_is_main (bool val);
     void set_error ();
+    void in_preamble () { m_ast.set_in_preamble (true); }
     void end_preamble ();
     void new_line();
     void start_debug () { _debug = true; }

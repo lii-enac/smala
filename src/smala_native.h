@@ -31,6 +31,9 @@ public:
     const std::string& src () const;
     const std::string& data () const;
     
+    void set_src (const std::string &src) { m_src = src; }
+    void set_data (const std::string &data) { m_data = data; }
+
 private:
     std::string m_fct;
     std::string m_src;

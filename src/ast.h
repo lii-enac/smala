@@ -41,9 +41,9 @@ public:
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
     void add_native_java (const std::string &code);
-    void add_smala_native (SmalaNative *nat);
     void add_define_node (Node *defineNode);
     void set_is_main (bool val);
+    void set_in_preamble (bool val) { m_in_preamble = val; }
     void end_preamble ();
 
     const std::vector<Node*> define_node_list () const;

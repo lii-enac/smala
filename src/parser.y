@@ -66,6 +66,7 @@
   using namespace Smala;
   vector<Node*> parent_list;
   vector<Node*> expression;
+  int func_num = 0;
 }
 
 
@@ -249,6 +250,8 @@
 %type <Node*> start_alternative
 %type <Node*> left_side
 %type <Node*> right_side
+%type <SmalaNative*> lambda
+%type <SmalaNative*> start_lambda
 %type < vector< pair<ParamType, string> > > parameters
 %type < pair<ParamType, string> > parameter
 
@@ -310,6 +313,7 @@ smala_action: smala_native_start LCB item_list RCB
 smala_native_start: NATIVE_ACTION NAME_OR_PATH LP COMPONENT NAME_OR_PATH COMMA COMPONENT NAME_OR_PATH RP
 {
   driver.start_debug ();
+  driver.in_preamble ();
   SmalaNative *native = new SmalaNative ($2, $5, $8);
   driver.add_node (native);
 }
@@ -944,6 +948,46 @@ binding: NAME_OR_PATH ARROW process_list
     driver.add_node (node);
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
+}
+| NAME_OR_PATH ARROW lambda
+{
+  /* first build the NativeACtion Component */
+  vector< pair<ParamType, string> >d_args;
+  d_args.push_back (make_pair (LOCAL_NAME, $3->fct ()));
+  d_args.push_back (make_pair (INT, $3->data ()));
+  d_args.push_back (make_pair (INT, "1"));
+  Node *native = new Node ("NativeAction", "", d_args);
+  native->set_node_type (NATIVE_ACTION_CPNT);
+  driver.add_node (native);
+  native->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+
+  /* then the binding */
+  CtrlNode *node = new CtrlNode ("Binding", "");
+  Node *in = new Node ("Name", $1);
+  in->set_node_type (PATH);
+  node->set_in (in);
+  node->set_out (native);
+  driver.add_node (node);
+  node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+}
+
+lambda: start_lambda LCB item_list RCB
+{
+  Node *node = new Node ();
+  node->set_node_type (END_NATIVE);
+  driver.add_node (node);
+  driver.end_preamble ();
+  $$ = $1;
+}
+
+start_lambda: LP NAME_OR_PATH RP
+{
+  driver.start_debug ();
+  driver.in_preamble ();
+  string new_name ("func_" + std::to_string (func_num++));
+  SmalaNative *native = new SmalaNative (new_name, "_src_", $2);
+  driver.add_node (native);
+  $$ = native;
 }
 
 assignment: full_expression assignment_symbol process_list is_model

@@ -78,14 +78,13 @@ namespace Smala {
             build_native_action (os, cur_node);
             break;
           }
-        case NATIVE_CODE:
-          {
-            NativeCodeNode *n = static_cast<NativeCodeNode*> (cur_node);
-            os << n->code () << std::endl;
-            break;
-          }
-        default:
+        case NATIVE_CODE: {
+          NativeCodeNode *n = static_cast<NativeCodeNode*> (cur_node);
+          os << n->code () << std::endl;
           break;
+        }
+        default:
+          build_node (os, cur_node);
         }
     }
   }

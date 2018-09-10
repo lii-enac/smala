@@ -376,7 +376,7 @@ namespace Smala
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::pair<std::string, std::string> s = parse_symbol (node->name ());
 
-    if (!s.second.empty ()) {
+    if (s.second.compare (m_null_string) != 0) {
       indent (os);
       os << "Process *" << new_name << " = " << s.first
       << "->find_component (" << s.second << ");\n";
@@ -501,7 +501,7 @@ namespace Smala
       data = "nullptr";
     else {
       std::pair<std::string, std::string> p = parse_symbol (data);
-      if (p.second.compare ("0") != 0) {
+      if (p.second.compare (m_null_string) != 0) {
         data = p.first + "->find_component (" + p.second + ")";
       } else
         data = p.first;

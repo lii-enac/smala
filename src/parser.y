@@ -606,6 +606,15 @@ find: NAME_OR_PATH SIMPLE_EQ FIND LP NAME_OR_PATH RP
   n->set_node_type (FIND);
   driver.add_node (n);
 }
+| NAME_OR_PATH SIMPLE_EQ FIND LP NAME_OR_PATH COMMA STRING RP
+{
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (NAME, $5));
+  args.push_back (make_pair (STRING, $7));
+  Node* n = new Node ("find", $1, args);
+  n->set_node_type (FIND);
+  driver.add_node (n);
+}
 
 add_child: NAME_OR_PATH INSERT NAME_OR_PATH
 {

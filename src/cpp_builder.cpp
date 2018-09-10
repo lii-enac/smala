@@ -406,8 +406,13 @@ namespace Smala
     if (arg.first == STRING) {
       os << "Process::find_component (nullptr, " << arg.second;
     } else {
-      std::pair<std::string, std::string> p = parse_symbol (arg.second);
-      os << p.first << "->find_component (" << p.second;
+      if (node->args ().size() == 2) {
+        string root = m_parent_list.back ().get_symbol (arg.second);
+        os << root << "->find_component (" << node->args ().at (1).second;
+      } else {
+        std::pair<std::string, std::string> p = parse_symbol (arg.second);
+        os << p.first << "->find_component (" << p.second;
+      }
     }
     os << ");\n";
   }

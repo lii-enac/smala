@@ -109,7 +109,7 @@ PanAndZoom (Component f, Component bg) {
         (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
         (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
       }
-      f.wheel -> setZoomAndPan, cl
+      scaleFactor -> setZoomAndPan, cl
     }
 
     // Transitions for basic version

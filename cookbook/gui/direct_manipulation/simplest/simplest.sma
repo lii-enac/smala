@@ -5,13 +5,23 @@ use gui
 _main_
 Component root
 {
+<<<<<<< HEAD
 	Frame f ("my frame", 0, 0, 800, 800)
+=======
+	Frame f ("my frame", 0, 0, 400, 600)
+    // mouseTracking deactivated by default
+>>>>>>> cookbook/gui - added comments in simplest cookbook
   	//mouseTracking = 1
 
 	OutlineWidth ow(10)
 	FillColor fc(255,0,0)
   	Circle mobile(100, 100, 40)
 
+  	// Two behaviors:
+  	//   mouseTracking activated
+  	//     f.move is updated constantly so mobile follows mouse
+  	//   mouseTracking deactivated
+  	//     f.move behaves like f.press so mobile is moved only on mouse press
   	f.move.x => mobile.cx
   	f.move.y => mobile.cy
 

@@ -11,5 +11,5 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #		Jérémie Garcia 	  <jeremie.garcia@enac.fr>
 
-objs_cookbook_app := src/APoint.o src/DoubleClick.o src/main.o
+objs_cookbook_app := src/APoint.o src/Distance.o src/DoubleClick.o src/main.o
 djnn_libs_cookbook_app := gui base core display

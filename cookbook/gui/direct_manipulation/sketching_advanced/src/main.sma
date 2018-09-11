@@ -10,6 +10,7 @@
 *  Contributors:
 *    Jérémie Garcia    <jeremie.garcia@enac.fr>
 *    Nicolas Saporito  <nicolas.saporito@enac.fr>
+*    Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 *
 */
 
@@ -21,7 +22,7 @@ import APoint
 import DoubleClick
 
 _action_
-clearContent (Component src1, Component data1)
+clearContent (Process src1, Process data1)
 {   
     root = getRef(data1.rootRef)
     contentToRemove = getRef(data1.contentRef)
@@ -40,7 +41,7 @@ clearContent (Component src1, Component data1)
 }
 
 _action_
-createSegment (Component src, Component data)
+createSegment (Process src, Process data)
 {   
     current = getRef(data.currentRef)
     mid = getRef (data.midRef)
@@ -102,6 +103,7 @@ Component root {
     Frame f ("Sketching", 100, 100, 800, 600)
     Exit ex (0, 1)
     f.close -> ex
+    mouseTracking = 1
 
     // background
     FillColor bgFill (50,50,50)
@@ -125,7 +127,7 @@ Component root {
     NativeAction clearAction (clearContent, clearData, 1)
     clear -> clearAction
     DoubleClick doubleClick (bgRect, f)
-    doubleClick.doubleClicked -> clear
+    doubleClick.double_click -> clear
 
     // temp points to draw sketches
     APoint prevPoint (0,0)

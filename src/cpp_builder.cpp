@@ -59,7 +59,6 @@ namespace Smala
     os << "#include \"core/core-dev.h\"\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
-    build_preamble (os);
     int size = m_ast.preamble ().import ().size ();
     for (int i = 0; i < size; ++i) {
       /* add the import name to the possible types */
@@ -67,6 +66,7 @@ namespace Smala
       m_types.insert (std::pair<std::string, std::string> (name, name));
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
+    build_preamble (os);
 
     size = m_ast.node_list ().size ();
     for (int i = 0; i < size; ++i) {

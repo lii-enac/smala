@@ -17,15 +17,18 @@ Component root
 
   	// FIXME when the two are active (MB and ZCGM), there are 2 refresh!!!
 
+  	/*
   	// MacGuffin & Balakrishnan
-  	/*f.move.x > 0.9*fitts.target_distance
+  	f.move.x > 0.9*fitts.target_distance
   		? 50*2
   		: 50
-  	=> fitts.target_width*/
+  	=> fitts.target_width
+  	*/
 
+  	/*
   	// Zhai, Conversy, Guiard & Beaudouin-Lafon
-  	/*Double
-  	scale(0.5) // fixme .5 does not work!!
+  	Double
+  	scale(0.5) // FIXME .5 does not work!!
   	//scale(1)
   	//scale(2)
   	// should be random
@@ -33,7 +36,8 @@ Component root
 	f.move.x > 0.9*fitts.target_distance
   		? 50*scale
   		: 50
-  	=> fitts.target_width*/
+  	=> fitts.target_width
+  	*/
 
 }
 

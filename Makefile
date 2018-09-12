@@ -222,6 +222,7 @@ cookbook_apps := core/debug \
 	gui/direct_manipulation/pan_and_zoom \
 	gui/direct_manipulation/sketching_simple \
 	gui/direct_manipulation/sketching_advanced \
+	gui/fitts_law \
 	gui/widgets/checkbox \
 	gui/widgets/tab \
 	gui/widgets/dial \
@@ -237,7 +238,7 @@ $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
-	$(smalac) $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
+	$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 

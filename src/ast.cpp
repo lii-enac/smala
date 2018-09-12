@@ -58,7 +58,10 @@ Ast::add_define_node (Node *node)
 void
 Ast::add_node (Node *node)
 {
-  m_node_list.push_back (node);
+  if (m_in_preamble)
+    m_preamble.add_node (node);
+  else
+    m_node_list.push_back (node);
 }
 
 void

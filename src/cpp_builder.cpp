@@ -59,7 +59,6 @@ namespace Smala
     os << "#include \"core/core-dev.h\"\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
-    build_preamble (os);
     int size = m_ast.preamble ().import ().size ();
     for (int i = 0; i < size; ++i) {
       /* add the import name to the possible types */
@@ -67,6 +66,7 @@ namespace Smala
       m_types.insert (std::pair<std::string, std::string> (name, name));
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
+    build_preamble (os);
 
     size = m_ast.node_list ().size ();
     for (int i = 0; i < size; ++i) {
@@ -376,7 +376,7 @@ namespace Smala
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::pair<std::string, std::string> s = parse_symbol (node->name ());
 
-    if (!s.second.empty ()) {
+    if (s.second.compare (m_null_string) != 0) {
       indent (os);
       os << "Process *" << new_name << " = " << s.first
       << "->find_component (" << s.second << ");\n";
@@ -406,8 +406,13 @@ namespace Smala
     if (arg.first == STRING) {
       os << "Process::find_component (nullptr, " << arg.second;
     } else {
-      std::pair<std::string, std::string> p = parse_symbol (arg.second);
-      os << p.first << "->find_component (" << p.second;
+      if (node->args ().size() == 2) {
+        string root = m_parent_list.back ().get_symbol (arg.second);
+        os << root << "->find_component (" << node->args ().at (1).second;
+      } else {
+        std::pair<std::string, std::string> p = parse_symbol (arg.second);
+        os << p.first << "->find_component (" << p.second;
+      }
     }
     os << ");\n";
   }
@@ -496,7 +501,7 @@ namespace Smala
       data = "nullptr";
     else {
       std::pair<std::string, std::string> p = parse_symbol (data);
-      if (p.second.compare ("0") != 0) {
+      if (p.second.compare (m_null_string) != 0) {
         data = p.first + "->find_component (" + p.second + ")";
       } else
         data = p.first;

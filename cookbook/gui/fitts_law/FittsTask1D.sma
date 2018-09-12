@@ -55,9 +55,9 @@ FittsTask1D(Component f) {
       Clock t(50) // 0.05ms
     }
     State success {
+      //on_starting_area.acquisition_time.elpased =: target_time_acquisition
       255 =: display.target.fc.g
       Clock t(50) // 0.05ms
-      //on_starting_area.acquisition_time.elpased =: target_time_acquisition
     }
 
     init -> on_starting_area (display.starting.area.enter)

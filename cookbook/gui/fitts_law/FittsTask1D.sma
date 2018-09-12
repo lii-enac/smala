@@ -17,7 +17,7 @@ FittsTask1D(Component f) {
 
   Switch display(starting_area) {
     Component starting_area {
-      Int width(50)
+      Int width(32)
       Translation t(0,0)
       //width/2 => t.tx
       //f.height/2 => t.ty

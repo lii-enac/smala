@@ -33,10 +33,18 @@ include config.default.mk
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
+ifndef os
+os := $(shell uname -s)
+endif
+
 # cross-compile support
 ifndef cross_prefix
+ifeq ($(os),Darwin)
 cross_prefix := llvm-g
-#cross_prefix := g
+endif
+ifeq ($(os),Linux)
+cross_prefix := g
+endif
 #cross_prefix := arm-none-eabi-
 #cross_prefix := em
 #cross_prefix := i686-w64-mingw32-
@@ -47,10 +55,6 @@ CXX := $(cross_prefix)++
 CFLAGS = -g -MMD
 CXXFLAGS = $(CFLAGS) -std=c++14
 LIBS = -lboost_system
-
-ifndef os
-os := $(shell uname -s)
-endif
 
 ifeq ($(os),Linux)
 CXXFLAGS +=

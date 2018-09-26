@@ -640,7 +640,7 @@ namespace Smala
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.push_back (
         BuildNode ("0", m_parent_list.back ().sym_table ()));
-    os << "\nvoid\n" << n->fct () << " (Process* c) {\n";
+    os << "\nstatic void\n" << n->fct () << " (Process* c) {\n";
     os << "\tProcess *" << src_name
         << " = c->get_activation_source ();\n";
     os << "\tProcess *" << data_name

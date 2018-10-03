@@ -42,9 +42,9 @@ ifndef cross_prefix
 ifeq ($(os),Darwin)
 cross_prefix := llvm-g
 endif
-ifeq ($(os),Linux)
+#ifeq ($(os),Linux)
 cross_prefix := g
-endif
+#endif
 #cross_prefix := arm-none-eabi-
 #cross_prefix := em
 #cross_prefix := i686-w64-mingw32-
@@ -54,7 +54,7 @@ CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
 CFLAGS = -g -MMD
 CXXFLAGS = $(CFLAGS) -std=c++14
-LIBS = -lboost_system
+LIBS = #-lboost_system
 
 ifeq ($(os),Linux)
 CXXFLAGS +=
@@ -73,6 +73,7 @@ endif
 
 ifeq ($(os),MINGW64_NT-10.0)
 YACC = bison -d
+LD_LIBRARY_PATH=PATH
 endif
 
 ifeq ($(cross_prefix),em)
@@ -106,7 +107,7 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@
 
-$(smalac): CFLAGS += -Isrc -I$(build_dir)/src
+$(smalac): CFLAGS += -Isrc -I$(build_dir)/src -I/usr/include
 
 $(build_dir)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -199,9 +200,9 @@ $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
 $$(notdir $1)_test: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
 
 
 .PHONY: $1 $1_test $1_dbg
@@ -307,3 +308,22 @@ truc:
 
 deps += $(smalac_objs:.o=.d)
 -include $(deps)
+
+
+pkg-deps := bison flex
+
+ifeq ($(os),Darwin)
+#https://brew.sh/
+pkgcmd := brew install
+endif
+
+ifeq ($(os),MINGW64_NT-10.0)
+#https://www.msys2.org/
+pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
+pkgcmd := pacman -S
+endif
+
+install-pkgdeps:
+	$(pkgcmd) $(pkgdeps)
+.PHONY: install-pkgdeps
+

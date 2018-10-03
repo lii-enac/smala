@@ -5,12 +5,8 @@ use gui
 _main_
 Component root
 {
-<<<<<<< HEAD
-	Frame f ("my frame", 0, 0, 800, 800)
-=======
 	Frame f ("my frame", 0, 0, 400, 600)
     // mouseTracking deactivated by default
->>>>>>> cookbook/gui - added comments in simplest cookbook
   	//mouseTracking = 1
 
 	OutlineWidth ow(10)

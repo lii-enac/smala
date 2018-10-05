@@ -1,0 +1,22 @@
+We provide a Makefile that should work on MacOS (10.12+),  Linux platforms, windows 10+
+
+Known dependencies:
+
+---- LINUX -----
+
+Linux/Ubuntu:
+  make install-pkgdeps
+  make -j4
+
+---- MACOS -----
+
+MacOS
+  make install-pkgdeps
+  make -j
+ 
+---- WINDOWS -----
+
+Win
+  launch MINGW64 command line and then
+  make install-pkgdeps
+  make -j4

@@ -310,7 +310,7 @@ deps += $(smalac_objs:.o=.d)
 -include $(deps)
 
 
-pkg-deps := bison flex
+pkgdeps := bison flex
 
 ifeq ($(os),Darwin)
 #https://brew.sh/
@@ -319,7 +319,7 @@ endif
 
 ifeq ($(os),MINGW64_NT-10.0)
 #https://www.msys2.org/
-pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
+# no need prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
 pkgcmd := pacman -S
 endif
 

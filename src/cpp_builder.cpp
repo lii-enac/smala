@@ -348,18 +348,25 @@ namespace Smala
   void
   CPPBuilder::add_child (std::ofstream &os, Node *node)
   {
-    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning,
-                           "duplicated name: " + node->name (), 0);
     std::pair<std::string, std::string> s = parse_symbol (
         node->args ().at (0).second);
     indent (os);
-    os << "Process *" << new_name << " = " << s.first
-        << "->find_component (" << s.second << ");\n";
-    indent (os);
-    os << m_parent_list.back ().name () << "->add_child (" << new_name << ", \""
-        << node->name () << "\");\n";
+    if (s.second.compare (m_null_string) == 0) {
+      m_parent_list.back ().add_entry (node->name (), s.first);
+      os << m_parent_list.back ().name () << "->add_child (" << s.first
+          << ", \"" << node->name () << "\");\n";
+    } else {
+      std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      if (m_parent_list.back ().add_entry (node->name (), new_name) == 1) {
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
+      }
+      os << "Process *" << new_name << " = " << s.first << "->find_component ("
+          << s.second << ");\n";
+      indent (os);
+      os << m_parent_list.back ().name () << "->add_child (" << new_name
+          << ", \"" << node->name () << "\");\n";
+    }
   }
 
   void

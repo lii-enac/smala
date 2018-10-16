@@ -127,6 +127,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "loadFromXML"         { return Smala::Parser::make_LOAD_XML (Smala::location ()); }
 "find"                { return Smala::Parser::make_FIND (Smala::location ()); }
 "clone"               { return Smala::Parser::make_CLONE (Smala::location ()); }
+"repeat"              { return Smala::Parser::make_REPEAT (Smala::location ()); }
 "getInt"              { return Smala::Parser::make_GET_INT (Smala::location ()); }
 "getDouble"           { return Smala::Parser::make_GET_DOUBLE (Smala::location ()); }
 "getBool"             { return Smala::Parser::make_GET_BOOL (Smala::location ()); }

@@ -35,7 +35,7 @@ namespace Smala {
     void alias (std::ofstream &os, Node *node);
     void merge (std::ofstream &os, Node *node);
     void remove (std::ofstream &os, Node *node);
-    void clone (std::ofstream &os, Node *node);
+    void repeat (std::ofstream &os, Node *node);
     void load_xml (std::ofstream &os, Node *node);
     void add_child (std::ofstream &os, Node *node);
     void fetch_add_child (std::ofstream &os, std::string &parent, std::string &child, std::string &name);

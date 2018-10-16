@@ -187,6 +187,7 @@
 %token FIND "find"
 %token NATIVE_CALL "CCal|NativeCall"
 %token CLONE "clone"
+%token REPEAT "repeat"
 %token GET_INT "getInt"
 %token GET_DOUBLE "getDouble"
 %token GET_BOOL "getBool"
@@ -225,7 +226,7 @@
 %type <string> literal
 %type <string> cpnt_type
 %type <string> is_model
-%type <string> clone_arg
+%type <string> repeat_arg
 %type <string> fsm_decl
 %type <ParamType> type
 %type <Node*> state_decl
@@ -427,7 +428,7 @@ item_list:
 | item_list item
 
 item: simple_component | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | clone | remove | string_cat | rough_code | macro
+  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro
 
 macro : NAME_OR_PATH COLON literal
 {
@@ -639,15 +640,15 @@ add_child: NAME_OR_PATH INSERT NAME_OR_PATH
   n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 }
 
-clone: start_clone items
+repeat: start_repeat items
 {
   Node *n = new Node ();
-  n->set_node_type (END_CLONE);
+  n->set_node_type (END_REPEAT);
   driver.add_node (n);
   parent_list.pop_back ();
 }
 
-start_clone: NAME_OR_PATH SIMPLE_EQ CLONE LP NAME_OR_PATH SIMPLE_EQ clone_arg RP
+start_repeat: NAME_OR_PATH SIMPLE_EQ REPEAT LP NAME_OR_PATH SIMPLE_EQ repeat_arg RP
 {
   vector< pair<ParamType, string> > args;
   args.push_back (make_pair (NAME, $5));
@@ -655,14 +656,14 @@ start_clone: NAME_OR_PATH SIMPLE_EQ CLONE LP NAME_OR_PATH SIMPLE_EQ clone_arg RP
     args.push_back (make_pair (INT, $7));
   else
     args.push_back (make_pair (NAME, $7));
-  Node *n = new Node ("clone", $1, args);
-  n->set_node_type (CLONE);
+  Node *n = new Node ("repeat", $1, args);
+  n->set_node_type (REPEAT);
   driver.add_node (n);
   n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
   parent_list.push_back (n);
 }
 
-clone_arg: INT { $$ = $1; } | NAME_OR_PATH { $$ = $1; }
+repeat_arg: INT { $$ = $1; } | NAME_OR_PATH { $$ = $1; }
 
 set_value: set_bool | set_int | set_double | set_text | set_ref
 get_value: get_bool | get_int | get_double | get_string | get_ref

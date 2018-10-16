@@ -34,7 +34,7 @@ Component root {
 
   NativeAction na (myFunc, 1)
 
-  myList = clone (n=5) {
+  myList = repeat (n=5) {
     Button b (f, "myButton", 10, n * 100)
     b.click -> na
   }

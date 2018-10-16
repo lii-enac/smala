@@ -175,12 +175,12 @@ namespace Smala {
           remove (os, node);
           break;
         }
-      case CLONE:
+      case REPEAT:
         {
-          clone (os, node);
+          repeat (os, node);
           break;
         }
-      case END_CLONE:
+      case END_REPEAT:
         {
           m_indent--;
           indent (os);

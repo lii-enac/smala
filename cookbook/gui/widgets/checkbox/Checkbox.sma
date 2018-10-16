@@ -20,7 +20,7 @@ Checkbox (Component frame, int nb_entry) {
   Int entry (0)
   Spike unselectAll
 
-  entries = clone (n = nb_entry) {
+  entries = repeat (n = nb_entry) {
 	Int index (n)
 	NoFill nf
 	OutlineColor oc (50, 50, 50)

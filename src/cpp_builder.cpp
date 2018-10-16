@@ -288,7 +288,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::clone (std::ofstream &os, Node *node)
+  CPPBuilder::repeat (std::ofstream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)

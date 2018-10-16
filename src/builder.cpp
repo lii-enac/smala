@@ -208,6 +208,11 @@ namespace Smala {
           find (os, node);
           break;
         }
+      case CLONE:
+      {
+        clone (os, node);
+        break;
+      }
       case FSM:
       case SWITCH:
         {

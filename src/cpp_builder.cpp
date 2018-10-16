@@ -425,6 +425,23 @@ namespace Smala
   }
 
   void
+  CPPBuilder::clone (std::ofstream &os, Node *node)
+  {
+    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
+    std::pair<ParamType, std::string> arg = node->args ().at (0);
+    indent (os);
+    os << "Process *" << new_name << " = ";
+    std::pair<std::string, std::string> p = parse_symbol (arg.second);
+    if (p.second.compare (m_null_string) == 0)
+      os << p.first << "->clone ();\n";
+    else
+      os << p.first << "->find_component (" << p.second << ")->clone();\n";
+  }
+
+  void
   CPPBuilder::build_this_node (std::ofstream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));

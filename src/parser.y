@@ -621,6 +621,15 @@ find: NAME_OR_PATH SIMPLE_EQ FIND LP NAME_OR_PATH RP
   driver.add_node (n);
 }
 
+clone: NAME_OR_PATH SIMPLE_EQ CLONE LP NAME_OR_PATH RP
+{
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (NAME, $5));
+  Node* n = new Node ("clone", $1, args);
+  n->set_node_type (CLONE);
+  driver.add_node (n);
+}
+
 add_child: NAME_OR_PATH INSERT NAME_OR_PATH
 {
   vector< pair<ParamType, string> > args;

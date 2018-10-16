@@ -77,14 +77,30 @@ LD_LIBRARY_PATH=PATH
 endif
 
 ifeq ($(cross_prefix),em)
-EMFLAGS := -s USE_SDL=2 -s FULL_ES2=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_ALL=1 #-s SIMD=1 
-CFLAGS += $(EMFLAGS) \
-	-I/usr/local/include -I/usr/local/Cellar/expat/2.2.6/include -I/usr/local/Cellar/curl/7.61.0/include
+EMFLAGS := -Wall -Oz -s WASM=1 -s USE_SDL=2 -s FULL_ES2=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_ALL=1 -s ASSERTIONS=1
+CFLAGS += $(EMFLAGS)
+
+truc := \
+	-I/usr/local/include \
+	-I/usr/local/Cellar/expat/2.2.6/include \
+	-I/usr/local/Cellar/curl/7.61.0/include \
+	-I../boost_1_68_0
+
 LDFLAGS += $(EMFLAGS) \
-	-L../expat-2.2.6/lib/.libs -L../curl-7.61.0/lib/.libs
+	-L../expat-2.2.6/lib/.libs \
+	-L../curl-7.61.0/lib/.libs \
+	$(djnn_lib_path_cpp)/libdjnn-animation.bc\
+	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
+	$(djnn_lib_path_cpp)/libdjnn-display.bc\
+	$(djnn_lib_path_cpp)/libdjnn-base.bc\
+	$(djnn_lib_path_cpp)/libdjnn-core.bc \
+	../boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
+	../boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
+	../boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
 
 os := em
 EXE := .html
+#to test: python -m SimpleHTTPServer 8080
 endif
 
 
@@ -107,7 +123,8 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@
 
-$(smalac): CFLAGS += -Isrc -I$(build_dir)/src -I/usr/include
+$(smalac): CFLAGS += -Isrc -I$(build_dir)/src
+# -I/usr/include
 
 $(build_dir)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -203,6 +220,9 @@ $$(notdir $1)_test: $$(notdir $1)
 	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_dbg: $$(notdir $1)
 	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
+
+$$(notdir $1)_clean:
+	rm $$($1_app_exe) $$($1_app_objs)
 
 
 .PHONY: $1 $1_test $1_dbg

@@ -607,8 +607,8 @@ Builder::get_constructor (const std::string &type) {
   std::map<std::string, std::string>::iterator it;
   it = m_types.find (type);
   if (it == m_types.end ()) {
-    print_error_message (error_level::error, "unknown type " + type, 1);
-    return "";
+    //print_error_message (error_level::error, "unknown type " + type, 1);
+    return type;
   }
   return it->second;
 }

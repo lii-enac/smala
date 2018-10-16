@@ -12,7 +12,7 @@ Component root
 
   	// Fitts-like (not the genuine from the 50's)
   	FittsTask1D fitts(f)
-  	32 =: fitts.target_width
+  	16 =: fitts.target_width
   	512 =: fitts.target_distance
 
   	// FIXME when the two are active (MB and ZCGM), there are 2 refresh!!!

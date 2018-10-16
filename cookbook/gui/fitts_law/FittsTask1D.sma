@@ -8,20 +8,20 @@ FittsTask1D(Component f) {
   Int target_distance(500)
   Int target_time_acquisition(0)
 
+  // bg
   FillColor _(0,0,0)
   Rectangle bg(0,0, 0,0, 0,0)
   f.width => bg.width
   f.height => bg.height
 
+  // scene
   Switch display(starting_area) {
     Component starting {
-      Int width(32)
       FillOpacity o(1)
       FillColor fc(200, 200, 200) // lightgray
-      Rectangle area (0,0, 0,0, 0,0)
-      (f.height-width)/2 => area.y
-      width => area.width
-      width => area.height
+      Rectangle area (0,0, 32,32, 0,0)
+      //(f.height-32)/2 => area.y
+      f.height => area.height
     }
     Component target {
       FillColor fc(200, 200, 200) // lightgray
@@ -32,6 +32,16 @@ FittsTask1D(Component f) {
     }
   }
 
+  // cursor
+  FillColor _(255,255,255)
+  OutlineColor _(0,0,0)
+  OutlineWidth _(1)
+  Rectangle cursor(0,0, 2,0, 0,0)
+  f.height => cursor.height
+  f.move.x => cursor.x
+
+  Bool in(0)
+
   FSM control {
     State init {
       sfc aka display.starting.fc
@@ -40,6 +50,7 @@ FittsTask1D(Component f) {
       200 =: tfc.r, tfc.g, tfc.b
       1 =: display.starting.o.a
       "starting" =: display.state
+      f.move.x < 32 => in
     }
     State on_starting_area {
       255 =: display.starting.fc.g
@@ -60,7 +71,8 @@ FittsTask1D(Component f) {
       Clock t(50) // 0.05ms
     }
 
-    init -> on_starting_area (display.starting.area.enter)
+    //init -> on_starting_area (display.starting.area.enter)
+    init -> on_starting_area (in.true)
     on_starting_area -> init (display.starting.area.leave)    
     on_starting_area -> started (on_starting_area.start_task.tick)
     started -> miss (bg.press)
@@ -68,4 +80,8 @@ FittsTask1D(Component f) {
     miss -> init (miss.t.tick)
     success -> init (success.t.tick)
   }
+
+  //TextPrinter tp
+  //control.state => tp.input
+
 }

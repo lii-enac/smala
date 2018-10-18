@@ -181,6 +181,7 @@
 %token ADD_CHILDREN_TO "addChildrenTo"
 %token MERGE "merge"
 %token REMOVE "remove"
+%token MOVE "move"
 %token WITH "with"
 %token FROM "from"
 %token LOAD_XML "loadFromXML"
@@ -428,7 +429,23 @@ item_list:
 | item_list item
 
 item: simple_component | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro
+  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move
+
+
+move : MOVE NAME_OR_PATH LT NAME_OR_PATH
+{
+
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  node->set_node_type (MOVE_BEFORE);
+  driver.add_node (node);
+}
+|
+MOVE NAME_OR_PATH GT NAME_OR_PATH
+{
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  node->set_node_type (MOVE_AFTER);
+  driver.add_node (node);
+}
 
 macro : NAME_OR_PATH COLON literal
 {

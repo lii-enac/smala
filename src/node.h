@@ -53,6 +53,8 @@ namespace Smala {
     LOCAL_NODE,
     MACRO,
     MERGE,
+    MOVE_AFTER,
+    MOVE_BEFORE,
     NATIVE_ACTION,
     NATIVE_ACTION_CPNT,
     NATIVE_CODE,

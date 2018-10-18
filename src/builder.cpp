@@ -175,6 +175,16 @@ namespace Smala {
           remove (os, node);
           break;
         }
+      case MOVE_AFTER:
+        {
+          move (os, node, '>');
+          break;
+        }
+      case MOVE_BEFORE:
+        {
+          move (os, node, '<');
+          break;
+        }
       case REPEAT:
         {
           repeat (os, node);

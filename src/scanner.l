@@ -120,6 +120,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "import"              { return Smala::Parser::make_IMPORT (Smala::location ()); }
 "merge"               { return Smala::Parser::make_MERGE (Smala::location ()); }
 "remove"              { return Smala::Parser::make_REMOVE (Smala::location ()); }
+"move"                { return Smala::Parser::make_MOVE (Smala::location ()); }
 "with"                { return Smala::Parser::make_WITH (Smala::location ()); }
 "from"                { return Smala::Parser::make_FROM (Smala::location ()); }
 "addChild"            { return Smala::Parser::make_ADD_CHILD (Smala::location ()); }

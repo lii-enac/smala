@@ -35,6 +35,7 @@ namespace Smala {
     void alias (std::ofstream &os, Node *node) override;
     void merge (std::ofstream &os, Node *node) override;
     void remove (std::ofstream &os, Node *node) override;
+    void move (std::ofstream &os, Node *n, char c) override;
     void repeat (std::ofstream &os, Node *node) override;
     void load_xml (std::ofstream &os, Node *node) override;
     void add_child (std::ofstream &os, Node *node) override;

@@ -448,16 +448,16 @@ MOVE NAME_OR_PATH GT NAME_OR_PATH
   driver.add_node (node);
 }
 |
-MOVE NAME_OR_PATH GGT NAME_OR_PATH
+MOVE NAME_OR_PATH GGT
 {
-  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, nullptr);
   node->set_node_type (MOVE_END);
   driver.add_node (node);
 }
 |
-MOVE NAME_OR_PATH INSERT NAME_OR_PATH
+MOVE NAME_OR_PATH INSERT
 {
-  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, nullptr);
   node->set_node_type (MOVE_FIRST);
   driver.add_node (node);
 }

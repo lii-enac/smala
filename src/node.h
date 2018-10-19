@@ -55,6 +55,8 @@ namespace Smala {
     MERGE,
     MOVE_AFTER,
     MOVE_BEFORE,
+    MOVE_END,
+    MOVE_FIRST,
     NATIVE_ACTION,
     NATIVE_ACTION_CPNT,
     NATIVE_CODE,

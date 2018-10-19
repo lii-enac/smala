@@ -161,6 +161,7 @@
 %token LT "<"
 %token LE "<="
 %token GT ">"
+%token GGT ">>"
 %token GE ">="
 %token EQ "=="
 %token SIMPLE_EQ "="
@@ -444,6 +445,20 @@ MOVE NAME_OR_PATH GT NAME_OR_PATH
 {
   BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
   node->set_node_type (MOVE_AFTER);
+  driver.add_node (node);
+}
+|
+MOVE NAME_OR_PATH GGT NAME_OR_PATH
+{
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  node->set_node_type (MOVE_END);
+  driver.add_node (node);
+}
+|
+MOVE NAME_OR_PATH INSERT NAME_OR_PATH
+{
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
+  node->set_node_type (MOVE_FIRST);
   driver.add_node (node);
 }
 

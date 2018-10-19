@@ -288,13 +288,13 @@ namespace Smala
   }
 
   void
-  CPPBuilder::move (std::ofstream &os, Node *node, char c)
+  CPPBuilder::move (std::ofstream &os, Node *node, int c)
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::pair<std::string, std::string> right = parse_symbol (n->right_arg ());
     std::pair<std::string, std::string> left = parse_symbol (n->left_arg ());
-    os << left.first << "->get_parent ()->move_child (" << left.first << ", \'" << c << "\', " << right.first << ");\n";
+    os << left.first << "->get_parent ()->move_child (" << left.first << ", " << c << ", " << right.first << ");\n";
   }
 
   void

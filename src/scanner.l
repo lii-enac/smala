@@ -81,6 +81,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "="                   { return Smala::Parser::make_SIMPLE_EQ (Smala::location ()); }
 "!="                  { return Smala::Parser::make_NEQ (Smala::location ()); }
 "<<"                  { return Smala::Parser::make_INSERT (Smala::location ()); }
+">>"                  { return Smala::Parser::make_GGT (Smala::location ()); }
 "int"                 { return Smala::Parser::make_INT_T (Smala::location ()); }
 "double"              { return Smala::Parser::make_DOUBLE_T (Smala::location ()); }
 "string"              { return Smala::Parser::make_STRING_T (Smala::location ()); }

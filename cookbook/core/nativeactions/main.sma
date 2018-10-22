@@ -20,7 +20,12 @@ use gui
 _action_
 cpp_action (Component c)
 %{
+	/* how to get the source */
+	//Process *source = c->get_activation_source ();
+	
+	/* how to get the user_data */
  	Process *data = (Process*) get_native_user_data (c);
+
  	Process *fc = data->find_component ("fc");
 
  	((IntProperty*) fc->find_component ("r"))->set_value (250, 1)  ;

@@ -242,6 +242,7 @@ cookbook_apps := core/debug \
 	core/paused_control \
 	core/switch \
 	core/text_cat \
+	core/nativeactions \
 	gui/direct_manipulation/simplest \
 	gui/direct_manipulation/hysteresis \
 	gui/direct_manipulation/pan_and_zoom \

@@ -45,16 +45,13 @@ smala_action (Component src, Component data)
     * they have to be related to a parent
     * here : data 
     * so you have to add them to data with
-    * addChildrenTo
+    * an "addChildrenTo"
     */
-    addChildrenTo data {
-    	0 =: data.fc.r
-    	255 =: data.fc.g 
-    	0 =: data.fc.b 
-    }
+    data.r = 0
+    data.g = 255
+    data.b = 0
 
-    dump data.fc
-
+    dump data
 }
 
 _main_
@@ -75,25 +72,23 @@ Component root {
 	NativeAction cpp_na (cpp_action, root, 1)
 	red.press -> cpp_na
 
-	NativeAction smala_na (smala_action, root, 1)
+	NativeAction smala_na (smala_action, fc, 1)
 	green.press -> smala_na
 
 	/* smala_lambda - in code native action */
-	blue.press -> (root) {
+	blue.press -> (fc) {
   		/* note: 
-   		* if you use assignment (->) or binding (=>)
+    	* if you use assignment (->) or binding (=>)
     	* they have to be related to a parent
     	* here : data 
     	* so you have to add them to data with
-    	* addChildrenTo
+    	* an "addChildrenTo"
     	*/
-    	addChildrenTo root {
-    		0 =: root.fc.r
-    		0 =: root.fc.g 
-    		255 =: root.fc.b
-    	}
+    	fc.r = 0
+    	fc.g = 0
+    	fc.b = 255
 
-    	dump root.fc
+    	dump fc
 	}
 }
 

@@ -10,6 +10,6 @@
 #  		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
-objs_cookbook_app := ScreenToLocal.o Drag.o PanAndZoom.o main.o
+objs_cookbook_app := Drag.o PanAndZoom.o main.o
 djnn_libs_cookbook_app := gui base core display
 lang_cookbook_app := cpp

@@ -85,9 +85,6 @@ Component root {
     FillColor fc (0,0,0)
     Text t (0,20, "this text should stick to screen")
   }
-
-  // debug
-  //"yes" =: pz.debugScene.state
 }
 
 run root

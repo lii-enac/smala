@@ -46,7 +46,7 @@ namespace Smala {
     m_ast = ast;
     m_types.clear ();
     m_parent_list.clear ();
-    m_parent_list.push_back (BuildNode ("0")); // the first parent is null
+    m_parent_list.push_back (new BuildNode ("0")); // the first parent is null
 
     std::size_t found = prefix.find_last_of ("/"); // we should search the OS dependent file separator
     m_class_name = prefix.substr (found + 1);
@@ -124,14 +124,16 @@ namespace Smala {
     m_indent--;
     indent (os);
     os << "}\n";
+    BuildNode* n = m_parent_list.at (m_parent_list.size () - 1);
     m_parent_list.pop_back ();
+    if (n) delete n;
   }
 
   void
   JBuilder::build_instruction (std::ofstream &os, Node *node) {
     InstructionNode *n = static_cast<InstructionNode*> (node);
     for (int i = 0; i < n->cpnt_list ().size (); i++) {
-      std::string cpnt_name = m_parent_list.back ().get_symbol (
+      std::string cpnt_name = m_parent_list.back ()->get_symbol (
           n->cpnt_list ().at (i));
       if (cpnt_name.empty ()) {
         print_error_message (error_level::error,
@@ -206,7 +208,7 @@ namespace Smala {
   void
   JBuilder::get_property (std::ofstream &os, Node *node) {
     std::string var_name ("var_" + std::to_string (m_var_num++));
-    if (m_parent_list.back ().add_entry (node->name (), var_name) == 1)
+    if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     indent (os);
@@ -240,7 +242,7 @@ namespace Smala {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     indent (os);
-    os << "new Alias (" << m_parent_list.back ().name () << ", \""
+    os << "new Alias (" << m_parent_list.back ()->name () << ", \""
         << n->left_arg () << "\", ";
     std::pair<std::string, std::string> arg = parse_symbol (n->right_arg ());
     if (arg.second.compare ("null") == 0)
@@ -249,9 +251,9 @@ namespace Smala {
       os << arg.first << ".findComponent (" << arg.second << "));\n";
     indent (os);
     os << "Component " << new_name << " = "
-        << m_parent_list.back ().name () + ".findComponent (\"" + n->left_arg ()
+        << m_parent_list.back ()->name () + ".findComponent (\"" + n->left_arg ()
             + "\");\n";
-    if (m_parent_list.back ().add_entry (n->left_arg (), new_name) == 1
+    if (m_parent_list.back ()->add_entry (n->left_arg (), new_name) == 1
         && node->duplicate_warning ())
       print_error_message (error_level::warning,
                            "duplicated name: " + n->left_arg (), 0);
@@ -285,7 +287,7 @@ namespace Smala {
   void
   JBuilder::repeat (std::ofstream &os, Node *node) {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
 
@@ -293,11 +295,11 @@ namespace Smala {
 
     indent (os);
     os << "Component " << new_name << " = new List ("
-        << m_parent_list.back ().name () << ", \"" << node->name () << "\");\n";
+        << m_parent_list.back ()->name () << ", \"" << node->name () << "\");\n";
     indent (os);
     std::string new_var_name ("var_" + std::to_string (m_var_num++));
     os << "int " << new_var_name << ";\n";
-    if (m_parent_list.back ().add_entry (node->args ().at (0).second,
+    if (m_parent_list.back ()->add_entry (node->args ().at (0).second,
                                          new_var_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->args ().at (0).second,
@@ -307,7 +309,7 @@ namespace Smala {
     string nb_entries =
         node->args ().at (1).first == INT ?
             node->args ().at (1).second :
-            m_parent_list.back ().get_symbol (node->args ().at (1).second);
+            m_parent_list.back ()->get_symbol (node->args ().at (1).second);
     os << "for (" << new_var_name << " = 1; " << new_var_name << " <= "
         << nb_entries << "; " << new_var_name << "++) {\n";
     m_indent++;
@@ -316,7 +318,7 @@ namespace Smala {
     os << "Component " << inFor << " = new Component (" << new_name
         << ", null);\n";
     m_parent_list.push_back (
-        BuildNode (inFor, m_parent_list.back ().sym_table ()));
+        new BuildNode (inFor, m_parent_list.back ()));
     /* FIXME dirty trick to set the parent name of the enclosed nodes*/
     node->set_build_name (inFor);
   }
@@ -324,7 +326,7 @@ namespace Smala {
   void
   JBuilder::load_xml (std::ofstream &os, Node *node) {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     std::pair<ParamType, std::string> arg = node->args ().at (0);
@@ -333,7 +335,7 @@ namespace Smala {
     if (arg.first == STRING) {
       os << arg.second;
     } else {
-      os << m_parent_list.back ().get_symbol (arg.second);
+      os << m_parent_list.back ()->get_symbol (arg.second);
     }
     os << ");\n";
   }
@@ -341,7 +343,7 @@ namespace Smala {
   void
   JBuilder::add_child (std::ofstream &os, Node *node) {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     std::pair<std::string, std::string> s = parse_symbol (
@@ -350,7 +352,7 @@ namespace Smala {
     os << "Component " << new_name << " = " << s.first << ".findComponent ("
         << s.second << ");\n";
     indent (os);
-    os << m_parent_list.back ().name () << ".addChild (" << new_name << ", \""
+    os << m_parent_list.back ()->name () << ".addChild (" << new_name << ", \""
         << node->name () << "\");\n";
   }
 
@@ -369,7 +371,7 @@ namespace Smala {
     os << "Component " << new_name << " = " << s.first << ".findComponent ("
         << s.second << ");\n";
     m_parent_list.push_back (
-        BuildNode (new_name, m_parent_list.back ().sym_table ()));
+        new BuildNode (new_name, m_parent_list.back ()));
     /* FIXME dirty trick to set the parent name of the enclosed nodes*/
     node->set_build_name (new_name);
   }
@@ -377,7 +379,7 @@ namespace Smala {
   void
   JBuilder::find (std::ofstream &os, Node *node) {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     std::pair<ParamType, std::string> arg = node->args ().at (0);
@@ -400,7 +402,7 @@ namespace Smala {
     node->set_build_name (new_name);
     std::string cb = node->args ().at (0).second;
     if (!node->name ().empty ()) {
-      if (m_parent_list.back ().add_entry (node->name (), new_name) == 1)
+      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
         print_error_message (error_level::warning,
                              "duplicated name: " + node->name (), 0);
     }
@@ -457,12 +459,12 @@ namespace Smala {
   void
   JBuilder::build_this_node (std::ofstream &os, Node *node) {
     node->set_build_name ("this");
-    if (m_parent_list.back ().add_entry ("this", "this") == 1)
+    if (m_parent_list.back ()->add_entry ("this", "this") == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
 
     m_parent_list.push_back (
-        BuildNode ("this", m_parent_list.back ().sym_table ()));
+        new BuildNode ("this", m_parent_list.back ()));
   }
 
   void
@@ -478,7 +480,7 @@ namespace Smala {
       else
         new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       os << " " << new_name;
-      if (m_parent_list.back ().add_entry (arg.second, new_name) == 1)
+      if (m_parent_list.back ()->add_entry (arg.second, new_name) == 1)
         print_error_message (error_level::warning,
                              "duplicated name: " + arg.second, 0);
     }
@@ -513,7 +515,7 @@ namespace Smala {
   JBuilder::build_transition_node (std::ofstream &os, CtrlNode *ctrl) {
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
-    os << "new " << constructor << " (" << m_parent_list.back ().name ()
+    os << "new " << constructor << " (" << m_parent_list.back ()->name ()
         << ", null";
 
     std::pair<std::string, std::string> src, dst;
@@ -544,8 +546,8 @@ namespace Smala {
     Node *left = op->left ();
     Node *right = op->right ();
     std::string prefix = "var_";
-    std::string left_sym = m_parent_list.back ().get_symbol (left->name ());
-    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    std::string left_sym = m_parent_list.back ()->get_symbol (left->name ());
+    std::string right_sym = m_parent_list.back ()->get_symbol (right->name ());
     bool left_is_var = left_sym.substr (0, prefix.size ()) == prefix;
     if (left_is_var) {
       left->set_name (left_sym);
@@ -559,11 +561,11 @@ namespace Smala {
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    m_parent_list.back ().add_entry (new_name, new_name);
+    m_parent_list.back ()->add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
     os << "Component " << new_name << " = new " << constructor << " ("
-        << m_parent_list.back ().name () << ", null, " << vleft << ", "
+        << m_parent_list.back ()->name () << ", null, " << vleft << ", "
         << vright << ");\n";
     if (!left_is_var) check_and_build_connector (os, left, new_name, "\"left\"");
     if (!right_is_var) check_and_build_connector (os, right, new_name, "\"right\"");
@@ -574,17 +576,17 @@ namespace Smala {
     OperatorNode *op = static_cast<OperatorNode*> (node);
     Node *right = op->right ();
     std::string prefix = "var_";
-    std::string right_sym = m_parent_list.back ().get_symbol (right->name ());
+    std::string right_sym = m_parent_list.back ()->get_symbol (right->name ());
     bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
     std::string vright = right->node_type () == LITERAL ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    m_parent_list.back ().add_entry (new_name, new_name);
+    m_parent_list.back ()->add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
     os << "Component " << new_name << " = new " << constructor << " ("
-        << m_parent_list.back ().name () << ", null, " << vright << ");\n";
+        << m_parent_list.back ()->name () << ", null, " << vright << ");\n";
     if (!right_is_var) check_and_build_connector (os, right, new_name, "\"input\"");
   }
 
@@ -616,7 +618,7 @@ namespace Smala {
         return;
       }
     indent (os);
-    os << "new Connector (" << m_parent_list.back ().name () << ", null, "
+    os << "new Connector (" << m_parent_list.back ()->name () << ", null, "
         << p.first << ", " << p.second << ", " << name << ", " << side
         << ");\n";
   }

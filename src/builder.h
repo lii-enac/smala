@@ -35,7 +35,7 @@ namespace Smala {
   class BuildNode
   {
   public:
-    BuildNode (const std::string &name, std::map<std::string, std::string>* sym_table);
+    BuildNode (const std::string &name, BuildNode* prev_node);
     BuildNode (const std::string &name);
     BuildNode ();
     virtual ~BuildNode ();
@@ -45,6 +45,7 @@ namespace Smala {
     int add_entry (const std::string &key, const std::string &value);
   private:
     std::map<std::string, std::string> *m_sym_table;
+    BuildNode *m_prev_node;
     std::string m_name;
   };
 
@@ -65,7 +66,7 @@ namespace Smala {
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
-    std::vector<BuildNode> m_parent_list;
+    std::vector<BuildNode*> m_parent_list;
     std::map<std::string, std::string> m_types;
     void indent (std::ofstream &os);
     std::string get_constructor (const std::string &type);

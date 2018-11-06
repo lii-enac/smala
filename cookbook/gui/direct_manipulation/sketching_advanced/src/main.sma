@@ -59,7 +59,7 @@ createSegment (Process src, Process data)
         Component quadraticSegment {
             //quadratic segment between origin and mid point
             Path quad {
-                PathSubpath origin (0, 0)
+                PathMove origin (0, 0)
                 PathQuadratic end (0, 0, 0, 0)
             }
 
@@ -75,7 +75,7 @@ createSegment (Process src, Process data)
         Component lineSegment {
             //line segment between origin and mid point
             Path line {
-                PathSubpath origin (0, 0)
+                PathMove origin (0, 0)
                 PathLine end (0, 0)
             }
 

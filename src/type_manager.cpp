@@ -89,6 +89,9 @@ namespace Smala {
     else if (module.compare ("Display") == 0) {
       symtable = djnDisplayGlobalSymTable;
     }
+    else if (module.compare ("Gui") == 0) {
+      symtable = djnGUIGlobalSymTable;
+    }
     else if (module.compare ("Phidgets") == 0) {
       symtable = djnPhidgetsGlobalSymTable;
     }

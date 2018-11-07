@@ -250,6 +250,7 @@ cookbook_apps := core/debug \
 	gui/direct_manipulation/sketching_simple \
 	gui/direct_manipulation/sketching_advanced \
 	gui/fitts_law \
+	gui/redisplay \
 	gui/widgets/checkbox \
 	gui/widgets/tab \
 	gui/widgets/dial \

@@ -1434,6 +1434,7 @@ gradient_decl: GRADIENT NAME_OR_PATH
   Node *node = new Node ($1, $2);
   node->set_node_type (CONTAINER);
   node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  node->set_has_arguments (true);
   parent_list.push_back (node);
   driver.add_node (node);
   $$ = node;
@@ -1454,6 +1455,7 @@ gradient_stop_decl: GRADIENT_STOP NAME_OR_PATH
 {
   Node *node = new Node  ("GradientStop", $2);
   node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  node->set_has_arguments (true);
   driver.add_node (node);
 }
 

@@ -42,7 +42,7 @@
 
 NAME [$a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
 INT [0-9]+
-CONTAINER ("Set"|"List"|"SwitchList")
+CONTAINER ("Group"|"Set"|"List"|"SwitchList")
 POLY ("Polygon"|"Polyline")
 PATH ("Path"|"PathClip")
 PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")

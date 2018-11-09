@@ -14,7 +14,7 @@
  */
 
 %skeleton "lalr1.cc" /* -*- C++ -*- */
-%require "3.0"
+%require "3.1"
 %defines
 %define parser_class_name { Parser }
 
@@ -48,6 +48,10 @@
     class Scanner;
     class Driver;
   }
+
+  typedef pair<Smala::ParamType, string> parameter_t;
+  typedef vector<parameter_t> parameters_t;
+
 }
 
 %code top
@@ -67,6 +71,8 @@
   vector<Node*> parent_list;
   vector<Node*> expression;
   int func_num = 0;
+
+
 }
 
 
@@ -255,8 +261,8 @@
 %type <Node*> right_side
 %type <SmalaNative*> lambda
 %type <SmalaNative*> start_lambda
-%type < vector< pair<ParamType, string> > > parameters
-%type < pair<ParamType, string> > parameter
+%type < parameters_t > parameters
+%type < parameter_t > parameter
 
 %left QUESTION_MARK COLON
 %nonassoc GT GE LT LE EQ NEQ

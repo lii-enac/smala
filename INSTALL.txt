@@ -1,22 +1,35 @@
 We provide a Makefile that should work on MacOS (10.12+),  Linux platforms, windows 10+
 
-Known dependencies:
-
 ---- LINUX -----
 
 Linux/Ubuntu:
+  git clone git@github.com:lii-enac/smala.git
+  cd smala
   make install-pkgdeps
   make -j4
 
 ---- MACOS -----
 
 MacOS
+  git clone git@github.com:lii-enac/smala.git
+  cd smala
   make install-pkgdeps
   make -j
- 
+
 ---- WINDOWS -----
 
 Win
-  launch MINGW64 command line and then
+  launch MINGW64 command line then
+  git clone git@github.com:lii-enac/smala.git
+  cd smala
   make install-pkgdeps
   make -j4
+
+
+--- ALL ---
+make -j simplest_test
+
+try any other cookbook in smala/cookbook
+make -j pan_and_zoom_test
+make -j fitts_law_test
+etc.

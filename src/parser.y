@@ -677,6 +677,21 @@ add_child: NAME_OR_PATH INSERT NAME_OR_PATH
   driver.add_node (n);
   n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 }
+| NAME_OR_PATH INSERT CLONE LP NAME_OR_PATH RP
+{
+  vector< pair<ParamType, string> > args_2;
+  args_2.push_back (make_pair (NAME, $5));
+  Node* n2 = new Node ("clone", $1, args_2);
+  n2->set_node_type (CLONE);
+  driver.add_node (n2);
+
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (NAME, $1));
+  Node* n = new Node ("addChild", $1, args);
+  n->set_node_type (ADD_CHILD);
+  driver.add_node (n);
+  n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+}
 | NAME_OR_PATH SIMPLE_EQ ADD_CHILD LP NAME_OR_PATH RP
 {
   vector< pair<ParamType, string> > args;

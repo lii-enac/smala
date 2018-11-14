@@ -1,35 +1,20 @@
-We provide a Makefile that should work on MacOS (10.12+),  Linux platforms, windows 10+
+We provide a Makefile that should work on MacOS (10.12+), Linux, Windows.
 
----- LINUX -----
+1. install djnn-cpp (see https://github.com/lii-enac/djnn-cpp/blob/master/INSTALL.txt)
+2. open a terminal, cd to the parent of the djnn-cpp directory and copy/paste the following commands:
 
-Linux/Ubuntu:
-  git clone git@github.com:lii-enac/smala.git
-  cd smala
-  make install-pkgdeps
-  make -j4
+git clone git@github.com:lii-enac/smala.git
+cd smala
+make install-pkgdeps
+make -j4
 
----- MACOS -----
+3. test it with the following commands:
 
-MacOS
-  git clone git@github.com:lii-enac/smala.git
-  cd smala
-  make install-pkgdeps
-  make -j
-
----- WINDOWS -----
-
-Win
-  launch MINGW64 command line then
-  git clone git@github.com:lii-enac/smala.git
-  cd smala
-  make install-pkgdeps
-  make -j4
-
-
---- ALL ---
 make -j simplest_test
 
-try any other cookbook in smala/cookbook
+4. try any other cookbook listed in smala/cookbook subdirectories
 make -j pan_and_zoom_test
 make -j fitts_law_test
 etc.
+
+5. copy cookbook/stand_alone somewhere else and start your own project  (see Makefile in stand_alone)

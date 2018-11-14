@@ -17,4 +17,4 @@ make -j pan_and_zoom_test
 make -j fitts_law_test
 etc.
 
-5. copy cookbook/stand_alone somewhere else and start your own project  (see Makefile in stand_alone)
+5. copy cookbook/stand_alone somewhere else and start your own project (see Makefile in stand_alone)

@@ -1,6 +1,6 @@
 # canonical Makefile for smala applications
 # 1. copy stand_alone directory somwhere: cp -r cookbook/stand_alone /some/where/else
-# 2. edit configuration part (executable name, srcs, target_lang, djnn_libs, path to smalac)
+# 2. edit configuration part (executable name, srcs, target_lang, djnn_libs, path to djnn-cpp and smalac)
 # 3. make test
 
 #--

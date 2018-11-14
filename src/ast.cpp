@@ -98,6 +98,13 @@ Ast::add_native_code (const std::string &code)
 }
 
 void
+Ast::add_native_expression (NativeExpressionNode *node)
+{
+  m_native_expression_list.push_back (node);
+  //m_preamble.add_node (node);
+}
+
+void
 Ast::add_native_java (const std::string &code)
 {
   NativeCodeNode *node = new NativeCodeNode (code);

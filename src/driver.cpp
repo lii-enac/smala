@@ -102,6 +102,12 @@ Driver::add_native_code (const std::string &code)
 }
 
 void
+Driver::add_native_expression (NativeExpressionNode* node)
+{
+  m_ast.add_native_expression (node);
+}
+
+void
 Driver::add_native_java (const std::string &code)
 {
   m_ast.add_native_java (code);

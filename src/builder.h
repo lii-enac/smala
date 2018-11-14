@@ -54,7 +54,7 @@ namespace Smala {
   public:
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
-            0), m_in_set_text (false), m_type_manager (nullptr)
+            0), m_sym_num (0), m_native_num (0), m_in_set_text (false), m_in_native_action (false), m_type_manager (nullptr)
     {
     }
     virtual ~Builder () {};
@@ -62,8 +62,8 @@ namespace Smala {
     string filename () { return m_filename; }
   protected:
     smala::ErrorLocation *m_curloc;
-    int m_indent, m_cpnt_num, m_var_num, m_error;
-    bool m_in_set_text;
+    int m_indent, m_cpnt_num, m_var_num, m_error, m_sym_num, m_native_num;
+    bool m_in_set_text, m_in_native_action;
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
@@ -78,7 +78,7 @@ namespace Smala {
     virtual void build_arg_node (std::ofstream &os, Node *node);
     void build_native_code (std::ofstream &os, Node *node);
     void build_cat (std::ofstream &os, Node *node);
-    void build_control_node (std::ofstream &os, Node *n);
+    virtual void build_control_node (std::ofstream &os, Node *n);
     void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor);
     virtual void build_activator (std::ofstream &os, ActivatorNode *node) {}
     virtual void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) = 0;
@@ -93,6 +93,8 @@ namespace Smala {
     virtual void build_smala_native (std::ofstream &os, Node *n) = 0;
     virtual void build_native_action_component (std::ofstream &os, Node *n) = 0;
     virtual void build_native_action (std::ofstream &os, Node *n) = 0;
+    virtual void build_native_expression (std::ofstream &os, Node *n) {}
+    virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
     void print_find_component (std::ofstream &os, const std::string&, const std::string&);
     virtual std::string build_find_component (const std::string&, const std::string&) = 0;

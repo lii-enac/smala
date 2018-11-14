@@ -13,6 +13,7 @@
  */
 
 #include "cpp_builder.h"
+#include "native_expression_node.h"
 #include "operator_node.h"
 #include "instruction_node.h"
 #include "binary_instruction_node.h"
@@ -41,7 +42,8 @@ namespace Smala
   }
 
   int
-  CPPBuilder::build (const Ast &ast, const std::string &builddir, const std::string &prefix)
+  CPPBuilder::build (const Ast &ast, const std::string &builddir,
+                     const std::string &prefix)
   {
     m_indent = 0;
     m_cpnt_num = 0;
@@ -94,11 +96,229 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_simple_control_node (std::ofstream &os,
+                                         NativeExpressionNode *node)
+  {
+    std::string p_name =
+        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+    ArgNode* arg_node = node->get_expression ().at (0);
+    std::pair<std::string, std::string> arg;
+    if (arg_node->arg_type () != VAR) {
+      std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      indent (os);
+      if (arg_node->arg_value ().at (0) == '\"') {
+        os << "TextProperty *" << new_name << " = new TextProperty (" << p_name
+            << ", \"\", " << arg_node->arg_value () << ");\n";
+      } else {
+        os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
+            << p_name << ", \"\", " << arg_node->arg_value () << ");\n";
+      }
+      arg = std::pair<std::string, std::string> (new_name, "\"\"");
+    } else {
+      arg = parse_symbol (arg_node->arg_value ());
+    }
+    if (!node->is_connector () && !node->name ().empty ()) {
+      std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      std::pair<std::string, std::string> out_arg = parse_symbol (
+          node->get_output_nodes ().at (0));
+      os << "Process *" << new_name << " = new Assignment ( " << p_name
+          << ", \"\", " << arg.first << ", " << arg.second << ", "
+          << out_arg.first << ", " << out_arg.second << ", "
+          << node->is_model () << ");\n";
+      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
+          && node->duplicate_warning ())
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
+    } else {
+      for (auto e : node->get_output_nodes ()) {
+        indent (os);
+        std::pair<std::string, std::string> out_arg = parse_symbol (e);
+        os << "new ";
+        if (node->is_paused ())
+          os << "Paused";
+        if (node->is_connector ())
+          os << "Connector (";
+        else
+          os << "Assignment (";
+        os << p_name << ", \"\", " << arg.first << ", " << arg.second << ", "
+            << out_arg.first << ", " << out_arg.second;
+        if (!node->is_connector ())
+          os << ", " << node->is_model ();
+        os << ");\n";
+      }
+    }
+  }
+
+  void
+  CPPBuilder::build_native_expression_node (std::ofstream &os, Node *n)
+  {
+    NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
+    if (node->get_expression ().size () == 1) {
+      build_simple_control_node (os, node);
+      return;
+    }
+    std::map<std::string, std::string> sym;
+    std::string sym_name ("sym_" + std::to_string (m_sym_num++));
+    std::string p_name =
+        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+    std::vector<std::string> triggers;
+    indent (os);
+    os << "std::map<std::string, AbstractProperty*> " << sym_name << ";\n";
+    indent (os);
+    bool string_setter = false;
+    for (auto e : node->get_expression ()) {
+      if (e->arg_value().at(0) == '\"')
+        string_setter = true;
+    }
+    std::string bool_name ("string_setter_" + std::to_string (m_sym_num - 1));
+    os << "bool " << bool_name << " = " << string_setter << ";\n";
+
+    for (auto e : node->get_expression ()) {
+      if (e->arg_type () == VAR && sym.find (e->arg_value ()) == sym.end ()) {
+        std::pair<std::string, std::string> arg = parse_symbol (
+            e->arg_value ());
+        if (arg.first.compare (0, 6, "d_var_") == 0
+            || arg.first.compare (0, 6, "i_var_") == 0) {
+          indent (os);
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
+              << p_name << ", \"\", " << e->arg_value () << ");\n";
+          indent (os);
+          os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+              << ";\n";
+        } else if (arg.first.compare (0, 6, "s_var_") == 0) {
+          indent (os);
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "TextProperty *" << new_name << " = new TextProperty ("
+              << p_name << ", \"\", " << e->arg_value () << ");\n";
+          indent (os);
+          os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+              << ";\n";
+          string_setter = true;
+        } else {
+          indent (os);
+          if (arg.second.compare (m_null_string) == 0) {
+            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
+                << ") == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e->arg_value ()
+                << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "} else if (dynamic_cast<TextProperty*>(" << arg.first
+                << ") != nullptr) {\n";
+            indent (os);
+            os << "\t" << bool_name << " = true;\n}\n";
+            indent (os);
+            os << sym_name << "[\"" << e->arg_value ()
+                << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
+                << ");\n";
+            sym[e->arg_value ()] = arg.first;
+            triggers.push_back (arg.first);
+          } else {
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            os << "AbstractProperty* " << new_name
+                << " = dynamic_cast<AbstractProperty*> (" << arg.first
+                << "->find_component (" << arg.second << "));\n";
+            indent (os);
+            os << "if (" << new_name << " == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e->arg_value ()
+                << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "} else if (dynamic_cast<TextProperty*>(" << arg.first
+                << "->find_component (" << arg.second << ")) != nullptr) {\n";
+            indent (os);
+            os << "\t" << bool_name << " = true;\n\t}\n";
+            indent (os);
+            os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+                << ";\n";
+            sym[e->arg_value ()] = new_name;
+            triggers.push_back (new_name);
+          }
+        }
+      }
+    }
+    for (auto e : node->get_output_nodes ()) {
+      if (sym.find (e) == sym.end ()) {
+        std::pair<std::string, std::string> arg = parse_symbol (e);
+        if (arg.first.compare (0, 4, "var_") != 0) {
+          indent (os);
+          if (arg.second.compare (m_null_string) == 0) {
+            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
+                << ") == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            os << sym_name << "[\"" << e
+                << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
+                << ");\n";
+            sym[e] = arg.first;
+          } else {
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            os << "AbstractProperty* " << new_name
+                << " = dynamic_cast<AbstractProperty*> (" << arg.first
+                << "->find_component (" << arg.second << "));\n";
+            indent (os);
+            os << "if (" << new_name << " == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            os << sym_name << "[\"" << e << "\"] = " << new_name << ";\n";
+            sym[e] = new_name;
+          }
+        }
+      }
+    }
+    indent (os);
+    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    std::string n_expr_name =
+        node->name ().empty () ? m_null_string : node->name ();
+    if (string_setter) {
+      os << "Process *" << new_name << " = new NativeExpressionAction ("
+          << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
+          << ", " << sym_name << ", true, " << node->is_model () << ");\n";
+    } else {
+      os << "Process *" << new_name << " = new NativeExpressionAction ("
+          << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
+          << ", " << sym_name << ", " << bool_name << ", " << node->is_model ()
+          << ");\n";
+    }
+
+    if (!node->name ().empty ()) {
+      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
+          && node->duplicate_warning ())
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
+    }
+    if (node->is_connector ()) {
+      for (auto t : triggers) {
+        indent (os);
+        os << "new Binding (" << p_name << ", \"\", " << t << ", \"\", "
+            << new_name << ", \"\");\n";
+      }
+    }
+  }
+
+  void
   CPPBuilder::build_activator (std::ofstream &os, ActivatorNode *n)
   {
     indent (os);
-    std::string p_name = n->parent () == nullptr ? "nullptr" : n->parent ()->build_name ();
-    os << "new Activator (" << p_name << ", \"\", " << n->node ()->build_name () << "->find_component (\"action\"));\n";
+    std::string p_name =
+        n->parent () == nullptr ? "nullptr" : n->parent ()->build_name ();
+    os << "new Activator (" << p_name << ", \"\", " << n->node ()->build_name ()
+        << "->find_component (\"action\"));\n";
   }
 
   void
@@ -114,6 +334,119 @@ namespace Smala
     if (code[code.length () - 1] != '}')
       os << "}";
     os << std::endl;
+  }
+
+  static bool
+  is_sym (const std::string &s)
+  {
+    return (s.compare ("+") == 0) || (s.compare ("-") == 0)
+        || (s.compare ("/") == 0) || (s.compare ("*") == 0)
+        || (s.compare (0, 1, "<") == 0) || (s.compare (0, 1, ">") == 0)
+        || (s.compare (0, 1, "!") == 0) || (s.compare (0, 1, "&") == 0)
+        || (s.compare (0, 1, "|") == 0) || (s.compare (0, 1, "=") == 0);
+  }
+
+  void
+  CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
+  {
+    NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
+    if (node->get_expression ().size () == 1) {
+      return;
+    }
+    bool sym = false;
+    bool has_sym = false;
+    bool has_str = false;
+    for (auto n_e : node->get_expression ()) {
+      if (is_sym (n_e->arg_value ()) || (n_e->arg_type () == VALUE && n_e->arg_value().at(0) != '\"')) {
+        sym = true;
+      } else if (n_e->arg_value ().compare ("?") == 0) {
+        sym = false;
+      } else if (n_e->arg_value ().compare (":") == 0) {
+        if (sym)
+          has_sym = true;
+      } else if (n_e->arg_value ().at (0) == '\"') {
+        has_str = true;
+      }
+    }
+    if (sym)
+      has_sym = true;
+    std::string native_name ("nat_" + std::to_string (m_native_num++));
+    node->set_build_name (native_name);
+    os << "\nstatic void\n" << native_name
+        << "(std::map<std::string, AbstractProperty*> sym_table, bool string_setter)\n{\n";
+    bool is_string = false;
+    for (auto n_e : node->get_expression ()) {
+      if (n_e->arg_value ().at (0) == '\"') {
+        is_string = true;
+        break;
+      }
+    }
+
+    if (!has_sym) {
+      os << "\tif (string_setter) {\n\t\tstd::string result = ";
+      int sz = node->get_expression ().size ();
+      int i = 1;
+      bool in_expr;
+      for (auto op : node->get_expression ()) {
+        if (op->arg_type () == SYMBOL) {
+          os << " " << op->arg_value () << " ";
+          if (is_sym (op->arg_value ())) {
+            in_expr = true;
+          } else if (op->arg_value ().compare ("?") == 0
+              || op->arg_value ().compare (":") == 0) {
+            in_expr = false;
+          }
+        } else if (op->arg_type () == VAR) {
+          if (!in_expr
+              && (i == sz || !is_sym (node->get_expression ().at (i)->arg_value ()))) {
+            os << "((TextProperty*) sym_table.find (\"" << op->arg_value ()
+                << "\")->second)->get_value ()";
+          } else {
+            os << "sym_table.find (\"" << op->arg_value ()
+                << "\")->second->get_double_value ()";
+          }
+        } else if (op->arg_value ().at (0) == '\"') {
+          os << "std::string (" << op->arg_value () << ")";
+        } else {
+          os << op->arg_value ();
+        }
+        i++;
+      }
+      os << ";\n";
+      for (auto n : node->get_output_nodes ()) {
+        os << "\t\tsym_table.find (\"" << n
+            << "\")->second->set_value (result, " << !node->is_paused ()
+            << ");\n";
+      }
+      os << "\t}";
+    }
+    if (!has_str) {
+      if (!has_sym)
+        os << "else {\n";
+      os << "\t\tdouble result = ";
+      for (auto n_e : node->get_expression ()) {
+        ArgNode *op = static_cast<ArgNode*> (n_e);
+        if (op->arg_type () == SYMBOL) {
+          os << " " << op->arg_value () << " ";
+        } else if (op->arg_type () == VAR) {
+          os << "sym_table.find (\"" << op->arg_value ()
+              << "\")->second->get_double_value ()";
+        } else if (op->arg_value ().at (0) == '\"') {
+          os << "std::string (" << op->arg_value () << ")";
+        } else {
+          os << op->arg_value ();
+        }
+      }
+      os << ";\n";
+      for (auto n : node->get_output_nodes ()) {
+        os << "\t\tsym_table.find (\"" << n
+            << "\")->second->set_value (result, " << !node->is_paused ()
+            << ");\n";
+      }
+      if (!has_sym)
+        os << "\t}";
+    }
+    os << "\n}\n";
   }
 
   void
@@ -137,11 +470,14 @@ namespace Smala
   {
     InstructionNode *n = static_cast<InstructionNode*> (node);
     for (int i = 0; i < n->cpnt_list ().size (); i++) {
-      std::pair<std::string, std::string> arg = parse_symbol (n->cpnt_list ().at (i));
+      std::pair<std::string, std::string> arg = parse_symbol (
+          n->cpnt_list ().at (i));
       std::string cpnt_name =
-          arg.second.compare (m_null_string) == 0 ? arg.first : arg.first + "->find_component (" + arg.second + ")";
+          arg.second.compare (m_null_string) == 0 ?
+              arg.first : arg.first + "->find_component (" + arg.second + ")";
       if (arg.first.empty ()) {
-        print_error_message (error_level::error, "unknown component " + n->cpnt_list ().at (i), 1);
+        print_error_message (error_level::error,
+                             "unknown component " + n->cpnt_list ().at (i), 1);
         return;
       }
       indent (os);
@@ -179,7 +515,8 @@ namespace Smala
           os << "if (" << arg.first << "->get_parent ())\n";
           indent (os);
           indent (os);
-          os << arg.first << "->get_parent ()->remove_child (" << arg.first << ");\n";
+          os << arg.first << "->get_parent ()->remove_child (" << arg.first
+              << ");\n";
           indent (os);
           os << "delete " << arg.first << ";\n";
         }
@@ -208,15 +545,17 @@ namespace Smala
       os << "string (";
       m_in_set_text = true;
     }
-    if (node->args().empty())
+    if (node->args ().empty ())
       return;
     if (node->args ().at (0).first == NAME) {
-      std::pair<std::string, std::string> val = parse_symbol (node->args ().at (0).second);
+      std::pair<std::string, std::string> val = parse_symbol (
+          node->args ().at (0).second);
       os << val.first << "->find_component (" << val.second << ")";
     } else
       os << node->args ().at (0).second;
     if (node->djnn_type ().substr (3).compare ("Text") == 0) {
       os << ")";
+      m_in_set_text = false;
     }
     os << ", true);\n";
   }
@@ -235,8 +574,7 @@ namespace Smala
   {
     ArgNode *n = static_cast<ArgNode*> (node);
     switch (n->arg_type ()) {
-      case SYMBOL:
-      {
+      case SYMBOL: {
         if (m_in_set_text) {
           os << ")";
         }
@@ -245,7 +583,7 @@ namespace Smala
           os << " string (";
         }
       }
-      break;
+        break;
       case VALUE:
         os << n->arg_value ();
         break;
@@ -270,11 +608,12 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec,
+  CPPBuilder::build_set_string (std::ofstream &os, const std::string &cpnt_name,
+                                const std::string &spec,
                                 const std::string &value)
   {
-    os << "((TextProperty*) " << cpnt_name << "->find_component (" << spec << "))->set_value (string (" << value
-        << "), true);\n";
+    os << "((TextProperty*) " << cpnt_name << "->find_component (" << spec
+        << "))->set_value (string (" << value << "), true);\n";
   }
 
   void
@@ -282,21 +621,25 @@ namespace Smala
   {
     std::string var_name ("pr_var_" + std::to_string (m_var_num++));
     if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
     indent (os);
 
-    if (node->djnn_type().compare ("doubleToString") == 0) {
-      os << "std::string " << var_name << " = std::to_string (((DoubleProperty*) ";
-    } else if (node->djnn_type().compare ("intToString") == 0){
+    if (node->djnn_type ().compare ("doubleToString") == 0) {
+      os << "std::string " << var_name
+          << " = std::to_string (((DoubleProperty*) ";
+    } else if (node->djnn_type ().compare ("intToString") == 0) {
       os << "std::string " << var_name << " = std::to_string (((IntProperty*) ";
     } else {
       print_type (os, node->args ().at (0).first);
       os << " " << var_name << " = ";
       os << "((" << node->djnn_type ().substr (3) << "Property*) ";
     }
-    std::pair<std::string, std::string> arg = parse_symbol (node->args ().at (0).second);
+    std::pair<std::string, std::string> arg = parse_symbol (
+        node->args ().at (0).second);
     os << arg.first << "->find_component (" << arg.second << "))->get_value ()";
-    if (node->djnn_type().compare ("doubleToString") == 0 || node->djnn_type().compare ("intToString") == 0) {
+    if (node->djnn_type ().compare ("doubleToString") == 0
+        || node->djnn_type ().compare ("intToString") == 0) {
       os << ")";
     }
     os << ";\n";
@@ -308,17 +651,20 @@ namespace Smala
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     indent (os);
-    os << "alias (" << m_parent_list.back ()->name () << ", \"" << n->left_arg () << "\", ";
+    os << "alias (" << m_parent_list.back ()->name () << ", \""
+        << n->left_arg () << "\", ";
     std::pair<std::string, std::string> arg = parse_symbol (n->right_arg ());
     if (arg.second.compare (m_null_string) == 0)
       os << arg.first << ");\n";
     else
       os << arg.first << "->find_component (" << arg.second << "));\n";
     indent (os);
-    os << "Process *" << new_name << " = " << m_parent_list.back ()->name () << "->find_component ( \""
-        << n->left_arg () + "\");\n";
-    if (m_parent_list.back ()->add_entry (n->left_arg (), new_name) == 1 && node->duplicate_warning ())
-      print_error_message (error_level::warning, "duplicated name: " + n->left_arg (), 0);
+    os << "Process *" << new_name << " = " << m_parent_list.back ()->name ()
+        << "->find_component ( \"" << n->left_arg () + "\");\n";
+    if (m_parent_list.back ()->add_entry (n->left_arg (), new_name) == 1
+        && node->duplicate_warning ())
+      print_error_message (error_level::warning,
+                           "duplicated name: " + n->left_arg (), 0);
   }
 
   void
@@ -328,8 +674,8 @@ namespace Smala
     indent (os);
     std::pair<std::string, std::string> left = parse_symbol (n->left_arg ());
     std::pair<std::string, std::string> right = parse_symbol (n->right_arg ());
-    os << "merge_children (" << left.first << ", " << left.second << ", " << right.first << ", " << right.second
-        << ");\n";
+    os << "merge_children (" << left.first << ", " << left.second << ", "
+        << right.first << ", " << right.second << ");\n";
   }
 
   void
@@ -349,7 +695,8 @@ namespace Smala
     indent (os);
     std::pair<std::string, std::string> right = parse_symbol (n->right_arg ());
     std::pair<std::string, std::string> left = parse_symbol (n->left_arg ());
-    os << left.first << "->get_parent ()->move_child (" << left.first << ", " << c << ", " << right.first << ");\n";
+    os << left.first << "->get_parent ()->move_child (" << left.first << ", "
+        << c << ", " << right.first << ");\n";
   }
 
   void
@@ -357,29 +704,36 @@ namespace Smala
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
 
     // TODO we should also parse properly argument expressions
 
     indent (os);
-    os << "Process *" << new_name << " = new List (" << m_parent_list.back ()->name () << ", \"" << node->name ()
+    os << "Process *" << new_name << " = new List ("
+        << m_parent_list.back ()->name () << ", \"" << node->name ()
         << "\");\n";
     indent (os);
     std::string new_var_name ("var_" + std::to_string (m_var_num++));
     os << "int " << new_var_name << ";\n";
-    if (m_parent_list.back ()->add_entry (node->args ().at (0).second, new_var_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->args ().at (0).second, 0);
+    if (m_parent_list.back ()->add_entry (node->args ().at (0).second,
+                                          new_var_name) == 1)
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->args ().at (0).second,
+                           0);
 
     indent (os);
     string nb_entries =
         node->args ().at (1).first == INT ?
-            node->args ().at (1).second : m_parent_list.back ()->get_symbol (node->args ().at (1).second);
-    os << "for (" << new_var_name << " = 1; " << new_var_name << " <= " << nb_entries << "; " << new_var_name
-        << "++) {\n";
+            node->args ().at (1).second :
+            m_parent_list.back ()->get_symbol (node->args ().at (1).second);
+    os << "for (" << new_var_name << " = 1; " << new_var_name << " <= "
+        << nb_entries << "; " << new_var_name << "++) {\n";
     m_indent++;
     std::string inFor ("cpnt_" + std::to_string (m_cpnt_num++));
     indent (os);
-    os << "Process *" << inFor << " = new Component (" << new_name << ", \"\");\n";
+    os << "Process *" << inFor << " = new Component (" << new_name
+        << ", \"\");\n";
     m_parent_list.push_back (new BuildNode (inFor, m_parent_list.back ()));
     /* FIXME dirty trick to set the parent name of the enclosed nodes*/
     node->set_build_name (inFor);
@@ -390,7 +744,8 @@ namespace Smala
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
     std::pair<ParamType, std::string> arg = node->args ().at (0);
     indent (os);
     os << "Process *" << new_name << " = XML::djnLoadFromXML (";
@@ -405,24 +760,30 @@ namespace Smala
   void
   CPPBuilder::add_child (std::ofstream &os, Node *node)
   {
-    std::pair<std::string, std::string> s = parse_symbol (node->args ().at (0).second);
+    std::pair<std::string, std::string> s = parse_symbol (
+        node->args ().at (0).second);
     indent (os);
     if (s.second.compare (m_null_string) == 0) {
       m_parent_list.back ()->add_entry (node->name (), s.first);
-      os << m_parent_list.back ()->name () << "->add_child (" << s.first << ", \"" << node->name () << "\");\n";
+      os << m_parent_list.back ()->name () << "->add_child (" << s.first
+          << ", \"" << node->name () << "\");\n";
     } else {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
-        print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
       }
-      os << "Process *" << new_name << " = " << s.first << "->find_component (" << s.second << ");\n";
+      os << "Process *" << new_name << " = " << s.first << "->find_component ("
+          << s.second << ");\n";
       indent (os);
-      os << m_parent_list.back ()->name () << "->add_child (" << new_name << ", \"" << node->name () << "\");\n";
+      os << m_parent_list.back ()->name () << "->add_child (" << new_name
+          << ", \"" << node->name () << "\");\n";
     }
   }
 
   void
-  CPPBuilder::fetch_add_child (std::ofstream &os, std::string &parent, std::string &child, std::string &name)
+  CPPBuilder::fetch_add_child (std::ofstream &os, std::string &parent,
+                               std::string &child, std::string &name)
   {
     indent (os);
     os << parent << "->add_child (" << child << ", \"" << name << "\");\n";
@@ -436,7 +797,8 @@ namespace Smala
 
     if (s.second.compare (m_null_string) != 0) {
       indent (os);
-      os << "Process *" << new_name << " = " << s.first << "->find_component (" << s.second << ");\n";
+      os << "Process *" << new_name << " = " << s.first << "->find_component ("
+          << s.second << ");\n";
       m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (new_name);
@@ -452,7 +814,8 @@ namespace Smala
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
     std::pair<ParamType, std::string> arg = node->args ().at (0);
     indent (os);
     os << "Process *" << new_name << " = ";
@@ -475,7 +838,8 @@ namespace Smala
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
     std::pair<ParamType, std::string> arg = node->args ().at (0);
     indent (os);
     os << "Process *" << new_name << " = ";
@@ -492,7 +856,8 @@ namespace Smala
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     node->set_build_name (new_name);
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + node->name (), 0);
     indent (os);
     os << "Process* " << new_name << " = new Component  (p, n);\n";
 
@@ -500,8 +865,9 @@ namespace Smala
      * the symbols in the sym_table should be the arguments of the function.
      * They must be duplicated to check for symbol duplication */
     BuildNode *new_parent = new BuildNode (new_name, m_parent_list.back ());
-    new_parent->sym_table ()->insert (m_parent_list.back ()->sym_table ()->begin (),
-                                      m_parent_list.back ()->sym_table ()->end ());
+    new_parent->sym_table ()->insert (
+        m_parent_list.back ()->sym_table ()->begin (),
+        m_parent_list.back ()->sym_table ()->end ());
     m_parent_list.push_back (new_parent);
   }
 
@@ -515,13 +881,24 @@ namespace Smala
       os << ", ";
       print_type (os, arg.first);
       std::string new_name;
-      if (arg.first != NAME)
-        new_name = "var_" + std::to_string (m_var_num++);
-      else
-        new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      switch (arg.first) {
+        case INT:
+          new_name = "i_var_" + std::to_string (m_var_num++);
+          break;
+        case DOUBLE:
+          new_name = "d_var_" + std::to_string (m_var_num++);
+          break;
+        case STRING:
+          new_name = "s_var_" + std::to_string (m_var_num++);
+          break;
+        case LOCAL_NAME:
+        case NAME:
+          new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      }
       os << " " << new_name;
       if (m_parent_list.back ()->add_entry (arg.second, new_name) == 1)
-        print_error_message (error_level::warning, "duplicated name: " + arg.second, 0);
+        print_error_message (error_level::warning,
+                             "duplicated name: " + arg.second, 0);
     }
     os << ")\n{\n";
     m_indent++;
@@ -551,17 +928,20 @@ namespace Smala
   CPPBuilder::build_native_action_component (std::ofstream &os, Node *node)
   {
     std::string constructor = get_constructor (node->djnn_type ());
-    std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
+    std::string name =
+        node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     node->set_build_name (new_name);
     if (!node->name ().empty ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-        print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
     }
     indent (os);
-    std::string p_name = node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
-    os << "Process* " << new_name << " = new " << constructor << " (" << p_name << ", " << name << ", "
-        << node->args ().at (0).second << ", ";
+    std::string p_name =
+        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+    os << "Process* " << new_name << " = new " << constructor << " (" << p_name
+        << ", " << name << ", " << node->args ().at (0).second << ", ";
     std::string data = node->args ().at (1).second;
     if (data.compare ("0") == 0)
       data = "nullptr";
@@ -580,20 +960,25 @@ namespace Smala
   {
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
-    os << "new " << constructor << " (" << m_parent_list.back ()->name () << ", " << m_null_string;
+    os << "new " << constructor << " (" << m_parent_list.back ()->name ()
+        << ", " << m_null_string;
 
     std::pair<std::string, std::string> src, dst;
     src = parse_symbol (ctrl->in ()->name ());
     dst = parse_symbol (ctrl->out ()->name ());
     std::string src_str =
-        src.second.compare (m_null_string) == 0 ? src.first : src.first + "->find_component (" + src.second + ")";
+        src.second.compare (m_null_string) == 0 ?
+            src.first : src.first + "->find_component (" + src.second + ")";
     std::string dst_str =
-        dst.second.compare (m_null_string) == 0 ? dst.first : dst.first + "->find_component (" + dst.second + ")";
+        dst.second.compare (m_null_string) == 0 ?
+            dst.first : dst.first + "->find_component (" + dst.second + ")";
     os << ", " << src_str << ", " << dst_str << ", ";
-    std::pair<std::string, std::string> trigger = parse_symbol (ctrl->args ().at (0).second);
+    std::pair<std::string, std::string> trigger = parse_symbol (
+        ctrl->args ().at (0).second);
     os << trigger.first << ", " << trigger.second << ", ";
     if (ctrl->args ().size () == 2) {
-      std::pair<std::string, std::string> act = parse_symbol (ctrl->args ().at (1).second);
+      std::pair<std::string, std::string> act = parse_symbol (
+          ctrl->args ().at (1).second);
       os << act.first << ", " << act.second << ");\n";
     } else {
       os << "nullptr, \"\");\n";
@@ -617,23 +1002,27 @@ namespace Smala
     if (right_is_var) {
       right->set_name (right_sym);
     }
-    std::string vleft = left->node_type () == LITERAL || left_is_var ? left->name () : "0";
-    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
+    std::string vleft =
+        left->node_type () == LITERAL || left_is_var ? left->name () : "0";
+    std::string vright =
+        right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ()->add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "Process *" << new_name << " = new " << constructor << " (" << m_parent_list.back ()->name () << ", \"\", "
-        << vleft << ", " << vright << ");\n";
+    os << "Process *" << new_name << " = new " << constructor << " ("
+        << m_parent_list.back ()->name () << ", \"\", " << vleft << ", "
+        << vright << ");\n";
     if (!left_is_var)
       check_and_build_connector (os, left, new_name, "\"left\"");
     if (!right_is_var)
       check_and_build_connector (os, right, new_name, "\"right\"");
     if (node->in_expression ()) {
       indent (os);
-      os << "new Activator (" << m_parent_list.back ()->name () << ", \"\", " << new_name << ", \"action\");\n";
+      os << "new Activator (" << m_parent_list.back ()->name () << ", \"\", "
+          << new_name << ", \"action\");\n";
     }
   }
 
@@ -645,52 +1034,53 @@ namespace Smala
     std::string prefix = "var_";
     std::string right_sym = m_parent_list.back ()->get_symbol (right->name ());
     bool right_is_var = right_sym.substr (0, prefix.size ()) == prefix;
-    std::string vright = right->node_type () == LITERAL || right_is_var ? right->name () : "0";
+    std::string vright =
+        right->node_type () == LITERAL || right_is_var ? right->name () : "0";
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.back ()->add_entry (new_name, new_name);
     node->set_build_name (new_name);
     indent (os);
-    os << "Process *" << new_name << " = new " << constructor << " (" << m_parent_list.back ()->name () << ", \"\", "
-        << vright << ");\n";
+    os << "Process *" << new_name << " = new " << constructor << " ("
+        << m_parent_list.back ()->name () << ", \"\", " << vright << ");\n";
     if (!right_is_var)
       check_and_build_connector (os, right, new_name, "\"input\"");
     if (node->in_expression ()) {
       indent (os);
-      os << "new Activator (" << m_parent_list.back ()->name () << ", \"\", " << new_name << ", \"action\");\n";
+      os << "new Activator (" << m_parent_list.back ()->name () << ", \"\", "
+          << new_name << ", \"action\");\n";
     }
   }
 
   void
-  CPPBuilder::check_and_build_connector (std::ofstream &os, Node *n, const std::string &name, const std::string &side)
+  CPPBuilder::check_and_build_connector (std::ofstream &os, Node *n,
+                                         const std::string &name,
+                                         const std::string &side)
   {
     std::pair<std::string, std::string> p;
-    switch (n->node_type ())
-      {
-      case PATH:
-        {
-          p = parse_symbol (n->name ());
-          break;
-        }
-      case BINARY_OP:
-        {
-          p = parse_symbol (n->build_name ());
-          p.second = "\"result\"";
-          break;
-        }
-      case UNARY_OP:
-        {
-          p = parse_symbol (n->build_name ());
-          p.second = "\"output\"";
-          break;
-        }
+    switch (n->node_type ()) {
+      case PATH: {
+        p = parse_symbol (n->name ());
+        break;
+      }
+      case BINARY_OP: {
+        p = parse_symbol (n->build_name ());
+        p.second = "\"result\"";
+        break;
+      }
+      case UNARY_OP: {
+        p = parse_symbol (n->build_name ());
+        p.second = "\"output\"";
+        break;
+      }
       default:
         return;
-      }
+    }
     indent (os);
-    os << "new Connector (" << m_parent_list.back ()->name () << ", \"\", " << p.first << ", " << p.second << ", "
-        << name << ", " << side << ");\n";
+    os << "new Connector (" << m_parent_list.back ()->name () << ", \"\", "
+        << p.first << ", " << p.second << ", " << name << ", " << side
+        << ");\n";
   }
 
   void
@@ -702,11 +1092,14 @@ namespace Smala
     m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));
     os << "\nstatic void\n" << n->fct () << " (Process* c) {\n";
     os << "\tProcess *" << src_name << " = c->get_activation_source ();\n";
-    os << "\tProcess *" << data_name << " = (Process *) get_native_user_data (c);\n";
+    os << "\tProcess *" << data_name
+        << " = (Process *) get_native_user_data (c);\n";
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + n->src (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + n->src (), 0);
     if (m_parent_list.back ()->add_entry (n->data (), data_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + n->data (), 0);
+      print_error_message (error_level::warning,
+                           "duplicated name: " + n->data (), 0);
     m_indent = 1;
   }
 
@@ -721,7 +1114,8 @@ namespace Smala
     os << "#pragma once\n#include <string>\n\n";
     for (int i = 0; i < m_ast.define_node_list ().size (); i++) {
       Node *def = m_ast.define_node_list ().at (i);
-      os << "djnn::Process* " << def->name () << " (djnn::Process*, const std::string &";
+      os << "djnn::Process* " << def->name ()
+          << " (djnn::Process*, const std::string &";
       for (int j = 0; j < def->args ().size (); j++) {
         std::pair<ParamType, std::string> arg = def->args ().at (j);
         os << ", ";
@@ -735,31 +1129,26 @@ namespace Smala
   void
   CPPBuilder::print_type (std::ofstream &os, ParamType type)
   {
-    switch (type)
-      {
-      case INT:
-        {
-          os << "int";
-          break;
-        }
-      case DOUBLE:
-        {
-          os << "double";
-          break;
-        }
-      case STRING:
-        {
-          os << "const string&";
-          break;
-        }
-      case NAME:
-        {
-          os << "djnn::Process*";
-          break;
-        }
-      default:
+    switch (type) {
+      case INT: {
+        os << "int";
         break;
       }
+      case DOUBLE: {
+        os << "double";
+        break;
+      }
+      case STRING: {
+        os << "const string&";
+        break;
+      }
+      case NAME: {
+        os << "djnn::Process*";
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   void
@@ -769,7 +1158,8 @@ namespace Smala
   }
 
   void
-  CPPBuilder::print_component_constructor (std::ofstream &os, const std::string &constructor)
+  CPPBuilder::print_component_constructor (std::ofstream &os,
+                                           const std::string &constructor)
   {
     std::map<std::string, std::string>::iterator it;
     it = m_import_types.find (constructor);
@@ -780,13 +1170,16 @@ namespace Smala
   }
 
   std::string
-  CPPBuilder::build_find_component (const std::string& first, const std::string& second)
+  CPPBuilder::build_find_component (const std::string& first,
+                                    const std::string& second)
   {
     return first + "->find_component (" + second + ")";
   }
 
   void
-  CPPBuilder::print_args (std::ofstream &os, std::vector<std::pair<ParamType, std::string> > args, bool is_first)
+  CPPBuilder::print_args (std::ofstream &os,
+                          std::vector<std::pair<ParamType, std::string> > args,
+                          bool is_first)
   {
     int size = args.size ();
     if (size == 0)
@@ -796,8 +1189,11 @@ namespace Smala
     for (int i = 0; i < size; i++) {
       std::string str;
       if (args.at (i).first == NAME) {
-        std::pair<std::string, std::string> var = parse_symbol (args.at (i).second);
-        str = var.second.compare ("0") == 0 ? var.first : var.first + "->find_component (" + var.second + ")";
+        std::pair<std::string, std::string> var = parse_symbol (
+            args.at (i).second);
+        str =
+            var.second.compare ("0") == 0 ?
+                var.first : var.first + "->find_component (" + var.second + ")";
       } else {
         str = args.at (i).second;
       }

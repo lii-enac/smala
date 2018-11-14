@@ -25,6 +25,7 @@
 namespace Smala {
 
 class Node;
+class NativeExpressionNode;
 class Preamble;
 
 class Driver {
@@ -39,6 +40,7 @@ public:
     void add_import (const std::string &val);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
+    void add_native_expression (NativeExpressionNode *node);
     void add_native_java (const std::string &code);
     void add_define_node (Node *node);
     void set_is_main (bool val);

@@ -23,6 +23,7 @@
 #include "parser.hpp"
 #include "preamble.h"
 #include "native_action_node.h"
+#include "native_expression_node.h"
 #include "native_code_node.h"
 
 namespace Smala {
@@ -40,6 +41,7 @@ public:
     void add_import (const std::string &val);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
+    void add_native_expression (NativeExpressionNode *node);
     void add_native_java (const std::string &code);
     void add_define_node (Node *defineNode);
     void set_is_main (bool val);
@@ -48,6 +50,7 @@ public:
 
     const std::vector<Node*> define_node_list () const;
     const std::vector<NativeActionNode*> native_list () const;
+    const std::vector<NativeExpressionNode*> native_expression_list () const { return m_native_expression_list; }
     const std::vector<Node*>& node_list () const;
     const Preamble& preamble () const;
     bool is_main () const;
@@ -55,6 +58,7 @@ public:
 private:
     Preamble m_preamble;
     std::vector<NativeActionNode*> m_native_list;
+    std::vector<NativeExpressionNode*> m_native_expression_list;
     std::vector<SmalaNative*> m_smala_native;
     std::vector<Node*> m_node_list;
     std::vector<Node*> m_define_nodes;

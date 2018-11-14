@@ -93,6 +93,7 @@ namespace Smala
   {
     int size = m_ast.preamble ().nodes ().size ();
     Node *cur_node;
+    /* put first use and import */
     for (int i = 0; i < size; ++i) {
       cur_node = m_ast.preamble ().nodes ().at (i);
       switch (cur_node->node_type ())
@@ -114,6 +115,19 @@ namespace Smala
             build_import (os, name);
             break;
           }
+        default: {}
+        }
+    }
+
+    /* then the auto-generated native */
+    for (auto e: m_ast.native_expression_list ()) {
+      build_native_expression (os, e);
+    }
+
+    /* finally the user defined native */
+    for (int i = 0; i < size; ++i) {
+      cur_node = m_ast.preamble ().nodes ().at (i);
+      switch (cur_node->node_type ()) {
         case NATIVE_ACTION:
           {
             build_native_action (os, cur_node);
@@ -161,6 +175,7 @@ namespace Smala
         }
       case SMALA_NATIVE:
         {
+          m_in_native_action = true;
           build_smala_native (os, node);
           break;
         }
@@ -170,8 +185,14 @@ namespace Smala
           BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
           m_parent_list.pop_back ();
           if (n) delete n;
+          m_in_native_action = false;
           break;
         }
+      case NATIVE_EXPRESSION:
+      {
+        build_native_expression_node (os, node);
+        break;
+      }
       case CCALL:
         {
           build_native_code (os, node);

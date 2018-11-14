@@ -48,6 +48,8 @@ namespace Smala {
     void build_activator (std::ofstream &os, ActivatorNode *n) override;
     void build_native_action_component (std::ofstream &os, Node *n) override;
     void build_native_action (std::ofstream &os, Node *n) override;
+    void build_native_expression (std::ofstream &os, Node *n) override;
+    void build_native_expression_node (std::ofstream &os, Node *n) override;
     void build_main_node (std::ofstream &os) override;
     void build_this_node (std::ofstream &os, Node *node) override;
     void build_define_node (std::ofstream &os, Node *node) override;
@@ -60,6 +62,7 @@ namespace Smala {
         Builder::build_new_line (os, n);
         os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
     }
+    void build_simple_control_node (std::ofstream &os, NativeExpressionNode *n);
     void check_and_build_connector (std::ofstream &os, Node *n, const std::string &name, const std::string &side);
     void print_native_code (std::ofstream &os);
     void print_component_decl (std::ofstream &os, const std::string &name) override;

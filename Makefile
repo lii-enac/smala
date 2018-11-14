@@ -341,8 +341,9 @@ endif
 
 ifeq ($(os),MINGW64_NT-10.0)
 #https://www.msys2.org/
-# no need prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
+# no need to prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
 pkgcmd := pacman -S
+CXXFLAGS += -I/usr/include # Fix for FlexLexer.h in /usr/include and in /ming64/include
 endif
 
 install-pkgdeps:

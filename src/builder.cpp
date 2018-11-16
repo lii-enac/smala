@@ -192,6 +192,11 @@ namespace Smala
           set_property (os, node);
           break;
         }
+      case END_PROPERTY:
+        {
+          end_property (os, node);
+          break;
+        }
       case GET_PROPERTY:
         {
           get_property (os, node);

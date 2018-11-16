@@ -197,10 +197,15 @@
 %token CLONE "clone"
 %token REPEAT "repeat"
 %token GET_INT "getInt"
+%token SET_INT "setInt"
 %token GET_DOUBLE "getDouble"
+%token SET_DOUBLE "setDouble"
 %token GET_BOOL "getBool"
+%token SET_BOOL "setBool"
 %token GET_STRING "getString"
+%token SET_STRING "setString"
 %token GET_REF "getRef"
+%token SET_REF "setRef"
 %token MAIN "_main_"
 %token DEFINE "_define_"
 %token NATIVE "Native"
@@ -746,12 +751,40 @@ set_bool: NAME_OR_PATH SIMPLE_EQ TRUE
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
+|
+start_set_bool argument_expression RP
+{
+  Node *n = new Node ("END_PROPERTY", "Bool");
+  n->set_node_type (END_PROPERTY);
+  driver.add_node (n);
+}
+
+start_set_bool: SET_BOOL LP NAME_OR_PATH COMMA
+{
+  Node *n = new Node ("SetBool", $3);
+  n->set_node_type (SET_PROPERTY);
+  driver.add_node (n);
+}
 
 set_int: NAME_OR_PATH SIMPLE_EQ INT
 {
   vector< pair<ParamType, string> > args;
   args.push_back (make_pair (INT, $3));
   Node *n = new Node ("SetInt", $1, args);
+  n->set_node_type (SET_PROPERTY);
+  driver.add_node (n);
+}
+|
+start_set_int  argument_expression RP
+{
+  Node *n = new Node ("END_PROPERTY", "Int");
+  n->set_node_type (END_PROPERTY);;
+  driver.add_node (n);
+}
+
+start_set_int: SET_INT LP NAME_OR_PATH COMMA
+{
+  Node *n = new Node ("SetInt", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
@@ -764,6 +797,20 @@ set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
+|
+start_set_double  argument_expression RP
+{
+  Node *n = new Node ("END_PROPERTY", "Double");
+  n->set_node_type (END_PROPERTY);
+  driver.add_node (n);
+}
+
+start_set_double: SET_DOUBLE LP NAME_OR_PATH COMMA
+{
+  Node *n = new Node ("SetDouble", $3);
+  n->set_node_type (SET_PROPERTY);
+  driver.add_node (n);
+}
 
 set_text: NAME_OR_PATH SIMPLE_EQ STRING
 {
@@ -773,12 +820,40 @@ set_text: NAME_OR_PATH SIMPLE_EQ STRING
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
+|
+start_set_text  argument_expression RP
+{
+  Node *n = new Node ("END_PROPERTY", "Text");
+  n->set_node_type (END_PROPERTY);
+  driver.add_node (n);
+}
+
+start_set_text: SET_STRING LP NAME_OR_PATH COMMA
+{
+  Node *n = new Node ("SetText", $3);
+  n->set_node_type (SET_PROPERTY);
+  driver.add_node (n);
+}
 
 set_ref: NAME_OR_PATH SIMPLE_EQ NAME_OR_PATH
 {
   vector< pair<ParamType, string> > args;
   args.push_back (make_pair (NAME, $3));
   Node *n = new Node ("SetRef", $1, args);
+  n->set_node_type (SET_PROPERTY);
+  driver.add_node (n);
+}
+|
+start_set_ref  argument_expression RP
+{
+  Node *n = new Node ("END_PROPERTY", "Ref");
+  n->set_node_type (END_PROPERTY);
+  driver.add_node (n);
+}
+
+start_set_ref: SET_REF LP NAME_OR_PATH COMMA
+{
+  Node *n = new Node ("SetRef", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }

@@ -131,10 +131,15 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "clone"               { return Smala::Parser::make_CLONE (Smala::location ()); }
 "repeat"              { return Smala::Parser::make_REPEAT (Smala::location ()); }
 "getInt"              { return Smala::Parser::make_GET_INT (Smala::location ()); }
+"setInt"              { return Smala::Parser::make_SET_INT (Smala::location ()); }
 "getDouble"           { return Smala::Parser::make_GET_DOUBLE (Smala::location ()); }
+"setDouble"           { return Smala::Parser::make_SET_DOUBLE (Smala::location ()); }
 "getBool"             { return Smala::Parser::make_GET_BOOL (Smala::location ()); }
+"setBool"             { return Smala::Parser::make_SET_BOOL (Smala::location ()); }
 "getString"           { return Smala::Parser::make_GET_STRING (Smala::location ()); }
+"setString"           { return Smala::Parser::make_SET_STRING (Smala::location ()); }
 "getRef"              { return Smala::Parser::make_GET_REF (Smala::location ()); }
+"setRef"              { return Smala::Parser::make_SET_REF (Smala::location ()); }
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
 {INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }
 {INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }

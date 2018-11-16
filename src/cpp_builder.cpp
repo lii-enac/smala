@@ -205,7 +205,10 @@ namespace Smala
     os << arg.first << "->find_component ( " << arg.second << "))->set_value (";
     if (node->djnn_type ().substr (3).compare ("Text") == 0) {
       os << "string (";
+      m_in_set_text = true;
     }
+    if (node->args().empty())
+      return;
     if (node->args ().at (0).first == NAME) {
       std::pair<std::string, std::string> val = parse_symbol (node->args ().at (0).second);
       os << val.first << "->find_component (" << val.second << ")";
@@ -215,6 +218,54 @@ namespace Smala
       os << ")";
     }
     os << ", true);\n";
+  }
+
+  void
+  CPPBuilder::end_property (std::ofstream &os, Node *node)
+  {
+    if (node->name ().compare ("Text") == 0)
+      os << ")";
+    os << ", true);\n";
+    m_in_set_text = false;
+  }
+
+  void
+  CPPBuilder::build_arg_node (std::ofstream &os, Node *node)
+  {
+    ArgNode *n = static_cast<ArgNode*> (node);
+    switch (n->arg_type ()) {
+      case SYMBOL:
+      {
+        if (m_in_set_text) {
+          os << ")";
+        }
+        os << n->arg_value ();
+        if (m_in_set_text) {
+          os << " string (";
+        }
+      }
+      break;
+      case VALUE:
+        os << n->arg_value ();
+        break;
+      case VAR: {
+        std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        if (p.second.compare (m_null_string) == 0)
+          os << p.first;
+        else
+          print_find_component (os, p.first, p.second);
+        break;
+      }
+      case SMALA_NULL: {
+        os << m_null_symbol;
+        break;
+      }
+      case END:
+        os << ");\n";
+        break;
+      default:
+        return;
+    }
   }
 
   void

@@ -29,8 +29,10 @@ namespace Smala {
     void build_use (std::ofstream &os, std::string use) override;
     void build_import (std::ofstream &os, std::string import) override;
     void build_instruction (std::ofstream &os, Node *node) override;
+    void build_arg_node (std::ofstream &os, Node *node) override;
     void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void set_property (std::ofstream &os, Node *node) override;
+    void end_property (std::ofstream &os, Node *n) override;
     void get_property (std::ofstream &os, Node *node) override;
     void alias (std::ofstream &os, Node *node) override;
     void merge (std::ofstream &os, Node *node) override;

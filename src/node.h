@@ -42,6 +42,7 @@ namespace Smala {
     END_CONTAINER,
     END_DEFINE,
     END_NATIVE,
+    END_PROPERTY,
     END_REPEAT,
     FIND,
     FSM,

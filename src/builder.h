@@ -54,7 +54,7 @@ namespace Smala {
   public:
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
-            0), m_type_manager (nullptr)
+            0), m_in_set_text (false), m_type_manager (nullptr)
     {
     }
     virtual ~Builder () {};
@@ -63,6 +63,7 @@ namespace Smala {
   protected:
     smala::ErrorLocation *m_curloc;
     int m_indent, m_cpnt_num, m_var_num, m_error;
+    bool m_in_set_text;
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
@@ -74,7 +75,7 @@ namespace Smala {
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
-    void build_arg_node (std::ofstream &os, Node *node);
+    virtual void build_arg_node (std::ofstream &os, Node *node);
     void build_native_code (std::ofstream &os, Node *node);
     void build_cat (std::ofstream &os, Node *node);
     void build_control_node (std::ofstream &os, Node *n);
@@ -96,6 +97,7 @@ namespace Smala {
     void print_find_component (std::ofstream &os, const std::string&, const std::string&);
     virtual std::string build_find_component (const std::string&, const std::string&) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
+    virtual void end_property (std::ofstream &os, Node *n) {};
     virtual void get_property (std::ofstream &os, Node *n) = 0;
     virtual void alias (std::ofstream &os, Node *n) = 0;
     virtual void merge (std::ofstream &os, Node *n) = 0;

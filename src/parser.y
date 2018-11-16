@@ -799,11 +799,18 @@ set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
-|
-start_set_double  argument_expression RP
+| start_set_double argument_expression RP
 {
   Node *n = new Node ("END_PROPERTY", "Double");
   n->set_node_type (END_PROPERTY);
+  driver.add_node (n);
+}
+| NAME_OR_PATH SIMPLE_EQ MINUS DOUBLE
+{
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (INT, std::string("-")+$4));
+  Node *n = new Node ("SetDouble", $1, args);
+  n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
 

@@ -137,6 +137,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "getBool"             { return Smala::Parser::make_GET_BOOL (Smala::location ()); }
 "setBool"             { return Smala::Parser::make_SET_BOOL (Smala::location ()); }
 "getString"           { return Smala::Parser::make_GET_STRING (Smala::location ()); }
+"doubleToString"      { return Smala::Parser::make_DOUBLE_TO_STRING (Smala::location ()); }
+"intToString"         { return Smala::Parser::make_INT_TO_STRING (Smala::location ()); }
 "setString"           { return Smala::Parser::make_SET_STRING (Smala::location ()); }
 "getRef"              { return Smala::Parser::make_GET_REF (Smala::location ()); }
 "setRef"              { return Smala::Parser::make_SET_REF (Smala::location ()); }

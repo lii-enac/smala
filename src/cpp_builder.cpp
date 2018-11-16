@@ -55,6 +55,7 @@ namespace Smala
     m_filename = std::string (prefix) + ".cpp";
     std::ofstream os (prefix + ".cpp");
     os << "#include <iostream>\n";
+    os << "#include <string>\n";
     os << "#include \"core/core-dev.h\"\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
@@ -283,10 +284,22 @@ namespace Smala
     if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1)
       print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
     indent (os);
-    print_type (os, node->args ().at (0).first);
-    os << " " << var_name << " = ((" << node->djnn_type ().substr (3) << "Property*) ";
+
+    if (node->djnn_type().compare ("doubleToString") == 0) {
+      os << "std::string " << var_name << " = std::to_string (((DoubleProperty*) ";
+    } else if (node->djnn_type().compare ("intToString") == 0){
+      os << "std::string " << var_name << " = std::to_string (((IntProperty*) ";
+    } else {
+      print_type (os, node->args ().at (0).first);
+      os << " " << var_name << " = ";
+      os << "((" << node->djnn_type ().substr (3) << "Property*) ";
+    }
     std::pair<std::string, std::string> arg = parse_symbol (node->args ().at (0).second);
-    os << arg.first << "->find_component (" << arg.second << "))->get_value ();\n";
+    os << arg.first << "->find_component (" << arg.second << "))->get_value ()";
+    if (node->djnn_type().compare ("doubleToString") == 0) {
+      os << ")";
+    }
+    os << ";\n";
   }
 
   void

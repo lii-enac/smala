@@ -203,6 +203,8 @@
 %token GET_BOOL "getBool"
 %token SET_BOOL "setBool"
 %token GET_STRING "getString"
+%token DOUBLE_TO_STRING "doubleToString"
+%token INT_TO_STRING "intToString"
 %token SET_STRING "setString"
 %token GET_REF "getRef"
 %token SET_REF "setRef"
@@ -890,6 +892,24 @@ get_string: NAME_OR_PATH SIMPLE_EQ GET_STRING LP NAME_OR_PATH RP
   vector< pair<ParamType, string> > args;
   args.push_back (make_pair (STRING, $5));
   Node *n = new Node ("GetText", $1, args);
+  n->set_node_type (GET_PROPERTY);
+  driver.add_node (n);
+}
+|
+NAME_OR_PATH SIMPLE_EQ DOUBLE_TO_STRING LP NAME_OR_PATH RP
+{
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (DOUBLE, $5));
+  Node *n = new Node ("doubleToString", $1, args);
+  n->set_node_type (GET_PROPERTY);
+  driver.add_node (n);
+}
+|
+NAME_OR_PATH SIMPLE_EQ INT_TO_STRING LP NAME_OR_PATH RP
+{
+  vector< pair<ParamType, string> > args;
+  args.push_back (make_pair (INT, $5));
+  Node *n = new Node ("intToString", $1, args);
   n->set_node_type (GET_PROPERTY);
   driver.add_node (n);
 }

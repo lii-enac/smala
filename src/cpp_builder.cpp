@@ -296,7 +296,7 @@ namespace Smala
     }
     std::pair<std::string, std::string> arg = parse_symbol (node->args ().at (0).second);
     os << arg.first << "->find_component (" << arg.second << "))->get_value ()";
-    if (node->djnn_type().compare ("doubleToString") == 0) {
+    if (node->djnn_type().compare ("doubleToString") == 0 || node->djnn_type().compare ("intToString") == 0) {
       os << ")";
     }
     os << ";\n";

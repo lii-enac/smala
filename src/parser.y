@@ -755,7 +755,7 @@ set_bool: NAME_OR_PATH SIMPLE_EQ TRUE
   driver.add_node (n);
 }
 |
-start_set_bool argument_expression RP
+start_set_bool exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Bool");
   n->set_node_type (END_PROPERTY);
@@ -778,7 +778,7 @@ set_int: NAME_OR_PATH SIMPLE_EQ INT
   driver.add_node (n);
 }
 |
-start_set_int  argument_expression RP
+start_set_int  exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Int");
   n->set_node_type (END_PROPERTY);;
@@ -800,7 +800,7 @@ set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
 }
-| start_set_double argument_expression RP
+| start_set_double exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Double");
   n->set_node_type (END_PROPERTY);
@@ -831,7 +831,7 @@ set_text: NAME_OR_PATH SIMPLE_EQ STRING
   driver.add_node (n);
 }
 |
-start_set_text  argument_expression RP
+start_set_text  exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Text");
   n->set_node_type (END_PROPERTY);
@@ -854,7 +854,7 @@ set_ref: NAME_OR_PATH SIMPLE_EQ NAME_OR_PATH
   driver.add_node (n);
 }
 |
-start_set_ref  argument_expression RP
+start_set_ref  exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Ref");
   n->set_node_type (END_PROPERTY);
@@ -970,44 +970,44 @@ argument_list:
 | argument_list argument
 
 
-argument: argument_expression 
+argument: exp 
 
-argument_expression:
-argument_expression plus argument_expression
+exp:
+exp plus exp
 |
-argument_expression minus argument_expression
+exp minus exp
 |
-argument_expression times argument_expression
+exp times exp
 |
-argument_expression divide argument_expression
+exp divide exp
 |
-argument_expression or argument_expression
+exp or exp
 |
-argument_expression and argument_expression
+exp and exp
 |
-argument_expression lt argument_expression
+exp lt exp
 |
-argument_expression le argument_expression
+exp le exp
 |
-argument_expression gt argument_expression
+exp gt exp
 |
-argument_expression ge argument_expression
+exp ge exp
 |
-argument_expression eq argument_expression
+exp eq exp
 |
-argument_expression neq argument_expression
+exp neq exp
 |
-minus argument_expression %prec NOT
+minus exp %prec NOT
 |
-NOT argument_expression
+NOT exp
 |
 alternative
 |
-argument_term
+term
 
 
-argument_term:
-lp argument_expression rp
+term:
+lp exp rp
 |
 INT
 {
@@ -1194,7 +1194,7 @@ comma: COMMA
 
 //------------------------------------------------
 
-connector: argument connector_symbol process_list
+connector: exp connector_symbol process_list
 {
   NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, true, false);
   expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -1263,7 +1263,7 @@ start_lambda: LP NAME_OR_PATH RP
   $$ = native;
 }
 
-assignment: argument assignment_symbol process_list is_model
+assignment: exp assignment_symbol process_list is_model
 {
   NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, false, $4);
   expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -1277,7 +1277,7 @@ assignment: argument assignment_symbol process_list is_model
   comp_expression.clear ();
 }
 |
-NAME_OR_PATH SIMPLE_EQ argument assignment_symbol NAME_OR_PATH is_model
+NAME_OR_PATH SIMPLE_EQ exp assignment_symbol NAME_OR_PATH is_model
 {
   NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $4, false, $6);
   expr_node->set_name ($1);
@@ -1310,11 +1310,11 @@ process_list: NAME_OR_PATH { vector<string> dst; dst.push_back ($1); $$ = dst;}
 
 alternative: start_alternative left_side right_side
 
-start_alternative: argument_expression question_mark 
+start_alternative: exp question_mark 
 
-left_side: argument_expression colon
+left_side: exp colon
 
-right_side: argument_expression
+right_side: exp
 
 question_mark: QUESTION_MARK
 {

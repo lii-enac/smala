@@ -1,0 +1,13 @@
+[
+{
+	"id" : "Smala",
+	"caption": "smala",
+	"children":
+	[
+	{
+		"caption" : "test",
+		"command" : "test"
+	}
+	]
+}
+]

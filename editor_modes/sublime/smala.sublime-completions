@@ -1,0 +1,15 @@
+{
+   "scope": "source.sma",
+
+   "completions":
+   [
+      { "trigger": "Int\t int property", "contents": "Int ${1:name} (${2:value})" },
+      { "trigger": "Double\t double property", "contents": "Double ${1:name} (${2:value})" },
+      { "trigger": "String\t text property", "contents": "String $1 ($2)" },
+      { "trigger": "dump\t dump Component", "contents": "dump ${1:Component}" },
+      { "trigger": "Clock\t clock component", "contents": "Clock ${1:name} (${2:millisecond})" },
+      { "trigger": "use\t use smala module", "contents": "use ${1:module name}" },
+      { "trigger": "import\t use smala package", "contents": "import ${1:package name}" },
+      { "trigger": "Connector\tconnect component", "contents": "Connector ${1:name} (${2:component in}, ${3:component out})" },
+   ]
+}

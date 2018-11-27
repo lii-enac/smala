@@ -760,6 +760,7 @@ start_set_bool exp RP
   Node *n = new Node ("END_PROPERTY", "Bool");
   n->set_node_type (END_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = false;
 }
 
 start_set_bool: SET_BOOL LP NAME_OR_PATH COMMA
@@ -767,6 +768,7 @@ start_set_bool: SET_BOOL LP NAME_OR_PATH COMMA
   Node *n = new Node ("SetBool", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = true;
 }
 
 set_int: NAME_OR_PATH SIMPLE_EQ INT
@@ -778,11 +780,12 @@ set_int: NAME_OR_PATH SIMPLE_EQ INT
   driver.add_node (n);
 }
 |
-start_set_int  exp RP
+start_set_int exp RP
 {
   Node *n = new Node ("END_PROPERTY", "Int");
   n->set_node_type (END_PROPERTY);;
   driver.add_node (n);
+  m_in_arguments = false;
 }
 
 start_set_int: SET_INT LP NAME_OR_PATH COMMA
@@ -790,6 +793,7 @@ start_set_int: SET_INT LP NAME_OR_PATH COMMA
   Node *n = new Node ("SetInt", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = true;
 }
 
 set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
@@ -805,6 +809,7 @@ set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
   Node *n = new Node ("END_PROPERTY", "Double");
   n->set_node_type (END_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = false;
 }
 | NAME_OR_PATH SIMPLE_EQ MINUS DOUBLE
 {
@@ -820,6 +825,7 @@ start_set_double: SET_DOUBLE LP NAME_OR_PATH COMMA
   Node *n = new Node ("SetDouble", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = true;
 }
 
 set_text: NAME_OR_PATH SIMPLE_EQ STRING
@@ -836,6 +842,7 @@ start_set_text  exp RP
   Node *n = new Node ("END_PROPERTY", "Text");
   n->set_node_type (END_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = false;
 }
 
 start_set_text: SET_STRING LP NAME_OR_PATH COMMA
@@ -843,6 +850,7 @@ start_set_text: SET_STRING LP NAME_OR_PATH COMMA
   Node *n = new Node ("SetText", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = true;
 }
 
 set_ref: NAME_OR_PATH SIMPLE_EQ NAME_OR_PATH
@@ -859,6 +867,7 @@ start_set_ref  exp RP
   Node *n = new Node ("END_PROPERTY", "Ref");
   n->set_node_type (END_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = false;
 }
 
 start_set_ref: SET_REF LP NAME_OR_PATH COMMA
@@ -866,6 +875,7 @@ start_set_ref: SET_REF LP NAME_OR_PATH COMMA
   Node *n = new Node ("SetRef", $3);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
+  m_in_arguments = true;
 }
 
 get_int: NAME_OR_PATH SIMPLE_EQ GET_INT LP NAME_OR_PATH RP

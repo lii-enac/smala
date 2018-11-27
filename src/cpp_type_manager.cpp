@@ -35,9 +35,9 @@ namespace Smala {
     displayGlobalSymbols = displayGS;
 
     type_entry inputGS[] = {
-      {"InputDevices", "djnInputDevices"},
-      {"Mice", "djnMice"},
-      {"TouchPanels", "djnTouchPanels"},
+      {"InputDevices", "InputDevices"},
+      {"Mice", "Mice"},
+      {"TouchPanels", "TouchPanels"},
 #if 0
       {"Styluses", "djnStyluses"},
       {"RawPointers", "djnRawPointers"},

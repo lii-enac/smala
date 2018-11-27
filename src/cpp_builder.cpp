@@ -540,7 +540,10 @@ namespace Smala
     indent (os);
     os << "((" << node->djnn_type ().substr (3) << "Property*) ";
     std::pair<std::string, std::string> arg = parse_symbol (node->name ());
-    os << arg.first << "->find_component ( " << arg.second << "))->set_value (";
+    os << arg.first;
+    if (arg.second.compare (m_null_string) != 0)
+      os << "->find_component (" << arg.second << ")";
+    os << ")->set_value (";
     if (node->djnn_type ().substr (3).compare ("Text") == 0) {
       os << "string (";
       m_in_set_text = true;
@@ -550,7 +553,9 @@ namespace Smala
     if (node->args ().at (0).first == NAME) {
       std::pair<std::string, std::string> val = parse_symbol (
           node->args ().at (0).second);
-      os << val.first << "->find_component (" << val.second << ")";
+      os << val.first ;
+      if (val.second.compare (m_null_string) != 0)
+        os << "->find_component (" << val.second << ")";
     } else
       os << node->args ().at (0).second;
     if (node->djnn_type ().substr (3).compare ("Text") == 0) {
@@ -580,7 +585,7 @@ namespace Smala
         }
         os << n->arg_value ();
         if (m_in_set_text) {
-          os << " string (";
+          os << "string (";
         }
       }
         break;
@@ -637,7 +642,10 @@ namespace Smala
     }
     std::pair<std::string, std::string> arg = parse_symbol (
         node->args ().at (0).second);
-    os << arg.first << "->find_component (" << arg.second << "))->get_value ()";
+    os << arg.first;
+    if (arg.second.compare (m_null_string) != 0)
+      os << "->find_component (" << arg.second << ")";
+    os << ")->get_value ()";
     if (node->djnn_type ().compare ("doubleToString") == 0
         || node->djnn_type ().compare ("intToString") == 0) {
       os << ")";

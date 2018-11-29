@@ -309,6 +309,14 @@ namespace Smala
             << new_name << ", \"\");\n";
       }
     }
+    for (auto out : node->get_output_nodes ()) {
+      std::pair<std::string, std::string> arg = parse_symbol (out);
+      indent (os);
+      os << "Graph::instance ().add_edge (" << new_name << "," << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ");\n";
+    }
   }
 
   void

@@ -167,7 +167,7 @@ namespace Smala
     indent (os);
     bool string_setter = false;
     for (auto e : node->get_expression ()) {
-      if (e->arg_value().at(0) == '\"')
+      if (e->arg_value ().at (0) == '\"')
         string_setter = true;
     }
     std::string bool_name ("string_setter_" + std::to_string (m_sym_num - 1));
@@ -576,7 +576,7 @@ namespace Smala
     if (node->args ().at (0).first == NAME) {
       std::pair<std::string, std::string> val = parse_symbol (
           node->args ().at (0).second);
-      os << val.first ;
+      os << val.first;
       if (val.second.compare (m_null_string) != 0)
         os << "->find_component (" << val.second << ")";
     } else

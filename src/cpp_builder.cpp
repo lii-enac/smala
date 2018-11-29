@@ -354,6 +354,14 @@ namespace Smala
         || (s.compare (0, 1, "|") == 0) || (s.compare (0, 1, "=") == 0);
   }
 
+  static bool
+  is_log_sym (const std::string &s)
+  {
+    return (s.compare (0, 1, "<") == 0) || (s.compare (0, 1, ">") == 0)
+        || (s.compare (0, 1, "!") == 0) || (s.compare (0, 1, "&") == 0)
+        || (s.compare (0, 1, "|") == 0) || (s.compare (0, 2, "==") == 0);
+  }
+
   void
   CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
   {
@@ -362,12 +370,17 @@ namespace Smala
       return;
     }
     bool sym = false;
+    bool has_log_sym = false;
     bool has_sym = false;
     bool has_str = false;
     for (auto n_e : node->get_expression ()) {
-      if (is_sym (n_e->arg_value ()) || (n_e->arg_type () == VALUE && n_e->arg_value().at(0) != '\"')) {
+      if (is_sym (n_e->arg_value ())
+          || (n_e->arg_type () == VALUE && n_e->arg_value ().at (0) != '\"')) {
+        if (is_log_sym (n_e->arg_value ()))
+          has_log_sym = true;
         sym = true;
       } else if (n_e->arg_value ().compare ("?") == 0) {
+        has_log_sym = false;
         sym = false;
       } else if (n_e->arg_value ().compare (":") == 0) {
         if (sym)
@@ -406,7 +419,8 @@ namespace Smala
           }
         } else if (op->arg_type () == VAR) {
           if (!in_expr
-              && (i == sz || !is_sym (node->get_expression ().at (i)->arg_value ()))) {
+              && (i == sz
+                  || !is_sym (node->get_expression ().at (i)->arg_value ()))) {
             os << "((TextProperty*) sym_table.find (\"" << op->arg_value ()
                 << "\")->second)->get_value ()";
           } else {
@@ -447,9 +461,10 @@ namespace Smala
       }
       os << ";\n";
       for (auto n : node->get_output_nodes ()) {
-        os << "\t\tsym_table.find (\"" << n
-            << "\")->second->set_value (result, " << !node->is_paused ()
-            << ");\n";
+        os << "\t\tsym_table.find (\"" << n << "\")->second->set_value (";
+        if (has_log_sym)
+          os << "(bool)";
+        os << "result, " << !node->is_paused () << ");\n";
       }
       if (!has_sym)
         os << "\t}";

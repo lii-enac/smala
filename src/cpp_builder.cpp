@@ -182,7 +182,7 @@ namespace Smala
           indent (os);
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
           os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
-              << p_name << ", \"\", " << e->arg_value () << ");\n";
+              << p_name << ", \"\", " << arg.first << ");\n";
           indent (os);
           os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
               << ";\n";
@@ -190,7 +190,7 @@ namespace Smala
           indent (os);
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
           os << "TextProperty *" << new_name << " = new TextProperty ("
-              << p_name << ", \"\", " << e->arg_value () << ");\n";
+              << p_name << ", \"\", " <<arg.first << ");\n";
           indent (os);
           os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
               << ";\n";

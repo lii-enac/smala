@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="aircraft" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="109.2px" height="104px" viewBox="0 0 109.2 104" enable-background="new 0 0 109.2 104" xml:space="preserve">
+<g id="background">
+	<radialGradient id="SVGID_1_" cx="70" cy="60" r="70" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.5" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.558" style="stop-color:#00ABE9"/>
+		<stop  offset="0.5693" style="stop-color:#00A5E7"/>
+		<stop  offset="0.5839" style="stop-color:#0095E2"/>
+		<stop  offset="0.6003" style="stop-color:#007AD9"/>
+		<stop  offset="0.6179" style="stop-color:#0055CD"/>
+		<stop  offset="0.6344" style="stop-color:#002CBF"/>
+		<stop  offset="0.7135" style="stop-color:#A900AA"/>
+		<stop  offset="0.7644" style="stop-color:#CA00C3"/>
+		<stop  offset="1" style="stop-color:#FFFFFF"/>
+	</radialGradient>
+	
+		<path opacity="0.8" fill="url(#SVGID_1_)" stroke="#B4AA00" stroke-miterlimit="10" enable-background="new    " d="
+		M97.9,63.3L76.8,50.6V38.8h-5.6v8.6l-16.2-9.8V4.8C54.9,2,52.5,0,50.1,0c-2.8,0-4.8,2.4-4.8,4.8v32.9l-16.2,9.8V39h-5.6v11.8
+		L2,63.3c-2,1.2-2.4,3.6-1.6,5.2c0.8,2,0.4,2.8,5.2,2.4L44.9,61v21.5l-11,11v6.4l16.2-4.8l16.2,4.8v-6.4l-11-11V61.2l39.3,9.8
+		c2.4,0.4,4.4-0.4,5.2-2.4C100.3,66.9,99.9,64.5,97.9,63.3z"/>
+</g>
+<text id="label" transform="matrix(1 0 0 1 0 0)" fill="#000000" font-family="'PlantagenetCherokee'" font-size="7px">FAKE</text>
+</svg>

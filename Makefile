@@ -256,6 +256,7 @@ cookbook_apps := core/debug \
 	gui/widgets/dial \
 	gui/widgets/button \
 	gui/animation/path_animation \
+	gui/clone \
 	network/helloIvy
 
 cookbook_apps: $(notdir $(cookbook_apps))

@@ -3,7 +3,7 @@ We provide a Makefile that should work on MacOS (10.12+), Linux, Windows.
 1. install djnn-cpp (see https://github.com/lii-enac/djnn-cpp/blob/master/INSTALL.md)
 2. open a terminal, cd to the parent of the djnn-cpp directory and copy/paste the following commands:
 
-git clone git@github.com:lii-enac/smala.git  
+git clone https://github.com/lii-enac/smala.git
 cd smala  
 make install-pkgdeps  
 make -j4  

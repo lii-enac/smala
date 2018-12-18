@@ -16,14 +16,14 @@ use core
 use base
 use gui
 
-
+// Define a C++ native action
 _action_
 cpp_action (Component c)
 %{
-	/* how to get the source */
+	// To get the source that triggered the native action:
 	//Process *source = c->get_activation_source ();
 	
-	/* how to get the user_data */
+	// To get the user_data:
  	Process *data = (Process*) get_native_user_data (c);
 
  	Process *fc = data->find_component ("fc");
@@ -32,24 +32,26 @@ cpp_action (Component c)
  	((IntProperty*) fc->find_component ("g"))->set_value (0, 1)  ;
  	((IntProperty*) fc->find_component ("b"))->set_value (0, 1)  ;
 
-    /* debug to check */
+    // To print the component tree:
  	fc->dump(0);
 %}
 
+// Define a smala native action
 _action_
 smala_action (Component src, Component data)
-{   
+{   // To create a NEW component (either visual or assignment/binding/connector):
+    // add it to a parent (passed for exemple as data), thanks to
+    //     addChildrenTo parent {
+    //         ...the new components...
+    //     }
 
-   /* note: 
-    * if you use assignment (->) or binding (=>)
-    * they have to be related to a parent
-    * here : data 
-    * so you have to add them to data with
-    * an "addChildrenTo"
-    */
-    data.r = 0
-    data.g = 255
-    data.b = 0
+    // To set a value on an EXISTING property:
+    // do not use an assignment as it would create a new Assignment component
+    // and add it to the component tree each time this native is invoked.
+    // The value change is propagated.
+    setInt (data.r, 0)
+    setInt (data.g, 255)
+    setInt (data.b, 0)
 
     dump data
 }
@@ -69,24 +71,29 @@ Component root {
 	FillColor _ (0, 0, 255)
 	Rectangle blue (350, 400, 100, 100, 0, 0)
 
+    // Bind a C++ native action
 	NativeAction cpp_na (cpp_action, root, 1)
 	red.press -> cpp_na
 
+    // Bind a smala native action
 	NativeAction smala_na (smala_action, fc, 1)
 	green.press -> smala_na
 
-	/* smala_lambda - in code native action */
+	// Define and bind a smala_lambda (in code native action)
 	blue.press -> (fc) {
-  		/* note: 
-    	* if you use assignment (->) or binding (=>)
-    	* they have to be related to a parent
-    	* here : data 
-    	* so you have to add them to data with
-    	* an "addChildrenTo"
-    	*/
-    	fc.r = 0
-    	fc.g = 0
-    	fc.b = 255
+  		// To create a NEW component (either visual or assignment/binding/connector):
+        // add it to a parent (passed as the argument of the native, here fc), thanks to
+        //     addChildrenTo parent {
+        //         ...the new components...
+        //     }
+
+        // To set a value on an EXISTING property:
+        // do not use an assignment as it would create a new Assignment component
+        // and add it to the component tree each time this native is invoked.
+        // The value change is propagated.
+        setInt (fc.r, 0)
+        setInt (fc.g, 0)
+        setInt (fc.b, 255)
 
     	dump fc
 	}

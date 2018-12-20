@@ -34,39 +34,29 @@ Component root {
     f.width => bgRect.width
     f.height => bgRect.height
 
+    // Foreground styles for sketches
+    NoFill nf
+    OutlineColor outlineColor (255, 255, 255)
+    OutlineWidth outlineWidth (2)
+
     // Content to host sketches
-    Component content {
-        NoFill nf
-        OutlineColor outlineColor (255, 255, 255)
-        OutlineWidth outlineWidth (2)
-    }
-    Ref contentRef (content)
+    Component content
 
     // Clear background on double click
     Spike clear
     DoubleClick doubleClick (bgRect, f)
     doubleClick.double_click -> clear
     clear -> (root) {
-        contentToRemove = getRef(root.contentRef)
-        remove contentToRemove from root
+        delete root.content
 
         addChildrenTo root {
-            Component content {
-                NoFill nf
-                OutlineColor outlineColor (255, 255, 255)
-                OutlineWidth outlineWidth (2)
-            }
-
-            Ref tmpRef (content)
-            tmpRef =: root.contentRef
+            Component content 
         }
     }
 
     // Sketch
-    APoint prevPoint (0, 0)
-    Ref prevRef (prevPoint)
     APoint currentPoint(0, 0)
-    Ref currentRef (currentPoint)
+    APoint prevPoint (0, 0)
 
     FSM sketchFSM {
         State idle
@@ -80,25 +70,32 @@ Component root {
 
             // Call this action on each move event
             f.move -> (root) {
-                prev = getRef(root.prevRef)
-                current = getRef(root.currentRef)
-                content = getRef(root.contentRef)
-
-                addChildrenTo content {
+                addChildrenTo root.content {
                     Path segment {
                         PathMove origin (0, 0)
                         PathLine end (100, 100)
                     }
 
                     // Assign the values to the segment
-                    prev.x =: segment.origin.x
-                    prev.y =: segment.origin.y
-                    current.x =: segment.end.x
-                    current.y =: segment.end.y
+                    // Get primitive double value from a djnn DoubleProperty,
+                    // then set this value on an already existing property 
+                    // (do not use an assignment as it would create a new Assignment component
+                    //  and add it to the component tree each time this native is invoked)
+                    prevx = getDouble (root.prevPoint.x) 
+                    setDouble (segment.origin.x, prevx)
 
-                    // Use the paused assignements to set the previous point value
-                    current.x :: prev.x
-                    current.y :: prev.y
+                    prevy = getDouble (root.prevPoint.y)
+                    setDouble (segment.origin.y, prevy)
+
+                    curx = getDouble (root.currentPoint.x)
+                    setDouble (segment.end.x, curx)
+
+                    cury = getDouble (root.currentPoint.y)
+                    setDouble (segment.end.y, cury)
+
+                    // Set the previous point value to prepare the next call
+                    setDouble (root.prevPoint.x, curx)
+                    setDouble (root.prevPoint.y, cury)
                 }
             }
         }

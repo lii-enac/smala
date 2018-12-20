@@ -21,82 +21,6 @@ use gui
 import APoint
 import DoubleClick
 
-_action_
-clearContent (Process src1, Process data1)
-{   
-    root = getRef(data1.rootRef)
-    contentToRemove = getRef(data1.contentRef)
-    remove contentToRemove from root
-
-    addChildrenTo root {
-        Component content {
-            NoFill nf
-            OutlineColor outlineColor (255,255,255)
-            OutlineWidth outlineWidth (2)
-        }
-
-        Ref tmpRef (content)
-        tmpRef =: data1.contentRef
-    }
-}
-
-_action_
-createSegment (Process src, Process data)
-{   
-    current = getRef(data.currentRef)
-    mid = getRef (data.midRef)
-    prev = getRef(data.prevRef)
-    prevMid = getRef(data.prevMidRef)
-    content = getRef(data.contentRef)
-    tmpShape = getRef (data.tmpShapeRef)
-    remove tmpShape from content
-
-    addChildrenTo content {
-        //compute mid point
-        (current.x + prev.x) / 2 =: mid.x
-        (current.y + prev.y) / 2 =: mid.y
-
-        Component quadraticSegment {
-            //quadratic segment between origin and mid point
-            Path quad {
-                PathMove origin (0, 0)
-                PathQuadratic end (0, 0, 0, 0)
-            }
-
-            //assign the values to the segment
-            prevMid.x =: quad.origin.x
-            prevMid.y =: quad.origin.y
-            mid.x =: quad.end.x
-            mid.y =: quad.end.y
-            prev.x =: quad.end.x1
-            prev.y =: quad.end.y1
-        }
-
-        Component lineSegment {
-            //line segment between origin and mid point
-            Path line {
-                PathMove origin (0, 0)
-                PathLine end (0, 0)
-            }
-
-            //assign the values to the segment
-            mid.x =: line.origin.x
-            mid.y =: line.origin.y
-            current.x =: line.end.x
-            current.y =: line.end.y
-        }
-
-        Ref tmpRef (lineSegment)
-        tmpRef =: data.tmpShapeRef
-
-        //use the paused assignements to set the previous points values
-        current.x :: prev.x
-        current.y :: prev.y
-
-        mid.x :: prevMid.x
-        mid.y :: prevMid.y
-    }
-}
 
 _main_
 Component root {
@@ -111,27 +35,39 @@ Component root {
     f.width => bgRect.width
     f.height => bgRect.height
 
+    // Foreground styles for sketches
+    NoFill nf
+    OutlineColor outlineColor (255, 255, 255)
+    OutlineWidth outlineWidth (2)
+
     // content (sketches are drawn here)
     Component content {
-        NoFill nf
-        OutlineColor outlineColor (255,255,255)
-        OutlineWidth outlineWidth (2)
+        Path lineSegment {
+            PathMove origin (0, 0)
+            PathLine end (0, 0)
+        }
     }
 
     // clear background on double click
-    Component clear
-    Component clearData {
-        Ref rootRef (root)
-        Ref contentRef (content)
-    }
-    NativeAction clearAction (clearContent, clearData, 1)
-    clear -> clearAction
+    Spike clear
     DoubleClick doubleClick (bgRect, f)
     doubleClick.double_click -> clear
+    clear -> (root) {
+        delete root.content
+
+        addChildrenTo root {
+            Component content {
+                Path lineSegment {
+                    PathMove origin (0, 0)
+                    PathLine end (0, 0)
+                }
+            }
+        }
+    }
 
     // temp points to draw sketches
     APoint prevPoint (0,0)
-    APoint currentPoint(0,0)
+    APoint currentPoint (0,0)
     APoint midPoint (0,0)
     APoint prevMidPoint (0,0)
 
@@ -143,29 +79,56 @@ Component root {
         f.press.y =: prevMidPoint.y
     }
 
-    // sketching
+    // Sketch
     FSM sketchFSM {
         State idle
         State sketching {
             f.move.x => currentPoint.x
             f.move.y => currentPoint.y
 
-            //data component with points and content
-            Component actionData {
-                Ref prevRef (prevPoint)
-                Ref currentRef (currentPoint) 
-                Ref midRef (midPoint) 
-                Ref prevMidRef (prevMidPoint)         
-                Ref contentRef (content)
-                clearData.contentRef => contentRef
-                Component placeHolder
-                Ref tmpShapeRef (placeHolder)
-            }
+            f.move -> (root) {
+                //compute mid point
+                currentPointX = getDouble (root.currentPoint.x)
+                currentPointY = getDouble (root.currentPoint.y)
+                prevPointX = getDouble (root.prevPoint.x)
+                prevPointY = getDouble (root.prevPoint.y)
+                setDouble (root.midPoint.x, (currentPointX + prevPointX) / 2)
+                setDouble (root.midPoint.y, (currentPointY + prevPointY) / 2)
 
-            //call this action on each move event
-            NativeAction createSegmentAction (createSegment, actionData, 1)
-            f.move -> createSegmentAction
+                addChildrenTo root.content {
+                    //quadratic segment between origin and mid point
+                    Path quadraticSegment {
+                        PathMove origin (0, 0)
+                        PathQuadratic end (0, 0, 0, 0)
+                    }
+                }
+
+                //assign the values to the quadratic segment
+                prevMidPointX = getDouble (root.prevMidPoint.x)
+                setDouble (root.content.quadraticSegment.origin.x, prevMidPointX)
+                prevMidPointY = getDouble (root.prevMidPoint.y)
+                setDouble (root.content.quadraticSegment.origin.y, prevMidPointY)
+                midPointX = getDouble (root.midPoint.x)
+                setDouble (root.content.quadraticSegment.end.x, midPointX)
+                midPointY = getDouble (root.midPoint.y)
+                setDouble (root.content.quadraticSegment.end.y, midPointY)
+                setDouble (root.content.quadraticSegment.end.x1, prevPointX)
+                setDouble (root.content.quadraticSegment.end.y1, prevPointY)
+
+                //assign the values to the line segment
+                setDouble (root.content.lineSegment.origin.x, midPointX)
+                setDouble (root.content.lineSegment.origin.y, midPointY)
+                setDouble (root.content.lineSegment.end.x, currentPointX)
+                setDouble (root.content.lineSegment.end.y, currentPointY)
+
+                //set the previous points values
+                setDouble (root.prevPoint.x, currentPointX)
+                setDouble (root.prevPoint.y, currentPointY)
+                setDouble (root.prevMidPoint.x, midPointX)
+                setDouble (root.prevMidPoint.y, midPointY)
+            }
         }
+
         idle -> sketching (f.press, onPressAction)
         sketching -> idle (f.release)
     }

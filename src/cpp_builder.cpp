@@ -527,7 +527,7 @@ namespace Smala
           indent (os);
           os << new_name << "->deactivation ();\n";
           indent (os);
-          os << arg.first << "->remove_child (" << new_name << ");\n";
+          os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
           indent (os);
           os << "delete " << new_name << ";\n";
         }

@@ -460,14 +460,14 @@ MOVE NAME_OR_PATH GT NAME_OR_PATH
 |
 MOVE NAME_OR_PATH GGT
 {
-  BinaryInstructionNode *node = new BinaryInstructionNode ($2, nullptr);
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, "");
   node->set_node_type (MOVE_END);
   driver.add_node (node);
 }
 |
 MOVE NAME_OR_PATH INSERT
 {
-  BinaryInstructionNode *node = new BinaryInstructionNode ($2, nullptr);
+  BinaryInstructionNode *node = new BinaryInstructionNode ($2, "");
   node->set_node_type (MOVE_FIRST);
   driver.add_node (node);
 }

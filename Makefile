@@ -238,7 +238,8 @@ deps += $$($1_app_objs:.o=.d)
 endef
 
 #find * -type d -mindepth 1 -maxdepth 2 | xargs echo
-cookbook_apps := core/debug \
+cookbook_apps := core/bindings \
+	core/debug \
 	core/paused_control \
 	core/switch \
 	core/text_cat \

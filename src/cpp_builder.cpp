@@ -96,6 +96,133 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_control_node (std::ofstream &os, Node *node)
+  {
+    CtrlNode *ctrl = static_cast<CtrlNode*> (node);
+    if (node->djnn_type ().compare ("FSMTransition") == 0) {
+      build_transition_node (os, ctrl);
+      return;
+    }
+    std::string constructor = get_constructor (node->djnn_type ());
+    //cout << "type = " << node->djnn_type() << " constructor = "  << constructor << endl;
+    std::pair<std::string, std::string> src, dst;
+    bool is_binding = node->djnn_type ().compare ("Binding") == 0;
+
+    switch (ctrl->in ()->node_type ()) {
+      case BINARY_OP: {
+        src.first = ctrl->in ()->build_name ();
+        src.second = "\"result\"";
+        break;
+      }
+      case UNARY_OP: {
+        src.first = ctrl->in ()->build_name ();
+        src.second = "\"output\"";
+        break;
+      }
+      case LOCAL_NODE: {
+        LocalNode *n = static_cast<LocalNode*> (ctrl->in ());
+        src.first = n->root ()->build_name ();
+        std::string path = n->path ();
+        std::replace (path.begin (), path.end (), '.', '/');
+        src.second = "\"" + path + "\"";
+        break;
+      }
+      case LITERAL: {
+        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        indent (os);
+        print_start_component (os, new_name, get_constructor ("Double"));
+        os << "(" << node->parent ()->build_name () << ", " << m_null_string
+            << ", " << ctrl->in ()->name () << ");\n";
+        src.first = new_name;
+        src.second = m_null_string;
+        break;
+      }
+      case TEXT: {
+        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        indent (os);
+        print_start_component (os, new_name, get_constructor ("String"));
+        os << "(" << node->parent ()->build_name () << ", " << m_null_string
+            << ", " << ctrl->in ()->name () << ");\n";
+        src.first = new_name;
+        src.second = m_null_string;
+        break;
+      }
+      default:
+        if (!ctrl->in ()->build_name ().empty ()) {
+          src.first = ctrl->in ()->build_name ();
+          src.second = m_null_string;
+        } else if (!ctrl->in ()->name ().empty ()) {
+          src = parse_symbol (ctrl->in ()->name ());
+          std::string prefix = "var_";
+          bool _is_var = src.first.substr (0, prefix.size ()) == prefix;
+          if (_is_var) {
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            indent (os);
+            print_start_component (os, new_name, get_constructor ("Double"));
+            os << "(" << node->parent ()->build_name () << ", " << m_null_string
+                << ", " << src.first << ");\n";
+            src.first = new_name;
+            src.second = m_null_string;
+          }
+        } else {
+          print_error_message (error_level::warning,
+                               "anonymous component in input of control node",
+                               1);
+          m_error |= 1;
+        }
+    }
+
+    switch (ctrl->out ()->node_type ()) {
+      case LOCAL_NODE: {
+        LocalNode *n = static_cast<LocalNode*> (ctrl->out ());
+        dst.first = n->root ()->build_name ();
+        std::string path = n->path ();
+        std::replace (path.begin (), path.end (), '.', '/');
+        dst.second = "\"" + path + "\"";
+        break;
+      }
+      default:
+        if (!ctrl->out ()->build_name ().empty ()) {
+          dst.first = ctrl->out ()->build_name ();
+          dst.second = m_null_string;
+        } else if (!ctrl->out ()->name ().empty ()) {
+          dst = parse_symbol (ctrl->out ()->name ());
+        } else {
+          print_error_message (error_level::error,
+                               "anonymous component in output of control node",
+                               1);
+        }
+    }
+
+    indent (os);
+    if (!node->name ().empty ()) {
+      std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      m_parent_list.back ()->add_entry (node->name (), new_name);
+      node->set_build_name (new_name);
+      print_component_decl (os, new_name);
+      os << " = ";
+      node->set_name ("\"" + node->name () + "\"");
+    } else {
+      node->set_name (m_null_string);
+    }
+
+    print_component_constructor (os, constructor);
+    os << " (" << node->parent ()->build_name () << ", " << node->name ();
+    os << ", " << src.first << ", " << src.second << ", ";
+    if (is_binding)
+      os << ctrl->get_in_act () << ", ";
+    os << dst.first << ", "
+        << dst.second;
+    if (is_binding)
+      os << ", " << ctrl->get_out_act ();
+    if (node->djnn_type ().compare ("Assignment") == 0
+        || node->djnn_type ().compare ("PausedAssignment") == 0) {
+      os << ", " << node->args ().at (0).second;
+    }
+    os << ");\n";
+  }
+
+  void
   CPPBuilder::build_simple_control_node (std::ofstream &os,
                                          NativeExpressionNode *node)
   {

@@ -267,6 +267,7 @@
 %type <SmalaNative*> start_lambda
 %type < parameters_t > parameters
 %type < parameter_t > parameter
+%type < pair <std::string, std::string> > binding_type
 
 %left QUESTION_MARK COLON
 %nonassoc GT GE LT LE EQ NEQ
@@ -1218,10 +1219,10 @@ connector: exp connector_symbol process_list
 
 connector_symbol: CONNECTOR { $$ = false; } | PAUSED_CONNECTOR { $$ = true; }
 
-binding: NAME_OR_PATH ARROW process_list
+binding: NAME_OR_PATH binding_type process_list
 {
   for (int i = 0; i < $3.size (); ++i) {
-    CtrlNode *node = new CtrlNode ("Binding", "");
+    CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
     Node *in = new Node ("Name", $1);
     in->set_node_type (PATH);
     node->set_in (in);
@@ -1232,7 +1233,7 @@ binding: NAME_OR_PATH ARROW process_list
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
 }
-| NAME_OR_PATH ARROW lambda
+| NAME_OR_PATH binding_type lambda
 {
   /* first build the NativeACtion Component */
   vector< pair<ParamType, string> >d_args;
@@ -1245,7 +1246,7 @@ binding: NAME_OR_PATH ARROW process_list
   native->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
   /* then the binding */
-  CtrlNode *node = new CtrlNode ("Binding", "");
+  CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
   Node *in = new Node ("Name", $1);
   in->set_node_type (PATH);
   node->set_in (in);
@@ -1253,6 +1254,8 @@ binding: NAME_OR_PATH ARROW process_list
   driver.add_node (node);
   node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 }
+
+binding_type: ARROW { $$ = make_pair ("true", "true"); } | NOT ARROW { $$ = make_pair ("false", "true"); } | NOT ARROW NOT { $$ = make_pair ("false", "false"); } | ARROW NOT { $$ = make_pair ("true", "false"); }
 
 lambda: start_lambda LCB item_list RCB
 {

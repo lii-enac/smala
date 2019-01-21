@@ -45,6 +45,7 @@ namespace Smala {
     void add_children_to (std::ofstream &os, Node *node) override;
     void find (std::ofstream &os, Node *node) override;
     void clone (std::ofstream &os, Node *node) override;
+    void build_control_node (std::ofstream &os, Node *n) override;
     void build_activator (std::ofstream &os, ActivatorNode *n) override;
     void build_native_action_component (std::ofstream &os, Node *n) override;
     void build_native_action (std::ofstream &os, Node *n) override;

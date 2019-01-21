@@ -18,7 +18,7 @@ namespace Smala
 {
 
   CtrlNode::CtrlNode () :
-      Node (), m_in (nullptr), m_out (nullptr)
+      Node (), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
   {
     set_node_type (CONTROL);
   }
@@ -26,12 +26,12 @@ namespace Smala
   CtrlNode::CtrlNode (
       const std::string &type, const std::string &name,
       const std::vector<std::pair<ParamType, std::string> > &arguments) :
-      Node (type, name, arguments), m_in (nullptr), m_out (nullptr)
+      Node (type, name, arguments), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
   {
     set_node_type (CONTROL);
   }
 
-  CtrlNode::CtrlNode (const std::string &type, const std::string &name) : Node (type, name), m_in (nullptr), m_out (nullptr)
+  CtrlNode::CtrlNode (const std::string &type, const std::string &name, std::string in_act, std::string out_act) : Node (type, name), m_in (nullptr), m_out (nullptr), m_in_act (in_act), m_out_act (out_act)
   {
     set_node_type (CONTROL);
   }

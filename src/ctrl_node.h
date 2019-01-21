@@ -24,7 +24,7 @@ namespace Smala
   public:
     CtrlNode ();
     CtrlNode (const std::string &type, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
-    CtrlNode (const std::string &type, const std::string &name);
+    CtrlNode (const std::string &type, const std::string &name, std::string in_act = "true", std::string out_act = "true");
     virtual ~CtrlNode ();
 
     Node* in () const;
@@ -36,10 +36,13 @@ namespace Smala
     std::vector<ArgNode*> expression () { return m_expression; }
     void add_output_node (std::string n) { m_vout.push_back (n); }
     std::vector<std::string> get_output_nodes () { return m_vout; }
+    std::string& get_in_act () { return m_in_act; }
+    std::string& get_out_act () { return m_out_act; }
 
   private:
     Node *m_in;
     Node *m_out;
+    std::string m_in_act, m_out_act;
     std::vector<ArgNode*> m_expression;
     std::vector<std::string> m_vout;
   };

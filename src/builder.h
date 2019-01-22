@@ -18,6 +18,7 @@
 #include <vector>
 #include "error_location.h"
 #include "activator_node.h"
+#include "dash_array_node.h"
 #include "ctrl_node.h"
 #include "type_manager.h"
 #include "ast.h"
@@ -120,7 +121,7 @@ namespace Smala {
     virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
         os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
     }
-    
+    virtual void build_dash_array (std::ofstream &os, DashArrayNode *n) {}
   };
 
 }

@@ -39,6 +39,7 @@ namespace Smala {
     CLONE,
     CONTAINER,
     CONTROL,
+    DASH_ARRAY,
     END_CONTAINER,
     END_DEFINE,
     END_NATIVE,

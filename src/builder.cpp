@@ -383,6 +383,11 @@ namespace Smala
           build_new_line (os, static_cast<NewLineNode*> (node));
           break;
         }
+      case DASH_ARRAY:
+        {
+          build_dash_array (os, static_cast<DashArrayNode*> (node));
+          break;
+        }
       default:
         return;
       }

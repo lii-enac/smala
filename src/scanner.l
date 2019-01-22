@@ -56,6 +56,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "//"[^\n]*                { }
 "{"                   { return Smala::Parser::make_LCB (Smala::location ()); }
 "}"                   { return Smala::Parser::make_RCB (Smala::location ()); }
+"["                   { return Smala::Parser::make_LB (Smala::location ()); }
+"]"                   { return Smala::Parser::make_RB (Smala::location ()); }
 "("                   { return Smala::Parser::make_LP (Smala::location ()); }
 ")"                   { return Smala::Parser::make_RP (Smala::location ()); }
 ","                   { return Smala::Parser::make_COMMA (Smala::location ()); }

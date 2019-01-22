@@ -29,6 +29,7 @@
   #include <vector>
   #include <stdint.h>
   #include "node.h"
+  #include "dash_array_node.h"
   #include "activator_node.h"
   #include "operator_node.h"
   #include "instruction_node.h"
@@ -72,6 +73,7 @@
   vector<Node*> parent_list;
   vector<Node*> expression;
   vector<ArgNode*> comp_expression;
+  vector<int> int_array;
   bool m_in_arguments = false;
   int func_num = 0;
 
@@ -178,6 +180,8 @@
 %token NOT"!"
 %token LCB "{"
 %token RCB "}"
+%token LB "["
+%token RB "]"
 %token LP "("
 %token RP ")"
 %token COMMA ","
@@ -246,6 +250,7 @@
 %type <bool> is_model
 %type <string> repeat_arg
 %type <string> fsm_decl
+%type <string> dash_array_decl
 %type <ParamType> type
 %type <Node*> state_decl
 %type <Node*> fsm_items
@@ -440,7 +445,7 @@ LCB item_list RCB
 item_list:
 | item_list item
 
-item: simple_component | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
+item: simple_component | dash_array | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
   | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move
 
 
@@ -945,6 +950,22 @@ get_ref: NAME_OR_PATH SIMPLE_EQ GET_REF LP NAME_OR_PATH RP
 
 //------------------------------------------------
 
+dash_array: dash_array_decl LP int_array_decl RP
+{
+  DashArrayNode *node = new DashArrayNode ($1, int_array);
+  driver.add_node (node);
+  node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+}
+
+dash_array_decl: DASHARRAY NAME_OR_PATH
+{
+  int_array.clear ();
+  $$ = $2;
+}
+
+int_array_decl:
+| int_array_decl INT COMMA { int_array.push_back (std::stoi ($2)); }
+| int_array_decl INT { int_array.push_back (std::stoi ($2)); }
 
 simple_component: simple_component_decl arguments
 {

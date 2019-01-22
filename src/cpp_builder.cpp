@@ -1216,6 +1216,39 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_dash_array (std::ofstream &os, DashArrayNode *node)
+  {
+    std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
+    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    if (node->name ().compare ("_") == 0)
+      node->set_name (new_name);
+    node->set_build_name (new_name);
+    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
+      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+    indent (os);
+    std::string p_name = node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
+    os << "DashArray *" << new_name << " =  new DashArray (" << p_name << ", " << name << ");\n";
+    int sz = node->get_pattern ().size ();
+    if (sz == 0)
+      return;
+    if (sz == 1) {
+      indent (os);
+      os << new_name << "->add_sub_pattern (" << node->get_pattern ().at (0) << ", " << node->get_pattern ().at (0) << ");\n";
+    } else {
+      for (int i = 0; i < sz - 1; i++) {
+        indent (os);
+        os << new_name << "->add_sub_pattern (" << node->get_pattern ().at (i) << ", " << node->get_pattern ().at (i + 1) << ");\n";
+      }
+      if (sz % 2 != 0) {
+        for (int i = 0; i < sz - 1; i++) {
+          indent (os);
+          os << new_name << "->add_sub_pattern (" << node->get_pattern ().at (i) << ", " << node->get_pattern ().at (i + 1) << ");\n";
+        }
+      }
+    }
+  }
+
+  void
   CPPBuilder::check_and_build_connector (std::ofstream &os, Node *n,
                                          const std::string &name,
                                          const std::string &side)

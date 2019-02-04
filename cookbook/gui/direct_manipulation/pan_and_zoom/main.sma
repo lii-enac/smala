@@ -30,36 +30,41 @@ Component root {
   PanAndZoom pz1 (f)
 
   Component zoomScene {
+    // Pan and zoom
     Scaling scaling (1, 1, 0, 0)
-    pz1.zoom => scaling.sx, scaling.sy
-
     Translation translation (0, 0)
+    pz1.zoom => scaling.sx, scaling.sy
     pz1.xpan => translation.tx
     pz1.ypan => translation.ty
 
-    Rectangle r (100, 100, 100, 100, 0, 0)
+    // Graphics
 
-    OutlineWidth ow (3)
-    3 / pz1.zoom => ow.width
-    Circle c (300, 250, 50)
+    FillColor _ (70, 70, 70)
+    Text ts (200, 200, "The scene can be panned and zoomed...")
 
-    FillColor fc(0, 0, 0)
-    Text ts (200, 200, "this text size should scale")
+    FillColor _ (200, 200, 200)
+    FillOpacity _ (0.5)
+    OutlineColor _ (70, 70, 70)
+    Rectangle rectangle (100, 100, 100, 100, 0, 0)
   }
 
   Component zoomCoordOnlyScene {
-    FillColor fc(0, 0, 0)
-    Double x(50)
-    Double y(400)
+    // positionning
+    Double x (100)
+    Double y (300)
     Translation t (0, 0)
     (pz1.xpan + x) * pz1.zoom => t.tx
     (pz1.ypan + y) * pz1.zoom => t.ty
-    Text te(0, 0, "this text position should move according to zoom, but the size should not scale")
+
+    // Graphics
+
+    FillColor _ (125, 125, 125)
+    Text te (0, 0, "...except this text wich moves as a consequence of pan and zoom, but does not scale")
   }
 
   Component stickToScreenScene {
-    FillColor fc(0,0,0)
-    Text t(0,20, "this text should stick to screen")
+    FillColor _ (0, 0, 0)
+    Text t (100, 400, "... and this text which is not transformed at all")
   }
 
   // debug

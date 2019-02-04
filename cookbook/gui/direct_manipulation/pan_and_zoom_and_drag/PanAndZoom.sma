@@ -23,57 +23,34 @@ PanAndZoom (Component frame, Component bg) {
   // Non visual rectangle serving as a local coordinates system
   Rectangle localRef (0, 0, 0, 0, 0, 0)
 
-  Double pressX (0)
-  Double pressY (0)
-
   // Pan management
   FSM fsm {
     State idle
-
-    // Only in hysteresis version
-    // With the hysteresis version, it's better to have a scene component (graphical elements 
-    // along with their transforms) and a fsm in distinct branches of the components tree 
-    // in order to keep the hysteresis circle drawing simple in the screen coordinates system
-    // (with none of the transforms applied to the scene component)
-    State waiting_hyst {
-      // Memorize press position in local coordinates
-      ScreenToLocal s2l (localRef)
-      localRef.press.x =: s2l.inX
-      localRef.press.y =: s2l.inY
-      s2l.outX => pressX
-      s2l.outY => pressY
-
-      FillColor fcwh (255, 0, 0)
-      Circle c (0, 0, 20)
-      pressX => c.cx
-      pressY => c.cy
-    }
 
     State pressed {
       // Memorize press position in local coordinates
       ScreenToLocal s2l (localRef)
       frame.press.x =: s2l.inX
       frame.press.y =: s2l.inY
-      s2l.outX => pressX
-      s2l.outY => pressY
-      // pressX/Y must be connected and not assigned as there is no guarantee that data flow
-      // inside ScreenToLocal will be activated before the assignment on pressX/Y is done.
-      // Using an AssignmentSequence here won't change anything.
     }
 
     State panning {
       // Memorize initial translation
-      Double tx0 (0)
-      Double ty0 (0)
-      xpan =: tx0
-      ypan =: ty0
+      AdderAccumulator atx (0, 0, 0)
+      xpan :: atx.input
+      AdderAccumulator aty (0, 0, 0)
+      ypan :: aty.input
 
-      // Compute added translation
+      // Convert mouse move to local coordinates
       ScreenToLocal s2l (localRef)
       frame.move.x => s2l.inX
       frame.move.y => s2l.inY
-      tx0 + s2l.outX - pressX => xpan
-      ty0 + s2l.outY - pressY => ypan
+
+      // Compute added translation
+      s2l.outX - pressed.s2l.outX => atx.input
+      s2l.outY - pressed.s2l.outY => aty.input
+      atx.result => xpan
+      aty.result => ypan
     }
 
     State zooming {
@@ -95,7 +72,7 @@ PanAndZoom (Component frame, Component bg) {
       s2l.outX => p0x
       s2l.outY => p0y
 
-      // changing zoom then translating (sequence activated on mouse wheel action)
+      // changing zoom then translating (sequence activated on scaleFactor activation)
       AssignmentSequence setZoomAndPan (0) {
         // apply new zoom
         zoom * scaleFactor =: zoom
@@ -109,7 +86,6 @@ PanAndZoom (Component frame, Component bg) {
       scaleFactor -> setZoomAndPan, cl
     }
 
-    // Transitions for basic version
     idle -> pressed (bg.press)
     pressed -> idle (frame.release)
     pressed -> panning (frame.move)
@@ -117,19 +93,6 @@ PanAndZoom (Component frame, Component bg) {
     idle -> zooming (frame.wheel)
     zooming -> idle (zooming.cl.tick)
     zooming -> pressed (bg.press)
-  
-    /*
-    // Transitions for hysteresis version
-    idle -> waiting_hyst (bg.press)
-    waiting_hyst -> idle (frame.release)
-    waiting_hyst -> pressed (waiting_hyst.c.leave)
-    pressed -> idle (frame.release)
-    pressed -> panning (frame.move)
-    panning -> idle (frame.release)
-    idle -> zooming (frame.wheel)
-    zooming -> idle (zooming.cl.tick)
-    zooming -> waiting_hyst (bg.press)
-    */
   }
 
 }

@@ -24,9 +24,6 @@ Drag (Component frame, Component localRef) {
   Double ty (0)
   /* --- end interface --- */
 
-  Double pressX (0)
-  Double pressY (0)
-
   FSM dragFsm {
     State idle
 
@@ -35,26 +32,25 @@ Drag (Component frame, Component localRef) {
       ScreenToLocal s2l (localRef)
       localRef.press.x =: s2l.inX
       localRef.press.y =: s2l.inY
-      s2l.outX => pressX
-      s2l.outY => pressY
-      // pressX/Y must be connected and not assigned as there is no guarantee that data flow
-      // inside ScreenToLocal will be activated before the assignment on pressX/Y is done.
-      // Using an AssignmentSequence here won't change anything.
     }
 
     State dragging {
       // Memorize initial translation
-      Double tx0 (0)
-      Double ty0 (0)
-      tx =: tx0
-      ty =: ty0
+      AdderAccumulator atx (0, 0, 0)
+      tx :: atx.input
+      AdderAccumulator aty (0, 0, 0)
+      ty :: aty.input
 
-      // Compute added translation
+      // Convert mouse move to local coordinates
       ScreenToLocal s2l (localRef)
       frame.move.x => s2l.inX
       frame.move.y => s2l.inY
-      tx0 + s2l.outX - pressX => tx
-      ty0 + s2l.outY - pressY => ty
+
+      // Compute added translation
+      s2l.outX - pressed.s2l.outX => atx.input
+      s2l.outY - pressed.s2l.outY => aty.input
+      atx.result => tx
+      aty.result => ty
     }
 
     idle -> pressed (localRef.press)
@@ -63,4 +59,37 @@ Drag (Component frame, Component localRef) {
     dragging -> idle (frame.release)
   }
 
+  // MORE COMPACT VERSION (2 states FSM + press outside)
+  /*
+  // Convert mouse press to local coordinates
+  ScreenToLocal s2l_press (localRef)
+  localRef.press.x => s2l_press.inX
+  localRef.press.y => s2l_press.inY
+
+  FSM dragFsm {
+    State idle
+
+    State dragging {
+      // Memorize initial translation
+      AdderAccumulator atx (0, 0, 0)
+      tx :: atx.input
+      AdderAccumulator aty (0, 0, 0)
+      ty :: aty.input
+
+      // Convert mouse move to local coordinates
+      ScreenToLocal s2l_move (localRef)
+      frame.move.x => s2l_move.inX
+      frame.move.y => s2l_move.inY
+
+      // Compute added translation
+      s2l_move.outX - s2l_press.outX => atx.input
+      s2l_move.outY - s2l_press.outY => aty.input
+      atx.result => tx
+      aty.result => ty
+    }
+
+    idle -> dragging (localRef.press)
+    dragging -> idle (frame.release)
+  }
+  */
 }

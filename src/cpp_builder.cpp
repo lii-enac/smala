@@ -652,23 +652,35 @@ namespace Smala
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
           os << "Process *" << new_name << " = " << cpnt_name << ";\n";
           indent (os);
+          os << "if (" << new_name << ") {\n";
+          indent (os); indent (os);
           os << new_name << "->deactivation ();\n";
-          indent (os);
+          indent (os); indent (os);
           os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
-          indent (os);
+          indent (os); indent (os);
           os << "delete " << new_name << ";\n";
+          indent (os); indent (os);
+          os << new_name << " = nullptr;\n";
+          indent (os);
+          os << "};\n";
         }
         /*  delete first */
         else {
+          os << "if (" << arg.first << ") {\n";
+          indent (os); indent (os);
           os << arg.first << "->deactivation ();\n";
-          indent (os);
+          indent (os); indent (os);
           os << "if (" << arg.first << "->get_parent ())\n";
-          indent (os);
+          indent (os); indent (os);
           indent (os);
           os << arg.first << "->get_parent ()->remove_child (" << arg.first
               << ");\n";
-          indent (os);
+          indent (os); indent (os);
           os << "delete " << arg.first << ";\n";
+          indent (os); indent (os);
+          os << arg.first << " = nullptr;\n";
+          indent (os);
+          os << "};\n";
         }
       }
     }

@@ -46,7 +46,7 @@ contexts:
     - match: '\b(use|import|aka|_main_|_define_)\b'
       scope: keyword.other.sma
 
-    - match: '\b(<<|=>|->|=:| << | => | -> | =: )\b'
+    - match: '\s*<<\s*|\s*=>\s*|\s*=:\s*|\s*!?->!?\s*'
       scope: keyword.operator.sma
 
     - match: '\b[A-Z].([a-zA-Z0-9])*\b'

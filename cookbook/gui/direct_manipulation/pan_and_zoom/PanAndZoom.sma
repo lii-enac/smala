@@ -20,6 +20,30 @@ PanAndZoom (Component f) {
     DoubleProperty y (0)
   }
 
+  Pow p (1.01, 0)
+  Double scaleFactor (1)
+  f.wheel.dy => p.exponent
+  p.result => scaleFactor
+
+  Double p0x (0) // mouse x in local coord system before zoom
+  Double p0y (0)
+
+  AssignmentSequence seq (0) {
+        // remember mouse pos in local coord system before zoom
+        // (as a local coord it won't change after zoom is applied)
+    f.move.x / zoom - xpan =: p0x
+    f.move.y / zoom - ypan =: p0y
+        // apply new zoom
+    zoom * scaleFactor =: zoom
+        // After the zoom is applied, p0 has become p1 = p0 * scaleFactor
+        // So to make believe that zoom is mouse centered, we must apply
+        // a new translation (p0 - p1) taking the scaleFactor into account
+        // i.e replace pan by (pan + p0 - p1)/scaleFactor
+    (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
+    (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
+  }
+  scaleFactor -> seq
+
   // Pan management
   FSM fsm {
     State idle
@@ -53,44 +77,10 @@ PanAndZoom (Component f) {
       f.move -> sequence
     }
 
-    State zooming {
-      // init a clock to leave this state after a timeout without interaction
-      Clock cl (1000)
-      
-      // compute scale factor to modify zoom (data flow)
-      Pow p (1.01, 0)
-      Double scaleFactor (1)
-      f.wheel.dy => p.exponent
-      p.result => scaleFactor
-
-      Double p0x (0) // mouse x in local coord system before zoom
-      Double p0y (0) // mouse y in local coord system before zoom
-
-      // define sequence of assignments to activate on mouse wheel
-      AssignmentSequence sequence (0) {
-        // remember mouse pos in local coord system before zoom
-        // (as a local coord it won't change after zoom is applied)
-        f.move.x / zoom - xpan =: p0x
-        f.move.y / zoom - ypan =: p0y
-        // apply new zoom
-        zoom * scaleFactor =: zoom
-        // After the zoom is applied, p0 has become p1 = p0 * scaleFactor
-        // So to make believe that zoom is mouse centered, we must apply
-        // a new translation (p0 - p1) taking the scaleFactor into account
-        // i.e replace pan by (pan + p0 - p1)/scaleFactor
-        (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
-        (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
-      }
-      scaleFactor -> sequence, cl
-    }
-
     // Transitions for basic version
     idle -> panning (f.press)
     panning -> idle (f.release)
-    idle -> zooming (f.wheel)
-    zooming -> idle (zooming.cl.tick)
-    zooming -> panning (f.press)
-    
+   
     /*
     // Transitions for hysteresis version
     idle -> waiting_hyst (f.press)

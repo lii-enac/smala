@@ -42,7 +42,6 @@
 
 NAME [$a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
 INT [0-9]+
-CONTAINER ("Group"|"Set"|"List"|"SwitchList")
 POLY ("Polygon"|"Polyline")
 PATH ("Path"|"PathClip")
 PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
@@ -104,7 +103,6 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "Component"           { return Smala::Parser::make_COMPONENT (Smala::location()); }
 "Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
 "String"              { return Smala::Parser::make_STRING_CPNT (Smala::location()); }
-{CONTAINER}           { return Smala::Parser::make_CONTAINER (yytext, Smala::location ()); }
 {POLY}                { return Smala::Parser::make_POLY (yytext, Smala::location ()); }
 {PATH}                { return Smala::Parser::make_PATH (yytext, Smala::location ()); }
 {PATH_POINT}          { return Smala::Parser::make_PATH_POINT (yytext, Smala::location ()); }

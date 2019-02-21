@@ -150,7 +150,6 @@
 %token COMPONENT "Component"
 %token PROCESS "Process"
 %token STRING_CPNT "String"
-%token <string> CONTAINER "<container>"
 %token <string> POLY "<poly>"
 %token <string> PATH "<path>"
 %token <string> PATH_POINT "<path-point>"
@@ -255,7 +254,7 @@
 %type <Node*> state_decl
 %type <Node*> fsm_items
 %type <Node*> component_decl
-%type <Node*> container_decl
+%type <Node*> new_container
 %type <Node*> assignment_seq_decl
 %type <Node*> switch_decl
 %type <Node*> pixmap_cache_decl
@@ -987,8 +986,6 @@ simple_component_decl: cpnt_type NAME_OR_PATH
 }
 
 cpnt_type:
-NAME_OR_PATH { $$ = $1;}
-|
 ASSIGNMENT_CPNT { $$ = "Assignment"; }
 |
 CONNECTOR_CPNT { $$ = "Connector"; }
@@ -1413,13 +1410,24 @@ generic_container: container_decl items {
   parent_list.pop_back ();
 }
 
-container_decl: CONTAINER NAME_OR_PATH
+container_decl: new_container arguments 
+{
+  if ($2 == 1) {
+    $1->set_has_arguments (true);
+    ArgNode *n = new ArgNode (END, "");
+    driver.add_node (n);
+  }
+  m_in_arguments = false;
+}
+
+new_container: NAME_OR_PATH NAME_OR_PATH
 {
   Node *node = new Node ($1, $2);
   node->set_node_type (CONTAINER);
   node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
   parent_list.push_back (node);
   driver.add_node (node);
+  m_in_arguments = true;
   $$ = node;
 }
 

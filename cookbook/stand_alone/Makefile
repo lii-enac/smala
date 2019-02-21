@@ -8,7 +8,9 @@
 
 # cpp example
 exe := button
-srcs := src/Button.sma src/main.sma
+srcs_sma := src/Button.sma src/main.sma
+#srcs := $(shell find src -name "*.sma")
+srcs_cpp := src/foo.cpp
 target_lang := cpp
 
 # java example
@@ -22,15 +24,16 @@ djnn_libs := gui base core
 src_dir := src
 build_dir := build
 
-smala_path := ../..
-smalac := $(smala_path)/build/smalac
-
 djnn_path := ../../../djnn-cpp
 djnn_include_path_cpp := $(djnn_path)/src
 djnn_lib_path_cpp := $(djnn_path)/build
 
 #djnn_path := ../../../local-install
 #djnn_java_classpath := ../../../djnn-java/src:../../../djnn-java/src/jna.jar
+
+smala_path := ../..
+smalac := $(smala_path)/build/smalac
+
 
 
 # -------------------------------------------------------------------
@@ -44,8 +47,9 @@ ifndef os
 os := $(shell uname -s)
 endif
 
+CXXFLAGS += -MMD -g -std=c++14
+
 ifeq ($(os),Linux)
-CXXFLAGS +=
 YACC = bison -d
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
@@ -53,10 +57,14 @@ endif
 
 ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
-#CFLAGS += -std=c++11
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
-debugger := /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
+debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
+endif
+
+ifeq ($(os),MINGW64_NT-10.0)
+YACC = bison -d
+LD_LIBRARY_PATH=PATH
 endif
 
 # -- c
@@ -70,17 +78,23 @@ default: $(exe)
 
 test: $(exe)
 	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(shell pwd)/$(exe))
+dbg: $(exe)
+	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(debugger) $(shell pwd)/$(exe))
 .PHONY: test
 
-CXXFLAGS ?= -g -std=c++14
 LD  = $(CXX)
 
-objs := $(srcs:.sma=.o)
-objs := $(addprefix $(build_dir)/,$(objs))
-gensrcs := $(objs:.o=.$(target_lang))
-$(objs): $(gensrcs) # this forces the right language to compile the generated sources
+objs_sma := $(srcs_sma:.sma=.o)
+objs_sma := $(addprefix $(build_dir)/,$(objs_sma))
+objs_other := $(srcs_cpp:.cpp=.o)
+objs_other := $(addprefix $(build_dir)/,$(objs_other))
 
-$(objs): CXXFLAGS += -I$(djnn_include_path_cpp) -MMD
+objs := $(objs_sma) $(objs_other)
+
+gensrcs := $(objs_sma:.o=.$(target_lang))
+$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources
+
+$(objs_sma): CXXFLAGS += -I$(djnn_include_path_cpp)
 $(exe): LDFLAGS += -L$(djnn_lib_path_cpp)
 $(exe): LIBS += $(addprefix -ldjnn-,$(djnn_libs))
 
@@ -92,15 +106,17 @@ $(exe): $(objs)
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
-	$(smalac) -cpp $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
+	@$(smalac) -cpp $<
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+
+# $(smalac) -cpp $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
 
 # .sma to .c
 $(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
-	@echo moncul smalac $<
-	$(smalac) -c $< || (c=$$?; rm -f $*.c $*.h $*.java; (exit $$c))
+	@echo smalac $<
+	@$(smalac) -c $<
 	@mv $*.c $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
@@ -169,8 +185,12 @@ endif
 
 # --
 
-clean:
+distclean clear:
 	rm -rf build
-.PHONY: clean
+clean:
+	rm -f $(gensrcs) $(objs) $(deps) $(classes) $(srcs_java)
+.PHONY: clean clear distclean
 
+foo:
+	echo $(objs_other)
 

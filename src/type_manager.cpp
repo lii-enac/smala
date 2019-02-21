@@ -114,7 +114,7 @@ namespace Smala {
     std::map<std::string, symtable_t>::const_iterator it;
     it = m_types_tables.find (module);
     if (it == m_types_tables.end ()) {
-      std::cout << "Warning: unknown module: " << module << std::endl;
+      //std::cout << "Warning: unknown module: " << module << std::endl;
       return;
     } else {
       types_table = it->second;

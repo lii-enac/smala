@@ -3,15 +3,24 @@
 # 2. edit configuration part (executable name, srcs, target_lang, djnn_libs, path to djnn-cpp and smalac)
 # 3. make test
 
+redirect: default
+.PHONY: redirect
+
 #--
 # configuration
+
+#relative
+src_dir := src
+build_dir := build
 
 # cpp example
 exe := button
 srcs_sma := src/Button.sma src/main.sma
-#srcs := $(shell find src -name "*.sma")
+#srcs_sma := $(shell find $(src_dir) -name "*.sma")
 srcs_cpp := src/foo.cpp
+#srcs_cpp := $(shell find $(src_dir) -name "*.cpp")
 target_lang := cpp
+LIBS += -lxerces-c -lboost_regex
 
 # java example
 #exe := MyApp
@@ -20,9 +29,6 @@ target_lang := cpp
 #target_lang := java
 
 djnn_libs := gui base core
-
-src_dir := src
-build_dir := build
 
 djnn_path := ../../../djnn-cpp
 djnn_include_path_cpp := $(djnn_path)/src
@@ -35,6 +41,7 @@ smala_path := ../..
 smalac := $(smala_path)/build/smalac
 
 
+#CXXFLAGS += -Isrc
 
 # -------------------------------------------------------------------
 # hopefully no need to tweak the lines below
@@ -92,9 +99,9 @@ objs_other := $(addprefix $(build_dir)/,$(objs_other))
 objs := $(objs_sma) $(objs_other)
 
 gensrcs := $(objs_sma:.o=.$(target_lang))
-$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources
+#$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
 
-$(objs_sma): CXXFLAGS += -I$(djnn_include_path_cpp)
+$(objs): CXXFLAGS += -I$(djnn_include_path_cpp) -I$(src_dir) -I$(build_dir)/$(src_dir)
 $(exe): LDFLAGS += -L$(djnn_lib_path_cpp)
 $(exe): LIBS += $(addprefix -ldjnn-,$(djnn_libs))
 
@@ -108,17 +115,19 @@ $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@echo smalac $<
 	@$(smalac) -cpp $<
 	@mv $*.cpp $(build_dir)/$(*D)
-	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+	@if [ -f $*.h ] && cmp -s $*.h $(build_dir)/$(*D)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
+
+#@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 # $(smalac) -cpp $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
 
 # .sma to .c
-$(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
-	@mkdir -p $(dir $@)
-	@echo smalac $<
-	@$(smalac) -c $<
-	@mv $*.c $(build_dir)/$(*D)
-	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+# $(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
+# 	@mkdir -p $(dir $@)
+# 	@echo smalac $<
+# 	@$(smalac) -c $<
+# 	@mv $*.c $(build_dir)/$(*D)
+# 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 # from .c user sources
 $(build_dir)/%.o: %.c

@@ -53,46 +53,39 @@ PanAndZoom (Component frame, Component bg) {
       aty.result => ypan
     }
 
-    State zooming {
-      // init a clock to leave this state after a timeout without interaction
-      Clock cl (1000)
-      
-      // compute scale factor to modify zoom (data flow)
-      Pow p (1.01, 0)
-      Double scaleFactor (1)
-      frame.wheel.dy => p.exponent
-      p.result => scaleFactor
-
-      // store pointer position in localRef coord system (data flow)
-      Double p0x (0)
-      Double p0y (0)
-      ScreenToLocal s2l (localRef)
-      frame.move.x => s2l.inX
-      frame.move.y => s2l.inY
-      s2l.outX => p0x
-      s2l.outY => p0y
-
-      // changing zoom then translating (sequence activated on scaleFactor activation)
-      AssignmentSequence setZoomAndPan (0) {
-        // apply new zoom
-        zoom * scaleFactor =: zoom
-        // After the zoom is applied, p0 has become p1 = p0 * scaleFactor
-        // So to make believe that zoom is mouse centered, we must apply
-        // a new translation (p0 - p1) taking the scaleFactor into account
-        // i.e replace pan by (pan + p0 - p1)/scaleFactor
-        (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
-        (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
-      }
-      scaleFactor -> setZoomAndPan, cl
-    }
-
     idle -> pressed (bg.press)
     pressed -> idle (frame.release)
     pressed -> panning (frame.move)
     panning -> idle (frame.release)
-    idle -> zooming (frame.wheel)
-    zooming -> idle (zooming.cl.tick)
-    zooming -> pressed (bg.press)
   }
+
+  // Zoom management
+  // store pointer position in localRef coord system (data flow)
+  Double p0x (0)
+  Double p0y (0)
+  ScreenToLocal s2l (localRef)
+  frame.move.x => s2l.inX
+  frame.move.y => s2l.inY
+  s2l.outX => p0x
+  s2l.outY => p0y
+
+  // compute scale factor to modify zoom (data flow)
+  Pow p (1.01, 0)
+  Double scaleFactor (1)
+  frame.wheel.dy => p.exponent
+  p.result => scaleFactor
+
+  // changing zoom then translating (sequence activated on scaleFactor activation)
+  AssignmentSequence setZoomAndPan (0) {
+    // apply new zoom
+    zoom * scaleFactor =: zoom
+    // After the zoom is applied, p0 has become p1 = p0 * scaleFactor
+    // So to make believe that zoom is mouse centered, we must apply
+    // a new translation (p0 - p1) taking the scaleFactor into account
+    // i.e replace pan by (pan + p0 - p1)/scaleFactor
+    (xpan + p0x * (1 - scaleFactor)) / scaleFactor =: xpan
+    (ypan + p0y * (1 - scaleFactor)) / scaleFactor =: ypan
+  }
+  scaleFactor -> setZoomAndPan
 
 }

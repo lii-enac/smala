@@ -18,7 +18,7 @@ exe := button
 srcs_sma := src/Button.sma src/main.sma
 #srcs_sma := $(shell find $(src_dir) -name "*.sma")
 srcs_other := src/foo.cpp
-#srcs_cpp := $(shell find $(src_dir) -name "*.cpp")
+#srcs_other := $(shell find $(src_dir) -name "*.cpp")
 target_lang := cpp
 LIBS += -lxerces-c -lboost_regex
 
@@ -40,8 +40,6 @@ djnn_lib_path_cpp := $(djnn_path)/build
 smala_path := ../..
 smalac := $(smala_path)/build/smalac
 
-
-#CXXFLAGS += -Isrc
 
 # -------------------------------------------------------------------
 # hopefully no need to tweak the lines below
@@ -115,7 +113,7 @@ $(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma $(smalac)
 	@echo smalac $<
 	@$(smalac) -$(target_lang) $<
 	@mv $*.$(target_lang) $(build_dir)/$(*D)
-	if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
+	@if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
 
 # from .c user sources
 $(build_dir)/%.o: %.c
@@ -138,7 +136,7 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-deps := $(smala_objs:.o=.d)
+deps := $(objs:.o=.d)
 -include $(deps)
 
 endif

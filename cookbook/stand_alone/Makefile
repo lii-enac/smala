@@ -17,7 +17,7 @@ build_dir := build
 exe := button
 srcs_sma := src/Button.sma src/main.sma
 #srcs_sma := $(shell find $(src_dir) -name "*.sma")
-srcs_cpp := src/foo.cpp
+srcs_other := src/foo.cpp
 #srcs_cpp := $(shell find $(src_dir) -name "*.cpp")
 target_lang := cpp
 LIBS += -lxerces-c -lboost_regex
@@ -74,7 +74,7 @@ YACC = bison -d
 LD_LIBRARY_PATH=PATH
 endif
 
-# -- c
+# -- cpp
 
 ifeq ($(target_lang),cpp)
 
@@ -93,7 +93,7 @@ LD  = $(CXX)
 
 objs_sma := $(srcs_sma:.sma=.o)
 objs_sma := $(addprefix $(build_dir)/,$(objs_sma))
-objs_other := $(srcs_cpp:.cpp=.o)
+objs_other := $(srcs_other:.$(target_lang)=.o)
 objs_other := $(addprefix $(build_dir)/,$(objs_other))
 
 objs := $(objs_sma) $(objs_other)
@@ -109,25 +109,13 @@ $(exe): $(objs)
 	@mkdir -p $(dir $@)
 	$(LD) $^ -o $@ $(LDFLAGS) $(LIBS)
 
-# .sma to .cpp
-$(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
+# .sma to .cpp, .c etc
+$(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
-	@$(smalac) -cpp $<
-	@mv $*.cpp $(build_dir)/$(*D)
-	@if [ -f $*.h ] && cmp -s $*.h $(build_dir)/$(*D)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
-
-#@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
-
-# $(smalac) -cpp $< || (c=$$?; rm -f $*.cpp $*.h $*.java; (exit $$c))
-
-# .sma to .c
-# $(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
-# 	@mkdir -p $(dir $@)
-# 	@echo smalac $<
-# 	@$(smalac) -c $<
-# 	@mv $*.c $(build_dir)/$(*D)
-# 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+	@$(smalac) -$(target_lang) $<
+	@mv $*.$(target_lang) $(build_dir)/$(*D)
+	if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
 
 # from .c user sources
 $(build_dir)/%.o: %.c

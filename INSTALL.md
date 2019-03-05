@@ -1,6 +1,6 @@
 We provide a Makefile that should work on MacOS (10.12+), Linux, Windows.
 
-1. install djnn-cpp (see https://github.com/lii-enac/djnn-cpp/blob/master/INSTALL.md)
+1. install [djnn-cpp](https://github.com/lii-enac/djnn-cpp) (see [INSTALL.md](https://github.com/lii-enac/djnn-cpp/blob/master/INSTALL.md))
 2. open a terminal (a mingw64 one on windows, not an MSYS2 one), cd to the parent of the djnn-cpp directory and copy/paste the following commands:
 ```
 git clone https://github.com/lii-enac/smala.git  

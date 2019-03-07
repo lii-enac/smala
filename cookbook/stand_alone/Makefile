@@ -113,7 +113,9 @@ $(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma $(smalac)
 	@echo smalac $<
 	@$(smalac) -$(target_lang) $<
 	@mv $*.$(target_lang) $(build_dir)/$(*D)
-	@if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
+	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+
+#@if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
 
 # from .c user sources
 $(build_dir)/%.o: %.c

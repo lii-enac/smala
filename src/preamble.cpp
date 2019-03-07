@@ -39,7 +39,7 @@ Preamble::add_import (const std::string &import) {
     ns = import.substr (0, pos);
     name = import.substr (pos + 1, import.length () - 1);
   }
-  Node *n = new Node ("", ns);
+  Node *n = new Node ("", import);
   n->set_node_type (IMPORT);
   add_node (n);
   if (!name.empty ())

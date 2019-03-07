@@ -92,6 +92,7 @@ namespace Smala
   void
   CPPBuilder::build_import (std::ofstream &os, std::string import)
   {
+    std::replace (import.begin (), import.end (), '.', '/');
     os << "#include \"" << import << ".h\"\n";
   }
 

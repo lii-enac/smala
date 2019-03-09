@@ -80,26 +80,31 @@ ifeq ($(cross_prefix),em)
 EMFLAGS := -Wall -Oz -s USE_SDL=2 -s FULL_ES2=1 -s USE_FREETYPE=1 \
 -s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
+-s ERROR_ON_UNDEFINED_SYMBOLS=0
 
 CFLAGS += $(EMFLAGS)
 
-truc := \
-	-I/usr/local/include \
-	-I/usr/local/Cellar/expat/2.2.6/include \
-	-I/usr/local/Cellar/curl/7.61.0/include \
-	-I../boost_1_68_0
+EMCFLAGS += $(EMFLAGS) \
+	-I../ext-libs/libexpat/expat/lib \
+	-I../ext-libs/curl/include \
+	-I../ext-libs/boost_1_68_0 \
+	-I../ext-libs/fontconfig \
+	-I/usr/local/include #glm
+
+CFLAGS += $(EMCFLAGS)
+CXXFLAGS += $(EMCFLAGS)
 
 LDFLAGS += $(EMFLAGS) \
-	-L../expat-2.2.6/lib/.libs \
-	-L../curl-7.61.0/lib/.libs \
+	-L../ext-libs/expat-2.2.6/lib/.libs \
+	-L../ext-libs/curl-7.61.0/lib/.libs \
 	$(djnn_lib_path_cpp)/libdjnn-animation.bc\
 	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
 	$(djnn_lib_path_cpp)/libdjnn-display.bc\
 	$(djnn_lib_path_cpp)/libdjnn-base.bc\
 	$(djnn_lib_path_cpp)/libdjnn-core.bc \
-	../boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
-	../boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
-	../boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
+	../ext-libs/boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
+	../ext-libs/boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
+	../ext-libs/boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
 
 os := em
 EXE := .html
@@ -322,9 +327,9 @@ clean_not_deps:
 	find build -type f -not -name "*.d" | xargs rm
 .PHONY: clean_not_deps
 
-clean_tests:
+clean_cookbook cookbook_clean:
 	rm -rf $(build_dir)/cookbook
-.PHONY: clean_test
+.PHONY: clean_cookbook cookbook_clean
 
 
 distclean clear clean:

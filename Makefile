@@ -74,6 +74,7 @@ endif
 ifeq ($(os),MINGW64_NT-10.0)
 YACC = bison -d
 LD_LIBRARY_PATH=PATH
+debugger := gdb
 endif
 
 ifeq ($(cross_prefix),em)

@@ -20,7 +20,6 @@ srcs_sma := src/Button.sma src/main.sma
 srcs_other := src/foo.cpp
 #srcs_other := $(shell find $(src_dir) -name "*.cpp")
 target_lang := cpp
-LIBS += -lxerces-c -lboost_regex
 
 # java example
 #exe := MyApp
@@ -70,6 +69,7 @@ endif
 ifeq ($(os),MINGW64_NT-10.0)
 YACC = bison -d
 LD_LIBRARY_PATH=PATH
+debugger := gdb
 endif
 
 # -- cpp
@@ -82,9 +82,9 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(shell pwd)/$(exe))
+	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(shell pwd)/$(exe))
 dbg: $(exe)
-	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)) $(debugger) $(shell pwd)/$(exe))
+	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(debugger) $(shell pwd)/$(exe))
 .PHONY: test
 
 LD  = $(CXX)

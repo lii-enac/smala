@@ -522,7 +522,7 @@ namespace Smala
     std::string native_name ("nat_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);
     os << "\nstatic void\n" << native_name
-        << "(std::map<std::string, AbstractProperty*> sym_table, bool string_setter)\n{\n";
+        << "(std::map<std::string, AbstractProperty*>& sym_table, bool string_setter)\n{\n";
     bool is_string = false;
     for (auto n_e : node->get_expression ()) {
       if (n_e->arg_value ().at (0) == '\"') {

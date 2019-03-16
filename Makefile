@@ -78,10 +78,17 @@ debugger := gdb
 endif
 
 ifeq ($(cross_prefix),em)
-EMFLAGS := -Wall -Oz -s USE_SDL=2 -s FULL_ES2=1 -s USE_FREETYPE=1 \
+os := em
+EXE := .html
+#to test: python -m SimpleHTTPServer 8080
+
+EMFLAGS := -Wall -Oz -s USE_SDL=2 -s USE_FREETYPE=1 \
 -s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
--s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
+-s DEMANGLE_SUPPORT=1 \
+-DSDL_DISABLE_IMMINTRIN_H \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
+
+#-s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
 
 CFLAGS += $(EMFLAGS)
 
@@ -95,6 +102,9 @@ EMCFLAGS += $(EMFLAGS) \
 CFLAGS += $(EMCFLAGS)
 CXXFLAGS += $(EMCFLAGS)
 
+#CC := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CC)
+#CXX := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CXX)
+
 LDFLAGS += $(EMFLAGS) \
 	-L../ext-libs/expat-2.2.6/lib/.libs \
 	-L../ext-libs/curl-7.61.0/lib/.libs \
@@ -107,9 +117,6 @@ LDFLAGS += $(EMFLAGS) \
 	../ext-libs/boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
 	../ext-libs/boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
 
-os := em
-EXE := .html
-#to test: python -m SimpleHTTPServer 8080
 endif
 
 
@@ -195,18 +202,25 @@ define cookbookapp_makerule
 libs_cookbook_app :=
 djnn_libs_cookbook_app :=
 lang_cookbook_app := cpp
+
 include cookbook/$1/cookbook_app.mk
+
 ckappname := $$(notdir $1)
 $1_app_lang := $$(lang_cookbook_app)
 $1_app_srcs_dir := cookbook/$1
 $1_app_objs := $$(objs_cookbook_app)
 $1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
-#$1_app_srcs := $$(objs_cookbook_app)
-#$1_app_objs := $$($1_app_srcs:.sma=.o)
 $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
+
+ifeq ($$(cross_prefix),em)
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
+$1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
+else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
+endif
+
 
 ifeq ($$(lang_cookbook_app),c)
 $1_app_link := $$(CC)
@@ -219,9 +233,7 @@ $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
 $$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
-#$$(addprefix -I,$$(djnn_include_path))
 $$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
-#$$(addprefix -L,$$(djnn_lib_path))
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)

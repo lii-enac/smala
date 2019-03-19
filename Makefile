@@ -65,10 +65,10 @@ endif
 
 ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
-#CFLAGS += -std=c++11
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
-debugger := /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
+debugger := env PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
+other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 endif
 
 ifeq ($(os),MINGW64_NT-10.0)
@@ -80,12 +80,14 @@ endif
 ifeq ($(cross_prefix),em)
 os := em
 EXE := .html
-#to test: python -m SimpleHTTPServer 8080
+launch_cmd := emrun
+##to test: python -m SimpleHTTPServer 8080
 
 EMFLAGS := -Wall -Oz -s USE_SDL=2 -s USE_FREETYPE=1 \
 -s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
 -s DEMANGLE_SUPPORT=1 \
 -DSDL_DISABLE_IMMINTRIN_H \
+-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
 
 #-s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
@@ -237,11 +239,11 @@ $$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
-$$(notdir $1)_test: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $$(shell pwd)/$$($1_app_exe))
-$$(notdir $1)_dbg: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))) $(debugger) $$(shell pwd)/$$($1_app_exe))
 
+$$(notdir $1)_test: $$(notdir $1)
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
+$$(notdir $1)_dbg: $$(notdir $1)
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_clean:
 	rm $$($1_app_exe) $$($1_app_objs)
 

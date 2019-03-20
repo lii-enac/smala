@@ -67,6 +67,7 @@ namespace Smala {
       {"fullScreen", "full_screen"},
       {"mouseTracking", "mouse_tracking"},
       {"DrawingRefreshManager", "DrawingRefreshManager"},
+      {"GenericMouse", "GenericMouse"},
       {"0", "0"}
     };
     guiGlobalSymbols = guiGS;

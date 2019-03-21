@@ -264,6 +264,7 @@ endef
 cookbook_apps := core/bindings \
 	core/debug \
 	core/paused_control \
+	core/refproperty \
 	core/switch \
 	core/text_cat \
 	core/nativeactions \

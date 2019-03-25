@@ -67,7 +67,7 @@ ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
-debugger := env PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
+debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 endif
 
@@ -88,8 +88,12 @@ EMFLAGS := -Wall -Oz -s USE_SDL=2 -s USE_FREETYPE=1 \
 -s DEMANGLE_SUPPORT=1 \
 -DSDL_DISABLE_IMMINTRIN_H \
 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
--s ERROR_ON_UNDEFINED_SYMBOLS=0
+-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+-s USE_WEBGL2=1
 
+#-s USE_WEBGL2=1 \
+#-s FULL_ES2=1
+#-s FULL_ES3=1
 #-s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
 
 CFLAGS += $(EMFLAGS)
@@ -244,6 +248,7 @@ $$(notdir $1)_test: $$(notdir $1)
 	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_dbg: $$(notdir $1)
 	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
+
 $$(notdir $1)_clean:
 	rm $$($1_app_exe) $$($1_app_objs)
 
@@ -361,6 +366,10 @@ deps += $(smalac_objs:.o=.d)
 
 
 pkgdeps := bison flex
+
+ifeq ($(os),Linux)
+pkgcmd := apt install -y
+endif
 
 ifeq ($(os),Darwin)
 #https://brew.sh/

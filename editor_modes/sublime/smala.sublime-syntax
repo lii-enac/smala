@@ -6,7 +6,7 @@ file_extensions: [sma]
 scope: source.sma
 
 variables:
-  function_sma: 'run|stop|delete|notify|merge|dump|with|from|addChild|addChildrenTo|loadFromXML|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|setInt|setdouble|setBool|setString|setRef'
+  function_sma: 'run|stop|delete|notify|merge|dump|with|from|addChild|addChildrenTo|loadFromXML|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|setInt|setDouble|setBool|setString|setRef'
 
 contexts:
   main:

@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include "node.h"
+#include "arg_node.h"
 
 namespace Smala
 {
@@ -30,9 +31,17 @@ namespace Smala
 
     void add_cpnt (std::string&);
     std::vector<std::string>& cpnt_list ();
-
+    void set_has_argument (bool v) { m_has_argument = v; }
+    bool has_argument () { return m_has_argument; }
+    void set_type (instruction_t type) { m_type = type; }
+    void set_args (std::vector<ArgNode*> &expression) { m_expression = expression; m_has_argument = true; }
+    std::vector<ArgNode*>& args () { return m_expression; }
+    instruction_t type () { return m_type; }
   private:
     std::vector<std::string> m_cpnt_list;
+    bool m_has_argument;
+    std::vector<ArgNode*> m_expression;
+    instruction_t m_type;
   };
 
 } /* namespace Smala */

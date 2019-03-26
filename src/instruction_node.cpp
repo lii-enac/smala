@@ -18,14 +18,26 @@ namespace Smala
 {
 
   InstructionNode::InstructionNode (const std::string& name) :
-      Node ()
+      Node (), m_has_argument (false), m_type (UNKNOWN)
   {
     set_node_type (INSTRUCTION);
     set_name (name);
+
+    // DELETE, DUMP, NOTIFY, RUN, STOP
+    if (name == "Delete")
+      set_type (DELETE);
+    else if (name == "Dump")
+      set_type (DUMP);
+    else if (name == "Notify")
+      set_type (NOTIFY);
+    else if (name == "Run")
+      set_type (RUN);
+    else if (name == "Stop")
+      set_type (STOP);
   }
 
   InstructionNode::InstructionNode () :
-      Node ()
+      Node (), m_has_argument (false), m_type (UNKNOWN)
   {
   }
 

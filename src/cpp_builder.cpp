@@ -622,70 +622,95 @@ namespace Smala
     InstructionNode *n = static_cast<InstructionNode*> (node);
     for (int i = 0; i < n->cpnt_list ().size (); i++) {
       std::pair<std::string, std::string> arg = parse_symbol (
-          n->cpnt_list ().at (i));
+        n->cpnt_list ().at (i));
       std::string cpnt_name =
-          arg.second.compare (m_null_string) == 0 ?
-              arg.first : arg.first + "->find_component (" + arg.second + ")";
+      arg.second.compare (m_null_string) == 0 ?
+      arg.first : arg.first + "->find_component (" + arg.second + ")";
       if (arg.first.empty ()) {
         print_error_message (error_level::error,
-                             "unknown component " + n->cpnt_list ().at (i), 1);
+         "unknown component " + n->cpnt_list ().at (i), 1);
         return;
       }
       indent (os);
-      if (n->name ().compare ("Dump") == 0) {
-        os << cpnt_name << "->dump (0);\n";
-      } else if (n->name ().compare ("Notify") == 0) {
-        os << cpnt_name << "->notify_activation ();\n";
-      } else if (n->name ().compare ("Run") == 0) {
-        if (n->cpnt_list ().at (i).compare ("syshook") == 0) {
-          os << "MainLoop::instance ().activation ();\n";
-        } else
-          os << cpnt_name << "->activation ();\n";
-      } else if (n->name ().compare ("Stop") == 0) {
-        if (cpnt_name.compare ("syshook") == 0) {
-          os << "MainLoop::instance ().deactivation ();\n";
-        } else
-          os << cpnt_name << "->deactivation ();\n";
-      } else if (n->name ().compare ("Delete") == 0) {
-
-        /* delete first.second */
-        if (arg.second.compare (m_null_string) != 0) {
-          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          os << "Process *" << new_name << " = " << cpnt_name << ";\n";
-          indent (os);
-          os << "if (" << new_name << ") {\n";
-          indent (os); indent (os);
-          os << new_name << "->deactivation ();\n";
-          indent (os); indent (os);
-          os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
-          indent (os); indent (os);
-          os << "delete " << new_name << ";\n";
-          indent (os); indent (os);
-          os << new_name << " = nullptr;\n";
-          indent (os);
-          os << "};\n";
+      switch (n->type ()) {
+        case DUMP:
+        os << cpnt_name << "->dump";
+        if (!n->has_argument ())
+         os << " (0);\n";
+       else {
+        os << " (";
+        for (auto arg : n->args ()) {
+          build_arg_node (os, arg);
         }
-        /*  delete first */
-        else {
-          os << "if (" << arg.first << ") {\n";
-          indent (os); indent (os);
-          os << arg.first << "->deactivation ();\n";
-          indent (os); indent (os);
-          os << "if (" << arg.first << "->get_parent ())\n";
-          indent (os); indent (os);
-          indent (os);
-          os << arg.first << "->get_parent ()->remove_child (" << arg.first
-              << ");\n";
-          indent (os); indent (os);
-          os << "delete " << arg.first << ";\n";
-          indent (os); indent (os);
-          os << arg.first << " = nullptr;\n";
-          indent (os);
-          os << "};\n";
-        }
+        os << ";\n";
       }
+      break;
+      case NOTIFY:
+      os << cpnt_name << "->notify_activation ();\n";
+      break;
+      case RUN:
+      if (n->cpnt_list ().at (i).compare ("syshook") == 0) {
+        if (n->has_argument ()) {
+          os << "MainLoop::instance ().set_run_for (";
+          for (auto arg : n->args ()) {
+            build_arg_node (os, arg);
+          }
+          //os << ");\n";
+        }
+        indent (os);
+        os << "MainLoop::instance ().activation ();\n";
+      } else
+      os << cpnt_name << "->activation ();\n";
+      break;
+      case STOP:
+      if (cpnt_name.compare ("syshook") == 0) {
+        os << "MainLoop::instance ().deactivation ();\n";
+      } else
+      os << cpnt_name << "->deactivation ();\n";
+      break;
+      case DELETE:
+         /* delete first.second */
+      if (arg.second.compare (m_null_string) != 0) {
+        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        os << "Process *" << new_name << " = " << cpnt_name << ";\n";
+        indent (os);
+        os << "if (" << new_name << ") {\n";
+        indent (os); indent (os);
+        os << new_name << "->deactivation ();\n";
+        indent (os); indent (os);
+        os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
+        indent (os); indent (os);
+        os << "delete " << new_name << ";\n";
+        indent (os); indent (os);
+        os << new_name << " = nullptr;\n";
+        indent (os);
+        os << "};\n";
+      }
+        /*  delete first */
+      else {
+        os << "if (" << arg.first << ") {\n";
+        indent (os); indent (os);
+        os << arg.first << "->deactivation ();\n";
+        indent (os); indent (os);
+        os << "if (" << arg.first << "->get_parent ())\n";
+        indent (os); indent (os);
+        indent (os);
+        os << arg.first << "->get_parent ()->remove_child (" << arg.first
+        << ");\n";
+        indent (os); indent (os);
+        os << "delete " << arg.first << ";\n";
+        indent (os); indent (os);
+        os << arg.first << " = nullptr;\n";
+        indent (os);
+        os << "};\n";
+      }
+      case UNKNOWN:
+      print_error_message (error_level::error,
+       "unknown instruction " + n->cpnt_list ().at (i), 1);
+      break;
     }
   }
+}
 
   void
   CPPBuilder::set_property (std::ofstream &os, Node *node)

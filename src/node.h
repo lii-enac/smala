@@ -21,6 +21,11 @@
 
 namespace Smala {
 
+  typedef enum
+  {
+    DELETE, DUMP, NOTIFY, RUN, STOP, UNKNOWN
+  } instruction_t;
+
   enum ParamType {
     INT, DOUBLE, STRING, NAME, LOCAL_NAME
   };

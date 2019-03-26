@@ -264,6 +264,7 @@
 %type <Node*> path_point_decl
 %type <Node*> simple_component_decl
 %type <Node*> string_decl
+%type <InstructionNode*> start_action
 %type < vector<string> > process_list
 %type <Node*> cat_expression
 %type <Node*> cat_term
@@ -562,6 +563,24 @@ action: ACTION process_list
     node->add_cpnt ($2.at (i));
   }
   driver.add_node (node);
+}
+|
+start_action argument_list RP
+{
+  ArgNode *n = new ArgNode (END, "");
+  comp_expression.push_back (n);
+  $1->set_args (comp_expression);
+  comp_expression.clear ();
+}
+
+start_action: ACTION NAME_OR_PATH LP
+{
+  $1[0] = std::toupper ($1[0]);
+  InstructionNode *node = new InstructionNode ($1);
+  node->add_cpnt ($2);
+  node->set_has_argument (true);
+  driver.add_node (node);
+  $$ = node;
 }
 
 alias: NAME_OR_PATH AKA NAME_OR_PATH

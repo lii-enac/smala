@@ -704,6 +704,7 @@ namespace Smala
         indent (os);
         os << "};\n";
       }
+      break;
       case UNKNOWN:
       print_error_message (error_level::error,
        "unknown instruction " + n->cpnt_list ().at (i), 1);

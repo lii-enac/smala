@@ -26,15 +26,16 @@ _native_code_
 
   //store in the map
   Process* addTouch (Process* added, Process* fingerConnector) {
-    fcList.insert(std::pair<Process*, Process*> (added, fingerConnector));
+    //fcList.insert(std::pair<Process*, Process*> (added, fingerConnector));
+    fcList[added] = fingerConnector;
+    return added; // ?
   }
 
-  //find in the map which fingerConnector has to be removed
-  Process* findTouch (Process* removed) {
-    std::map<Process*, Process*>::iterator it;
-    
-    it = fcList.find(removed);
-    Process* found;
+  //find in the map which fingerConnector has to be removed and remove it
+  Process* removeTouch (Process* removed) {
+    //std::map<Process*, Process*>::iterator it;
+    auto it = fcList.find(removed);
+    Process* found = nullptr;
     if (it != fcList.end()) {
       found = it->second; 
       fcList.erase(it);
@@ -68,7 +69,7 @@ Component root
 
   f.touches.$removed-> (root) {
     t = getRef (root.f.touches.$removed)
-    Process d = CCall (findTouch, t)  
+    Process d = CCall (removeTouch, t)  
     delete d
   }
 }

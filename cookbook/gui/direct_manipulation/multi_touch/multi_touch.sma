@@ -17,45 +17,17 @@ use core
 use base
 use gui
 
-_native_code_
-%{
-  #include <map>
-
-  //map to store the various fingerConnector components  
-  std::map<Process*, Process*> fcList;
-
-  //store in the map
-  Process* addTouch (Process* added, Process* fingerConnector) {
-    //fcList.insert(std::pair<Process*, Process*> (added, fingerConnector));
-    fcList[added] = fingerConnector;
-    return added; // ?
-  }
-
-  //find in the map which fingerConnector has to be removed and remove it
-  Process* removeTouch (Process* removed) {
-    //std::map<Process*, Process*>::iterator it;
-    auto it = fcList.find(removed);
-    Process* found = nullptr;
-    if (it != fcList.end()) {
-      found = it->second; 
-      fcList.erase(it);
-    }
-
-    return found;
-  }
-%}
-
 _main_
 Component root
 {
   Frame f ("my frame", 0, 0, 1000, 1000)
-
   NoFill _
+  Dictionary d_touch
   OutlineColor _ (100,100,255)
   OutlineWidth _ (10)
   OutlineOpacity _ (0.5)
 
-  f.touches.$added-> (root) {
+  f.touches.$added->(root) {
     t = getRef (root.f.touches.$added)
     addChildrenTo root {
       Component fingerConnector {
@@ -63,14 +35,17 @@ Component root
         t.x => root.fingerConnector.finger.cx
         t.y => root.fingerConnector.finger.cy
       }
+    setRef (root.d_touch.key, t)
+    setRef (root.d_touch.value, fingerConnector)
+    run root.d_touch.add
     }
-    Process plop = CCall (addTouch, t, root.fingerConnector)
   }
-
-  f.touches.$removed-> (root) {
+  f.touches.$removed->(root) {
     t = getRef (root.f.touches.$removed)
-    Process d = CCall (removeTouch, t)  
-    delete d
+    setRef (root.d_touch.key, t)
+    p = getRef (root.d_touch.value)
+    run root.d_touch.delete
+    delete p
   }
 }
 

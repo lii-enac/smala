@@ -27,7 +27,7 @@ target_lang := cpp
 #srcs := Button.sma MyApp.sma
 #target_lang := java
 
-djnn_libs := gui base core
+djnn_libs := gui display base core
 
 djnn_path := ../../../djnn-cpp
 djnn_include_path_cpp := $(djnn_path)/src

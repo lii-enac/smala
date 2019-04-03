@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := ReactiveAndCappedRefresh.o main.o
-djnn_libs_cookbook_app := gui base core display
+djnn_libs_cookbook_app := gui display base core display

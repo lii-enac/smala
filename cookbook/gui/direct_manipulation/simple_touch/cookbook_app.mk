@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := simple_touch.o
-djnn_libs_cookbook_app := gui base core
+djnn_libs_cookbook_app := gui display base core

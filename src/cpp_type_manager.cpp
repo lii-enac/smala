@@ -64,6 +64,7 @@ namespace Smala {
     powerGlobalSymbols = powerGS;
 
     type_entry guiGS[] = {
+      {"hidePointer", "hide_pointer"},
       {"fullScreen", "full_screen"},
       {"mouseTracking", "mouse_tracking"},
       {"DrawingRefreshManager", "DrawingRefreshManager"},

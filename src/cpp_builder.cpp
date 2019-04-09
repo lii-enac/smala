@@ -899,7 +899,11 @@ namespace Smala
   void
   CPPBuilder::get_property (std::ofstream &os, Node *node)
   {
-    std::string var_name ("pr_var_" + std::to_string (m_var_num++));
+    std::string var_name;
+    if (node->djnn_type ().compare ("GetRef") == 0)
+      var_name = string ("cpnt_" + std::to_string (m_cpnt_num++));
+    else
+      var_name = ("pr_var_" + std::to_string (m_var_num++));
     if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);

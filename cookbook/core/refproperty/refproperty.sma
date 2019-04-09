@@ -17,14 +17,22 @@ Component root
   Text height (200, 165, "")
   RefProperty current (r1)
   
-  set_r1 = r1 =: current : 1
-  set_r2 = r2 =: current : 1
+  AssignmentSequence set_r1 (1) {
+    r1 =: current
+  }
+  AssignmentSequence set_r2 (1) {
+    r2 =: current
+  }
 
   current.$value.width => width.text
   current.$value.height => height.text
 
   r1.press->set_r1
   r2.press->set_r2
+  Incr i(1)
+  current->i
+  TextPrinter tp
+  i.state=>tp.input
 }
 
 run root

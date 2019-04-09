@@ -50,9 +50,9 @@ smala_action (Component src, Component data)
     // do not use an assignment as it would create a new Assignment component
     // and add it to the component tree each time this native is invoked.
     // The value change is propagated.
-    setInt (data.r, 0)
-    setInt (data.g, 255)
-    setInt (data.b, 0)
+    data.r =  0
+    data.g = 255
+    data.b = 0
 
     dump data
 }

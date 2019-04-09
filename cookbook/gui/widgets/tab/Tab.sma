@@ -65,7 +65,9 @@ Tab (Component frame, Component tabManager, string _label, int _index) {
   Int index (_index)
   Spike select
   Spike unselect
-  notify_selected = index =: tabManager.selected_index : 1
+  AssignmentSequence notify_selected (1) {
+    index =: tabManager.selected_index
+  }
   /* --- End interface with TabManager --- */
 
 

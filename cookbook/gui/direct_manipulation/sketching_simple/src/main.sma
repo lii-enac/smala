@@ -82,21 +82,15 @@ Component root {
                     // then set this value on an already existing property 
                     // (do not use an assignment as it would create a new Assignment component
                     //  and add it to the component tree each time this native is invoked)
-                    prevx = getDouble (root.prevPoint.x) 
-                    setDouble (segment.origin.x, prevx)
+                    segment.origin.x = root.prevPoint.x
+                    segment.origin.y = root.prevPoint.y
 
-                    prevy = getDouble (root.prevPoint.y)
-                    setDouble (segment.origin.y, prevy)
-
-                    curx = getDouble (root.currentPoint.x)
-                    setDouble (segment.end.x, curx)
-
-                    cury = getDouble (root.currentPoint.y)
-                    setDouble (segment.end.y, cury)
+                    segment.end.x = root.currentPoint.x
+                    segment.end.y = root.currentPoint.y
 
                     // Set the previous point value to prepare the next call
-                    setDouble (root.prevPoint.x, curx)
-                    setDouble (root.prevPoint.y, cury)
+                    root.prevPoint.x = root.currentPoint.x
+                    root.prevPoint.y = root.currentPoint.y
                 }
             }
         }

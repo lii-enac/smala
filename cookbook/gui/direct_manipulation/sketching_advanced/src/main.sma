@@ -88,13 +88,9 @@ Component root {
             f.move.y => currentPoint.y
 
             f.move -> (root) {
-                //compute mid point
-                currentPointX = getDouble (root.currentPoint.x)
-                currentPointY = getDouble (root.currentPoint.y)
-                prevPointX = getDouble (root.prevPoint.x)
-                prevPointY = getDouble (root.prevPoint.y)
-                setDouble (root.midPoint.x, (currentPointX + prevPointX) / 2)
-                setDouble (root.midPoint.y, (currentPointY + prevPointY) / 2)
+                //compute mid point              
+                root.midPoint.x =  (root.currentPoint.x + root.prevPoint.x) / 2
+                root.midPoint.y =  (root.currentPoint.y + root.prevPoint.y) / 2
 
                 addChildrenTo root.content {
                     //quadratic segment between origin and mid point
@@ -105,28 +101,24 @@ Component root {
                 }
 
                 //assign the values to the quadratic segment
-                prevMidPointX = getDouble (root.prevMidPoint.x)
-                setDouble (root.content.quadraticSegment.origin.x, prevMidPointX)
-                prevMidPointY = getDouble (root.prevMidPoint.y)
-                setDouble (root.content.quadraticSegment.origin.y, prevMidPointY)
-                midPointX = getDouble (root.midPoint.x)
-                setDouble (root.content.quadraticSegment.end.x, midPointX)
-                midPointY = getDouble (root.midPoint.y)
-                setDouble (root.content.quadraticSegment.end.y, midPointY)
-                setDouble (root.content.quadraticSegment.end.x1, prevPointX)
-                setDouble (root.content.quadraticSegment.end.y1, prevPointY)
+                root.content.quadraticSegment.origin.x =  root.prevMidPoint.x
+                root.content.quadraticSegment.origin.y = root.prevMidPoint.y
+                root.content.quadraticSegment.end.x = root.midPoint.x
+                root.content.quadraticSegment.end.y = root.midPoint.y
+                root.content.quadraticSegment.end.x1 = root.prevPoint.x
+                root.content.quadraticSegment.end.y1 = root.prevPoint.y
 
                 //assign the values to the line segment
-                setDouble (root.content.lineSegment.origin.x, midPointX)
-                setDouble (root.content.lineSegment.origin.y, midPointY)
-                setDouble (root.content.lineSegment.end.x, currentPointX)
-                setDouble (root.content.lineSegment.end.y, currentPointY)
+                root.content.lineSegment.origin.x = root.midPoint.x
+                root.content.lineSegment.origin.y = root.midPoint.y
+                root.content.lineSegment.end.x = root.currentPoint.x
+                root.content.lineSegment.end.y = root.currentPoint.y
 
                 //set the previous points values
-                setDouble (root.prevPoint.x, currentPointX)
-                setDouble (root.prevPoint.y, currentPointY)
-                setDouble (root.prevMidPoint.x, midPointX)
-                setDouble (root.prevMidPoint.y, midPointY)
+                root.prevPoint.x = root.currentPoint.x
+                root.prevPoint.y = root.currentPoint.y
+                root.prevMidPoint.x = root.midPoint.x
+                root.prevMidPoint.y = root.midPoint.y
             }
         }
 

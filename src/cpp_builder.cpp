@@ -726,6 +726,19 @@ namespace Smala
         has_string = true;
     }
     indent (os);
+
+    // if the symbol is unknown we add it as a double or as a string
+    if (!known_symbol (node->name ())) {
+      std::string var_name ("pr_var_" + std::to_string (m_var_num++));
+      if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1
+                && node->duplicate_warning ())
+              print_error_message (error_level::warning,
+                                   "duplicated name: " + node->name (), 0);
+      if (has_string)
+        os << "string ";
+      else
+        os << "double ";
+    }
     std::pair<std::string, std::string> arg = parse_symbol (node->name ());
     if (arg.first.rfind ("cpnt_", 0) == 0) {
       os << "((AbstractProperty*) ";
@@ -764,6 +777,19 @@ namespace Smala
       }
       os << ";\n";
     }
+  }
+
+  bool
+  CPPBuilder::known_symbol (const string& name)
+  {
+    std::string str;
+    std::size_t pos = name.find ('.');
+    if (pos == std::string::npos) {
+      str = m_parent_list.back ()->get_symbol (name);
+      if (str.empty ())
+        return false;
+    }
+    return true;
   }
 
   void
@@ -809,12 +835,28 @@ namespace Smala
         }
       }
         break;
-      case VALUE:
+      case VALUE: {
+        if (m_in_set_text) {
+          os << "to_string (";
+        }
+        os << n->arg_value ();
+        if (m_in_set_text) {
+          os << ")";
+        }
+      }
+        break;
       case STRING_VALUE:
         os << n->arg_value ();
         break;
       case VAR: {
         std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        // if the name contains "var_" then this is a simple variable not a djnn property
+        // so write it as is and return
+        std::size_t found = p.first.find ("var_");
+        if (found != std::string::npos) {
+          os << p.first;
+          return;
+        }
         if (m_in_static_expr) {
           if (m_in_set_text)
             os << "((TextProperty*)";

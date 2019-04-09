@@ -25,6 +25,7 @@ namespace Smala {
   {
     SYMBOL,
     VALUE,
+    STRING_VALUE,
     VAR,
     END,
     SMALA_NULL,

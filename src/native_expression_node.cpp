@@ -23,7 +23,7 @@ namespace Smala
     set_node_type (NATIVE_EXPRESSION);
   }
 
-  NativeExpressionNode::NativeExpressionNode (std::vector<ArgNode*> expression, bool paused, bool is_connector, bool is_model) :
+  NativeExpressionNode::NativeExpressionNode (std::vector<Node*> expression, bool paused, bool is_connector, bool is_model) :
       Node (), _expression (expression), _paused (paused), _is_connector (is_connector), _is_model (is_model)
   {
     set_node_type (NATIVE_EXPRESSION);
@@ -38,7 +38,7 @@ namespace Smala
     _output_nodes.push_back (n);
   }
 
-  std::vector<ArgNode*>
+  std::vector<Node*>
   NativeExpressionNode::get_expression ()
   {
     return _expression;

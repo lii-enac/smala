@@ -229,7 +229,7 @@ namespace Smala
   {
     std::string p_name =
         node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
-    ArgNode* arg_node = node->get_expression ().at (0);
+    ArgNode* arg_node = (ArgNode*) node->get_expression ().at (0);
     std::pair<std::string, std::string> arg;
     if (arg_node->arg_type () != VAR) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -295,16 +295,16 @@ namespace Smala
     indent (os);
     bool string_setter = false;
     for (auto e : node->get_expression ()) {
-      if (e->arg_value ().at (0) == '\"')
+      if (((ArgNode*)e)->arg_value ().at (0) == '\"')
         string_setter = true;
     }
     std::string bool_name ("string_setter_" + std::to_string (m_sym_num - 1));
     os << "bool " << bool_name << " = " << string_setter << ";\n";
 
     for (auto e : node->get_expression ()) {
-      if (e->arg_type () == VAR && sym.find (e->arg_value ()) == sym.end ()) {
+      if (((ArgNode*)e)->arg_type () == VAR && sym.find (((ArgNode*)e)->arg_value ()) == sym.end ()) {
         std::pair<std::string, std::string> arg = parse_symbol (
-            e->arg_value ());
+            ((ArgNode*)e)->arg_value ());
         if (arg.first.compare (0, 6, "d_var_") == 0
             || arg.first.compare (0, 6, "i_var_") == 0) {
           indent (os);
@@ -312,7 +312,7 @@ namespace Smala
           os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
               << p_name << ", \"\", " << arg.first << ");\n";
           indent (os);
-          os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+          os << sym_name << "[\"" << ((ArgNode*)e)->arg_value () << "\"] = " << new_name
               << ";\n";
         } else if (arg.first.compare (0, 6, "s_var_") == 0) {
           indent (os);
@@ -320,7 +320,7 @@ namespace Smala
           os << "TextProperty *" << new_name << " = new TextProperty ("
               << p_name << ", \"\", " <<arg.first << ");\n";
           indent (os);
-          os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+          os << sym_name << "[\"" << ((ArgNode*)e)->arg_value () << "\"] = " << new_name
               << ";\n";
           string_setter = true;
         } else {
@@ -329,7 +329,7 @@ namespace Smala
             os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
                 << ") == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e->arg_value ()
+            os << "\tcerr << \"" << ((ArgNode*)e)->arg_value ()
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
@@ -339,10 +339,10 @@ namespace Smala
             indent (os);
             os << "\t" << bool_name << " = true;\n}\n";
             indent (os);
-            os << sym_name << "[\"" << e->arg_value ()
+            os << sym_name << "[\"" << ((ArgNode*)e)->arg_value ()
                 << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
                 << ");\n";
-            sym[e->arg_value ()] = arg.first;
+            sym[((ArgNode*)e)->arg_value ()] = arg.first;
             triggers.push_back (arg.first);
           } else {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -352,7 +352,7 @@ namespace Smala
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e->arg_value ()
+            os << "\tcerr << \"" << ((ArgNode*)e)->arg_value ()
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
@@ -362,9 +362,9 @@ namespace Smala
             indent (os);
             os << "\t" << bool_name << " = true;\n\t}\n";
             indent (os);
-            os << sym_name << "[\"" << e->arg_value () << "\"] = " << new_name
+            os << sym_name << "[\"" << ((ArgNode*)e)->arg_value () << "\"] = " << new_name
                 << ";\n";
-            sym[e->arg_value ()] = new_name;
+            sym[((ArgNode*)e)->arg_value ()] = new_name;
             triggers.push_back (new_name);
           }
         }
@@ -502,18 +502,18 @@ namespace Smala
     bool has_sym = false;
     bool has_str = false;
     for (auto n_e : node->get_expression ()) {
-      if (is_sym (n_e->arg_value ())
-          || (n_e->arg_type () == VALUE && n_e->arg_value ().at (0) != '\"')) {
-        if (is_log_sym (n_e->arg_value ()))
+      if (is_sym (((ArgNode*)n_e)->arg_value ())
+          || (((ArgNode*)n_e)->arg_type () == VALUE && ((ArgNode*)n_e)->arg_value ().at (0) != '\"')) {
+        if (is_log_sym (((ArgNode*)n_e)->arg_value ()))
           has_log_sym = true;
         sym = true;
-      } else if (n_e->arg_value ().compare ("?") == 0) {
+      } else if (((ArgNode*)n_e)->arg_value ().compare ("?") == 0) {
         has_log_sym = false;
         sym = false;
-      } else if (n_e->arg_value ().compare (":") == 0) {
+      } else if (((ArgNode*)n_e)->arg_value ().compare (":") == 0) {
         if (sym)
           has_sym = true;
-      } else if (n_e->arg_value ().at (0) == '\"') {
+      } else if (((ArgNode*)n_e)->arg_value ().at (0) == '\"') {
         has_str = true;
       }
     }
@@ -525,7 +525,7 @@ namespace Smala
         << "(std::map<std::string, AbstractProperty*>& sym_table, bool string_setter)\n{\n";
     bool is_string = false;
     for (auto n_e : node->get_expression ()) {
-      if (n_e->arg_value ().at (0) == '\"') {
+      if (((ArgNode*)n_e)->arg_value ().at (0) == '\"') {
         is_string = true;
         break;
       }
@@ -537,28 +537,28 @@ namespace Smala
       int i = 1;
       bool in_expr;
       for (auto op : node->get_expression ()) {
-        if (op->arg_type () == SYMBOL) {
-          os << " " << op->arg_value () << " ";
-          if (is_sym (op->arg_value ())) {
+        if (((ArgNode*)op)->arg_type () == SYMBOL) {
+          os << " " << ((ArgNode*)op)->arg_value () << " ";
+          if (is_sym (((ArgNode*)op)->arg_value ())) {
             in_expr = true;
-          } else if (op->arg_value ().compare ("?") == 0
-              || op->arg_value ().compare (":") == 0) {
+          } else if (((ArgNode*)op)->arg_value ().compare ("?") == 0
+              || ((ArgNode*)op)->arg_value ().compare (":") == 0) {
             in_expr = false;
           }
-        } else if (op->arg_type () == VAR) {
+        } else if (((ArgNode*)op)->arg_type () == VAR) {
           if (!in_expr
               && (i == sz
-                  || !is_sym (node->get_expression ().at (i)->arg_value ()))) {
-            os << "((TextProperty*) sym_table.find (\"" << op->arg_value ()
+                  || !is_sym (((ArgNode*)node->get_expression ().at (i))->arg_value ()))) {
+            os << "((TextProperty*) sym_table.find (\"" << ((ArgNode*)op)->arg_value ()
                 << "\")->second)->get_value ()";
           } else {
-            os << "sym_table.find (\"" << op->arg_value ()
+            os << "sym_table.find (\"" << ((ArgNode*)op)->arg_value ()
                 << "\")->second->get_double_value ()";
           }
-        } else if (op->arg_value ().at (0) == '\"') {
-          os << "std::string (" << op->arg_value () << ")";
+        } else if (((ArgNode*)op)->arg_value ().at (0) == '\"') {
+          os << "std::string (" << ((ArgNode*)op)->arg_value () << ")";
         } else {
-          os << op->arg_value ();
+          os << ((ArgNode*)op)->arg_value ();
         }
         i++;
       }
@@ -716,46 +716,72 @@ namespace Smala
   void
   CPPBuilder::set_property (std::ofstream &os, Node *node)
   {
-    if (node->name ().compare ("mouseTracking") == 0) {
-      indent (os);
-      os << "mouse_tracking = " << node->args ().at (0).second << ";\n";
+    if (node->name ().compare ("set_ref") == 0) {
+      set_ref_property (os, node);
       return;
     }
-    if (node->name ().compare ("fullScreen") == 0) {
-      indent (os);
-      os << "full_screen = " << node->args ().at (0).second << ";\n";
-      return;
-    }
-    if (node->name ().compare ("hidePointer") == 0) {
-      indent (os);
-      os << "hide_pointer = " << node->args ().at (0).second << ";\n";
-      return;
+    bool has_string = false;
+    for (Node *n : node->get_expression ()) {
+      if (((ArgNode*) n)->arg_type () == STRING_VALUE)
+        has_string = true;
     }
     indent (os);
-    os << "((" << node->djnn_type ().substr (3) << "Property*) ";
     std::pair<std::string, std::string> arg = parse_symbol (node->name ());
+    if (arg.first.rfind ("cpnt_", 0) == 0) {
+      os << "((AbstractProperty*) ";
+      os << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ")->set_value (";
+      if (has_string) {
+        os << "string (";
+        m_in_set_text = true;
+      }
+      m_in_static_expr = true;
+      for (Node *n: node->get_expression ()) {
+        build_node (os, n);
+      }
+      m_in_static_expr = false;
+      if (has_string) {
+        os << ")";
+        m_in_set_text = false;
+      }
+      os << ", true);\n";
+    } else {
+      os << arg.first << " = ";
+      if (has_string) {
+        os << "string (";
+        m_in_set_text = true;
+      }
+      m_in_static_expr = true;
+      for (Node *n : node->get_expression ()) {
+        build_node (os, n);
+      }
+      m_in_static_expr = false;
+      if (has_string) {
+        os << ")";
+        m_in_set_text = false;
+      }
+      os << ";\n";
+    }
+  }
+
+  void
+  CPPBuilder::set_ref_property (std::ofstream &os, Node *node)
+  {
+    std::string dst = node->args ()[0].second;
+    std::string src = node->args ()[1].second;
+    indent (os);
+    std::pair<std::string, std::string> arg = parse_symbol (dst);
+    os << "((RefProperty*) ";
     os << arg.first;
     if (arg.second.compare (m_null_string) != 0)
       os << "->find_component (" << arg.second << ")";
     os << ")->set_value (";
-    if (node->djnn_type ().substr (3).compare ("Text") == 0) {
-      os << "string (";
-      m_in_set_text = true;
-    }
-    if (node->args ().empty ())
-      return;
-    if (node->args ().at (0).first == NAME) {
-      std::pair<std::string, std::string> val = parse_symbol (
-          node->args ().at (0).second);
-      os << val.first;
-      if (val.second.compare (m_null_string) != 0)
-        os << "->find_component (" << val.second << ")";
-    } else
-      os << node->args ().at (0).second;
-    if (node->djnn_type ().substr (3).compare ("Text") == 0) {
-      os << ")";
-      m_in_set_text = false;
-    }
+    std::pair<std::string, std::string> arg2 = parse_symbol (src);
+    os << arg2.first;
+    if (arg2.second.compare (m_null_string) != 0)
+      os << "->find_component (" << arg2.second << ")";
     os << ", true);\n";
   }
 
@@ -784,14 +810,27 @@ namespace Smala
       }
         break;
       case VALUE:
+      case STRING_VALUE:
         os << n->arg_value ();
         break;
       case VAR: {
         std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        if (m_in_static_expr) {
+          if (m_in_set_text)
+            os << "((TextProperty*)";
+          else
+            os << "((AbstractProperty*)";
+        }
         if (p.second.compare (m_null_string) == 0)
           os << p.first;
         else
           print_find_component (os, p.first, p.second);
+        if (m_in_static_expr) {
+          if (m_in_set_text)
+            os << ")->get_value ()";
+          else
+            os << ")->get_double_value ()";
+        }
         break;
       }
       case SMALA_NULL: {

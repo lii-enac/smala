@@ -32,6 +32,7 @@ namespace Smala {
     void build_arg_node (std::ofstream &os, Node *node) override;
     void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void set_property (std::ofstream &os, Node *node) override;
+    void set_ref_property (std::ofstream &os, Node *node);
     void end_property (std::ofstream &os, Node *n) override;
     void get_property (std::ofstream &os, Node *node) override;
     void alias (std::ofstream &os, Node *node) override;

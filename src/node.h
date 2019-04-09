@@ -16,7 +16,6 @@
 
 #include <string>
 #include <vector>
-
 #include "error_location.h"
 
 namespace Smala {
@@ -114,6 +113,8 @@ public:
     void set_duplicate_warning (bool v);
     bool in_expression () { return m_in_expression; }
     void set_in_expression (bool v) { m_in_expression = v; }
+    void set_expression (std::vector<Node*>& nodes) { m_expression = nodes; }
+    std::vector<Node*>& get_expression () { return m_expression; }
 private:
     Node * m_parent;
     std::string m_djnn_type;
@@ -123,6 +124,7 @@ private:
     bool m_has_arguments, m_duplicate_warning, m_in_expression;
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
+    std::vector<Node*> m_expression;
 };
 
 }

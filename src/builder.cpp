@@ -406,10 +406,19 @@ namespace Smala
       case VAR:
         {
           std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+          if (m_in_static_expr && m_in_set_text) {
+            os << "((TextProperty*)";
+          }
           if (p.second.compare (m_null_string) == 0)
             os << p.first;
           else
             print_find_component (os, p.first, p.second);
+          if (m_in_static_expr) {
+            if (m_in_set_text)
+              os << ")->get_value ()";
+            else
+              os << "->get_double_value ()";
+          }
           break;
         }
       case SMALA_NULL:

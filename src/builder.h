@@ -55,7 +55,7 @@ namespace Smala {
   public:
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
-            0), m_sym_num (0), m_native_num (0), m_in_set_text (false), m_in_native_action (false), m_type_manager (nullptr)
+            0), m_sym_num (0), m_native_num (0), m_in_set_text (false), m_in_native_action (false), m_in_static_expr (false), m_type_manager (nullptr)
     {
     }
     virtual ~Builder () {};
@@ -64,7 +64,7 @@ namespace Smala {
   protected:
     smala::ErrorLocation *m_curloc;
     int m_indent, m_cpnt_num, m_var_num, m_error, m_sym_num, m_native_num;
-    bool m_in_set_text, m_in_native_action;
+    bool m_in_set_text, m_in_native_action, m_in_static_expr;
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;

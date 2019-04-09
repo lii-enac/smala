@@ -73,7 +73,7 @@
   using namespace Smala;
   vector<Node*> parent_list;
   vector<Node*> expression;
-  vector<ArgNode*> comp_expression;
+  vector<Node*> comp_expression;
   vector<int> int_array;
   bool m_in_arguments = false;
   int func_num = 0;
@@ -269,6 +269,7 @@
 %type < vector<string> > process_list
 %type <Node*> cat_expression
 %type <Node*> cat_term
+%type <Node*> start_set_value
 %type <SmalaNative*> lambda
 %type <SmalaNative*> start_lambda
 %type < parameters_t > parameters
@@ -760,147 +761,31 @@ start_repeat: NAME_OR_PATH SIMPLE_EQ REPEAT LP NAME_OR_PATH SIMPLE_EQ repeat_arg
 
 repeat_arg: INT { $$ = $1; } | NAME_OR_PATH { $$ = $1; }
 
-set_value: set_bool | set_int | set_double | set_text | set_ref
+set_value: start_set_value exp
+{
+  $1->set_expression (comp_expression);
+  comp_expression.clear ();
+}
+|
+SET_REF LP NAME_OR_PATH COMMA NAME_OR_PATH RP
+{
+  Node *n = new Node ("set_ref", "set_ref");
+  std::vector< std::pair<ParamType, std::string> > args;
+  args.push_back (std::pair<ParamType, std::string> (NAME, $3));
+  args.push_back (std::pair<ParamType, std::string> (NAME, $5));
+  n->set_node_type (SET_PROPERTY);
+  n->add_args (args);
+  driver.add_node (n);
+}
+
 get_value: get_bool | get_int | get_double | get_string | get_ref
 
-set_bool: NAME_OR_PATH SIMPLE_EQ TRUE
+start_set_value: NAME_OR_PATH SIMPLE_EQ
 {
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (INT, "1"));
-  Node *n = new Node ("SetBool", $1, args);
+  Node *n = new Node ("set", $1);
   n->set_node_type (SET_PROPERTY);
   driver.add_node (n);
-}
-| NAME_OR_PATH SIMPLE_EQ FALSE
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (INT, "0"));
-  Node *n = new Node ("SetBool", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-|
-start_set_bool exp RP
-{
-  Node *n = new Node ("END_PROPERTY", "Bool");
-  n->set_node_type (END_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = false;
-}
-
-start_set_bool: SET_BOOL LP NAME_OR_PATH COMMA
-{
-  Node *n = new Node ("SetBool", $3);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = true;
-}
-
-set_int: NAME_OR_PATH SIMPLE_EQ INT
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (INT, $3));
-  Node *n = new Node ("SetInt", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-|
-start_set_int exp RP
-{
-  Node *n = new Node ("END_PROPERTY", "Int");
-  n->set_node_type (END_PROPERTY);;
-  driver.add_node (n);
-  m_in_arguments = false;
-}
-
-start_set_int: SET_INT LP NAME_OR_PATH COMMA
-{
-  Node *n = new Node ("SetInt", $3);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = true;
-}
-
-set_double: NAME_OR_PATH SIMPLE_EQ DOUBLE
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (INT, $3));
-  Node *n = new Node ("SetDouble", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-| start_set_double exp RP
-{
-  Node *n = new Node ("END_PROPERTY", "Double");
-  n->set_node_type (END_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = false;
-}
-| NAME_OR_PATH SIMPLE_EQ MINUS DOUBLE
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (INT, std::string("-")+$4));
-  Node *n = new Node ("SetDouble", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-
-start_set_double: SET_DOUBLE LP NAME_OR_PATH COMMA
-{
-  Node *n = new Node ("SetDouble", $3);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = true;
-}
-
-set_text: NAME_OR_PATH SIMPLE_EQ STRING
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (STRING, $3));
-  Node *n = new Node ("SetText", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-|
-start_set_text  exp RP
-{
-  Node *n = new Node ("END_PROPERTY", "Text");
-  n->set_node_type (END_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = false;
-}
-
-start_set_text: SET_STRING LP NAME_OR_PATH COMMA
-{
-  Node *n = new Node ("SetText", $3);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = true;
-}
-
-set_ref: NAME_OR_PATH SIMPLE_EQ NAME_OR_PATH
-{
-  vector< pair<ParamType, string> > args;
-  args.push_back (make_pair (NAME, $3));
-  Node *n = new Node ("SetRef", $1, args);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-}
-|
-start_set_ref  exp RP
-{
-  Node *n = new Node ("END_PROPERTY", "Ref");
-  n->set_node_type (END_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = false;
-}
-
-start_set_ref: SET_REF LP NAME_OR_PATH COMMA
-{
-  Node *n = new Node ("SetRef", $3);
-  n->set_node_type (SET_PROPERTY);
-  driver.add_node (n);
-  m_in_arguments = true;
+  $$ = n;
 }
 
 get_int: NAME_OR_PATH SIMPLE_EQ GET_INT LP NAME_OR_PATH RP
@@ -1076,6 +961,23 @@ MINUS INT
     comp_expression.push_back (n);
 }
 |
+TRUE
+{
+  ArgNode *n = new ArgNode (VALUE, "1");
+  if (m_in_arguments)
+    driver.add_node (n);
+  else
+    comp_expression.push_back (n);
+}
+|
+FALSE {
+  ArgNode *n = new ArgNode (VALUE, "0");
+  if (m_in_arguments)
+    driver.add_node (n);
+  else
+    comp_expression.push_back (n);
+}
+|
 DOUBLE
 {
   ArgNode *n = new ArgNode (VALUE, $1);
@@ -1096,7 +998,7 @@ MINUS DOUBLE
 |
 STRING
 {
-  ArgNode *n = new ArgNode (VALUE, $1);
+  ArgNode *n = new ArgNode (STRING_VALUE, $1);
   if (m_in_arguments)
     driver.add_node (n);
   else
@@ -1323,19 +1225,6 @@ assignment: exp assignment_symbol process_list is_model
     out->set_node_type (PATH);
     expr_node->add_output_node ($3.at (i));
   }
-  driver.add_native_expression (expr_node);
-  driver.add_node (expr_node);
-  comp_expression.clear ();
-}
-|
-NAME_OR_PATH SIMPLE_EQ exp assignment_symbol NAME_OR_PATH is_model
-{
-  NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $4, false, $6);
-  expr_node->set_name ($1);
-  expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-  Node *out = new Node ("Name", $5);
-  out->set_node_type (PATH);
-  expr_node->add_output_node ($5);
   driver.add_native_expression (expr_node);
   driver.add_node (expr_node);
   comp_expression.clear ();

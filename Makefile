@@ -282,6 +282,7 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/sketching_simple \
 	gui/direct_manipulation/sketching_advanced \
 	gui/direct_manipulation/zoom \
+	gui/direct_manipulation/accumulated_transforms \
 	gui/fitts_law \
 	gui/redisplay \
 	gui/widgets/checkbox \

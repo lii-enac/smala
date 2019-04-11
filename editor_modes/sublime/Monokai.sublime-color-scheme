@@ -1,0 +1,11 @@
+{
+    "rules":
+    [
+        {
+            "name": "imperatif code",
+            "scope": "source.imperatif",
+            //"background": "color(var(background) (+ 50%))",
+            "background": "hsl(70, 10%, 26%)",
+        },
+    ]
+}

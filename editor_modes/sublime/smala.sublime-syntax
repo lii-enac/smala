@@ -6,7 +6,7 @@ file_extensions: [sma]
 scope: source.sma
 
 variables:
-  function_sma: 'run|stop|delete|notify|merge|dump|with|from|addChild|addChildrenTo|loadFromXML|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|setInt|setDouble|setBool|setString|setRef'
+  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|setInt|setDouble|setBool|setString|setRef'
 
 contexts:
   main:
@@ -43,14 +43,15 @@ contexts:
     # need to be escaped: this is done by using two single quotes next to each
     # other.
 
-    - match: '\b(use|import|aka|_main_|_define_)\b'
+    - match: '\b(use|import|aka|_main_|_define_|addChild|addChildrenTo)\b'
       scope: keyword.other.sma
 
-    - match: '\s*<<\s*|\s*=>\s*|\s*=:\s*|\s*!?->!?\s*'
+    - match: '\s*<<\s*|\s*=>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
       scope: keyword.operator.sma
 
-    - match: '\b[A-Z].([a-zA-Z0-9])*\b'
-      scope: storage.type.sma
+    - match: '^\s*(\b[A-Z].[a-zA-Z0-9]*\b)'
+      captures:
+        1: storage.type.sma
 
     # Numbers
     - match: '\b(-)?[0-9]+(.[0-9]*)?\b'

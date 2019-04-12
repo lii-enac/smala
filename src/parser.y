@@ -128,7 +128,7 @@
 
 }
 
-
+%expect 180
 %lex-param { Smala::Scanner &scanner }
 %lex-param { Smala::Driver &driver }
 %parse-param { Smala::Scanner &scanner }
@@ -185,6 +185,9 @@
 %token LP "("
 %token RP ")"
 %token COMMA ","
+%token IF "if"
+%token THEN "then"
+%token ELSE "else"
 %token INSERT "insert"
 %token INT_T "int"
 %token DOUBLE_T "double"
@@ -270,6 +273,7 @@
 %type <Node*> cat_expression
 %type <Node*> cat_term
 %type <Node*> start_set_value
+%type <Node*> start_if
 %type <SmalaNative*> lambda
 %type <SmalaNative*> start_lambda
 %type < parameters_t > parameters
@@ -448,12 +452,56 @@ item_list:
 | item_list item
 
 item: simple_component | dash_array | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move
+  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement
 
+if_statement: if_exp item_list end_if_statement %prec IF
+| if_exp item_list end_if_statement start_else item_list end_if_statement
+| if_exp item_list end_if_statement else if_statement
+
+if_exp: start_if exp end_if_exp
+{
+  $1->set_expression (comp_expression);
+  comp_expression.clear ();
+}
+
+start_if: IF LP
+{
+  Node *n = new Node ();
+  n->set_node_type (START_IF);
+  driver.add_node (n);
+  $$ = n;
+}
+
+start_else: ELSE LCB
+{
+  Node *n = new Node ();
+  n->set_node_type (START_ELSE);
+  driver.add_node (n);
+}
+
+else: ELSE
+{
+  Node *n = new Node ();
+  n->set_node_type (START_ELSEIF);
+  driver.add_node (n);
+}
+
+end_if_exp: RP LCB
+{
+  Node *n = new Node ();
+  n->set_node_type (END_IF_EXPRESSION);
+  driver.add_node (n);
+}
+
+end_if_statement: RCB
+{
+  Node *n = new Node ();
+  n->set_node_type (END_IF_STATEMENT);
+  driver.add_node (n); 
+}
 
 move : MOVE NAME_OR_PATH LT NAME_OR_PATH
 {
-
   BinaryInstructionNode *node = new BinaryInstructionNode ($2, $4);
   node->set_node_type (MOVE_BEFORE);
   driver.add_node (node);

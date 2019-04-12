@@ -81,7 +81,7 @@ Component root {
 	green.press -> smala_na
 
 	// Define and bind a smala_lambda (in code native action)
-	blue.press -> (fc) {
+	blue.press -> (root) {
   		// To create a NEW component (either visual or assignment/binding/connector):
         // add it to a parent (passed as the argument of the native, here fc), thanks to
         //     addChildrenTo parent {
@@ -92,11 +92,18 @@ Component root {
         // do not use an assignment as it would create a new Assignment component
         // and add it to the component tree each time this native is invoked.
         // The value change is propagated.
-        setInt (fc.r, 0)
-        setInt (fc.g, 0)
-        setInt (fc.b, 255)
+        root.fc.r = 0
+        root.fc.g = 0
+        root.fc.b = 255
+        if (root.blue.press.x < 400) {
+            root.blue.y = 100
+        } else if (root.blue.press.x > 430) {
+            root.blue.y = 500
+        } else {
+            root.blue.y = 400
+        }
 
-    	dump fc
+    	dump root.fc
 	}
 }
 

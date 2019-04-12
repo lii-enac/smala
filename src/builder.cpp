@@ -161,6 +161,43 @@ namespace Smala
           build_define_node (os, node);
           break;
         }
+      case START_ELSE:
+        {
+          indent  (os);
+          os << "else {\n";
+          m_indent++;
+          break;
+        }
+      case START_ELSEIF:
+        {
+           indent  (os);
+           os << "else ";
+           break;
+        }
+      case START_IF:
+      {
+        indent  (os);
+        os << "if (";
+        m_in_static_expr = true;
+        for (Node *n : node->get_expression ()) {
+          build_node (os, n);
+        }
+        m_in_static_expr = false;
+        break;
+      }
+      case END_IF_EXPRESSION:
+      {
+        os << ") {\n";
+        m_indent++;
+        break;
+      }
+      case END_IF_STATEMENT:
+      {
+        m_indent--;
+        indent (os);
+        os << "}\n";
+        break;
+      }
       case END_DEFINE:
         {
           build_end_define (os, node);

@@ -98,6 +98,18 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_while (std::ofstream &os, Node *node)
+  {
+    indent (os);
+    os << "while (";
+    for (auto cur: node->get_expression()) {
+      build_node (os, cur);
+    }
+    os << ") {\n";
+    m_indent++;
+  }
+
+  void
   CPPBuilder::build_for (std::ofstream &os, Node *node)
   {
     ForNode* n = (ForNode*) node;

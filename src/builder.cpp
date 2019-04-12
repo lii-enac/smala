@@ -215,6 +215,11 @@ namespace Smala
         build_for (os, node);
         break;
       }
+      case WHILE:
+      {
+        build_while (os, node);
+        break;
+      }
       case SMALA_NATIVE:
         {
           m_in_native_action = true;

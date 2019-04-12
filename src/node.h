@@ -89,7 +89,8 @@ namespace Smala {
     TEXT,
     THIS,
     UNARY_OP,
-    USE
+    USE,
+    WHILE
   };
 
 class Node

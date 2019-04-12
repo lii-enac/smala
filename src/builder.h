@@ -93,6 +93,7 @@ namespace Smala {
     virtual void build_end_define (std::ofstream &os, Node *node) = 0;
     virtual void build_smala_native (std::ofstream &os, Node *n) = 0;
     virtual void build_for (std::ofstream &os, Node *node) {}
+    virtual void build_while (std::ofstream &os, Node *node) {}
     virtual void build_native_action_component (std::ofstream &os, Node *n) = 0;
     virtual void build_native_action (std::ofstream &os, Node *n) = 0;
     virtual void build_native_expression (std::ofstream &os, Node *n) {}

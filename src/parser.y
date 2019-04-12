@@ -191,6 +191,7 @@
 %token THEN "then"
 %token ELSE "else"
 %token FOR "for"
+%token WHILE "while"
 %token INSERT "insert"
 %token INT_T "int"
 %token DOUBLE_T "double"
@@ -457,8 +458,23 @@ item_list:
 | item_list item
 
 item: simple_component | dash_array | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement | for_loop
+  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement | for_loop | while_loop
 
+while_loop: start_while LCB item_list RCB
+{
+  Node *n = new Node ();
+  n->set_node_type (END_BLOCK);
+  driver.add_node (n);
+}
+
+start_while: WHILE LP exp RP
+{
+  Node *n = new Node ();
+  n->set_node_type (WHILE);
+  n->set_expression (comp_expression);
+  comp_expression.clear ();
+  driver.add_node (n);
+}
 
 for_loop: start_for SEMICOLON set_value end_for
 {

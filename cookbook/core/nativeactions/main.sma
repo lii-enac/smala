@@ -103,7 +103,9 @@ Component root {
             root.blue.y = 400
         }
 
-    	dump root.fc
+        for (i = 0; i < 5; i = i + 1) {
+            dump root.fc
+        }
 	}
 }
 

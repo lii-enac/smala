@@ -22,6 +22,7 @@
 #include "ctrl_node.h"
 #include "local_node.h"
 #include "cpp_type_manager.h"
+#include "for_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -94,6 +95,81 @@ namespace Smala
   {
     std::replace (import.begin (), import.end (), '.', '/');
     os << "#include \"" << import << ".h\"\n";
+  }
+
+  void
+  CPPBuilder::build_for (std::ofstream &os, Node *node)
+  {
+    ForNode* n = (ForNode*) node;
+    indent (os);
+    os << "for (";
+    //first statement
+    Node *first = n->first_st ();
+    // if the symbol is unknown we add it as an int
+    if (!known_symbol (first->name ())) {
+      std::string var_name ("pr_var_" + std::to_string (m_var_num++));
+      if (m_parent_list.back ()->add_entry (first->name (), var_name) == 1
+          && node->duplicate_warning ())
+        print_error_message (error_level::warning,
+                             "duplicated name: " + first->name (), 0);
+      os << "int ";
+    }
+    std::pair<std::string, std::string> arg = parse_symbol (first->name ());
+    if (arg.first.rfind ("cpnt_", 0) == 0) {
+      os << "((AbstractProperty*) ";
+      os << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ")->set_value (";
+      m_in_static_expr = true;
+      for (Node *cur : first->get_expression ()) {
+        build_node (os, cur);
+      }
+      m_in_static_expr = false;
+      os << ", true);\n";
+    } else {
+      os << arg.first << " = ";
+      m_in_static_expr = true;
+      for (Node *cur : first->get_expression ()) {
+        build_node (os, cur);
+      }
+      m_in_static_expr = false;
+    }
+    os << ";";
+    m_in_static_expr = true;
+
+    // second statement
+    for (auto cur : n->get_expression ()) {
+      build_node (os, cur);
+    }
+    os << "; ";
+
+    // third statement
+    Node *third = n->third_st ();
+    arg = parse_symbol (third->name ());
+    if (arg.first.rfind ("cpnt_", 0) == 0) {
+      os << "((AbstractProperty*) ";
+      os << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ")->set_value (";
+      m_in_static_expr = true;
+      for (Node *cur : third->get_expression ()) {
+        build_node (os, cur);
+      }
+      m_in_static_expr = false;
+      os << ", true);\n";
+    } else {
+      os << arg.first << " = ";
+      m_in_static_expr = true;
+      for (Node *cur : third->get_expression ()) {
+        build_node (os, cur);
+      }
+      m_in_static_expr = false;
+    }
+    m_in_static_expr = false;
+    os << ") {\n";
+    m_indent++;
   }
 
   void

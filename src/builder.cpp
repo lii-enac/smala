@@ -191,7 +191,7 @@ namespace Smala
         m_indent++;
         break;
       }
-      case END_IF_STATEMENT:
+      case END_BLOCK:
       {
         m_indent--;
         indent (os);
@@ -210,6 +210,11 @@ namespace Smala
           if (n) delete n;
           break;
         }
+      case FOR:
+      {
+        build_for (os, node);
+        break;
+      }
       case SMALA_NATIVE:
         {
           m_in_native_action = true;

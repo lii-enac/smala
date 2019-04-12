@@ -78,6 +78,12 @@ Driver::add_node (Node *node)
 }
 
 void
+Driver::remove_node (Node *node)
+{
+  m_ast.remove_node (node);
+}
+
+void
 Driver::add_use (const std::string &val)
 {
   m_ast.add_use (val);

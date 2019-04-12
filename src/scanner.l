@@ -53,6 +53,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 
 "/*"([^*]|\*+[^*/])*\*+"/"            { }
 "//"[^\n]*                { }
+";"                   { return Smala::Parser::make_SEMICOLON (Smala::location ()); }
 "{"                   { return Smala::Parser::make_LCB (Smala::location ()); }
 "}"                   { return Smala::Parser::make_RCB (Smala::location ()); }
 "["                   { return Smala::Parser::make_LB (Smala::location ()); }
@@ -145,6 +146,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "if"                  { return Smala::Parser::make_IF (Smala::location ()); }
 "then"                { return Smala::Parser::make_THEN (Smala::location ()); }
 "else"                { return Smala::Parser::make_ELSE (Smala::location ()); }
+"for"                 { return Smala::Parser::make_FOR (Smala::location ()); }
+"while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
 {INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }
 {INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
@@ -152,7 +155,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {NAME}(("."({NAME}|{INT}))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }
 <<EOF>>               { return yyterminate (); }
-[\t ;\.]+             {}
+[\t \.]+             {}
 [\n]                  { if (m_driver.debug())
                           m_driver.new_line(); }
 %%

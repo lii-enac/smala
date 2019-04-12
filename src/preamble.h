@@ -33,6 +33,7 @@ public:
     std::vector<std::string> import () const;
     std::vector<std::string> use () const;
     void add_node (Node *node);
+    void remove_node (Node *node);
     void add_java_code_node (NativeCodeNode *node);
     void add_import (const std::string &import);
     void add_use (const std::string &use);

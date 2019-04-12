@@ -65,6 +65,17 @@ Ast::add_node (Node *node)
 }
 
 void
+Ast::remove_node (Node *node)
+{
+  std::vector<Node*>::iterator it = find (m_node_list.begin(), m_node_list.end(), node);
+  if (it != m_node_list.end()) {
+    m_node_list.erase (it);
+  } else {
+    m_preamble.remove_node (node);
+  }
+}
+
+void
 Ast::add_use (const std::string &val)
 {
   m_preamble.add_use (val);

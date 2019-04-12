@@ -44,6 +44,7 @@
   #include "native_action_node.h"
   #include "native_code_node.h"
   #include "native_expression_node.h"
+  #include "for_node.h"
 
   using namespace std;
 
@@ -161,6 +162,7 @@
 %token POINT "Point"
 %token SWITCH "Switch"
 %token PIXMAP_CACHE "PixmapCache"
+%token SEMICOLON ";"
 %token MINUS "-"
 %token PLUS "+"
 %token TIMES "*"
@@ -188,6 +190,7 @@
 %token IF "if"
 %token THEN "then"
 %token ELSE "else"
+%token FOR "for"
 %token INSERT "insert"
 %token INT_T "int"
 %token DOUBLE_T "double"
@@ -273,7 +276,9 @@
 %type <Node*> cat_expression
 %type <Node*> cat_term
 %type <Node*> start_set_value
+%type <Node*> set_value
 %type <Node*> start_if
+%type <ForNode*> start_for
 %type <SmalaNative*> lambda
 %type <SmalaNative*> start_lambda
 %type < parameters_t > parameters
@@ -452,7 +457,32 @@ item_list:
 | item_list item
 
 item: simple_component | dash_array | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
-  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement
+  | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement | for_loop
+
+
+for_loop: start_for SEMICOLON set_value end_for
+{
+  $1->set_third_st ($3);
+  driver.remove_node ($3);
+}
+
+start_for: FOR LP set_value SEMICOLON exp
+{
+  ForNode *n = new ForNode ();
+  n->set_first_st ($3);
+  driver.remove_node ($3);
+  n->set_expression (comp_expression);
+  comp_expression.clear ();
+  driver.add_node (n);
+  $$ = n;
+}
+
+end_for: RP LCB item_list RCB
+{
+  Node *n = new Node ();
+  n->set_node_type (END_BLOCK);
+  driver.add_node (n);
+}
 
 if_statement: if_exp item_list end_if_statement %prec IF
 | if_exp item_list end_if_statement start_else item_list end_if_statement
@@ -496,7 +526,7 @@ end_if_exp: RP LCB
 end_if_statement: RCB
 {
   Node *n = new Node ();
-  n->set_node_type (END_IF_STATEMENT);
+  n->set_node_type (END_BLOCK);
   driver.add_node (n); 
 }
 
@@ -813,6 +843,7 @@ set_value: start_set_value exp
 {
   $1->set_expression (comp_expression);
   comp_expression.clear ();
+  $$ = $1;
 }
 |
 SET_REF LP NAME_OR_PATH COMMA NAME_OR_PATH RP
@@ -824,6 +855,7 @@ SET_REF LP NAME_OR_PATH COMMA NAME_OR_PATH RP
   n->set_node_type (SET_PROPERTY);
   n->add_args (args);
   driver.add_node (n);
+  $$ = n;
 }
 
 get_value: get_bool | get_int | get_double | get_string | get_ref

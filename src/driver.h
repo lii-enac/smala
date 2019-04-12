@@ -36,6 +36,7 @@ public:
     void set_stream (std::istream *is, const std::string& filename);
     void clear();
     void add_node (Node *node);
+    void remove_node (Node *node);
     void add_use (const std::string &val);
     void add_import (const std::string &val);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);

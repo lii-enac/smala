@@ -80,7 +80,9 @@ Preamble::java_code_nodes () const {
 void Preamble::add_node (Node *node) {
 	m_node_list.push_back (node);
 }
-
+void Preamble::remove_node (Node *node) {
+  m_node_list.erase (std::remove (m_node_list.begin (), m_node_list.end (), node), m_node_list.end ());
+}
 void Preamble::add_java_code_node (NativeCodeNode *node) {
   m_java_node_list.push_back (node);
 }

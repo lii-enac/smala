@@ -31,7 +31,7 @@ namespace Smala
 {
 
   CPPBuilder::CPPBuilder () :
-      Builder ()
+      Builder (), m_in_for (false)
   {
     m_type_manager = new CPPTypeManager ();
     m_null_symbol = "nullptr";
@@ -98,6 +98,39 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_step (std::ofstream &os, Node *node, bool is_incr)
+  {
+    if (!m_in_for)
+      indent (os);
+    std::pair<std::string, std::string> arg = parse_symbol (node->name ());
+    if (arg.first.rfind ("cpnt_", 0) == 0) {
+      os << "((AbstractProperty*) ";
+      os << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ")->set_value (";
+      os << "((AbstractProperty*) ";
+      os << arg.first;
+      if (arg.second.compare (m_null_string) != 0)
+        os << "->find_component (" << arg.second << ")";
+      os << ")->get_double_value ()";
+      if (is_incr)
+        os << " +";
+      else
+        os << " - ";
+      os << " 1, true);\n";
+    } else {
+      os << arg.first;
+      if (is_incr)
+        os << "++";
+      else
+        os << "--";
+    }
+    if (!m_in_for)
+      os << ";\n";
+  }
+
+  void
   CPPBuilder::build_while (std::ofstream &os, Node *node)
   {
     indent (os);
@@ -158,26 +191,32 @@ namespace Smala
 
     // third statement
     Node *third = n->third_st ();
-    arg = parse_symbol (third->name ());
-    if (arg.first.rfind ("cpnt_", 0) == 0) {
-      os << "((AbstractProperty*) ";
-      os << arg.first;
-      if (arg.second.compare (m_null_string) != 0)
-        os << "->find_component (" << arg.second << ")";
-      os << ")->set_value (";
-      m_in_static_expr = true;
-      for (Node *cur : third->get_expression ()) {
-        build_node (os, cur);
-      }
-      m_in_static_expr = false;
-      os << ", true);\n";
+    if (third->node_type () == INCREMENT || third->node_type () == DECREMENT) {
+      m_in_for = true;
+      build_node (os, third);
+      m_in_for = false;
     } else {
-      os << arg.first << " = ";
-      m_in_static_expr = true;
-      for (Node *cur : third->get_expression ()) {
-        build_node (os, cur);
+      arg = parse_symbol (third->name ());
+      if (arg.first.rfind ("cpnt_", 0) == 0) {
+        os << "((AbstractProperty*) ";
+        os << arg.first;
+        if (arg.second.compare (m_null_string) != 0)
+          os << "->find_component (" << arg.second << ")";
+        os << ")->set_value (";
+        m_in_static_expr = true;
+        for (Node *cur : third->get_expression ()) {
+          build_node (os, cur);
+        }
+        m_in_static_expr = false;
+        os << ", true);\n";
+      } else {
+        os << arg.first << " = ";
+        m_in_static_expr = true;
+        for (Node *cur : third->get_expression ()) {
+          build_node (os, cur);
+        }
+        m_in_static_expr = false;
       }
-      m_in_static_expr = false;
     }
     m_in_static_expr = false;
     os << ") {\n";

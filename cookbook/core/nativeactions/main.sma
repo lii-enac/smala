@@ -92,7 +92,7 @@ Component root {
         // do not use an assignment as it would create a new Assignment component
         // and add it to the component tree each time this native is invoked.
         // The value change is propagated.
-        root.fc.r = 0
+        root.fc.r--
         root.fc.g = 0
         root.fc.b = 255
         if (root.blue.press.x < 400) {
@@ -103,7 +103,7 @@ Component root {
             root.blue.y = 400
         }
 
-        for (i = 0; i < 5; i = i + 1) {
+        for (i = 0; i < 5; i++) {
             dump root.fc
         }
 	}

@@ -33,6 +33,7 @@ namespace Smala {
     void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void build_for (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
+    void build_step (std::ofstream &os, Node *node, bool is_incr) override;
     void set_property (std::ofstream &os, Node *node) override;
     bool known_symbol (const string &name);
     void set_ref_property (std::ofstream &os, Node *node);
@@ -77,6 +78,8 @@ namespace Smala {
     void print_type (std::ofstream &os, ParamType type) override;
     void print_args (std::ofstream &os, std::vector< std::pair<ParamType, std::string> > args, bool is_first);
     std::map<std::string, std::string> m_import_types;
+  private:
+    bool m_in_for;
   };
 
 } /* namespace Smala */

@@ -129,7 +129,7 @@
 
 }
 
-%expect 180
+%expect 182
 %lex-param { Smala::Scanner &scanner }
 %lex-param { Smala::Driver &driver }
 %parse-param { Smala::Scanner &scanner }
@@ -860,6 +860,22 @@ set_value: start_set_value exp
   $1->set_expression (comp_expression);
   comp_expression.clear ();
   $$ = $1;
+}
+|
+NAME_OR_PATH PLUS PLUS
+{
+  Node *n = new Node ("incr", $1);
+  n->set_node_type (INCREMENT);
+  driver.add_node (n);
+  $$ = n;
+}
+|
+NAME_OR_PATH MINUS MINUS
+{
+  Node *n = new Node ("decr", $1);
+  n->set_node_type (DECREMENT);
+  driver.add_node (n);
+  $$ = n;
 }
 |
 SET_REF LP NAME_OR_PATH COMMA NAME_OR_PATH RP

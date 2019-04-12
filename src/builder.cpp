@@ -185,6 +185,16 @@ namespace Smala
         m_in_static_expr = false;
         break;
       }
+      case INCREMENT:
+      {
+        build_step (os, node, true);
+        break;
+      }
+      case DECREMENT:
+      {
+        build_step (os, node, false);
+        break;
+      }
       case END_IF_EXPRESSION:
       {
         os << ") {\n";

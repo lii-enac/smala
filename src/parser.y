@@ -129,7 +129,7 @@
 
 }
 
-%expect 182
+%expect 180
 %lex-param { Smala::Scanner &scanner }
 %lex-param { Smala::Driver &driver }
 %parse-param { Smala::Scanner &scanner }
@@ -165,6 +165,8 @@
 %token SEMICOLON ";"
 %token MINUS "-"
 %token PLUS "+"
+%token INCR "++"
+%token DECR "--"
 %token TIMES "*"
 %token DIVIDE "/"
 %token COLON ":"
@@ -288,6 +290,7 @@
 
 %left QUESTION_MARK COLON
 %nonassoc GT GE LT LE EQ NEQ
+%nonassoc   INCR DECR
 %left OR AND
 %left PLUS MINUS 
 %left TIMES DIVIDE
@@ -862,7 +865,7 @@ set_value: start_set_value exp
   $$ = $1;
 }
 |
-NAME_OR_PATH PLUS PLUS
+NAME_OR_PATH INCR
 {
   Node *n = new Node ("incr", $1);
   n->set_node_type (INCREMENT);
@@ -870,7 +873,7 @@ NAME_OR_PATH PLUS PLUS
   $$ = n;
 }
 |
-NAME_OR_PATH MINUS MINUS
+NAME_OR_PATH DECR
 {
   Node *n = new Node ("decr", $1);
   n->set_node_type (DECREMENT);

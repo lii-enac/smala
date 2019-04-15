@@ -28,23 +28,19 @@ DemoRight (Component frame) {
         Homography transforms                 // transforms are accumulated here
         Rectangle rect (0, 0, 100, 100, 0, 0) // shape to transform (and reference coordinates system)
         Text _ (0, -5, "Translate")
-        Double x0 (0)
-        Double y0 (0)
         FSM fsm {
             State idle
             State pressed {
                 ScreenToLocal s2l (rect)
                 frame.press.x => s2l.inX
                 frame.press.y => s2l.inY
-                s2l.outX => x0
-                s2l.outY => y0
             }
             State dragging {
                 ScreenToLocal s2l (rect)
                 frame.move.x => s2l.inX
                 frame.move.y => s2l.inY
-                s2l.outX - x0 => transforms.rightTranslateBy.dx
-                s2l.outY - y0 => transforms.rightTranslateBy.dy
+                s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
+                s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
             }
             idle -> pressed (rect.press)
             pressed -> idle (frame.release)
@@ -145,23 +141,19 @@ DemoRight (Component frame) {
         Homography transforms
         Rectangle rect (0, 0, 100, 100, 0, 0)
         Text _ (0, -5, "TRS")
-        Double x0 (0)
-        Double y0 (0)
         FSM fsmDrag {
             State idle
             State pressed {
                 ScreenToLocal s2l (rect)
                 frame.press.x => s2l.inX
                 frame.press.y => s2l.inY
-                s2l.outX => x0
-                s2l.outY => y0
             }
             State dragging {
                 ScreenToLocal s2l (rect)
                 frame.move.x => s2l.inX
                 frame.move.y => s2l.inY
-                s2l.outX - x0 => transforms.rightTranslateBy.dx
-                s2l.outY - y0 => transforms.rightTranslateBy.dy
+                s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
+                s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
             }
             idle -> pressed (rect.press)
             pressed -> idle (frame.release)

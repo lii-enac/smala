@@ -277,8 +277,7 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/simple_touch \
 	gui/direct_manipulation/multi_touch \
 	gui/direct_manipulation/hysteresis \
-	gui/direct_manipulation/pan_and_zoom \
-	gui/direct_manipulation/pan_and_zoom_and_drag \
+	gui/direct_manipulation/drag_pan_zoom \
 	gui/direct_manipulation/sketching_simple \
 	gui/direct_manipulation/sketching_advanced \
 	gui/direct_manipulation/zoom \

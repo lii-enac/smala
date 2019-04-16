@@ -53,10 +53,11 @@ Component root {
   Rectangle buttonInit (570, 100, 125, 50, 5, 5)
 
   FillColor _ (70, 70, 70)
-  Text _ (246, 180, "Emit event s2")
-  Text _ (417, 130, "FSM state:")
+  TextAnchor _ (1)
+  Text _ (287, 180, "Emit event s2")
+  Text _ (440, 130, "FSM state:")
   Text textFsmState (492, 130, "")
-  Text _ (605, 130, "Init FSM")
+  Text _ (632, 130, "Init FSM")
 
   ///////////
   // logic //

@@ -6,7 +6,7 @@ file_extensions: [sma]
 scope: source.sma
 
 variables:
-  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|setInt|setDouble|setBool|setString|setRef'
+  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef'
 
 contexts:
   main:
@@ -44,7 +44,11 @@ contexts:
     # need to be escaped: this is done by using two single quotes next to each
     # other.
 
-    - match: '\b(use|import|aka|_main_|_define_)\b'
+    - match: '_action_\n'
+      scope: keyword.other.sma
+      push: native_action
+
+    - match: '\b(use|import|aka|_main_|_define_|_action_|for|if|then|else|while)\b'
       scope: keyword.other.sma
 
     - match: '\s*<<\s*|\s*=>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
@@ -62,14 +66,38 @@ contexts:
     - match: \b({{function_sma}})\b
       scope: storage.type
 
-    - match: '\s*(.*(\s=\s).*\b({{function_sma}})\b.*)'
-      captures:
-         1: source.imperatif
-         3: storage.type
 
-    - match: '\s*(.*(\s=\s).*)'
+    ##################
+    # Expérimental : try to detect imperative code such as :
+    # foo = bar
+    # if then else
+    # while
+    # for ...
+    # 
+    #- match: '\s*(.*(\s=\s))'
+    - match: '^(?!.*for)\s*(.*\s=)\s'
       captures:
          1: source.imperatif
+
+    - match: '^(?:(?!\bfor\b).)\s*(.*--)$'
+      captures:
+         1: source.imperatif
+
+    - match: '^(?:(?!\bfor\b).)\s*(.*(?<!C)\+\+)$'
+      captures:
+         1: source.imperatif
+
+    # test for more complex regexp too keep comment and function color
+    ## - match: '\s*(.*(\s=\s).*\b({{function_sma}})\b.*)'
+    ##   captures:
+    ##      1: source.imperatif
+    ##      3: storage.type
+
+    ## - match: '\s*(.*(\s=\s).*)'
+    ##   captures:
+    ##      1: source.imperatif
+
+    ######## END OF Experimental
 
   double_quoted_string:
     - meta_include_prototype: false
@@ -90,7 +118,12 @@ contexts:
     - match: '\*/'
       pop: true
 
+  native_action:
+    - match: '^([\w\-]+)'
+      scope : storage.type.function
+    - match: '\)'
+      pop: true
+    - include: main
+
   prototype:
     - include: comments
-
-

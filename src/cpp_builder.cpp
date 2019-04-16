@@ -135,9 +135,11 @@ namespace Smala
   {
     indent (os);
     os << "while (";
+    m_in_static_expr = true;
     for (auto cur: node->get_expression()) {
       build_node (os, cur);
     }
+    m_in_static_expr = false;
     os << ") {\n";
     m_indent++;
   }

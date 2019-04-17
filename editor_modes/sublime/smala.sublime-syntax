@@ -6,7 +6,8 @@ file_extensions: [sma]
 scope: source.sma
 
 variables:
-  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef'
+  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|print'
+  deprecated_sma: 'remove'
 
 contexts:
   main:
@@ -31,6 +32,9 @@ contexts:
         - match: "}"
           pop: true
         - include: main
+
+    - match: ';\s*$'
+      scope: invalid.illegal
 
     - match: '%{'
       push: Packages/C++/C++.sublime-syntax
@@ -66,6 +70,9 @@ contexts:
     - match: \b({{function_sma}})\b
       scope: storage.type
 
+    #smala functions name
+    - match: \b({{deprecated_sma}})\b
+      scope: invalid.deprecated
 
     ##################
     # Expérimental : try to detect imperative code such as :
@@ -74,7 +81,8 @@ contexts:
     # while
     # for ...
     # 
-    #- match: '\s*(.*(\s=\s))'
+
+    # = should not e include in for ... but also in // and  /*
     - match: '^(?!.*for)\s*(.*\s=)\s'
       captures:
          1: source.imperatif

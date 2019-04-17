@@ -33,6 +33,7 @@ namespace Smala {
     void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void build_for (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
+    void build_print (std::ofstream &os, Node *node) override;
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;
     void set_property (std::ofstream &os, Node *node) override;
     bool known_symbol (const string &name);

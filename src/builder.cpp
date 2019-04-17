@@ -230,6 +230,11 @@ namespace Smala
         build_while (os, node);
         break;
       }
+      case PRINT:
+      {
+        build_print (os, node);
+        break;
+      }
       case SMALA_NATIVE:
         {
           m_in_native_action = true;

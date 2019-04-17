@@ -16,8 +16,8 @@
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "3.0"
 %defines
-//%define parser_class_name { Parser }
-%define api.parser.class { Parser }
+%define parser_class_name { Parser }
+//%define api.parser.class { Parser }
 
 %define api.token.constructor
 %define api.value.type variant
@@ -194,6 +194,7 @@
 %token ELSE "else"
 %token FOR "for"
 %token WHILE "while"
+%token PRINT "print"
 %token INSERT "insert"
 %token INT_T "int"
 %token DOUBLE_T "double"
@@ -462,6 +463,16 @@ item_list:
 
 item: simple_component | dash_array | connector | binding | assignment | container | alias | set_value | get_value | add_child | load_xml
   | find | native | c_call | action | merge | repeat | clone | remove | string_cat | rough_code | macro | move | if_statement | for_loop | while_loop
+  | print
+
+print: PRINT LP exp RP
+{
+  Node *n = new Node ();
+  n->set_node_type (PRINT);
+  n->set_expression (comp_expression);
+  comp_expression.clear ();
+  driver.add_node (n);
+}
 
 while_loop: start_while LCB item_list RCB
 {

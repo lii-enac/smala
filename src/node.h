@@ -76,6 +76,7 @@ namespace Smala {
     NATIVE_JAVA,
     NEW_LINE,
     PATH,
+    PRINT,
     REMOVE,
     REPEAT,
     SET_PARENT,

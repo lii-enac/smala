@@ -131,6 +131,55 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_print (std::ofstream &os, Node *node)
+  {
+    indent (os);
+    std::string name ("var_" + std::to_string (m_var_num++));
+    os << "std::string " << name << " ( ";
+    for (auto cur: node->get_expression()) {
+      ArgNode *n = static_cast<ArgNode*> (cur);
+      switch (n->arg_type ()) {
+        case SYMBOL: {
+          if (n->arg_value() != "+")
+            print_error_message (error_level::error, "only + symbol is allowed in string expression", 1);
+          os << " " << n->arg_value () << " ";
+        }
+          break;
+        case VALUE: {
+          os << n->arg_value ();
+        }
+          break;
+        case STRING_VALUE:
+          os << n->arg_value ();
+          break;
+        case VAR: {
+          std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+          // if the name contains "var_" then this is a simple variable not a djnn property
+          // so write it as is and return
+          std::size_t found = p.first.find ("var_");
+          if (found != std::string::npos) {
+            os << p.first;
+            return;
+          }
+          os << "((AbstractProperty*)";
+          if (p.second.compare (m_null_string) == 0) {
+            os << p.first;
+          } else {
+            print_find_component (os, p.first, p.second);
+          }
+          os << ")->get_string_value ()";
+          break;
+        }
+        default:
+          return;
+      }
+    }
+    os << ");\n";
+    indent (os);
+    os << "cout << " << name << " << endl;\n";
+  }
+
+  void
   CPPBuilder::build_while (std::ofstream &os, Node *node)
   {
     indent (os);
@@ -678,8 +727,8 @@ namespace Smala
           if (!in_expr
               && (i == sz
                   || !is_sym (((ArgNode*)node->get_expression ().at (i))->arg_value ()))) {
-            os << "((TextProperty*) sym_table.find (\"" << ((ArgNode*)op)->arg_value ()
-                << "\")->second)->get_value ()";
+            os << "((AbstractProperty*) sym_table.find (\"" << ((ArgNode*)op)->arg_value ()
+                << "\")->second)->get_string_value ()";
           } else {
             os << "sym_table.find (\"" << ((ArgNode*)op)->arg_value ()
                 << "\")->second->get_double_value ()";
@@ -987,9 +1036,6 @@ namespace Smala
           return;
         }
         if (m_in_static_expr) {
-          if (m_in_set_text)
-            os << "((TextProperty*)";
-          else
             os << "((AbstractProperty*)";
         }
         if (p.second.compare (m_null_string) == 0)
@@ -998,7 +1044,7 @@ namespace Smala
           print_find_component (os, p.first, p.second);
         if (m_in_static_expr) {
           if (m_in_set_text)
-            os << ")->get_value ()";
+            os << ")->get_string_value ()";
           else
             os << ")->get_double_value ()";
         }

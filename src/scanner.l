@@ -150,6 +150,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "else"                { return Smala::Parser::make_ELSE (Smala::location ()); }
 "for"                 { return Smala::Parser::make_FOR (Smala::location ()); }
 "while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
+"print"               { return Smala::Parser::make_PRINT (Smala::location ()); }
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
 {INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }
 {INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }

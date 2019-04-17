@@ -176,7 +176,7 @@ namespace Smala
     }
     os << ");\n";
     indent (os);
-    os << "cout << " << name << " << endl;\n";
+    os << "cout << " << name << "\n";
   }
 
   void

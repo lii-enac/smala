@@ -18,95 +18,16 @@ use base
 use gui
 use display
 
-_native_code_
-%{
-  #include <map>
-  #include <cmath>
-
-  //map to store the various fingerConnector components  
-  std::map<Process*, Process*> fcMap;
-
-  //store in the map
-  Process* addTouch (Process* root, Process* added, Process* fingerConnector) {
-    fcMap.insert(std::pair<Process*, Process*> (added, fingerConnector));
-    ((IntProperty*) root->find_component ("nbTouches"))->set_value ((int) fcMap.size(), 1);
-  }
-
-  //find in the map which fingerConnector has to be removed
-  Process* findTouch (Process* root, Process* removed) {
-    std::map<Process*, Process*>::iterator it;
-    
-    it = fcMap.find(removed);
-    Process* found;
-    if (it != fcMap.end()) {
-      found = it->second; 
-      fcMap.erase(it);
-    }
-
-    ((IntProperty*) root->find_component ("nbTouches"))->set_value ((int) fcMap.size(), 1);
-    return found;
-  }
-
-  //n is 0 or 1
-  Process * getTouch (int n) {
-  	std::map<Process*, Process*>::iterator it;
-  	it = fcMap.begin();
-  	if (n>0) {
-  		++it;
-  	}
-  	return it->first;
-  }
-
-%}
 
 //this action monitors the distance between the 2 touches 
 //and binds the resulting scale factor to the root scale factor
-_action_
-pinch_action (Component src, Component root)
-{
-	Process p1 = CCall(getTouch,0)
-	Process p2 = CCall(getTouch,1)
-	addChildrenTo root {
-		Component pinchZoomConnector {
-      Double d0 (1) //initial distance between the 2 touches
-      Double d (1) // current distance between the 2 touches
 
-      //compute initial distance between p1 and p2, set the result to property d0
-      Sqrt sqrt0 (0)      
-      (p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y) =: sqrt0.input
-      sqrt0.output => d0
-
-      //current distance p1->p2
-      Sqrt sqrt (0)      
-			(p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y) => sqrt.input
-			sqrt.output => d
-
-			//compute and bind the scale factor and center
-      (p2.x+p1.x)/2 =: root.transforms.leftScaleBy.cx
-      (p2.y+p1.y)/2 =: root.transforms.leftScaleBy.cy
-      
-      //I would have been delighted to be able to write d/(last(d)) => xxx.sx, but...
-      AssignmentSequence as (1) {
-        d/d0 =: root.transforms.leftScaleBy.sx, root.transforms.leftScaleBy.sy
-        d =: d0
-      }
-      d -> as
-
-		}
-	}
-}
-
-_action_
-delete_action (Component src, Component root)
-{
-	delete root.pinchZoomConnector
-}
 
 _main_
 Component root
 {
   Frame f ("my frame", 0, 0, 1000, 1000)
-  
+  Dictionary d_touch
   NoFill _
   OutlineColor _ (100,100,255)
   OutlineWidth _ (10)
@@ -123,41 +44,76 @@ Component root
   Rectangle _ (100,100,500,200,5,5)
   Circle _ (500,500,200)
 
-  
   //touch
-  Int nbTouches (0)			//exactly 2 touches are required
-  f.touches.$added-> (root) {
+
+  f.touches.$added->(root) {
     t = getRef (root.f.touches.$added)
     addChildrenTo root.fixedScene {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
-        t.x => root.fixedScene.fingerConnector.finger.cx
-        t.y => root.fixedScene.fingerConnector.finger.cy
+        t.x => finger.cx
+        t.y => finger.cy
       }
+    setRef (root.d_touch.key, t)
+    setRef (root.d_touch.value, fingerConnector)
+    run root.d_touch.add
     }
-    Process _ = CCall (addTouch, root, t, root.fixedScene.fingerConnector)
   }
-
-  //touch release
-  f.touches.$removed-> (root) {
+  f.touches.$removed->(root) {
     t = getRef (root.f.touches.$removed)
-    Process d = CCall (findTouch, root, t)  
-    delete d
+    setRef (root.d_touch.key, t)
+    p = getRef (root.d_touch.value)
+    run root.d_touch.delete
+    delete p
   }
+  TextPrinter print_b
+  RefProperty p1 (0)
+  RefProperty p2 (0)
 
-  //pinching requires to have exactly 2 touches, associate actions to change of state
-  //native actions are required because the components must not be activated 
-  //when building the tree
+  //pinching requires to have exactly 2 touches
   Switch pinchSw (idle) {
-    Component idle {
-      NativeAction _ (delete_action, root, 0)
-    }
+    Component idle
     Component pinching {
-	  NativeAction _ (pinch_action, root, 0)
+      Double d (1) // current distance between the 2 touches
+      Double p1x (0)
+      Double p1y (0)
+      Double p2x (0)
+      Double p2y (0)
+
+      p1.$value.x => p1x
+      p1.$value.y => p1y
+
+      p2.$value.x => p2x
+      p2.$value.y => p2y
+
+      //compute initial distance between p1 and p2, set the result to property d0
+      Previous prev (1)
+      Sqrt sqrt (0)
+      (p2x-p1x)*(p2x-p1x)+(p2y-p1y)*(p2y-p1y) => sqrt.input
+      sqrt.output => d
+
+      //compute and bind the scale factor and center
+      (p2x+p1x)/2 =: transforms.leftScaleBy.cx
+      (p2y+p1y)/2 =: transforms.leftScaleBy.cy
+
+      d =: prev.input
+      d => prev.input
+      d / prev.output => root.transforms.leftScaleBy.sx, root.transforms.leftScaleBy.sy
     }
   }
-  nbTouches == 2 ? "pinching" : "idle" => pinchSw.state
-
+  Bool test (0)
+  RefProperty null_ref (0)
+  f.touches.size == 2 => test
+  test.true -> (root) {
+    setRef (root.p1, root.f.touches.1)
+    setRef (root.p2, root.f.touches.2)
+    root.pinchSw.state = "pinching"
+  }
+  AssignmentSequence set_null (1) {
+    null_ref =: p1, p2
+    "idle" =: pinchSw.state
+  }
+  test.false -> set_null
 }
 
 run root

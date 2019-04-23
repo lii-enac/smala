@@ -100,6 +100,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "Connector"           { return Smala::Parser::make_CONNECTOR_CPNT (Smala::location()); }
 "DashArray"           { return Smala::Parser::make_DASHARRAY (Smala::location()); }
 "Switch"              { return Smala::Parser::make_SWITCH (Smala::location()); }
+"SwitchList"          { return Smala::Parser::make_SWITCH_LIST (Smala::location()); }
 "FSM"                 { return Smala::Parser::make_FSM (Smala::location()); }
 "State"               { return Smala::Parser::make_STATE (Smala::location()); }
 "PixmapCache"         { return Smala::Parser::make_PIXMAP_CACHE (Smala::location()); }

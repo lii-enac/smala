@@ -89,6 +89,7 @@ namespace Smala {
     START_IF,
     START_MAIN,
     SWITCH,
+    SWITCH_LIST,
     TEXT,
     THIS,
     UNARY_OP,

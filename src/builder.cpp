@@ -371,6 +371,7 @@ namespace Smala
         }
       case FSM:
       case SWITCH:
+      case SWITCH_LIST:
         {
           std::string new_name = build_simple_node (os, node, true);
           m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));

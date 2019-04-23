@@ -161,6 +161,7 @@
 %token STATE "State"
 %token POINT "Point"
 %token SWITCH "Switch"
+%token SWITCH_LIST "SwitchList"
 %token PIXMAP_CACHE "PixmapCache"
 %token SEMICOLON ";"
 %token MINUS "-"
@@ -268,6 +269,7 @@
 %type <Node*> new_container
 %type <Node*> assignment_seq_decl
 %type <Node*> switch_decl
+%type <Node*> switch_list_decl
 %type <Node*> pixmap_cache_decl
 %type <Node*> poly_decl
 %type <Node*> gradient_decl
@@ -1401,7 +1403,7 @@ colon: COLON
 }
 //------------------------------------------------
 
-container: generic_container | poly | path | gradient | switch | fsm | pixmap_cache | component 
+container: generic_container | poly | path | gradient | switch | switch_list | fsm | pixmap_cache | component 
 | add_children_to | assignment_sequence
 
 add_children_to: start_add_children_to LCB item_list RCB
@@ -1620,6 +1622,25 @@ switch_decl: SWITCH NAME_OR_PATH LP NAME_OR_PATH RP
   n = new ArgNode (END, "");
   driver.add_node (n);
 
+  $$ = node;
+}
+
+switch_list: switch_list_decl items
+{
+  Node *node = new Node ();
+  node->set_node_type (SET_PARENT);
+  node->set_name ($1->name ());
+  driver.add_node (node);
+  parent_list.pop_back ();
+}
+
+switch_list_decl: SWITCH_LIST NAME_OR_PATH
+{
+  Node *node = new Node ("SwitchList", $2);
+  node->set_node_type (SWITCH_LIST);
+  node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  parent_list.push_back (node);
+  driver.add_node (node);
   $$ = node;
 }
 

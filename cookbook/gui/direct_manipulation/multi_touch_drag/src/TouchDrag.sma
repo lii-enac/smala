@@ -59,7 +59,7 @@ TouchDrag (Component _localRef, Component transforms) {
     State idle
 
     State pressed {
-      ScreenToLocal s2l (localRef) // TODO UTILISER LOCAL_X/Y A INTEGRER A TOUCHDATA (ON PEUT ICI CAR CONTRAIREMENT AU DRAG SOURIS ON N'A PAS BESOIN D'ECOUTER LES MOVE SUR LA FENETRE)
+      ScreenToLocal s2l (localRef)
       activeTouchData.press.x => s2l.inX
       activeTouchData.press.y => s2l.inY
     }
@@ -70,6 +70,7 @@ TouchDrag (Component _localRef, Component transforms) {
       activeTouchData.move.y => s2l.inY
       s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
       s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+      // FIXME DRAG INTERROMPU SI MVMNT TROP BRUSQUE, COMME POUR LE DRAG SOURIS IL FAUDRAIT POUVOIR ÉCOUTER LA FENÊTRE TOUT EN AYANT LE PICKING
     }
     
     idle -> pressed (activeTouchData.pressed)

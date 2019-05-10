@@ -80,7 +80,7 @@ namespace Smala {
     void print_args (std::ofstream &os, std::vector< std::pair<ParamType, std::string> > args, bool is_first);
     std::map<std::string, std::string> m_import_types;
   private:
-    bool m_in_for;
+    bool m_in_for, m_display_initialized;
   };
 
 } /* namespace Smala */

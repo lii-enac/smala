@@ -31,7 +31,7 @@ namespace Smala
 {
 
   CPPBuilder::CPPBuilder () :
-      Builder (), m_in_for (false)
+      Builder (), m_in_for (false), m_display_initialized (false)
   {
     m_type_manager = new CPPTypeManager ();
     m_null_symbol = "nullptr";
@@ -86,7 +86,14 @@ namespace Smala
   {
     if (use.compare ("core") == 0)
       return;
-    else
+    else if (use.compare ("gui") == 0) {
+      if (!m_display_initialized) {
+        os << "#include \"display/display.h\"\n";
+        m_display_initialized = true;
+      }
+    } else if (use.compare ("display") == 0) {
+      m_display_initialized = true;
+    }
       os << "#include \"" << use << "/" << use << ".h\"\n";
   }
 

@@ -34,7 +34,7 @@ Component root
     OutlineWidth _ (2)
     Rectangle rect (0, 0, 200, 150, 0, 0)
 
-    TouchDrag td (rect, transforms)
+    TouchDrag td (frame, rect, transforms)
   }
 
   Component r2 {
@@ -46,7 +46,7 @@ Component root
     OutlineWidth _ (2)
     Rectangle rect (0, 0, 200, 150, 0, 0)
 
-    TouchDrag td (rect, transforms)
+    TouchDrag td (frame, rect, transforms)
   }
 
   TouchMarker tm (frame)

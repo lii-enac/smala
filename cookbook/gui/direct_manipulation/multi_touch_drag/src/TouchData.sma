@@ -4,6 +4,8 @@ use base
 _define_
 TouchData ()
 {
+    Int touchId (0)
+
     Spike pressed
     Component press {
         Double x (0)

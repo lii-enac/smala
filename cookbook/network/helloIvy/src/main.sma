@@ -28,8 +28,8 @@ Component root {
     /*----- Background -----*/
     FillColor bgFill (50,50,50)
     Rectangle bgRect (0, 0, 0, 0 , 0, 0)
-    f.width => bgRect.width
-    f.height => bgRect.height
+    f.width =:> bgRect.width
+    f.height =:> bgRect.height
 
     /*------ Button to send a Message ---*/
     FillColor rectFill (100, 100, 100)

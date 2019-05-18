@@ -23,6 +23,7 @@ use display
 //and binds the resulting scale factor to the root scale factor
 
 
+
 _main_
 Component root
 {
@@ -51,8 +52,8 @@ Component root
     addChildrenTo root.fixedScene {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
-        t.x => finger.cx
-        t.y => finger.cy
+        t.x =:> finger.cx
+        t.y =:> finger.cy
       }
     setRef (root.d_touch.key, t)
     setRef (root.d_touch.value, fingerConnector)

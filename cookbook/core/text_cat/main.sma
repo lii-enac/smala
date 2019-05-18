@@ -23,7 +23,7 @@ Component root {
   String s = "frame width =  " + f.width + " frame height = " + f.height
   FillColor fc (0, 0, 0)
   Text t (20, 20, "")
-  s => t.text
+  s =:> t.text
 }
 
 run root

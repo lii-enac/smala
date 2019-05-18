@@ -24,10 +24,10 @@ ReactiveAndCappedRefresh(Component f) {
 	Int refresh_rate(60) // in Hz
 	
 	Int period(-1) // in ms
-	1000/refresh_rate => period
+	1000/refresh_rate =:> period
 
 	Timer wait (-1)
-    period => wait.delay
+    period =:> wait.delay
 
     //0 =: DrawingRefreshManager.auto_refresh
 

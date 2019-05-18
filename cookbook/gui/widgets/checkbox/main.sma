@@ -36,7 +36,7 @@ Component root {
   Incr incr (1)
   String s = "Selected entry: " + cb.entry + " state: " + incr.state 
   Text t (150, 50, "")
-  s => t.text
+  s =:> t.text
 
   cb.entries.2.selected -> incr
 }

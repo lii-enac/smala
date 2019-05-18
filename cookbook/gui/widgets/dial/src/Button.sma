@@ -50,8 +50,8 @@ Button (Component frame, string l, double _x, double _y) {
     pressed->idle (frame.release)
   }
   glabel = addChild (gbutton.label)
-  label => glabel.text
-  glabel.width + 30 => fsm.idle.r.width, fsm.pressed.r.width, getwidth
-  fsm.idle.r.height => getheight
-  fsm.idle.r.width / 2 => glabel.x
+  label =:> glabel.text
+  glabel.width + 30 =:> fsm.idle.r.width, fsm.pressed.r.width, getwidth
+  fsm.idle.r.height =:> getheight
+  fsm.idle.r.width / 2 =:> glabel.x
 }

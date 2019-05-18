@@ -84,9 +84,9 @@ Tab (Component frame, Component tabManager, string _label, int _index) {
       tabManager.selected_border_color =: border_color.r, border_color.g, border_color.b, label_box.tab.stroke.r, label_box.tab.stroke.g, label_box.tab.stroke.b
 
       Slider s (frame, 300, 50)
-      frame.width - s.width - 30 => s.x
-      frame.height - 30 => s.y
-      s.output => pane.opacity.a
+      frame.width - s.width - 30 =:> s.x
+      frame.height - 30 =:> s.y
+      s.output =:> pane.opacity.a
     }
 
     st_unselected -> st_selected   (label_box.tab.press, notify_selected)

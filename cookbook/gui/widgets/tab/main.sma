@@ -35,8 +35,8 @@ Component root {
     Rectangle r (0, 0, 100, 36, 0, 0)
     FillColor fc2 (40, 40, 40)
     Rectangle r2 (0, 36, 100, 100, 0, 0)
-    f.width => r.width, r2.width
-    f.height - 36 => r2.height
+    f.width =:> r.width, r2.width
+    f.height - 36 =:> r2.height
   }
   
   Translation pos (0, 5)

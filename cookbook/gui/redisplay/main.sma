@@ -32,12 +32,12 @@
   
   Circle mobile(100, 100, 40)
 
-  f.move.x => mobile.cx
-  f.move.y => mobile.cy
+  f.move.x =:> mobile.cx
+  f.move.y =:> mobile.cy
 
   Int refresh_rate(60) // in Hz
   Int period(-1)
-  1000/refresh_rate => period
+  1000/refresh_rate =:> period
 
 
   Switch test (reactive_and_capped_refresh) {
@@ -55,13 +55,13 @@
     Component periodic {
       0 =: DrawingRefreshManager.auto_refresh
       Clock cl (-1)
-      period => cl.period
+      period =:> cl.period
       cl.tick->DrawingRefreshManager.draw_sync
     }
     Component reactive_and_capped_refresh {
       0 =: DrawingRefreshManager.auto_refresh
       ReactiveAndCappedRefresh d(f)
-      refresh_rate => d.refresh_rate
+      refresh_rate =:> d.refresh_rate
     }
   }
 }

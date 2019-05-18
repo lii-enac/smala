@@ -10,16 +10,16 @@ _define_
 MouseCenteredZoom (Component frame, Component scaling, Component translation) {
 
   Double zoom (1)
-  zoom => scaling.sx, scaling.sy
+  zoom =:> scaling.sx, scaling.sy
   Double xpan (0)
-  xpan => translation.tx
+  xpan =:> translation.tx
   Double ypan (0)
-  ypan => translation.ty
+  ypan =:> translation.ty
 
   Pow p (1.01, 0)
   Double scaleFactor (1)
-  frame.wheel.dy => p.exponent
-  p.result => scaleFactor
+  frame.wheel.dy =:> p.exponent
+  p.result =:> scaleFactor
 
   Double p0x (0) // mouse x in local coord system before zoom
   Double p0y (0)

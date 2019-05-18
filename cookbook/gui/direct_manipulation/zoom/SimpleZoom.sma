@@ -10,12 +10,12 @@ _define_
 SimpleZoom (Component frame, Component scaling) {
 
   Double zoom (1)
-  zoom => scaling.sx, scaling.sy
-  frame.width /2 => scaling.cx
-  frame.height /2 => scaling.cy
+  zoom =:> scaling.sx, scaling.sy
+  frame.width /2 =:> scaling.cx
+  frame.height /2 =:> scaling.cy
 
   Pow p (1.01, 0)
-  frame.wheel.dy => p.exponent
+  frame.wheel.dy =:> p.exponent
 
   AssignmentSequence seq (0) {
     // apply new zoom

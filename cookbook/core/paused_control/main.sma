@@ -41,7 +41,7 @@ Component root {
 
   // data flow (no need to sequence)
   t_prev.text -> incr      // everytime the sequence ends, activate incr...
-  incr.state => t_cur.text // ...and connect the increment value to current text.
+  incr.state =:> t_cur.text // ...and connect the increment value to current text.
 
 }
 

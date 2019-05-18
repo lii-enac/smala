@@ -47,7 +47,7 @@ Button (Process frame, string label, double x_, double y_) {
   Text thisLabel (10, 10, label)
 
   r.height / 2 + thisLabel.height / 4 =: thisLabel.y
-  thisLabel.width + 20 => r.width
-  r.width / 2 => thisLabel.x
+  thisLabel.width + 20 =:> r.width
+  r.width / 2 =:> thisLabel.x
 
 }

@@ -11,8 +11,8 @@ FittsTask1D(Component f) {
   // bg
   FillColor _(0,0,0)
   Rectangle bg(0,0, 0,0, 0,0)
-  f.width => bg.width
-  f.height => bg.height
+  f.width =:> bg.width
+  f.height =:> bg.height
 
   // scene
   Switch display(starting_area) {
@@ -20,15 +20,15 @@ FittsTask1D(Component f) {
       FillOpacity o(1)
       FillColor fc(200, 200, 200) // lightgray
       Rectangle area (0,0, 32,32, 0,0)
-      //(f.height-32)/2 => area.y
-      f.height => area.height
+      //(f.height-32)/2 =:> area.y
+      f.height =:> area.height
     }
     Component target {
       FillColor fc(200, 200, 200) // lightgray
       Rectangle area (0,0, 0,0, 0,0)
-      target_distance-target_width/2 => area.x
-      target_width => area.width
-      f.height => area.height
+      target_distance-target_width/2 =:> area.x
+      target_width =:> area.width
+      f.height =:> area.height
     }
   }
 
@@ -37,8 +37,8 @@ FittsTask1D(Component f) {
   OutlineColor _(0,0,0)
   OutlineWidth _(1)
   Rectangle cursor(0,0, 2,0, 0,0)
-  f.height => cursor.height
-  f.move.x => cursor.x
+  f.height =:> cursor.height
+  f.move.x =:> cursor.x
 
   Bool in(0)
 
@@ -50,7 +50,7 @@ FittsTask1D(Component f) {
       200 =: tfc.r, tfc.g, tfc.b
       1 =: display.starting.o.a
       "starting" =: display.state
-      f.move.x < 32 => in
+      f.move.x < 32 =:> in
     }
     State on_starting_area {
       255 =: display.starting.fc.g
@@ -82,6 +82,6 @@ FittsTask1D(Component f) {
   }
 
   //TextPrinter tp
-  //control.state => tp.input
+  //control.state =:> tp.input
 
 }

@@ -44,10 +44,10 @@ Component root
       PathCubic _(100,100, 200,500, 300,400)
     }
 
-    f.move.x => t.tx
-    f.move.y => t.ty
-    //f.move.x => mobile.cx
-    //f.move.y => mobile.cy
+    f.move.x =:> t.tx
+    f.move.y =:> t.ty
+    //f.move.x =:> mobile.cx
+    //f.move.y =:> mobile.cy
 
 
 }

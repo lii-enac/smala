@@ -30,8 +30,8 @@ Component root
     t = getRef (root.mobile.touches.$added)
     addChildrenTo root {
       Component connector {
-        t.x => root.mobile.cx
-        t.y => root.mobile.cy
+        t.x =:> root.mobile.cx
+        t.y =:> root.mobile.cy
       }
     }
   }

@@ -143,6 +143,7 @@
 %token ARROW "->"
 %token BINDING_CPNT "Binding"
 %token CONNECTOR "=>"
+%token ASSGNT_CONN "=:>"
 %token PAUSED_CONNECTOR "::>"
 %token CONNECTOR_CPNT "Connector"
 %token ASSIGNMENT "=:"
@@ -1275,7 +1276,19 @@ comma: COMMA
 
 connector: exp connector_symbol process_list
 {
-  NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, true, false);
+  NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, true, true);
+  expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+  for (int i = 0; i < $3.size (); ++i) {
+    expr_node->add_output_node ($3.at (i));
+  }
+  driver.add_native_expression (expr_node);
+  driver.add_node (expr_node);
+  comp_expression.clear ();
+}
+|
+exp ASSGNT_CONN process_list
+{
+  NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, false, true, false);
   expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
   for (int i = 0; i < $3.size (); ++i) {
     expr_node->add_output_node ($3.at (i));

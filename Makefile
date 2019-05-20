@@ -15,7 +15,7 @@
 default: config.mk smalac
 .PHONY: default
 
-all: config.mk smalac cookbook_apps
+all: config.mk smalac cookbook_apps test_apps
 .PHONY: all
 
 help:
@@ -301,6 +301,73 @@ cookbook_apps: $(notdir $(cookbook_apps))
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 
+# -----------
+# cookbook apps
+
+define testapp_makerule
+libs_test_app :=
+djnn_libs_test_app :=
+lang_test_app := cpp
+
+include test/$1/test_app.mk
+
+ckappname := $$(notdir $1)
+$1_app_lang := $$(lang_test_app)
+$1_app_srcs_dir := test/$1
+$1_app_objs := $$(objs_test_app)
+$1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
+$1_app_gensrcs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_gensrcs))
+$1_app_objs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_objs))
+$1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
+
+ifeq ($$(cross_prefix),em)
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
+$1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
+else
+$1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_test_app)) $$(libs_test_app)
+endif
+
+
+$1_app_link := $$(CXX)
+
+$$($1_app_objs): $$($1_app_gensrcs)
+$$($1_app_exe): $$($1_app_objs)
+	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
+$$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
+$$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
+$$($1_app_exe): LIBS += $$($1_app_libs)
+
+$$(notdir $1): $$($1_app_exe)
+
+$$(notdir $1)_test: $$(notdir $1)
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
+$$(notdir $1)_dbg: $$(notdir $1)
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
+
+$$(notdir $1)_clean:
+	rm $$($1_app_exe) $$($1_app_objs)
+
+
+.PHONY: $1 $1_test $1_dbg
+
+$$(notdir $1)_dbg_print:
+	@echo $1_dbg
+	@echo $$($1_app_objs)
+	@echo $$($1_app_lang)
+	@echo $$($1_app_objs:.o=.$$($1_app_lang))
+	@echo $$($1_app_gensrcs)
+
+deps += $$($1_app_objs:.o=.d)
+endef
+
+test_apps := test_1 test_2 test_3 test_4
+
+test_apps: $(notdir $(test_apps))
+.PHONY: test_apps $(notdir $(test_apps))
+
+
+$(foreach a,$(test_apps),$(eval $(call testapp_makerule,$a)))
+
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
@@ -358,6 +425,9 @@ clean_cookbook cookbook_clean:
 	rm -rf $(build_dir)/cookbook
 .PHONY: clean_cookbook cookbook_clean
 
+clean_test test_clean:
+	rm -rf $$(build_dir)/test
+.PHONY: clean_test test_clean
 
 distclean clear clean:
 	rm -rf $(build_dir)

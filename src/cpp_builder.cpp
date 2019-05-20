@@ -856,9 +856,16 @@ namespace Smala
       indent (os);
       switch (n->type ()) {
         case DUMP:
+        os << "if (" << cpnt_name << ")" << endl ;
+        indent (os); indent (os);
         os << cpnt_name << "->dump";
-        if (!n->has_argument ())
-         os << " (0);\n";
+        if (!n->has_argument ()) {
+          os << " (0);\n";
+          indent (os);
+          os << "else" << endl ;
+          indent (os); indent (os);
+          os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg.second <<  " << endl << endl;" << endl; 
+       }
        else {
         os << " (";
         for (auto arg : n->args ()) {

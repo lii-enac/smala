@@ -18,8 +18,8 @@ TouchMarker (Component _frame) {
     addChildrenTo this {
       Component fingerMarker {
         Circle finger (-100, -100, 20)
-        t.x => finger.cx
-        t.y => finger.cy
+        t.x =:> finger.cx
+        t.y =:> finger.cy
       }
 	    setRef (this.d_touch.key, t)
 	    setRef (this.d_touch.value, fingerMarker)

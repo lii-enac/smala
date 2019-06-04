@@ -36,8 +36,8 @@ TouchDrag (Component _frame, Component _shape, Component transforms) {
   
       addChildrenTo this {
         Component touchEvents {
-          t.x => this.activeTouchData.move.x
-          t.y => this.activeTouchData.move.y
+          t.x =:> this.activeTouchData.move.x
+          t.y =:> this.activeTouchData.move.y
           t.y -> this.activeTouchData.moved
         }
         setRef (this.d_touch.key, t)
@@ -71,16 +71,16 @@ TouchDrag (Component _frame, Component _shape, Component transforms) {
 
     State pressed {
       ScreenToLocal s2l (shape)
-      activeTouchData.press.x => s2l.inX
-      activeTouchData.press.y => s2l.inY
+      activeTouchData.press.x =:> s2l.inX
+      activeTouchData.press.y =:> s2l.inY
     }
 
     State dragging {
       ScreenToLocal s2l (shape)
-      activeTouchData.move.x => s2l.inX
-      activeTouchData.move.y => s2l.inY
-      s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
-      s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+      activeTouchData.move.x =:> s2l.inX
+      activeTouchData.move.y =:> s2l.inY
+      s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
+      s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
     }
     
     idle -> pressed (activeTouchData.pressed)

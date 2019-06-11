@@ -20,11 +20,13 @@
 #include "smala_native.h"
 #include "ctrl_node.h"
 #include "local_node.h"
-#include "arg_node.h"
 #include "native_action_node.h"
+#include "function_node.h"
+#include "newvar_node.h"
 #include <locale>
 #include <algorithm>
 #include "native_code_node.h"
+#include "term_node.h"
 
 namespace Smala
 {
@@ -208,6 +210,11 @@ namespace Smala
         os << "}\n";
         break;
       }
+      case END_LOOP:
+      {
+        m_in_for = false;
+        break;
+      }
       case END_DEFINE:
         {
           build_end_define (os, node);
@@ -260,11 +267,6 @@ namespace Smala
           build_native_code (os, node);
           break;
         }
-      case CAT:
-        {
-          build_cat (os, node);
-          break;
-        }
       case INSTRUCTION:
         {
           build_instruction (os, node);
@@ -275,6 +277,11 @@ namespace Smala
           set_property (os, node);
           break;
         }
+      case END_SET_PROPERTY:
+        {
+          end_set_property (os, node);
+          break;
+        }
       case END_PROPERTY:
         {
           end_property (os, node);
@@ -283,14 +290,6 @@ namespace Smala
       case GET_PROPERTY:
         {
           get_property (os, node);
-          break;
-        }
-      case MACRO:
-        {
-          if (!node->name ().empty () && !node->djnn_type ().empty ()) {
-            if (m_parent_list.back ()->add_entry (node->djnn_type (), node->name ()) == 1 && node->duplicate_warning ())
-              print_error_message (error_level::warning, "duplicated macro: " + node->djnn_type (), 0);
-          }
           break;
         }
       case ALIAS:
@@ -329,21 +328,11 @@ namespace Smala
           move (os, node, 3);
           break;
         }
-      case REPEAT:
-        {
-          repeat (os, node);
-          break;
-        }
-      case END_REPEAT:
-        {
-          m_indent--;
-          indent (os);
-          os << "}\n";
-          BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-          m_parent_list.pop_back ();
-          if (n) delete n;
-          break;
-        }
+      case END_ASSIGNMENT:
+      {
+        os << ";\n";
+        break;
+      }
       case LOAD_XML:
         {
           load_xml (os, node);
@@ -370,22 +359,23 @@ namespace Smala
           break;
         }
       case FSM:
-      case SWITCH:
-      case SWITCH_LIST:
         {
-          std::string new_name = build_simple_node (os, node, true);
+          std::string new_name = build_simple_node (os, node);
           m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
           break;
         }
       case SET_PARENT:
         {
-          std::string fsm = m_parent_list.back ()->name ();
           BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
           m_parent_list.pop_back ();
           if (n) delete n;
-          std::string parent = m_parent_list.back ()->name ();
+          std::string parent;
+          if (!node->parent()->name().empty())
+            parent =  parse_symbol(node->parent()->name ()).first;
+          else
+            parent = m_parent_list.back()->name ();
           std::string name = node->name ();
-          fetch_add_child (os, parent, fsm, name);
+          fetch_add_child (os, parent, parse_symbol (name).first, name);
           break;
         }
       case CONTROL:
@@ -395,7 +385,7 @@ namespace Smala
         }
       case SIMPLE:
         {
-          build_simple_node (os, node, false);
+          build_simple_node (os, node);
           break;
         }
       case THIS:
@@ -405,7 +395,7 @@ namespace Smala
         }
       case CONTAINER:
         {
-          std::string new_name = build_simple_node (os, node, false);
+          std::string new_name = build_simple_node (os, node);
           m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
           break;
         }
@@ -424,9 +414,9 @@ namespace Smala
           build_unary_node (os, node);
           break;
         }
-      case ARG_NODE:
+      case TERM_NODE:
         {
-          build_arg_node (os, node);
+          build_term_node (os, node);
           break;
         }
       case NATIVE_CODE:
@@ -446,6 +436,30 @@ namespace Smala
           build_new_line (os, static_cast<NewLineNode*> (node));
           break;
         }
+      case NEW_VAR:
+      {
+        NewVarNode *n = static_cast<NewVarNode*> (node);
+        if (!m_in_for)
+          indent (os);
+        print_type (os, n->type ());
+        std::string new_name;
+        switch (n->type ()) {
+          case INT:
+          case DOUBLE:
+          case STRING:
+            new_name = "var_" + std::to_string (m_var_num++);
+            break;
+          case PROCESS:
+            new_name = "var_" + std::to_string (m_cpnt_num++);
+            break;
+          default:
+            new_name =  "";
+        }
+        if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
+          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
+        os << " " << new_name << " = ";
+        break;
+      }
       case DASH_ARRAY:
         {
           build_dash_array (os, static_cast<DashArrayNode*> (node));
@@ -456,10 +470,11 @@ namespace Smala
       }
   }
 
+  /* WARNING: this method is overridden in cpp_builder.cpp */
   void
-  Builder::build_arg_node (std::ofstream &os, Node *node)
+  Builder::build_term_node (std::ofstream &os, Node *node)
   {
-    ArgNode *n = static_cast<ArgNode*> (node);
+    TermNode *n = static_cast<TermNode*> (node);
     switch (n->arg_type ())
       {
       case SYMBOL:
@@ -497,60 +512,13 @@ namespace Smala
       }
   }
 
-  void
-  Builder::build_cat (std::ofstream &os, Node *node)
-  {
-    OperatorNode *op = static_cast<OperatorNode*> (node);
-    Node *left = op->left ();
-    Node *right = op->right ();
-    std::string constructor = get_constructor (node->djnn_type ());
-    std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    node->set_build_name (new_name);
-    m_parent_list.back ()->add_entry (new_name, new_name);
-
-    indent (os);
-    print_start_component (os, new_name, constructor);
-    os << " (" << m_parent_list.back ()->name () << ", " << m_null_string << ");\n";
-    if (!node->name ().empty ()) {
-      m_parent_list.back ()->add_entry (node->name (), build_find_component (new_name, "\"output\""));
-    }
-    indent (os);
-    if (left->node_type () == LITERAL) {
-      build_set_string (os, new_name, "\"head\"", left->name ());
-      //os << get_constructor ("setString") << " (" << new_name << ", \"head\", "
-      // << left->name () << ");\n";
-    } else if (left->node_type () == PATH) {
-      print_component_constructor (os, get_constructor ("Connector"));
-      os << " (" << m_parent_list.back ()->name () << ", " << m_null_string << ", ";
-      std::pair<std::string, std::string> pair = parse_symbol (left->name ());
-      os << pair.first << ", " << pair.second << ", " << new_name << ", \"head\");\n";
-    } else {
-      print_component_constructor (os, get_constructor ("Connector"));
-      os << " (" << m_parent_list.back ()->name () << ", " << m_null_string << ", " << left->build_name ()
-          << ", \"output\"" << ", " << new_name << ", \"head\");\n";
-    }
-
-    indent (os);
-    if (right->node_type () == LITERAL) {
-      build_set_string (os, new_name, "\"tail\"", right->name ());
-      //os << get_constructor ("setString") << " (" << new_name << ", \"tail\", "
-      //  << right->name () << ");\n";
-    } else if (right->node_type () == PATH) {
-      print_component_constructor (os, get_constructor ("Connector"));
-      os << " (" << m_parent_list.back ()->name () << ", " << m_null_string << ", ";
-      std::pair<std::string, std::string> pair = parse_symbol (right->name ());
-      os << pair.first << ", " << pair.second << ", " << new_name << ", \"tail\");\n";
-    } else {
-      print_component_constructor (os, get_constructor ("Connector"));
-      os << " (" << m_parent_list.back ()->name () << ", " << m_null_string << ", " << right->build_name ()
-          << ", \"output\"" << ", " << new_name << ", \"tail\");\n";
-    }
-  }
 
   std::string
-  Builder::build_simple_node (std::ofstream &os, Node *node, bool ignore_parent)
+  Builder::build_simple_node (std::ofstream &os, Node *node)
   {
     std::string constructor = get_constructor (node->djnn_type ());
+    if (constructor == "Switch")
+      m_in_switch = true;
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
 
     if (node->name ().compare ("_") == 0)
@@ -563,7 +531,7 @@ namespace Smala
         print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
     }
     indent (os);
-    std::string p_name = (node->parent () == nullptr || ignore_parent) ? m_null_symbol : node->parent ()->build_name ();
+    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     print_start_component (os, new_name, constructor);
     os << " (" << p_name << ", " << name;
     if (node->has_arguments ())
@@ -582,7 +550,6 @@ namespace Smala
       return;
     }
     std::string constructor = get_constructor (node->djnn_type ());
-    //cout << "type = " << node->djnn_type() << " constructor = "  << constructor << endl;
     std::pair<std::string, std::string> src, dst;
 
     switch (ctrl->in ()->node_type ())
@@ -699,15 +666,9 @@ namespace Smala
   void
   Builder::build_native_code (std::ofstream &os, Node *node)
   {
-    NativeCallNode *n = static_cast<NativeCallNode*> (node);
-    std::string new_name ("var_" + std::to_string (m_var_num++));
+    FunctionNode *n = static_cast<FunctionNode*> (node);
     indent (os);
-    print_type (os, n->return_type ());
-    os << " " << new_name << " = " << n->func_name () << " (";
-    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
-      print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
-    if (!node->has_arguments ())
-      os << ");\n";
+    os << n->func_name ();
   }
 
   void
@@ -737,7 +698,6 @@ namespace Smala
     std::map<std::string, std::string>::iterator it;
     it = m_types.find (type);
     if (it == m_types.end ()) {
-      //print_error_message (error_level::error, "unknown type " + type, 1);
       return type;
     }
     return it->second;

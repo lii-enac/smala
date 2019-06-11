@@ -7,7 +7,7 @@ use gui
  * (both shapes must be graphical shapes, ie must have a transformation matrix)
  */
 _define_
-LocalToLocal (Component inShape, Component outShape) {
+LocalToLocal (Process inShape, Process outShape) {
 
     LocalToScreen l2s (inShape)
     ScreenToLocal s2l (outShape)

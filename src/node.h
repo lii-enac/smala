@@ -26,7 +26,7 @@ namespace Smala {
   } instruction_t;
 
   enum ParamType {
-    INT, DOUBLE, STRING, NAME, LOCAL_NAME
+    INT, DOUBLE, STRING, PROCESS, NAME, LOCAL_NAME, VOID
   };
 
   enum NodeType
@@ -35,24 +35,24 @@ namespace Smala {
     ADD_CHILD,
     ADD_CHILDREN_TO,
     ALIAS,
-    ALTERNATIVE,
-    ARG_NODE,
     BINARY_OP,
-    CAT,
     CCALL,
     CLONE,
     CONTAINER,
     CONTROL,
     DASH_ARRAY,
     DECREMENT,
+    END_ASSIGNMENT,
+    END_BLOCK,
     END_CONTAINER,
     END_DEFINE,
     END_ELSE,
     END_IF_EXPRESSION,
-    END_BLOCK,
+    END_LOOP,
     END_NATIVE,
     END_PROPERTY,
     END_REPEAT,
+    END_SET_PROPERTY,
     FIND,
     FOR,
     FSM,
@@ -63,18 +63,18 @@ namespace Smala {
     LITERAL,
     LOAD_XML,
     LOCAL_NODE,
-    MACRO,
     MERGE,
     MOVE_AFTER,
     MOVE_BEFORE,
     MOVE_END,
     MOVE_FIRST,
-    NATIVE_ACTION,
     NATIVE_ACTION_CPNT,
+    NATIVE_ACTION,
     NATIVE_CODE,
     NATIVE_EXPRESSION,
     NATIVE_JAVA,
     NEW_LINE,
+    NEW_VAR,
     PATH,
     PRINT,
     REMOVE,
@@ -88,8 +88,7 @@ namespace Smala {
     START_ELSEIF,
     START_IF,
     START_MAIN,
-    SWITCH,
-    SWITCH_LIST,
+    TERM_NODE,
     TEXT,
     THIS,
     UNARY_OP,
@@ -119,6 +118,8 @@ public:
     void add_args (std::vector< std::pair<ParamType, std::string> > &args);
     void set_location (smala::ErrorLocation *loc);
     smala::ErrorLocation* location ();
+    bool ignore_parent () { return m_ignore_parent; }
+    void set_ignore_parent (bool ignore) { m_ignore_parent = ignore; }
     bool has_arguments ();
     void set_has_arguments (bool v);
     bool duplicate_warning ();
@@ -128,6 +129,7 @@ public:
     void set_expression (std::vector<Node*>& nodes) { m_expression = nodes; }
     std::vector<Node*>& get_expression () { return m_expression; }
 private:
+    bool m_ignore_parent;
     Node * m_parent;
     std::string m_djnn_type;
     std::string m_name;

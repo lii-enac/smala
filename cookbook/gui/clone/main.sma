@@ -59,9 +59,7 @@ buildPath (const char* file)
   dolly2 << clone (dolly1.cric1)
 
   /* test with SVG */
-  
-  string path = CCall (buildPath, "img/aircraft.svg")
-  svg = loadFromXML (path)
+  svg = loadFromXML (buildPath ("img/aircraft.svg"))
 
   Translation t3 (300, -300)
   Group aircraft {  

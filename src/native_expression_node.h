@@ -15,7 +15,7 @@
 #pragma once
 
 #include "node.h"
-#include "arg_node.h"
+#include "term_node.h"
 namespace Smala
 {
 

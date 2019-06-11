@@ -7,7 +7,7 @@ use gui
  * Works by connecting interface members to these scaling and translation.
  */
 _define_
-MouseCenteredZoom (Component frame, Component scaling, Component translation) {
+MouseCenteredZoom (Process frame, Process scaling, Process translation) {
 
   Double zoom (1)
   zoom =:> scaling.sx, scaling.sy

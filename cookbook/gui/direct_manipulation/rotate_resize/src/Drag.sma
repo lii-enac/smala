@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-Drag (Component frame, Component target, Component transforms) {
+Drag (Process frame, Process target, Process transforms) {
     FSM fsm {
         State idle
         State pressed {

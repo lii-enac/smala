@@ -20,10 +20,10 @@ use gui
 _main_
 Component root {
   Frame f ("f", 0, 0, 500, 600)
-  String s = "frame width =  " + f.width + " frame height = " + f.height
+
   FillColor fc (0, 0, 0)
   Text t (20, 20, "")
-  s =:> t.text
+  isString ("frame width =  " + f.width + " frame height = " + f.height) =:> t.text
 }
 
 run root

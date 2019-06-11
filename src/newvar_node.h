@@ -15,22 +15,23 @@
 #pragma once
 
 #include "node.h"
-#include "ctrl_node.h"
 
 namespace Smala
 {
 
-  class AlternativeNode : public Node
+  class NewVarNode : public Node
   {
   public:
-    AlternativeNode ();
-    virtual ~AlternativeNode ();
-    void add_ctrl_node (CtrlNode* n);
-    void add_ctrl_nodes (std::vector<CtrlNode*> nodes);
-    std::vector<CtrlNode*> ctrl_nodes ();
+    NewVarNode ();
+    NewVarNode (ParamType type, const std::string &name);
+    virtual ~NewVarNode ();
+
+    std::string& var_name ();
+    ParamType type ();
 
   private:
-    std::vector<CtrlNode*> m_ctrl_nodes;
+    std::string m_var_name;
+    ParamType m_type;
   };
 
 } /* namespace Smala */

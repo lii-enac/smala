@@ -51,6 +51,12 @@ Driver::set_error ()
 }
 
 void
+Driver::set_error (const std::string& msg)
+{
+  m_error |= 1;
+  cerr << location() << " " << msg << std::endl;
+}
+void
 Driver::set_stream (std::istream *is, const std::string& filename)
 {
   m_file = filename;

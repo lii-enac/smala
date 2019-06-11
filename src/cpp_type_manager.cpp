@@ -69,6 +69,7 @@ namespace Smala {
       {"mouseTracking", "mouse_tracking"},
       {"DrawingRefreshManager", "DrawingRefreshManager"},
       {"GenericMouse", "GenericMouse"},
+      {"Point", "PolyPoint"},
       {"0", "0"}
     };
     guiGlobalSymbols = guiGS;
@@ -130,6 +131,7 @@ namespace Smala {
 
     type_entry gui_t[] = {
       {"Frame", "Window"},
+      {"Point", "PolyPoint"},
       {"0", "0"}
     };
     gui_types = gui_t;

@@ -22,13 +22,12 @@ extern char* buildPath (const char *file);
 %}
 
 _define_
-Dial (Component frame, double _x, double _y) {
+Dial (Process frame, double _x, double _y) {
   Translation t (_x, _y)
   x aka t.tx
   y aka t.ty
 
-  string path = CCall (buildPath, "img/dial.svg")
-  gdial = loadFromXML (path)
+  gdial = loadFromXML (buildPath ("img/dial.svg"))
 
   /*---- interface -----*/
   Double input (0)

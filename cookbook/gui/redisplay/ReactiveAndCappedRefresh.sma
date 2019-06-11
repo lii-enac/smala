@@ -19,7 +19,7 @@ use base
 use gui
 
 _define_
-ReactiveAndCappedRefresh(Component f) {
+ReactiveAndCappedRefresh(Process f) {
 
 	Int refresh_rate(60) // in Hz
 	

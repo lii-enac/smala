@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-FittsTask1D(Component f) {
+FittsTask1D(Process f) {
   Int target_width(10)
   Int target_distance(500)
   Int target_time_acquisition(0)

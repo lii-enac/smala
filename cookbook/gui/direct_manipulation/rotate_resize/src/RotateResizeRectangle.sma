@@ -27,7 +27,7 @@ import HandleNW
 import RotationHandle
 
 _define_
-RotateResizeRectangle (Component frame, double x_, double y_) {
+RotateResizeRectangle (Process frame, double x_, double y_) {
 
     //// Translation to initially place the rectangle (use it just for that, 
     // the other transforms will be accumulated into the Homography named transforms, see below)

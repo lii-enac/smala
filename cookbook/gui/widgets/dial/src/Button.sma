@@ -22,7 +22,7 @@ extern char* buildPath (const char *file);
 %}
 
 _define_
-Button (Component frame, string l, double _x, double _y) {
+Button (Process frame, string l, double _x, double _y) {
   Translation t (_x, _y)
 
   /*----- interface -----*/
@@ -35,8 +35,7 @@ Button (Component frame, string l, double _x, double _y) {
   /*--- end interface ---*/
 
   /*----- graphics and behavior-----*/
-  string path = CCall (buildPath, "img/button.svg")
-  gbutton = loadFromXML (path)
+  gbutton = loadFromXML (buildPath ("img/button.svg"))
 
   FSM fsm {
     State idle {

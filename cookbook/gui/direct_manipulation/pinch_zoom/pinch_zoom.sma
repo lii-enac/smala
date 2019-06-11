@@ -34,9 +34,7 @@ Component root
   OutlineWidth _ (10)
   OutlineOpacity _ (0.5)
 
-  Component fixedScene {
-    //will contain the visualization of touches
-  }
+  Component fixedScene //will contain the visualization of touches
 
   //component to support the accumulation of transformations (scaling here)
   Homography transforms

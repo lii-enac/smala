@@ -12,7 +12,7 @@ _define_
  */
 DoubleClick (Process f, Process shape)
 {
-  CLICK_DELAY : 500
+  int CLICK_DELAY = 500
  
   Spike double_click
 

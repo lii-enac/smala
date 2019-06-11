@@ -27,11 +27,10 @@ buildPath (const char* file)
 
 
 _define_
-Tab (Component frame, Component tabManager, string _label, int _index) {
+Tab (Process frame, Process tabManager, string _label, int _index) {
   /* -------- Graphic components --------- */
   FillColor foreground_color (250, 250, 250)
-  string path = CCall (buildPath, "img/tab.svg")
-  g_tab = loadFromXML (path)
+  g_tab = loadFromXML (buildPath ("img/tab.svg"))
 
   Component label_box {
     Translation pos ((_index - 1) * 160, 0)

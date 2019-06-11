@@ -33,10 +33,9 @@ Component root {
   cb.entries.5.label = "e"
 
   FillColor fc (0, 0, 0)
-  Incr incr (1)
-  String s = "Selected entry: " + cb.entry + " state: " + incr.state 
+  Incr incr (1)  
   Text t (150, 50, "")
-  s =:> t.text
+  String: ("Selected entry: " + cb.entry + " state: " + incr.state) =:> t.text
 
   cb.entries.2.selected -> incr
 }

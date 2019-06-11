@@ -19,7 +19,7 @@ use gui
 
 // Define a C++ native action
 _action_
-cpp_action (Component c)
+cpp_action (Process c)
 %{
 	// To get the source that triggered the native action:
 	//Process *source = c->get_activation_source ();
@@ -39,7 +39,7 @@ cpp_action (Component c)
 
 // Define a smala native action
 _action_
-smala_action (Component src, Component data)
+smala_action (Process src, Process data)
 {   // To create a NEW component (either visual or assignment/binding/connector):
     // add it to a parent (passed for exemple as data), thanks to
     //     addChildrenTo parent {
@@ -103,7 +103,7 @@ Component root {
             root.blue.y = 400
         }
 
-        for (i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             dump root.fc
         }
 	}

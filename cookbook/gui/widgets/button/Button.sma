@@ -16,7 +16,7 @@ use base
 use gui
 
 _define_
-Button (Component frame, string label, double x_, double y_) {
+Button (Process frame, string label, double x_, double y_) {
   Translation t (x_, y_)
 
   /*----- interface -----*/

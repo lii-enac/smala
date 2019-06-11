@@ -18,7 +18,7 @@ import TouchData
  *   to capture a press in the same zone (to trigger the drag interaction).
  */
 _define_
-TouchDrag (Component _frame, Component _shape, Component transforms) {
+TouchDrag (Process _frame, Process _shape, Process transforms) {
 
   frame aka _frame // alias to access frame from natives
   shape aka _shape // alias to access shape from natives

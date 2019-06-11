@@ -7,7 +7,7 @@ use gui
  * Works by connecting interface members to these scaling and translation.
  */
 _define_
-SimpleZoom (Component frame, Component scaling) {
+SimpleZoom (Process frame, Process scaling) {
 
   Double zoom (1)
   zoom =:> scaling.sx, scaling.sy

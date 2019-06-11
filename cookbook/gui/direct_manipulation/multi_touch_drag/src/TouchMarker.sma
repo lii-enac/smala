@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-TouchMarker (Component _frame) {
+TouchMarker (Process _frame) {
 	
 	frame aka _frame
 	Dictionary d_touch

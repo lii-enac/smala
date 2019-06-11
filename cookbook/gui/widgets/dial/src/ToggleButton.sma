@@ -22,7 +22,7 @@ extern char* buildPath (const char *file);
 %}
 
 _define_
-ToggleButton (Component frame, string l, double _x, double _y) {
+ToggleButton (Process frame, string l, double _x, double _y) {
   Translation t (_x, _y)
 
   /*----- interface -----*/
@@ -35,8 +35,7 @@ ToggleButton (Component frame, string l, double _x, double _y) {
   String label (l)
  /*--- end interface ---*/
 
-  string path = CCall (buildPath, "img/button.svg")
-  gbutton = loadFromXML (path)
+  gbutton = loadFromXML (buildPath("img/button.svg"))
   FSM fsm {
     State idle {
       r = addChild (gbutton.idle)

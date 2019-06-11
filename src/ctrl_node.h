@@ -15,7 +15,7 @@
 #pragma once
 
 #include "node.h"
-#include "arg_node.h"
+#include "term_node.h"
 namespace Smala
 {
 
@@ -32,8 +32,8 @@ namespace Smala
     Node* out () const;
     void set_out (Node *out);
 
-    void add_expression (std::vector<ArgNode*> expression) { m_expression.insert (m_expression.begin (), expression.begin (), expression.end ()); }
-    std::vector<ArgNode*> expression () { return m_expression; }
+    void add_expression (std::vector<TermNode*> expression) { m_expression.insert (m_expression.begin (), expression.begin (), expression.end ()); }
+    std::vector<TermNode*> expression () { return m_expression; }
     void add_output_node (std::string n) { m_vout.push_back (n); }
     std::vector<std::string> get_output_nodes () { return m_vout; }
     std::string& get_in_act () { return m_in_act; }
@@ -43,7 +43,7 @@ namespace Smala
     Node *m_in;
     Node *m_out;
     std::string m_in_act, m_out_act;
-    std::vector<ArgNode*> m_expression;
+    std::vector<TermNode*> m_expression;
     std::vector<std::string> m_vout;
   };
 

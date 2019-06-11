@@ -21,7 +21,7 @@ use gui
  * uses the local coordinates system of the node placed just after the Homography (rect)
  */
 _define_
-DemoRight (Component frame) {
+DemoRight (Process frame) {
 
     Component RightTranslateByDemo {
         Translation _ (100, 100)

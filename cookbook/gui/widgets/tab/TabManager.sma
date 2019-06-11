@@ -18,7 +18,7 @@ use gui
 
 
 _action_
-reorder_tabs_action (Component c)
+reorder_tabs_action (Process c)
 %{
 	Process *my_tab_manager = (Process*) get_native_user_data (c);
 	List *tabs_list = (List*) my_tab_manager->find_component ("tabs");
@@ -29,7 +29,7 @@ reorder_tabs_action (Component c)
 	sprintf (spec, "%d", tabs_list->size());
 	Process *old_selected_tab = (Process*) tabs_list->find_component (spec);
 	Spike *unselect = (Spike*) old_selected_tab->find_component ("unselect");
-	unselect->activation ();
+	unselect->activate ();
 	// get its original index...
 	int old_selected_index = ((IntProperty*) old_selected_tab->find_component ("index"))->get_value ();
 	sprintf (spec, "<%d", old_selected_index);

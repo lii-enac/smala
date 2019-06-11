@@ -21,7 +21,7 @@ import Button
 
 
 _action_
-myFunc (Component c) 
+myFunc (Process c) 
 %{
   cout << ("Button clicked") << endl;
 %}
@@ -35,9 +35,13 @@ Component root {
 
   NativeAction na (myFunc, 1)
 
-  myList = repeat (n=5) {
-    Button b (f, "myButton", 10, n * 100)
-    b.click -> na
+  List myList {
+    for (int n = 0; n < 5; n++) {
+      Component _ {
+        Button b (f, "myButton", 10, n * 100)
+        b.click -> na
+      }
+    }
   }
 
   e = find (myList.1.b)

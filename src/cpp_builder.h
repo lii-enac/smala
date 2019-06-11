@@ -29,13 +29,14 @@ namespace Smala {
     void build_use (std::ofstream &os, std::string use) override;
     void build_import (std::ofstream &os, std::string import) override;
     void build_instruction (std::ofstream &os, Node *node) override;
-    void build_arg_node (std::ofstream &os, Node *node) override;
+    void build_term_node (std::ofstream &os, Node *node) override;
     void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void build_for (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
     void build_print (std::ofstream &os, Node *node) override;
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;
     void set_property (std::ofstream &os, Node *node) override;
+    void end_set_property (std::ofstream &os, Node *node) override;
     bool known_symbol (const string &name);
     void set_ref_property (std::ofstream &os, Node *node);
     void end_property (std::ofstream &os, Node *n) override;
@@ -47,7 +48,7 @@ namespace Smala {
     void repeat (std::ofstream &os, Node *node) override;
     void load_xml (std::ofstream &os, Node *node) override;
     void add_child (std::ofstream &os, Node *node) override;
-    void fetch_add_child (std::ofstream &os, std::string &parent, std::string &child, std::string &name) override;
+    void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) override;
     void add_children_to (std::ofstream &os, Node *node) override;
     void find (std::ofstream &os, Node *node) override;
     void clone (std::ofstream &os, Node *node) override;
@@ -80,7 +81,7 @@ namespace Smala {
     void print_args (std::ofstream &os, std::vector< std::pair<ParamType, std::string> > args, bool is_first);
     std::map<std::string, std::string> m_import_types;
   private:
-    bool m_in_for, m_display_initialized;
+    bool m_display_initialized;
   };
 
 } /* namespace Smala */

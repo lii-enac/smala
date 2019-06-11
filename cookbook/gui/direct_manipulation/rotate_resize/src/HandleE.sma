@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-HandleE (Component frame, Component target, double size) {
+HandleE (Process frame, Process target, double size) {
 
     /* ----- Interface ----- */
     Double x (0)

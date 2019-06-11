@@ -31,8 +31,8 @@ BoolToggleButton (double x, double y, double w, double h, string textContent) {
 
   FillColor _ (70, 70, 70)
   TextAnchor _ (1)
-  _x = x + w/2
-  _y = y + h/2 + 5
+  double _x = x + w/2
+  double _y = y + h/2 + 5
   Text text (_x, _y, textContent)
 
   FSM toggleFsm {

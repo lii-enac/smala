@@ -46,6 +46,7 @@ public:
     void add_define_node (Node *node);
     void set_is_main (bool val);
     void set_error ();
+    void set_error (const std::string& msg);
     void in_preamble () { m_ast.set_in_preamble (true); }
     void end_preamble ();
     void new_line();

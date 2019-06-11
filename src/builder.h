@@ -55,7 +55,8 @@ namespace Smala {
   public:
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
-            0), m_sym_num (0), m_native_num (0), m_in_set_text (false), m_in_native_action (false), m_in_static_expr (false), m_type_manager (nullptr)
+            0), m_sym_num (0), m_native_num (0), m_in_for (false), m_in_set_text (false), m_in_set_property(false) , m_in_native_action (false), m_in_static_expr (false), m_in_switch (false),
+            m_type_manager (nullptr)
     {
     }
     virtual ~Builder () {};
@@ -64,7 +65,7 @@ namespace Smala {
   protected:
     smala::ErrorLocation *m_curloc;
     int m_indent, m_cpnt_num, m_var_num, m_error, m_sym_num, m_native_num;
-    bool m_in_set_text, m_in_native_action, m_in_static_expr;
+    bool m_in_for, m_in_set_text, m_in_set_property, m_in_native_action, m_in_static_expr, m_in_switch;
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
@@ -76,9 +77,8 @@ namespace Smala {
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
-    virtual void build_arg_node (std::ofstream &os, Node *node);
+    virtual void build_term_node (std::ofstream &os, Node *node);
     void build_native_code (std::ofstream &os, Node *node);
-    void build_cat (std::ofstream &os, Node *node);
     virtual void build_control_node (std::ofstream &os, Node *n);
     void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor);
     virtual void build_activator (std::ofstream &os, ActivatorNode *node) {}
@@ -104,6 +104,7 @@ namespace Smala {
     void print_find_component (std::ofstream &os, const std::string&, const std::string&);
     virtual std::string build_find_component (const std::string&, const std::string&) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
+    virtual void end_set_property (std::ofstream &os, Node *node) {};
     virtual void end_property (std::ofstream &os, Node *n) {};
     virtual void get_property (std::ofstream &os, Node *n) = 0;
     virtual void alias (std::ofstream &os, Node *n) = 0;
@@ -113,12 +114,12 @@ namespace Smala {
     virtual void repeat (std::ofstream &os, Node *n) = 0;
     virtual void load_xml (std::ofstream &os, Node *n) = 0;
     virtual void add_child (std::ofstream &os, Node *n) = 0;
-    virtual void fetch_add_child (std::ofstream &os, std::string &parent, std::string &child, std::string &name) = 0;
+    virtual void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) {};
     virtual void add_children_to (std::ofstream &os, Node *n) = 0;
     virtual void find (std::ofstream &os, Node *n) = 0;
     virtual void clone (std::ofstream &os, Node *node) {}
     virtual void build_transition_node (std::ofstream &os, CtrlNode *ctrl) = 0;
-    std::string build_simple_node (std::ofstream &os, Node *n, bool ignore_parent);
+    std::string build_simple_node (std::ofstream &os, Node *n);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
     virtual void build_binary_node (std::ofstream &os, Node *n) = 0;
     virtual void build_unary_node (std::ofstream &os, Node *n) = 0;

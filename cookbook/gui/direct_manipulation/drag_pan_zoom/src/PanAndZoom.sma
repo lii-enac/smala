@@ -13,7 +13,7 @@ use gui
  * If no drag, pass the frame both as frame and bg parameters.
  */
 _define_
-PanAndZoom (Component frame, Component bg, Component transforms) {
+PanAndZoom (Process frame, Process bg, Process transforms) {
 
   // Non visual rectangle serving as a local coordinates system
   Rectangle localRef (0, 0, 0, 0, 0, 0)

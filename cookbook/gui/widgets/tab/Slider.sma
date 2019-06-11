@@ -10,13 +10,12 @@ _native_code_
 
 
 _define_
-Slider (Component frame, double _x, double _y) {
+Slider (Process frame, double _x, double _y) {
   Translation t (_x, _y)
   x aka t.tx
   y aka t.ty
 
-  string path = CCall (buildPath, "img/slider.svg")
-  gslider = loadFromXML (path)
+  gslider = loadFromXML (buildPath ("img/slider.svg"))
 
   Component gobj {
     bkg << gslider.layer1.bkg

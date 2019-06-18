@@ -45,7 +45,7 @@ Component root {
 
   Button b2 (f, "myVeryLongButton", 10, 150)
   b2.click -> ex
-  f.width > 200 ? 150 : 10 => b2.x
+  f.width > 200 ? 150 : 10 =:> b2.x
 }
 
 run root

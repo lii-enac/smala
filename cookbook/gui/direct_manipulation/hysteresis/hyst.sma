@@ -52,8 +52,8 @@ Component root {
     State dragging {
       waiting_hyst.c.cx * sc.sx =: offset.x
       waiting_hyst.c.cy * sc.sy =: offset.y
-      f.move.x - offset.x => tr.tx
-      f.move.y - offset.y => tr.ty
+      f.move.x - offset.x =:> tr.tx
+      f.move.y - offset.y =:> tr.ty
     }
     
     idle -> waiting_hyst (mobile.press)
@@ -63,7 +63,7 @@ Component root {
   }
 
   TextPrinter tp
-  fsm.state => tp.input
+  fsm.state =:> tp.input
 }
 
 run root

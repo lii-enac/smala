@@ -11,8 +11,8 @@ LocalToLocal (Component inShape, Component outShape) {
 
     LocalToScreen l2s (inShape)
     ScreenToLocal s2l (outShape)
-    l2s.outX => s2l.inX
-    l2s.outY => s2l.inY
+    l2s.outX =:> s2l.inX
+    l2s.outY =:> s2l.inY
 
     /* --- input interface: coordinates in inShape local coordinates system --- */
     inX aka l2s.inX

@@ -20,7 +20,7 @@ DoubleClick (Process f, Process shape)
   APoint p1 (0, 0)
   APoint p2 (0, 0)
   Distance d (p1, p2)
-  d.result > 10 => max_distance
+  d.result > 10 =:> max_distance
  
   FSM fsm {
     State idle
@@ -33,8 +33,8 @@ DoubleClick (Process f, Process shape)
 
     State first_release {
       Timer t (CLICK_DELAY)
-      f.move.x => p2.x
-      f.move.y => p2.y
+      f.move.x =:> p2.x
+      f.move.y =:> p2.y
     }
 
     State second_press {

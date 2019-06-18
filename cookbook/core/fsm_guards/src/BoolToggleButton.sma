@@ -47,6 +47,6 @@ BoolToggleButton (double x, double y, double w, double h, string textContent) {
     false -> true (buttonvalue.press)
     true -> false (buttonvalue.press)
   }
-  toggleFsm.state => value
+  toggleFsm.state =:> value
 
 }

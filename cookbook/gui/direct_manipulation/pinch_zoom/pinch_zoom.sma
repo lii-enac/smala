@@ -23,6 +23,7 @@ use display
 //and binds the resulting scale factor to the root scale factor
 
 
+
 _main_
 Component root
 {
@@ -51,8 +52,8 @@ Component root
     addChildrenTo root.fixedScene {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
-        t.x => finger.cx
-        t.y => finger.cy
+        t.x =:> finger.cx
+        t.y =:> finger.cy
       }
     setRef (root.d_touch.key, t)
     setRef (root.d_touch.value, fingerConnector)
@@ -80,25 +81,25 @@ Component root
       Double p2x (0)
       Double p2y (0)
 
-      p1.$value.x => p1x
-      p1.$value.y => p1y
+      p1.$value.x =:> p1x
+      p1.$value.y =:> p1y
 
-      p2.$value.x => p2x
-      p2.$value.y => p2y
+      p2.$value.x =:> p2x
+      p2.$value.y =:> p2y
 
       //compute initial distance between p1 and p2, set the result to property d0
       Previous prev (1)
       Sqrt sqrt (0)
-      (p2x-p1x)*(p2x-p1x)+(p2y-p1y)*(p2y-p1y) => sqrt.input
-      sqrt.output => d
+      (p2x-p1x)*(p2x-p1x)+(p2y-p1y)*(p2y-p1y) =:> sqrt.input
+      sqrt.output =:> d
 
       //compute and bind the scale factor and center
       (p2x+p1x)/2 =: transforms.leftScaleBy.cx
       (p2y+p1y)/2 =: transforms.leftScaleBy.cy
 
       d =: prev.input
-      d => prev.input
-      d / prev.output => root.transforms.leftScaleBy.sx, root.transforms.leftScaleBy.sy
+      d =:> prev.input
+      d / prev.output =:> root.transforms.leftScaleBy.sx, root.transforms.leftScaleBy.sy
     }
   }
   Bool test (0)

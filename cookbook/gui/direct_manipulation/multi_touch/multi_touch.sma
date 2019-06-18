@@ -33,8 +33,8 @@ Component root
     addChildrenTo root {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
-        t.x => root.fingerConnector.finger.cx
-        t.y => root.fingerConnector.finger.cy
+        t.x =:> root.fingerConnector.finger.cx
+        t.y =:> root.fingerConnector.finger.cy
       }
     setRef (root.d_touch.key, t)
     setRef (root.d_touch.value, fingerConnector)

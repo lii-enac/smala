@@ -16,13 +16,13 @@ TouchMarker (Component _frame) {
   frame.touches.$added -> (this) {
     t = getRef (this.frame.touches.$added)
     addChildrenTo this {
-      Component fingerConnector {
+      Component fingerMarker {
         Circle finger (-100, -100, 20)
-        t.x => finger.cx
-        t.y => finger.cy
+        t.x =:> finger.cx
+        t.y =:> finger.cy
       }
 	    setRef (this.d_touch.key, t)
-	    setRef (this.d_touch.value, fingerConnector)
+	    setRef (this.d_touch.value, fingerMarker)
 	    run this.d_touch.add
     }
   }

@@ -14,6 +14,55 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 - None
 
 
+## [1.4.0] - 2019-06-04
+### compliant with djnn-cpp [1.5.0]
+- please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+- Added and manage automatically synchronizer 
+- Added new operator for connector with a first copy on activation "=:>""
+- Setting a refproperty will automatically use pointer : ref r (foo), if foo is component will automatically get foo pointer address.
+- Setting double into Doublepropperty is automatic : Double d(0.0) ; d = 5.0
+- Setting int into Intpropperty is automatic : Int i(0.0) ; i = 5
+- Allowed to define new variables in native
+- Added "if else" pattern in action
+- Added "for" loop in native actions
+- Added while loop in native actions
+- Added increment and decrement : using symbol --  and ++ : eg: root.foo++
+- Added accumulated_transforms cookbook recipe
+- Added rotate_resize recipe cookbook recipe
+- Added pinch to zoom cookbook recipe
+- Added fsm with guards cookbook recipe
+- Added multi_touch_drag cookbook recipe
+- Added a simple print function : print()
+- Added few tests
+
+### Added
+-  Managed switch_list component properly
+-  By default initialize display when using gui
+- Improved warning compilation
+
+### Changed
+- "=>" is now a connector component without a first copy on activation, react only on triggering
+- Removed named assignment mechanism ... use AssigmentSequence instead : eg: 
+    .notify_selected = index =: tabManager.selected_index : 1 ==>  AssignmentSequence notify_selected (1) { index =: tabManager.selected_index }
+- Improved editor_mode for SublimeText :
+    .improves syntax highlighting for smala - added better Type, ::, ::>, =:> and change keyword
+    .detect imperative code
+- Improved drag & pan cookbook recipe to accumulation in a single Homography
+- Update all cookbook with new mechanism : =>, =:> ...
+
+### Removed
+- Removed SetDouble, 
+- Removed named assignment mechanism ... use AssigmentSequence instead
+
+### Fixed
+- Fixed several cookbook recipes using new mechanism
+- Fixed smala parser
+- Fixed compilation issues on Linux platform
+- Fixed a shift/reduce conflict
+
+
 
 ## [1.3.0] - 2019-04-05
 ### compliant with djnn-cpp [1.4.0]

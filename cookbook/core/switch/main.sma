@@ -34,14 +34,14 @@ Component root {
   /* behavior */
   Switch sw (greater) {
     Component greater {
-      f.width / 2 => r.x	
+      f.width / 2 =:> r.x	
     }
     Component lower {
     	  Double x (10)
     	  x =: r.x
     }
   }
-  f.width > 400 ? "greater" : "lower" => sw.state
+  f.width > 400 ? "greater" : "lower" =:> sw.state
 }
 
 run root

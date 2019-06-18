@@ -34,12 +34,12 @@ Component root {
   exit.click->ex
 
   ToggleButton edit (f, "Edit", 325, 15)
-  f.width - edit.getwidth - 10 => edit.x
+  f.width - edit.getwidth - 10 =:> edit.x
 
   Slider s (f, 100, 250)
   Dial d (f, 200, 150)
 
-  s.output => d.input
+  s.output =:> d.input
   edit.on -> d.edit, s.edit
   edit.off -> d.exec, s.exec
 

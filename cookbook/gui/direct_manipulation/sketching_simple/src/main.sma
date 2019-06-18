@@ -32,8 +32,8 @@ Component root {
     // Background
     FillColor bgFill (50, 50,50)
     Rectangle bgRect (0, 0, 0, 0, 0, 0)
-    f.width => bgRect.width
-    f.height => bgRect.height
+    f.width =:> bgRect.width
+    f.height =:> bgRect.height
 
     // Foreground styles for sketches
     NoFill nf
@@ -66,8 +66,8 @@ Component root {
             f.press.x =: prevPoint.x
             f.press.y =: prevPoint.y
 
-            f.move.x => currentPoint.x
-            f.move.y => currentPoint.y
+            f.move.x =:> currentPoint.x
+            f.move.y =:> currentPoint.y
 
             // Call this action on each move event
             f.move -> (root) {
@@ -105,8 +105,8 @@ Component root {
             FillColor w (255, 255, 255)
             TextAnchor anchor (1)
             Text promptText (100, 100, "click and drag to sketch")
-            f.width / 2 => promptText.x
-            f.height / 2 => promptText.y
+            f.width / 2 =:> promptText.x
+            f.height / 2 =:> promptText.y
         }
 
         State noprompt

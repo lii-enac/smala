@@ -21,15 +21,15 @@ PanAndZoom (Component frame, Component bg, Component transforms) {
   // Store pointer position in localRef coordinates system
   // (used by both zoom and pan management)
   ScreenToLocal s2l (localRef)
-  frame.move.x => s2l.inX
-  frame.move.y => s2l.inY
+  frame.move.x =:> s2l.inX
+  frame.move.y =:> s2l.inY
 
   // Zoom management
   s2l.outX ::> transforms.rightScaleBy.cx
   s2l.outY ::> transforms.rightScaleBy.cy
   Pow p (1.01, 0)
-  frame.wheel.dy => p.exponent
-  p.result => transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
+  frame.wheel.dy =:> p.exponent
+  p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
 
   // Pan management
   FSM panFsm {
@@ -44,8 +44,8 @@ PanAndZoom (Component frame, Component bg, Component transforms) {
 
     State panning {
       // Compute added translation
-      s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
-      s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+      s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
+      s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
     }
 
     idle -> pressed (bg.press)

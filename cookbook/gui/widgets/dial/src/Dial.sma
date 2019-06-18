@@ -42,8 +42,8 @@ Dial (Component frame, double _x, double _y) {
     Rotation rot (0, 0, 0)
     Scaling scale (1, 1, 0, 0)
     needle << gdial.needle
-    gdial.axis_mark.cx => rot.cx
-    gdial.axis_mark.cy => rot.cy
+    gdial.axis_mark.cx =:> rot.cx
+    gdial.axis_mark.cy =:> rot.cy
   }
   Double initWidth (0)
   Double initHeight (0)
@@ -52,7 +52,7 @@ Dial (Component frame, double _x, double _y) {
   
   FSM fsm {
     State st_exec {
-      input * 360 => gobj.rot.a
+      input * 360 =:> gobj.rot.a
     }
 
     State st_edit {
@@ -80,23 +80,23 @@ Dial (Component frame, double _x, double _y) {
     
           shadow.upLeft.press.y - shadow.upLeft.y =: offY
           shadow.upLeft.press.x - shadow.upLeft.x =: offX
-          frame.move.y - offY => shadow.upLeft.y
-          frame.move.x - offX => shadow.upLeft.x
+          frame.move.y - offY =:> shadow.upLeft.y
+          frame.move.x - offX =:> shadow.upLeft.x
 
-          shadow.bkg.width / initWidth => gobj.scale.sx
-          shadow.bkg.height / initHeight => gobj.scale.sy
-          (initWidth - shadow.bkg.width) / 2  => gobj.translate.tx
-          (initHeight - shadow.bkg.height) / 2  => gobj.translate.ty
+          shadow.bkg.width / initWidth =:> gobj.scale.sx
+          shadow.bkg.height / initHeight =:> gobj.scale.sy
+          (initWidth - shadow.bkg.width) / 2  =:> gobj.translate.tx
+          (initHeight - shadow.bkg.height) / 2  =:> gobj.translate.ty
 
-          shadow.upLeft.x + 2.5 => shadow.bkg.x
-          shadow.upLeft.x => shadow.downLeft.x
-          shadow.upRight.x - shadow.upLeft.x => shadow.bkg.width
-          shadow.upLeft.y + 2.5 => shadow.bkg.y
-          shadow.upLeft.y => shadow.upRight.y
-          shadow.downLeft.y - shadow.upLeft.y => shadow.bkg.height
+          shadow.upLeft.x + 2.5 =:> shadow.bkg.x
+          shadow.upLeft.x =:> shadow.downLeft.x
+          shadow.upRight.x - shadow.upLeft.x =:> shadow.bkg.width
+          shadow.upLeft.y + 2.5 =:> shadow.bkg.y
+          shadow.upLeft.y =:> shadow.upRight.y
+          shadow.downLeft.y - shadow.upLeft.y =:> shadow.bkg.height
 
-          shadow.bkg.x + (shadow.bkg.width / 2) - 2.5 => shadow.middle.x
-          shadow.bkg.y + (shadow.bkg.height / 2) - 2.5 => shadow.middle.y
+          shadow.bkg.x + (shadow.bkg.width / 2) - 2.5 =:> shadow.middle.x
+          shadow.bkg.y + (shadow.bkg.height / 2) - 2.5 =:> shadow.middle.y
 
         }
         idle->enter (shadow.upLeft.enter)
@@ -116,8 +116,8 @@ Dial (Component frame, double _x, double _y) {
           t.ty =: initTy
           shadow.middle.press.y =: offY
           shadow.middle.press.x =: offX
-          frame.move.y - offY + initTy => t.ty
-          frame.move.x - offX + initTx => t.tx
+          frame.move.y - offY + initTy =:> t.ty
+          frame.move.x - offX + initTx =:> t.tx
         }
         idle->dragging (shadow.middle.press)
         dragging->idle (frame.release)

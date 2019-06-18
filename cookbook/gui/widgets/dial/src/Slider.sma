@@ -66,15 +66,15 @@ Slider (Component frame, double _x, double _y) {
   gslider.shadow.bkg.height =: initHeight
 
   Double output (0)
-  -gobj.t_thumb.ty / 275 => output
+  -gobj.t_thumb.ty / 275 =:> output
   Double dy (0)
   Double min (-275.0)
   Double max (0)
   Double buff (0)
 
   
-  dy > min ? dy : min => buff
-  buff < max ? buff : max => gobj.t_thumb.ty
+  dy > min ? dy : min =:> buff
+  buff < max ? buff : max =:> gobj.t_thumb.ty
 
   FSM fsm {
     State st_exec {
@@ -85,7 +85,7 @@ Slider (Component frame, double _x, double _y) {
         State dragging {
           Double offset (0)
           gobj.thumb.press.y - (gobj.scale.sy * dy) =: offset
-          (initHeight /gslider.shadow.bkg.height)  * (frame.move.y - offset) => dy
+          (initHeight /gslider.shadow.bkg.height)  * (frame.move.y - offset) =:> dy
         }
         idle->dragging (gobj.thumb.press)
         dragging->idle (frame.release)
@@ -112,23 +112,23 @@ Slider (Component frame, double _x, double _y) {
           
           shadow.upLeft.press.y - shadow.upLeft.y =: offY
           shadow.upLeft.press.x - shadow.upLeft.x =: offX
-          frame.move.y - offY => shadow.upLeft.y
-          frame.move.x - offX => shadow.upLeft.x
+          frame.move.y - offY =:> shadow.upLeft.y
+          frame.move.x - offX =:> shadow.upLeft.x
           
-          shadow.bkg.width / initWidth => gobj.scale.sx
-          shadow.bkg.height / initHeight => gobj.scale.sy
-          (initWidth - shadow.bkg.width) / 2  => gobj.translate.tx
-          (initHeight - shadow.bkg.height) / 2  => gobj.translate.ty
+          shadow.bkg.width / initWidth =:> gobj.scale.sx
+          shadow.bkg.height / initHeight =:> gobj.scale.sy
+          (initWidth - shadow.bkg.width) / 2  =:> gobj.translate.tx
+          (initHeight - shadow.bkg.height) / 2  =:> gobj.translate.ty
           
-          shadow.upLeft.x + 2.5 => shadow.bkg.x
-          shadow.upLeft.x => shadow.downLeft.x
-          shadow.upRight.x - shadow.upLeft.x => shadow.bkg.width
-          shadow.upLeft.y + 2.5 => shadow.bkg.y
-          shadow.upLeft.y => shadow.upRight.y
-          shadow.downLeft.y - shadow.upLeft.y => shadow.bkg.height
+          shadow.upLeft.x + 2.5 =:> shadow.bkg.x
+          shadow.upLeft.x =:> shadow.downLeft.x
+          shadow.upRight.x - shadow.upLeft.x =:> shadow.bkg.width
+          shadow.upLeft.y + 2.5 =:> shadow.bkg.y
+          shadow.upLeft.y =:> shadow.upRight.y
+          shadow.downLeft.y - shadow.upLeft.y =:> shadow.bkg.height
           
-          shadow.bkg.x + (shadow.bkg.width / 2) - 2.5 => shadow.middle.x
-          shadow.bkg.y + (shadow.bkg.height / 2) - 2.5 => shadow.middle.y
+          shadow.bkg.x + (shadow.bkg.width / 2) - 2.5 =:> shadow.middle.x
+          shadow.bkg.y + (shadow.bkg.height / 2) - 2.5 =:> shadow.middle.y
           
         }
         idle->enter (shadow.upLeft.enter)
@@ -148,8 +148,8 @@ Slider (Component frame, double _x, double _y) {
           t.ty =: initTy
           shadow.middle.press.y =: offY
           shadow.middle.press.x =: offX
-          frame.move.y - offY + initTy => t.ty
-          frame.move.x - offX + initTx => t.tx
+          frame.move.y - offY + initTy =:> t.ty
+          frame.move.x - offX + initTx =:> t.tx
         }
         idle->dragging (shadow.middle.press)
         dragging->idle (frame.release)

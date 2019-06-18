@@ -55,7 +55,7 @@ contexts:
     - match: '\b(use|import|aka|_main_|_define_|_action_|for|if|then|else|while)\b'
       scope: keyword.other.sma
 
-    - match: '\s*<<\s*|\s*=>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
+    - match: '\s*<<\s*|\s*=>\s*|\s*=:>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
       scope: keyword.operator.sma
 
     - match: '^\s*(\b[A-Z].[a-zA-Z0-9]*\b)'
@@ -81,8 +81,7 @@ contexts:
     # while
     # for ...
     # 
-
-    # = should not e include in for ... but also in // and  /*
+    #- match: '\s*(.*(\s=\s))'
     - match: '^(?!.*for)\s*(.*\s=)\s'
       captures:
          1: source.imperatif
@@ -135,3 +134,5 @@ contexts:
 
   prototype:
     - include: comments
+
+

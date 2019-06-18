@@ -25,16 +25,16 @@ Drag (Component frame, Component localRef, Component transforms) {
 
     State pressed {
       ScreenToLocal s2l (localRef)
-      frame.press.x => s2l.inX
-      frame.press.y => s2l.inY
+      frame.press.x =:> s2l.inX
+      frame.press.y =:> s2l.inY
     }
 
     State dragging {
       ScreenToLocal s2l (localRef)
-      frame.move.x => s2l.inX
-      frame.move.y => s2l.inY
-      s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
-      s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+      frame.move.x =:> s2l.inX
+      frame.move.y =:> s2l.inY
+      s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
+      s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
     }
     
     idle -> pressed (localRef.press)
@@ -46,17 +46,17 @@ Drag (Component frame, Component localRef, Component transforms) {
   // MORE COMPACT VERSION (press outside, only 2 states FSM)
   /*
   ScreenToLocal s2l_press (localRef)
-  localRef.press.x => s2l_press.inX
-  localRef.press.y => s2l_press.inY
+  localRef.press.x =:> s2l_press.inX
+  localRef.press.y =:> s2l_press.inY
 
   FSM fsm {
     State idle
     State dragging {
       ScreenToLocal s2l_move (localRef)
-      frame.move.x => s2l_move.inX
-      frame.move.y => s2l_move.inY
-      s2l_move.outX - s2l_press.outX => transforms.rightTranslateBy.dx
-      s2l_move.outY - s2l_press.outY => transforms.rightTranslateBy.dy
+      frame.move.x =:> s2l_move.inX
+      frame.move.y =:> s2l_move.inY
+      s2l_move.outX - s2l_press.outX =:> transforms.rightTranslateBy.dx
+      s2l_move.outY - s2l_press.outY =:> transforms.rightTranslateBy.dy
     }
     idle -> dragging (localRef.press)
     dragging -> idle (frame.release)

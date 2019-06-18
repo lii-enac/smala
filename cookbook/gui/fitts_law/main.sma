@@ -23,7 +23,7 @@ Component root
   	f.move.x > 0.9*fitts.target_distance
   		? 50*2
   		: 50
-  	=> fitts.target_width
+  	=:> fitts.target_width
   	*/
 
   	/*
@@ -37,7 +37,7 @@ Component root
 	f.move.x > 0.9*fitts.target_distance
   		? 50*scale
   		: 50
-  	=> fitts.target_width
+  	=:> fitts.target_width
   	*/
 
 }

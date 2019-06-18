@@ -380,32 +380,64 @@ namespace Smala
         }
     }
 
-    indent (os);
-    if (!node->name ().empty ()) {
-      std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-      m_parent_list.back ()->add_entry (node->name (), new_name);
-      node->set_build_name (new_name);
-      print_component_decl (os, new_name);
-      os << " = ";
-      node->set_name ("\"" + node->name () + "\"");
-    } else {
-      node->set_name (m_null_string);
-    }
+    if (is_binding) {
+      /* check for synchronizer */
+      indent (os);
+      os << "if (dynamic_cast<Synchronizer*> (" << dst.first;
+      if (dst.second != m_null_string)
+        os << "->find_component (" << dst.second << ")";
+      os << ") != nullptr) {\n";
+      indent (os);
+      os << "\t((Synchronizer*) " << dst.first;
+      if (dst.second != m_null_string)
+        os << "->find_component (" << dst.second << ")";
+      os << ")->add_source (" << src.first << ", " << src.second << ");\n";
+      indent (os);
+      os << "} else {\n";
+      m_indent++;
+      indent (os);
+      if (!node->name ().empty ()) {
+        std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+        m_parent_list.back ()->add_entry (node->name (), new_name);
+        node->set_build_name (new_name);
+        print_component_decl (os, new_name);
+        os << " = ";
+        node->set_name ("\"" + node->name () + "\"");
+      } else {
+        node->set_name (m_null_string);
+      }
 
-    print_component_constructor (os, constructor);
-    os << " (" << node->parent ()->build_name () << ", " << node->name ();
-    os << ", " << src.first << ", " << src.second << ", ";
-    if (is_binding)
-      os << ctrl->get_in_act () << ", ";
-    os << dst.first << ", "
-        << dst.second;
-    if (is_binding)
-      os << ", " << ctrl->get_out_act ();
-    if (node->djnn_type ().compare ("Assignment") == 0
-        || node->djnn_type ().compare ("PausedAssignment") == 0) {
-      os << ", " << node->args ().at (0).second;
+      print_component_constructor (os, constructor);
+      os << " (" << node->parent ()->build_name () << ", " << node->name ();
+      os << ", " << src.first << ", " << src.second << ", ";
+      os << ctrl->get_in_act () << ", " << dst.first << ", " << dst.second
+          << ", " << ctrl->get_out_act () << ");\n";
+      m_indent--;
+      indent (os);
+      os << "}\n";
+    } else {
+      indent (os);
+      if (!node->name ().empty ()) {
+        std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+        m_parent_list.back ()->add_entry (node->name (), new_name);
+        node->set_build_name (new_name);
+        print_component_decl (os, new_name);
+        os << " = ";
+        node->set_name ("\"" + node->name () + "\"");
+      } else {
+        node->set_name (m_null_string);
+      }
+
+      print_component_constructor (os, constructor);
+      os << " (" << node->parent ()->build_name () << ", " << node->name ();
+      os << ", " << src.first << ", " << src.second << ", ";
+      os << dst.first << ", " << dst.second;
+      if (node->djnn_type ().compare ("Assignment") == 0
+          || node->djnn_type ().compare ("PausedAssignment") == 0) {
+        os << ", " << node->args ().at (0).second;
+      }
+      os << ");\n";
     }
-    os << ");\n";
   }
 
   void
@@ -455,9 +487,11 @@ namespace Smala
           os << "Assignment (";
         os << p_name << ", \"\", " << arg.first << ", " << arg.second << ", "
             << out_arg.first << ", " << out_arg.second;
-        if (!node->is_connector ())
-          os << ", " << node->is_model ();
-        os << ");\n";
+        // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
+        if (node->is_connector())
+          os << ", " << !node->is_model () << ");\n";
+        else
+          os << ", " << node->is_model () << ");\n";
       }
     }
   }
@@ -616,10 +650,13 @@ namespace Smala
                              "duplicated name: " + node->name (), 0);
     }
     if (node->is_connector ()) {
+      indent (os);
+      std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
+          << ", \"\", " << new_name << ", \"\");\n";
       for (auto t : triggers) {
         indent (os);
-        os << "new Binding (" << p_name << ", \"\", " << t << ", \"\", "
-            << new_name << ", \"\");\n";
+        os << sync_name << "->add_source (" << t << ", \"\");\n";
       }
     }
     for (auto out : node->get_output_nodes ()) {
@@ -819,9 +856,16 @@ namespace Smala
       indent (os);
       switch (n->type ()) {
         case DUMP:
+        os << "if (" << cpnt_name << ")" << endl ;
+        indent (os); indent (os);
         os << cpnt_name << "->dump";
-        if (!n->has_argument ())
-         os << " (0);\n";
+        if (!n->has_argument ()) {
+          os << " (0);\n";
+          indent (os);
+          os << "else" << endl ;
+          indent (os); indent (os);
+          os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg.second <<  " << endl << endl;" << endl; 
+       }
        else {
         os << " (";
         for (auto arg : n->args ()) {
@@ -1586,7 +1630,7 @@ namespace Smala
     indent (os);
     os << "new Connector (" << m_parent_list.back ()->name () << ", \"\", "
         << p.first << ", " << p.second << ", " << name << ", " << side
-        << ");\n";
+        << ", false);\n";
   }
 
   void

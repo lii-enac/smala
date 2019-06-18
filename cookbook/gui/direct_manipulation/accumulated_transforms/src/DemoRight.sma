@@ -32,15 +32,15 @@ DemoRight (Component frame) {
             State idle
             State pressed {
                 ScreenToLocal s2l (rect)
-                frame.press.x => s2l.inX
-                frame.press.y => s2l.inY
+                frame.press.x =:> s2l.inX
+                frame.press.y =:> s2l.inY
             }
             State dragging {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
-                s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
-                s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
+                s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
+                s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
             }
             idle -> pressed (rect.press)
             pressed -> idle (frame.release)
@@ -58,11 +58,11 @@ DemoRight (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.rightRotateBy.cx
                 s2l.outY ::> transforms.rightRotateBy.cy
-                frame.wheel.dy => transforms.rightRotateBy.da
+                frame.wheel.dy =:> transforms.rightRotateBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -78,13 +78,13 @@ DemoRight (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.rightScaleBy.cx
                 s2l.outY ::> transforms.rightScaleBy.cy
                 Pow p (1.01, 0)
-                frame.wheel.dy => p.exponent
-                p.result => transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
+                frame.wheel.dy =:> p.exponent
+                p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -100,11 +100,11 @@ DemoRight (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.rightSkewXBy.cx
                 s2l.outY ::> transforms.rightSkewXBy.cy
-                frame.wheel.dy => transforms.rightSkewXBy.da
+                frame.wheel.dy =:> transforms.rightSkewXBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -120,11 +120,11 @@ DemoRight (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.rightSkewYBy.cx
                 s2l.outY ::> transforms.rightSkewYBy.cy
-                frame.wheel.dy => transforms.rightSkewYBy.da
+                frame.wheel.dy =:> transforms.rightSkewYBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -145,15 +145,15 @@ DemoRight (Component frame) {
             State idle
             State pressed {
                 ScreenToLocal s2l (rect)
-                frame.press.x => s2l.inX
-                frame.press.y => s2l.inY
+                frame.press.x =:> s2l.inX
+                frame.press.y =:> s2l.inY
             }
             State dragging {
                 ScreenToLocal s2l (rect)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
-                s2l.outX - pressed.s2l.outX => transforms.rightTranslateBy.dx
-                s2l.outY - pressed.s2l.outY => transforms.rightTranslateBy.dy
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
+                s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
+                s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
             }
             idle -> pressed (rect.press)
             pressed -> idle (frame.release)
@@ -170,11 +170,11 @@ DemoRight (Component frame) {
                     State off
                     State on {
                         ScreenToLocal s2l (rect)
-                        frame.move.x => s2l.inX
-                        frame.move.y => s2l.inY
+                        frame.move.x =:> s2l.inX
+                        frame.move.y =:> s2l.inY
                         s2l.outX ::> transforms.rightRotateBy.cx
                         s2l.outY ::> transforms.rightRotateBy.cy
-                        frame.wheel.dy => transforms.rightRotateBy.da
+                        frame.wheel.dy =:> transforms.rightRotateBy.da
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)
@@ -186,13 +186,13 @@ DemoRight (Component frame) {
                     State off
                     State on {
                         ScreenToLocal s2l (rect)
-                        frame.move.x => s2l.inX
-                        frame.move.y => s2l.inY
+                        frame.move.x =:> s2l.inX
+                        frame.move.y =:> s2l.inY
                         s2l.outX ::> transforms.rightScaleBy.cx
                         s2l.outY ::> transforms.rightScaleBy.cy
                         Pow p (1.01, 0)
-                        frame.wheel.dy => p.exponent
-                        p.result => transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
+                        frame.wheel.dy =:> p.exponent
+                        p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)

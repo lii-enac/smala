@@ -60,8 +60,8 @@ RotateResizeRectangle (Component frame, double x_, double y_) {
     Component rCenter {
         // Make this handle look size-invariant (inverse of the scalings accumulated on the rectangle)
         Scaling scaling_inv (1, 1, 50, 50)
-        1 / transforms.accsx => scaling_inv.sx
-        1 / transforms.accsy => scaling_inv.sy
+        1 / transforms.accsx =:> scaling_inv.sx
+        1 / transforms.accsy =:> scaling_inv.sy
         Circle center (50, 50, 1)
     }
 

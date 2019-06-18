@@ -35,15 +35,15 @@ DemoLeft (Component frame) {
             State idle
             State pressed {
                 ScreenToLocal s2l (ref)
-                frame.press.x => s2l.inX
-                frame.press.y => s2l.inY
-                s2l.outX => x0
-                s2l.outY => y0
+                frame.press.x =:> s2l.inX
+                frame.press.y =:> s2l.inY
+                s2l.outX =:> x0
+                s2l.outY =:> y0
             }
             State dragging {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 AssignmentSequence seqX (1) {
                     s2l.outX - x0 =: transforms.leftTranslateBy.dx
                     s2l.outX :: x0
@@ -72,11 +72,11 @@ DemoLeft (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftRotateBy.cx
                 s2l.outY ::> transforms.leftRotateBy.cy
-                frame.wheel.dy => transforms.leftRotateBy.da
+                frame.wheel.dy =:> transforms.leftRotateBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -93,13 +93,13 @@ DemoLeft (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftScaleBy.cx
                 s2l.outY ::> transforms.leftScaleBy.cy
                 Pow p (1.01, 0)
-                frame.wheel.dy => p.exponent
-                p.result => transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
+                frame.wheel.dy =:> p.exponent
+                p.result =:> transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -116,11 +116,11 @@ DemoLeft (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftSkewXBy.cx
                 s2l.outY ::> transforms.leftSkewXBy.cy
-                frame.wheel.dy => transforms.leftSkewXBy.da
+                frame.wheel.dy =:> transforms.leftSkewXBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -137,11 +137,11 @@ DemoLeft (Component frame) {
             State off
             State on {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftSkewYBy.cx
                 s2l.outY ::> transforms.leftSkewYBy.cy
-                frame.wheel.dy => transforms.leftSkewYBy.da
+                frame.wheel.dy =:> transforms.leftSkewYBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -165,15 +165,15 @@ DemoLeft (Component frame) {
             State idle
             State pressed {
                 ScreenToLocal s2l (ref)
-                frame.press.x => s2l.inX
-                frame.press.y => s2l.inY
-                s2l.outX => x0
-                s2l.outY => y0
+                frame.press.x =:> s2l.inX
+                frame.press.y =:> s2l.inY
+                s2l.outX =:> x0
+                s2l.outY =:> y0
             }
             State dragging {
                 ScreenToLocal s2l (ref)
-                frame.move.x => s2l.inX
-                frame.move.y => s2l.inY
+                frame.move.x =:> s2l.inX
+                frame.move.y =:> s2l.inY
                 AssignmentSequence seqX (1) {
                     s2l.outX - x0 =: transforms.leftTranslateBy.dx
                     s2l.outX :: x0
@@ -200,11 +200,11 @@ DemoLeft (Component frame) {
                     State off
                     State on {
                         ScreenToLocal s2l (ref)
-                        frame.move.x => s2l.inX
-                        frame.move.y => s2l.inY
+                        frame.move.x =:> s2l.inX
+                        frame.move.y =:> s2l.inY
                         s2l.outX ::> transforms.leftRotateBy.cx
                         s2l.outY ::> transforms.leftRotateBy.cy
-                        frame.wheel.dy => transforms.leftRotateBy.da
+                        frame.wheel.dy =:> transforms.leftRotateBy.da
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)
@@ -216,13 +216,13 @@ DemoLeft (Component frame) {
                     State off
                     State on {
                         ScreenToLocal s2l (ref)
-                        frame.move.x => s2l.inX
-                        frame.move.y => s2l.inY
+                        frame.move.x =:> s2l.inX
+                        frame.move.y =:> s2l.inY
                         s2l.outX ::> transforms.leftScaleBy.cx
                         s2l.outY ::> transforms.leftScaleBy.cy
                         Pow p (1.01, 0)
-                        frame.wheel.dy => p.exponent
-                        p.result => transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
+                        frame.wheel.dy =:> p.exponent
+                        p.result =:> transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)

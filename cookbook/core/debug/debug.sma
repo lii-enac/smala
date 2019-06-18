@@ -34,7 +34,7 @@ Component root {
 		  Incr incr (1)
 		  cl.tick->incr
 		  TextPrinter tp
-		  incr.state=>tp.input
+		  incr.state=:>tp.input
 	  }
 	  idle->clock (r.press)
 	  clock->idle (r.press)

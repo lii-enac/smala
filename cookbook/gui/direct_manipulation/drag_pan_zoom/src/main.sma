@@ -35,8 +35,8 @@ Component root {
     NoOutline _
     NoFill _
     Rectangle bg (0, 0, 0, 0, 0, 0)
-    frame.width => bg.width
-    frame.height => bg.height
+    frame.width =:> bg.width
+    frame.height =:> bg.height
   }
 
   // A few arbitrary transforms
@@ -61,7 +61,7 @@ Component root {
       OutlineColor _ (70, 70, 70)
       // adaptive outline width (always 1px)
       OutlineWidth ow (1)
-      1 / panAndZoomTransform.accsx => ow.width
+      1 / panAndZoomTransform.accsx =:> ow.width
       // graphics
       Rectangle rectangle (100, 100, 100, 100, 0, 0)
       // drag
@@ -73,7 +73,7 @@ Component root {
       Translation t (100, 300)
       // apply inverse of the accumulated zoom (supposedly homothetic)
       Scaling scaling_inv (1, 1, 0, 0)
-      1 / panAndZoomTransform.accsx => scaling_inv.sx, scaling_inv.sy
+      1 / panAndZoomTransform.accsx =:> scaling_inv.sx, scaling_inv.sy
       // graphics
       FillColor _ (125, 125, 125)
       Text te (0, 0, "...except this text wich moves as a consequence of pan and zoom, but does not scale")

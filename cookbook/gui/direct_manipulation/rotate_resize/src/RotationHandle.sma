@@ -45,7 +45,7 @@ RotationHandle (Process frame, Process target, double distance, double size) {
     // non homothetic scalings are skewed by ulterior rotations, so we must decompose 
     // the scalings, apply the new rotation, then recompose the scalings, which is more 
     // difficult than directly apply the rotation on the left with the good coordinates conversion:
-    // right product -> local coordinates system of the node placed just after the Homography (ref)
+    // right product -> local coordinates system of the node placed just after the Homography (rect)
     // left product  -> local coordinates system of the node placed just before the Homography (ref)
             
     // Store mouse press in rect coord system

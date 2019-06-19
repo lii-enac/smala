@@ -964,7 +964,7 @@ namespace Smala
               print_error_message (error_level::warning,
                                    "duplicated name: " + node->name (), 0);
       if (has_string)
-        os << "string ";
+        os << "std::string ";
       else
         os << "double ";
     }
@@ -976,7 +976,7 @@ namespace Smala
         os << "->find_component (" << arg.second << ")";
       os << ")->set_value (";
       if (has_string) {
-        os << "string (";
+        os << "std::string (";
         m_in_set_text = true;
       }
       m_in_static_expr = true;
@@ -992,7 +992,7 @@ namespace Smala
     } else {
       os << arg.first << " = ";
       if (has_string) {
-        os << "string (";
+        os << "std::string (";
         m_in_set_text = true;
       }
       m_in_static_expr = true;
@@ -1060,7 +1060,7 @@ namespace Smala
         }
         os << n->arg_value ();
         if (m_in_set_text) {
-          os << "string (";
+          os << "std::string (";
         }
       }
         break;
@@ -1689,7 +1689,7 @@ namespace Smala
         break;
       }
       case STRING: {
-        os << "const string&";
+        os << "const std::string&";
         break;
       }
       case NAME: {

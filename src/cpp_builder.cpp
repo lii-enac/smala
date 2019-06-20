@@ -875,7 +875,7 @@ namespace Smala
       }
       break;
       case NOTIFY:
-      os << cpnt_name << "->notify_activation ();\n";
+      os << cpnt_name << "->notify_activate ();\n";
       break;
       case RUN:
       if (n->cpnt_list ().at (i).compare ("syshook") == 0) {
@@ -887,15 +887,15 @@ namespace Smala
           //os << ");\n";
         }
         indent (os);
-        os << "MainLoop::instance ().activation ();\n";
+        os << "MainLoop::instance ().activate ();\n";
       } else
-      os << cpnt_name << "->activation ();\n";
+      os << cpnt_name << "->activate ();\n";
       break;
       case STOP:
       if (cpnt_name.compare ("syshook") == 0) {
-        os << "MainLoop::instance ().deactivation ();\n";
+        os << "MainLoop::instance ().deactivate ();\n";
       } else
-      os << cpnt_name << "->deactivation ();\n";
+      os << cpnt_name << "->deactivate ();\n";
       break;
       case DELETE:
          /* delete first.second */
@@ -905,7 +905,7 @@ namespace Smala
         indent (os);
         os << "if (" << new_name << ") {\n";
         indent (os); indent (os);
-        os << new_name << "->deactivation ();\n";
+        os << new_name << "->deactivate ();\n";
         indent (os); indent (os);
         os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
         indent (os); indent (os);
@@ -919,7 +919,7 @@ namespace Smala
       else {
         os << "if (" << arg.first << ") {\n";
         indent (os); indent (os);
-        os << arg.first << "->deactivation ();\n";
+        os << arg.first << "->deactivate ();\n";
         indent (os); indent (os);
         os << "if (" << arg.first << "->get_parent ())\n";
         indent (os); indent (os);

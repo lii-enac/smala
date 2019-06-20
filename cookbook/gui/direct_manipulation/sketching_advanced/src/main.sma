@@ -73,7 +73,7 @@ Component root {
     APoint prevMidPoint (0,0)
 
     // set the origin on press
-    Component onPressAction {
+    AssignmentSequence on_press_action (1) {
         f.press.x =: prevPoint.x
         f.press.y =: prevPoint.y
         f.press.x =: prevMidPoint.x
@@ -122,7 +122,7 @@ Component root {
             }
         }
 
-        idle -> sketching (f.press, onPressAction)
+        idle -> sketching (f.press, on_press_action)
         sketching -> idle (f.release)
     }
 

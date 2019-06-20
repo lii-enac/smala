@@ -27,7 +27,7 @@ Component root {
     Frame f ("Line Sketching", 100, 100, 800, 600)
     Exit ex (0, 1)
     f.close -> ex
-    mouseTracking = 1;
+    mouseTracking = 1
 
     // Background
     FillColor bgFill (50, 50,50)

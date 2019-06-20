@@ -35,7 +35,8 @@
   f.move.x =:> mobile.cx
   f.move.y =:> mobile.cy
 
-  Int refresh_rate(60) // in Hz
+  //Int refresh_rate(60) // in Hz
+  Int refresh_rate(5) // in Hz
   Int period(-1)
   1000/refresh_rate =:> period
 

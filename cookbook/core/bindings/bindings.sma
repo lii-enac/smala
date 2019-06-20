@@ -23,25 +23,25 @@ import Button
 _main_
 Component root {
   Frame f ("my frame", 0, 0, 1200, 600)
-  Button display (f, "Show", 50, 50)
+  Button show (f, "Show", 50, 50)
   Button hide (f, "Hide", 50, 150)
 
-  FillColor _(100, 210, 100)
-  Rectangle test (50, 250, 100, 70, 0, 0)
-  display.click -> test
-  hide.click ->! test
+  FillColor _(255, 0, 0)
+  Rectangle rectR (50, 250, 100, 70, 0, 0)
+  show.click -> rectR
+  hide.click ->! rectR
 
-  FillColor _ (210, 100, 100)
-  Rectangle test2 (250, 250, 100, 70, 0, 0)
-  test !-> test2
-  test ->! test2
+  FillColor _ (0, 255, 0)
+  Rectangle rectG (250, 250, 100, 70, 0, 0)
+  rectR !-> rectG
+  rectR ->! rectG
 
-  FillColor _ (100, 100, 210)
-  Rectangle test3 (450, 250, 100, 70, 0, 0)
-  test !->! test3
-  display.click -> test3
+  FillColor _ (0, 0, 255)
+  Rectangle rectB (450, 250, 100, 70, 0, 0)
+  rectR !->! rectB
+  show.click -> rectB
 }
 
 run root
-stop root.test2
+stop root.rectG
 run syshook

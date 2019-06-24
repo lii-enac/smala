@@ -19,8 +19,6 @@
 #include "scanner.h"
 #include "parser.hpp"
 #include "driver.h"
-#include "c_builder.h"
-#include "j_builder.h"
 #include "cpp_builder.h"
 
 using namespace Smala;
@@ -29,18 +27,9 @@ using namespace std;
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
 	Driver driver (arg.debug());
-	Builder *b;
+	Builder *b = new CPPBuilder ();
 	int error = 0;
-	switch (arg.lang ()) {
-	  case C:
-	    b = new CBuilder ();
-	    break;
-	  case JAVA:
-	    b = new JBuilder (arg.get_option ("package"));
-	    break;
-	  case CPP:
-	    b = new CPPBuilder ();
-	}
+
 	int sz = arg.files().size();
 
 	for (auto filename: arg.files()) {

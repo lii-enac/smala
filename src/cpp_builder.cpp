@@ -423,6 +423,18 @@ namespace Smala
     }
   }
 
+
+  string
+  transform_name(const string& input)
+  {
+    string new_param_name = input;
+    replace(new_param_name.begin(), new_param_name.end(), '.','_');
+    replace(new_param_name.begin(), new_param_name.end(), '/','_');
+    new_param_name.erase(std::remove(new_param_name.begin(), new_param_name.end(), '"'), new_param_name.end());
+    return new_param_name;
+  }
+
+
   void
   CPPBuilder::build_native_expression_node (std::ofstream &os, Node *n)
   {
@@ -437,6 +449,8 @@ namespace Smala
         node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
     std::vector<std::string> triggers;
     indent (os);
+
+#if 0
     os << "std::map<std::string, AbstractProperty*> " << sym_name << ";\n";
 
     for (auto e : node->get_expression ()) {
@@ -456,6 +470,7 @@ namespace Smala
           indent (os);
           os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name
               << ";\n";
+
         } else if (arg.first.compare (0, 6, "s_var_") == 0) {
           indent (os);
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -464,25 +479,11 @@ namespace Smala
           indent (os);
           os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name
               << ";\n";
+
         } else {
           indent (os);
-          if (arg.second.compare (m_null_string) == 0) {
-            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
-                << ") == nullptr) {\n";
-            indent (os);
-            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
-                << "\" << \" is not a property\\n\";\n";
-            indent (os);
-            os << "\texit(0);\n";
-            indent (os);
-            os << "}\n";
-            indent (os);
-            os << sym_name << "[\"" << ((TermNode*)e)->arg_value ()
-                << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
-                << ");\n";
-            sym[((TermNode*)e)->arg_value ()] = arg.first;
-            triggers.push_back (arg.first);
-          } else {
+
+          if (arg.second.compare (m_null_string) != 0) {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             os << "AbstractProperty* " << new_name
                 << " = dynamic_cast<AbstractProperty*> (" << arg.first
@@ -501,10 +502,32 @@ namespace Smala
                 << ";\n";
             sym[((TermNode*)e)->arg_value ()] = new_name;
             triggers.push_back (new_name);
+
+            //string new_param_name = transform_name(arg.second);
+            //nat_struct_os << "\t AbstractProperty* " <<  new_param_name << ";\n";
+
+          } else {
+            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
+                << ") == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
+                << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            os << sym_name << "[\"" << ((TermNode*)e)->arg_value ()
+                << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
+                << ");\n";
+            sym[((TermNode*)e)->arg_value ()] = arg.first;
+            triggers.push_back (arg.first);
+            
           }
         }
       }
     }
+
     for (auto e : node->get_output_nodes ()) {
       if (sym.find (e) == sym.end ()) {
         std::pair<std::string, std::string> arg = parse_symbol (e);
@@ -546,11 +569,149 @@ namespace Smala
     }
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+#endif
+
+    string native_name_struct = node->get_build_name () + "_struct";
+    string native_name_obj = node->get_build_name () + "_obj";
+
+    //os << "std::map<std::string, AbstractProperty*> " << sym_name << ";\n";
+    os << native_name_struct << "* " << native_name_obj << " = new "<< native_name_struct << ";\n";
+
+    for (auto e : node->get_expression ()) {
+      if ((((TermNode*) e)->arg_type () == VAR
+          || ((TermNode*) e)->arg_type () == CAST_STRING
+          || ((TermNode*) e)->arg_type () == CAST_DOUBLE
+          || ((TermNode*) e)->arg_type () == CAST_PROCESS)
+          && sym.find (((TermNode*) e)->arg_value ()) == sym.end ()) {
+        std::pair<std::string, std::string> arg = parse_symbol (
+            ((TermNode*)e)->arg_value ());
+
+        if (arg.first.compare (0, 6, "d_var_") == 0
+            || arg.first.compare (0, 6, "i_var_") == 0) {
+          indent (os);
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
+              << p_name << ", \"\", " << arg.first << ");\n";
+          indent (os);
+          os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+
+        } else if (arg.first.compare (0, 6, "s_var_") == 0) {
+          indent (os);
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "TextProperty *" << new_name << " = new TextProperty ("
+              << p_name << ", \"\", " <<arg.first << ");\n";
+          indent (os);
+          os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+
+        } else {
+          indent (os);
+
+          if (arg.second.compare (m_null_string) != 0) {
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            os << "AbstractProperty* " << new_name
+                << " = dynamic_cast<AbstractProperty*> (" << arg.first
+                << "->find_component (" << arg.second << "));\n";
+            indent (os);
+            os << "if (" << new_name << " == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
+                << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            //os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name
+            //    << ";\n";
+            string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            os << native_name_obj << "->"<< new_param_name <<  "= " << new_name
+                << ";\n";
+            sym[((TermNode*)e)->arg_value ()] = new_name;
+            triggers.push_back (new_name);
+
+          } else {
+            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
+                << ") == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
+                << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            //os << sym_name << "[\"" << ((TermNode*)e)->arg_value ()
+            //    << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
+            //    << ");\n";
+            string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            os << native_name_obj << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg.first
+                << ");\n";
+            sym[((TermNode*)e)->arg_value ()] = arg.first;
+            triggers.push_back (arg.first);
+            
+          }
+        }
+      }
+    }
+
+    for (auto e : node->get_output_nodes ()) {
+      if (sym.find (e) == sym.end ()) {
+        std::pair<std::string, std::string> arg = parse_symbol (e);
+        if (arg.first.compare (0, 4, "var_") != 0) {
+          indent (os);
+          if (arg.second.compare (m_null_string) == 0) {
+            os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
+                << ") == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            //os << sym_name << "[\"" << e
+            //    << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
+            //    << ");\n";
+            string new_param_name = transform_name(e);
+            os << native_name_obj << "->"<< new_param_name
+                << " = dynamic_cast<AbstractProperty*>(" << arg.first
+                << ");\n";
+            sym[e] = arg.first;
+          } else {
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            os << "AbstractProperty* " << new_name
+                << " = dynamic_cast<AbstractProperty*> (" << arg.first
+                << "->find_component (" << arg.second << "));\n";
+            indent (os);
+            os << "if (" << new_name << " == nullptr) {\n";
+            indent (os);
+            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            indent (os);
+            os << "\texit(0);\n";
+            indent (os);
+            os << "}\n";
+            indent (os);
+            //os << sym_name << "[\"" << e << "\"] = " << new_name << ";\n";
+            string new_param_name = transform_name(e);
+            os << native_name_obj << "->" << new_param_name << " = " << new_name << ";\n";
+            sym[e] = new_name;
+          }
+        }
+      }
+    }
+
+    indent (os);
+    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+
     std::string n_expr_name =
         node->name ().empty () ? m_null_string : node->name ();
+    // os << "Process *" << new_name << " = new NativeExpressionAction ("
+    //    << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
+    //    << ", " << sym_name << ", false, " << node->is_model ()
+    //    << ");\n";
     os << "Process *" << new_name << " = new NativeExpressionAction ("
        << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
-       << ", " << sym_name << ", false, " << node->is_model ()
+       << ", " << native_name_obj << ", false, " << node->is_model ()
        << ");\n";
 
     if (!node->name ().empty ()) {
@@ -629,9 +790,10 @@ namespace Smala
     if (node->get_expression ().size () == 1) {
       return;
     }
-
     std::string native_name ("nat_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);
+
+#if 0
     os << "\nstatic void\n" << native_name
         << "(std::map<std::string, AbstractProperty*>& sym_table, bool string_setter)\n{\n";
 
@@ -660,8 +822,106 @@ namespace Smala
       }
       os << ", " << !node->is_paused () << ");\n";
     }
-
     os << "\n}\n";
+#endif
+    
+    // first pass: generate nat struct
+    map<string,bool> already_handled;
+    string native_name_struct = native_name + "_struct";
+    string native_name_obj = native_name + "_obj";
+
+    os << "\n";
+    os << "struct " << native_name_struct << " {\n";
+
+    for (auto n : node->get_output_nodes ()) {
+      string tn = transform_name(n);
+      if(already_handled.count(tn)==0) {
+        os << "\tAbstractProperty * " << tn << ";\n";
+        already_handled[tn] = true;
+      }
+
+      for (auto op : node->get_expression ()) {
+        // if (op->node_type () == CCALL) {
+        //   os << ((FunctionNode*) op)->func_name ();
+        // } else
+        if (op->node_type () == TERM_NODE) {
+          if (((TermNode*) op)->arg_type () == VAR
+              || ((TermNode*) op)->arg_type () == CAST_DOUBLE) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //    << "\")->second->get_double_value ()";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            if(already_handled.count(tn)==0) {
+              os << "\tAbstractProperty * " << tn << ";\n";
+              already_handled[tn] = true;
+            }
+          } else if (((TermNode*) op)->arg_type () == CAST_STRING) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //    << "\")->second->get_string_value ()";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            if(already_handled.count(tn)==0) {
+              os << "\tAbstractProperty * " << tn << ";\n";
+              already_handled[tn] = true;
+            }
+          } else if (((TermNode*) op)->arg_type () == CAST_PROCESS) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //               << "\")->second";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            if(already_handled.count(tn)==0) {
+              os << "\tAbstractProperty * " << tn << ";\n";
+              already_handled[tn] = true;
+            }
+          } else if (((TermNode*) op)->arg_value ().size() >= 1 && ((TermNode*) op)->arg_value ().at (0) == '\"') {
+            //os << "std::string (" << ((TermNode*) op)->arg_value () << ")";
+          } else {
+            //os << ((TermNode*) op)->arg_value ();
+          }
+        }
+      }
+      //os << ", " << !node->is_paused () << ");\n";
+    }
+    os << "};\n";
+
+
+    // second pass: generate nat
+
+    os << "\nstatic void\n" << native_name
+        << "(void* data, bool string_setter)\n{\n";
+    os << "\t" << native_name_struct << "* " << native_name_obj <<" = (" << native_name_struct << "*) data;\n"; 
+    for (auto n : node->get_output_nodes ()) {
+      //os << "\tsym_table.find (\"" << n << "\")->second->set_value (";
+      os << "\t" << native_name_obj << "->" << transform_name(n) << "->set_value(";
+      for (auto op : node->get_expression ()) {
+        if (op->node_type () == CCALL) {
+          os << ((FunctionNode*) op)->func_name ();
+        } else if (op->node_type () == TERM_NODE) {
+          if (((TermNode*) op)->arg_type () == VAR
+              || ((TermNode*) op)->arg_type () == CAST_DOUBLE) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //    << "\")->second->get_double_value ()";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            os << native_name_obj << "->" << tn << "->get_double_value()";
+          } else if (((TermNode*) op)->arg_type () == CAST_STRING) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //    << "\")->second->get_string_value ()";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            os << native_name_obj << "->" << tn << "->get_string_value()";
+          } else if (((TermNode*) op)->arg_type () == CAST_PROCESS) {
+            //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
+            //               << "\")->second";
+            string tn = transform_name(((TermNode*) op)->arg_value ());
+            os << native_name_obj << "->" << tn;
+          } else if (((TermNode*) op)->arg_value ().size() >= 1 && ((TermNode*) op)->arg_value ().at (0) == '\"') {
+            os << "std::string (" << ((TermNode*) op)->arg_value () << ")";
+          } else {
+            os << ((TermNode*) op)->arg_value ();
+          }
+        }
+      }
+      os << ", " << !node->is_paused () << ");\n";
+    }
+    indent(os);
+    os << "};\n\n";
+
   }
 
   void

@@ -296,10 +296,12 @@ cookbook_apps := core/bindings \
 	gui/clone \
 	network/helloIvy
 
-cookbook_apps: $(notdir $(cookbook_apps))
-.PHONY: cookbook_apps $(notdir $(cookbook_apps))
-
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
+
+cookbook_apps: $(notdir $(cookbook_apps))
+cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
+
+.PHONY: cookbook_apps cookbook_apps_test $(notdir $(cookbook_apps))
 
 # -----------
 # cookbook apps

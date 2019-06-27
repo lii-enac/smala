@@ -46,22 +46,22 @@ Component root
   //touch
 
   f.touches.$added->(root) {
-    t = getRef (root.f.touches.$added)
+    t = getRef (&root.f.touches.$added)
     addChildrenTo root.fixedScene {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
         t.x =:> finger.cx
         t.y =:> finger.cy
       }
-    setRef (root.d_touch.key, t)
-    setRef (root.d_touch.value, fingerConnector)
+    setRef (&root.d_touch.key, &t)
+    setRef (&root.d_touch.value, &fingerConnector)
     run root.d_touch.add
     }
   }
   f.touches.$removed->(root) {
-    t = getRef (root.f.touches.$removed)
-    setRef (root.d_touch.key, t)
-    p = getRef (root.d_touch.value)
+    t = getRef (&root.f.touches.$removed)
+    setRef (&root.d_touch.key, &t)
+    p = getRef (&root.d_touch.value)
     run root.d_touch.delete
     delete p
   }
@@ -104,8 +104,8 @@ Component root
   RefProperty null_ref (0)
   f.touches.size == 2 => test
   test.true -> (root) {
-    setRef (root.p1, root.f.touches.1)
-    setRef (root.p2, root.f.touches.2)
+    setRef (&root.p1, &root.f.touches.1)
+    setRef (&root.p2, &root.f.touches.2)
     root.pinchSw.state = "pinching"
   }
   AssignmentSequence set_null (1) {

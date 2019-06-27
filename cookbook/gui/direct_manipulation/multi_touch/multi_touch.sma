@@ -29,22 +29,22 @@ Component root
   OutlineOpacity _ (0.5)
 
   f.touches.$added->(root) {
-    t = getRef (root.f.touches.$added)
+    t = getRef (&root.f.touches.$added)
     addChildrenTo root {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
         t.x =:> root.fingerConnector.finger.cx
         t.y =:> root.fingerConnector.finger.cy
       }
-    setRef (root.d_touch.key, t)
-    setRef (root.d_touch.value, fingerConnector)
+    setRef (&root.d_touch.key, &t)
+    setRef (&root.d_touch.value, &fingerConnector)
     run root.d_touch.add
     }
   }
   f.touches.$removed->(root) {
-    t = getRef (root.f.touches.$removed)
-    setRef (root.d_touch.key, t)
-    p = getRef (root.d_touch.value)
+    t = getRef (&root.f.touches.$removed)
+    setRef (&root.d_touch.key, &t)
+    p = getRef (&root.d_touch.value)
     run root.d_touch.delete
     delete p
   }

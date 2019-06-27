@@ -29,7 +29,7 @@ TouchDrag (Process _frame, Process _shape, Process transforms) {
   // monitor touch presses on shape to get reference of new touches on shape only
   shape.touches.$added -> (this) {
     if (this.activeTouchData.touchId == 0) {
-      t = getRef (this.shape.touches.$added)
+      t = getRef (&this.shape.touches.$added)
       this.activeTouchData.touchId = t.id
       this.activeTouchData.press.x = t.x
       this.activeTouchData.press.y = t.y
@@ -40,8 +40,8 @@ TouchDrag (Process _frame, Process _shape, Process transforms) {
           t.y =:> this.activeTouchData.move.y
           t.y -> this.activeTouchData.moved
         }
-        setRef (this.d_touch.key, t)
-        setRef (this.d_touch.value, touchEvents)
+        setRef (&this.d_touch.key, &t)
+        setRef (&this.d_touch.value, &touchEvents)
         run this.d_touch.add
       }
   
@@ -52,11 +52,11 @@ TouchDrag (Process _frame, Process _shape, Process transforms) {
   // monitor touch releases on frame and not on shape
   // otherwise if the touches move outside shape, the touch is considered released
   frame.touches.$removed -> (this) {
-    t = getRef (this.frame.touches.$removed)
+    t = getRef (&this.frame.touches.$removed)
     // interrupt drag only if the released touch is the active one on the shape
     if (t.id == this.activeTouchData.touchId) {
-      setRef (this.d_touch.key, t)
-      p = getRef (this.d_touch.value)
+      setRef (&this.d_touch.key, &t)
+      p = getRef (&this.d_touch.value)
       run this.d_touch.delete
       delete p
       this.activeTouchData.touchId = 0

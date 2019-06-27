@@ -27,7 +27,7 @@ Component root
   
   Circle mobile (100, 100, 40)
   mobile.touches.$added-> (root) {
-    t = getRef (root.mobile.touches.$added)
+    t = getRef (&root.mobile.touches.$added)
     addChildrenTo root {
       Component connector {
         t.x =:> root.mobile.cx

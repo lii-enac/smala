@@ -575,7 +575,13 @@ namespace Smala
     string native_name_obj = node->get_build_name () + "_obj";
 
     //os << "std::map<std::string, AbstractProperty*> " << sym_name << ";\n";
-    os << native_name_struct << "* " << native_name_obj << " = new "<< native_name_struct << ";\n";
+
+    std::string native_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    std::string n_expr_name =
+        node->name ().empty () ? m_null_string : node->name ();
+    os << "auto *" << native_name << " = new "<< native_name_struct << " ("
+       << p_name << ", " << n_expr_name << ", true, " << node->is_model ()
+       << ");\n";
 
     for (auto e : node->get_expression ()) {
       if ((((TermNode*) e)->arg_type () == VAR
@@ -624,7 +630,7 @@ namespace Smala
             //os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name
             //    << ";\n";
             string new_param_name = transform_name(((TermNode*)e)->arg_value ());
-            os << native_name_obj << "->"<< new_param_name <<  "= " << new_name
+            os << native_name << "->"<< new_param_name <<  "= " << new_name
                 << ";\n";
             sym[((TermNode*)e)->arg_value ()] = new_name;
             triggers.push_back (new_name);
@@ -644,7 +650,7 @@ namespace Smala
             //    << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
             //    << ");\n";
             string new_param_name = transform_name(((TermNode*)e)->arg_value ());
-            os << native_name_obj << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg.first
+            os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg.first
                 << ");\n";
             sym[((TermNode*)e)->arg_value ()] = arg.first;
             triggers.push_back (arg.first);
@@ -673,7 +679,7 @@ namespace Smala
             //    << "\"] = dynamic_cast<AbstractProperty*>(" << arg.first
             //    << ");\n";
             string new_param_name = transform_name(e);
-            os << native_name_obj << "->"<< new_param_name
+            os << native_name << "->"<< new_param_name
                 << " = dynamic_cast<AbstractProperty*>(" << arg.first
                 << ");\n";
             sym[e] = arg.first;
@@ -693,7 +699,7 @@ namespace Smala
             indent (os);
             //os << sym_name << "[\"" << e << "\"] = " << new_name << ";\n";
             string new_param_name = transform_name(e);
-            os << native_name_obj << "->" << new_param_name << " = " << new_name << ";\n";
+            os << native_name << "->" << new_param_name << " = " << new_name << ";\n";
             sym[e] = new_name;
           }
         }
@@ -701,18 +707,21 @@ namespace Smala
     }
 
     indent (os);
-    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    os << native_name << "->finalize_construction ();\n";
 
-    std::string n_expr_name =
-        node->name ().empty () ? m_null_string : node->name ();
-    // os << "Process *" << new_name << " = new NativeExpressionAction ("
+    // indent (os);
+    // std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    // std::string n_expr_name =
+    //     node->name ().empty () ? m_null_string : node->name ();
+    // // os << "Process *" << new_name << " = new NativeExpressionAction ("
     //    << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
     //    << ", " << sym_name << ", false, " << node->is_model ()
     //    << ");\n";
-    os << "Process *" << new_name << " = new NativeExpressionAction ("
-       << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
-       << ", " << native_name_obj << ", false, " << node->is_model ()
-       << ");\n";
+    // os << "Process *" << new_name << " = new NativeExpressionAction ("
+    //    << p_name << ", " << n_expr_name << ", " << node->get_build_name ()
+    //    << ", " << native_name_obj << ", false, " << node->is_model ()
+    //    << ");\n";
+    std::string& new_name = native_name;
 
     if (!node->name ().empty ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
@@ -790,7 +799,11 @@ namespace Smala
     if (node->get_expression ().size () == 1) {
       return;
     }
-    std::string native_name ("nat_" + std::to_string (m_native_num++));
+    std::string unique_name = m_filename;
+    std::replace (unique_name.begin (), unique_name.end (), '/', '_');
+    std::replace (unique_name.begin (), unique_name.end (), '.', '_');
+
+    std::string native_name ("nat_" + unique_name + "_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);
 
 #if 0
@@ -831,7 +844,16 @@ namespace Smala
     string native_name_obj = native_name + "_obj";
 
     os << "\n";
-    os << "struct " << native_name_struct << " {\n";
+    os << "struct " << native_name_struct << " : public Action {\n";
+    os << "\t" << native_name_struct << R"( (Process *p, const std::string &n, bool string_setter, bool isModel): Action(p,n,isModel), _string_setter(string_setter) {
+      set_is_model (isModel);
+    }
+    void finalize_construction() {
+      Process::finalize_construction ();
+    }
+    bool _string_setter;
+    void impl_deactivate () override {}
+    void impl_activate () override;)" << "\n";
 
     for (auto n : node->get_output_nodes ()) {
       string tn = transform_name(n);
@@ -884,12 +906,12 @@ namespace Smala
 
     // second pass: generate nat
 
-    os << "\nstatic void\n" << native_name
-        << "(void* data, bool string_setter)\n{\n";
-    os << "\t" << native_name_struct << "* " << native_name_obj <<" = (" << native_name_struct << "*) data;\n"; 
+    //os << "\nstatic void\n" << native_name << "(void* data, bool string_setter)\n{\n";
+    //os << "\t" << native_name_struct << "* " << native_name_obj <<" = (" << native_name_struct << "*) data;\n";
+    os << "\nvoid\n" << native_name_struct << "::impl_activate ()\n{\n";
     for (auto n : node->get_output_nodes ()) {
       //os << "\tsym_table.find (\"" << n << "\")->second->set_value (";
-      os << "\t" << native_name_obj << "->" << transform_name(n) << "->set_value(";
+      os << "\t" << transform_name(n) << "->set_value(";
       for (auto op : node->get_expression ()) {
         if (op->node_type () == CCALL) {
           os << ((FunctionNode*) op)->func_name ();
@@ -899,17 +921,20 @@ namespace Smala
             //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
             //    << "\")->second->get_double_value ()";
             string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << native_name_obj << "->" << tn << "->get_double_value()";
+            //os << native_name_obj << "->" << tn << "->get_double_value()";
+            os << tn << "->get_double_value()";
           } else if (((TermNode*) op)->arg_type () == CAST_STRING) {
             //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
             //    << "\")->second->get_string_value ()";
             string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << native_name_obj << "->" << tn << "->get_string_value()";
+            //os << native_name_obj << "->" << tn << "->get_string_value()";
+            os << tn << "->get_string_value()";
           } else if (((TermNode*) op)->arg_type () == CAST_PROCESS) {
             //os << "sym_table.find (\"" << ((TermNode*) op)->arg_value ()
             //               << "\")->second";
             string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << native_name_obj << "->" << tn;
+            //os << native_name_obj << "->" << tn;
+            os << tn;
           } else if (((TermNode*) op)->arg_value ().size() >= 1 && ((TermNode*) op)->arg_value ().at (0) == '\"') {
             os << "std::string (" << ((TermNode*) op)->arg_value () << ")";
           } else {

@@ -845,10 +845,12 @@ namespace Smala
 
     os << "\n";
     os << "struct " << native_name_struct << " : public Action {\n";
-    os << "\t" << native_name_struct << R"( (Process *p, const std::string &n, bool string_setter, bool isModel): Action(p,n,isModel), _string_setter(string_setter) {
+    os << "\t" << native_name_struct << R"( (Process *p, const std::string &n, bool string_setter, bool isModel)
+      : Action (p, n, isModel), _string_setter (string_setter)
+    {
       set_is_model (isModel);
     }
-    void finalize_construction() {
+    void finalize_construction () {
       Process::finalize_construction ();
     }
     bool _string_setter;

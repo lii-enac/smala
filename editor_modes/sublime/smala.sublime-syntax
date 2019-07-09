@@ -6,7 +6,7 @@ file_extensions: [sma]
 scope: source.sma
 
 variables:
-  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|CCall|getInt|getDouble|getBool|getString|getRef|print'
+  function_sma: 'run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print'
   deprecated_sma: 'remove'
 
 contexts:
@@ -52,7 +52,7 @@ contexts:
       scope: keyword.other.sma
       push: native_action
 
-    - match: '\b(use|import|aka|_main_|_define_|_action_|for|if|then|else|while)\b'
+    - match: '\b(use|import|aka|_main_|_define_|_action_|for|if|then|else|while|int|double|string)\b'
       scope: keyword.other.sma
 
     - match: '\s*<<\s*|\s*=>\s*|\s*=:>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
@@ -81,19 +81,22 @@ contexts:
     # while
     # for ...
     # 
-    #- match: '\s*(.*(\s=\s))'
-    - match: '^(?!.*for)\s*(.*\s=)\s'
-      captures:
-         1: source.imperatif
 
-    - match: '^(?:(?!\bfor\b).)\s*(.*--)$'
-      captures:
-         1: source.imperatif
+    # ## ALMOST WORKING
+    # - match: '^(?!.*for)\s*(.*\s=)\s'
+    #   captures:
+    #      1: source.imperatif
 
-    - match: '^(?:(?!\bfor\b).)\s*(.*(?<!C)\+\+)$'
-      captures:
-         1: source.imperatif
+    # - match: '^(?:(?!\bfor\b).)\s*(.*--)$'
+    #   captures:
+    #      1: source.imperatif
 
+    # - match: '^(?:(?!\bfor\b).)\s*(.*(?<!C)\+\+)$'
+    #   captures:
+    #      1: source.imperatif
+    # END OF ALMOST WORKING
+
+    # NOT WORKING YET
     # test for more complex regexp too keep comment and function color
     ## - match: '\s*(.*(\s=\s).*\b({{function_sma}})\b.*)'
     ##   captures:

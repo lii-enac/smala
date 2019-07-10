@@ -440,7 +440,11 @@ namespace Smala
     os << "std::map<std::string, AbstractProperty*> " << sym_name << ";\n";
 
     for (auto e : node->get_expression ()) {
-      if ((((TermNode*)e)->arg_type () == VAR || ((TermNode*)e)->arg_type () == CAST_STRING)&& sym.find (((TermNode*)e)->arg_value ()) == sym.end ()) {
+      if ((((TermNode*) e)->arg_type () == VAR
+          || ((TermNode*) e)->arg_type () == CAST_STRING
+          || ((TermNode*) e)->arg_type () == CAST_DOUBLE
+          || ((TermNode*) e)->arg_type () == CAST_PROCESS)
+          && sym.find (((TermNode*) e)->arg_value ()) == sym.end ()) {
         std::pair<std::string, std::string> arg = parse_symbol (
             ((TermNode*)e)->arg_value ());
         if (arg.first.compare (0, 6, "d_var_") == 0

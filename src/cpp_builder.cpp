@@ -599,7 +599,10 @@ namespace Smala
           os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
               << p_name << ", \"\", " << arg.first << ");\n";
           indent (os);
-          os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+          //os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+          string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            os << native_name << "->"<< new_param_name <<  "= " << new_name
+                << ";\n";
 
         } else if (arg.first.compare (0, 6, "s_var_") == 0) {
           indent (os);
@@ -607,7 +610,10 @@ namespace Smala
           os << "TextProperty *" << new_name << " = new TextProperty ("
               << p_name << ", \"\", " <<arg.first << ");\n";
           indent (os);
-          os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+          //os << sym_name << "[\"" << ((TermNode*)e)->arg_value () << "\"] = " << new_name << ";\n";
+          string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            os << native_name << "->"<< new_param_name <<  "= " << new_name
+                << ";\n";
 
         } else {
           indent (os);

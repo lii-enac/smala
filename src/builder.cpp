@@ -309,23 +309,23 @@ namespace Smala
         }
       case MOVE_FIRST:
         {
-          move (os, node, 0);
+          move (os, node, "FIRST");
           break;
         }
       case MOVE_BEFORE:
         {
-          move (os, node, 1);
+          move (os, node, "BEFORE");
           break;
         }
       case MOVE_AFTER:
         {
-          move (os, node, 2);
+          move (os, node, "AFTER");
           break;
         }
 
       case MOVE_END:
         {
-          move (os, node, 3);
+          move (os, node, "LAST");
           break;
         }
       case END_ASSIGNMENT:

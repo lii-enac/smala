@@ -1062,7 +1062,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::move (std::ofstream &os, Node *node, int c)
+  CPPBuilder::move (std::ofstream &os, Node *node, const string &c)
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);

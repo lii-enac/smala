@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-HandleN (Process frame, Process target, double size) {
+HandleN (Component target, double size) {
 
     /* ----- Interface ----- */
     Double x (0)
@@ -57,8 +57,8 @@ HandleN (Process frame, Process target, double size) {
             //Double x1 (0)
             Double y1 (0)
             ScreenToLocal s2l_mouse (rect)
-            frame.move.x =:> s2l_mouse.inX
-            frame.move.y =:> s2l_mouse.inY
+            handle.move.x =:> s2l_mouse.inX
+            handle.move.y =:> s2l_mouse.inY
             //s2l_mouse.outX =:> x1
             s2l_mouse.outY =:> y1
 
@@ -70,8 +70,8 @@ HandleN (Process frame, Process target, double size) {
         }
 
         idle -> pressed (handle.press)
-        pressed -> idle (frame.release)
-        pressed -> resizing (frame.move)
-        resizing -> idle (frame.release)
+        pressed -> idle (handle.release)
+        pressed -> resizing (handle.move)
+        resizing -> idle (handle.release)
     }
 }

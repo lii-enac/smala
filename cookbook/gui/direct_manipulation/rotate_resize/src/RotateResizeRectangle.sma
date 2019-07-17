@@ -71,39 +71,39 @@ RotateResizeRectangle (Process frame, double x_, double y_) {
 
     //// Resizing handles
 
-    HandleN handleN (frame, this, 10)
+    HandleN handleN (this, 10)
     rect.width /2 =: handleN.x
     0 =: handleN.y
 
-    HandleNE handleNE (frame, this, 10)
+    HandleNE handleNE (this, 10)
     rect.width =: handleNE.x
     0 =: handleNE.y
 
-    HandleE handleE (frame, this, 10)
+    HandleE handleE (this, 10)
     rect.width =: handleE.x
     rect.height /2 =: handleE.y
 
-    HandleSE handleSE (frame, this, 10)
+    HandleSE handleSE (this, 10)
     rect.width =: handleSE.x
     rect.height =: handleSE.y
 
-    HandleS handleS (frame, this, 10)
+    HandleS handleS (this, 10)
     rect.width /2 =: handleS.x
     rect.height =: handleS.y
 
-    HandleSW handleSW (frame, this, 10)
+    HandleSW handleSW (this, 10)
     0 =: handleSW.x
     rect.height =: handleSW.y
 
-    HandleW handleW (frame, this, 10)
+    HandleW handleW (this, 10)
     0 =: handleW.x
     rect.height /2 =: handleW.y
 
-    HandleNW handleNW (frame, this, 10)
+    HandleNW handleNW (this, 10)
     0 =: handleNW.x
     0 =: handleNW.y
 
     //// Drag
     
-    Drag drag (frame, rect, transforms)
+    Drag drag (rect, transforms)
 }

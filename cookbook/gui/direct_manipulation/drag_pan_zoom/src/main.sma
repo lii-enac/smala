@@ -65,7 +65,7 @@ Component root {
       // graphics
       Rectangle rectangle (100, 100, 100, 100, 0, 0)
       // drag
-      Drag drag (frame, rectangle, dragTransform)
+      Drag drag (rectangle, dragTransform)
     }
 
     Component zoomCoordOnly {

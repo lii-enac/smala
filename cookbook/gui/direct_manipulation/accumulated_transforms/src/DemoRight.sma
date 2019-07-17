@@ -30,22 +30,14 @@ DemoRight (Process frame) {
         Text _ (0, -5, "Translate")
         FSM fsm {
             State idle
-            State pressed {
-                ScreenToLocal s2l (rect)
-                frame.press.x =:> s2l.inX
-                frame.press.y =:> s2l.inY
-            }
             State dragging {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
-                s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
+                // Common API for mouse and single touch
+                // to react only to mouse, use rect.mouse.[press|enter|move|leave|release]
+                rect.move.local_x - rect.press.local_x =:> transforms.rightTranslateBy.dx
+                rect.move.local_y - rect.press.local_y =:> transforms.rightTranslateBy.dy
             }
-            idle -> pressed (rect.press)
-            pressed -> idle (frame.release)
-            pressed -> dragging (frame.move)
-            dragging -> idle (frame.release)
+            idle -> dragging (rect.press)
+            dragging -> idle (rect.release)
         }
     }
 
@@ -57,11 +49,8 @@ DemoRight (Process frame) {
         FSM fsm {
             State off
             State on {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX ::> transforms.rightRotateBy.cx
-                s2l.outY ::> transforms.rightRotateBy.cy
+                rect.move.local_x ::> transforms.rightRotateBy.cx
+                rect.move.local_y ::> transforms.rightRotateBy.cy
                 frame.wheel.dy =:> transforms.rightRotateBy.da
             }
             off -> on (rect.enter)
@@ -77,11 +66,8 @@ DemoRight (Process frame) {
         FSM fsm {
             State off
             State on {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX ::> transforms.rightScaleBy.cx
-                s2l.outY ::> transforms.rightScaleBy.cy
+                rect.move.local_x ::> transforms.rightScaleBy.cx
+                rect.move.local_y ::> transforms.rightScaleBy.cy
                 Pow p (1.01, 0)
                 frame.wheel.dy =:> p.exponent
                 p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
@@ -99,11 +85,8 @@ DemoRight (Process frame) {
         FSM fsm {
             State off
             State on {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX ::> transforms.rightSkewXBy.cx
-                s2l.outY ::> transforms.rightSkewXBy.cy
+                rect.move.local_x ::> transforms.rightSkewXBy.cx
+                rect.move.local_y ::> transforms.rightSkewXBy.cy
                 frame.wheel.dy =:> transforms.rightSkewXBy.da
             }
             off -> on (rect.enter)
@@ -119,11 +102,8 @@ DemoRight (Process frame) {
         FSM fsm {
             State off
             State on {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX ::> transforms.rightSkewYBy.cx
-                s2l.outY ::> transforms.rightSkewYBy.cy
+                rect.move.local_x ::> transforms.rightSkewYBy.cx
+                rect.move.local_y ::> transforms.rightSkewYBy.cy
                 frame.wheel.dy =:> transforms.rightSkewYBy.da
             }
             off -> on (rect.enter)
@@ -143,22 +123,14 @@ DemoRight (Process frame) {
         Text _ (0, -5, "TRS")
         FSM fsmDrag {
             State idle
-            State pressed {
-                ScreenToLocal s2l (rect)
-                frame.press.x =:> s2l.inX
-                frame.press.y =:> s2l.inY
-            }
             State dragging {
-                ScreenToLocal s2l (rect)
-                frame.move.x =:> s2l.inX
-                frame.move.y =:> s2l.inY
-                s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
-                s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
+                // Common API for mouse and single touch
+                // to react only to mouse, use rect.mouse.[press|enter|move|leave|release]
+                rect.move.local_x - rect.press.local_x =:> transforms.rightTranslateBy.dx
+                rect.move.local_y - rect.press.local_y =:> transforms.rightTranslateBy.dy
             }
-            idle -> pressed (rect.press)
-            pressed -> idle (frame.release)
-            pressed -> dragging (frame.move)
-            dragging -> idle (frame.release)
+            idle -> dragging (rect.press)
+            dragging -> idle (rect.release)
         }
         Rectangle buttonRotateOrResize (23, 105, 54, 15, 0, 0)
         FillColor _ (50, 50, 50)
@@ -169,11 +141,8 @@ DemoRight (Process frame) {
                 FSM fsmRot {
                     State off
                     State on {
-                        ScreenToLocal s2l (rect)
-                        frame.move.x =:> s2l.inX
-                        frame.move.y =:> s2l.inY
-                        s2l.outX ::> transforms.rightRotateBy.cx
-                        s2l.outY ::> transforms.rightRotateBy.cy
+                        rect.move.local_x ::> transforms.rightRotateBy.cx
+                        rect.move.local_y ::> transforms.rightRotateBy.cy
                         frame.wheel.dy =:> transforms.rightRotateBy.da
                     }
                     off -> on (rect.enter)
@@ -185,11 +154,8 @@ DemoRight (Process frame) {
                 FSM fsm {
                     State off
                     State on {
-                        ScreenToLocal s2l (rect)
-                        frame.move.x =:> s2l.inX
-                        frame.move.y =:> s2l.inY
-                        s2l.outX ::> transforms.rightScaleBy.cx
-                        s2l.outY ::> transforms.rightScaleBy.cy
+                        rect.move.local_x ::> transforms.rightScaleBy.cx
+                        rect.move.local_y ::> transforms.rightScaleBy.cy
                         Pow p (1.01, 0)
                         frame.wheel.dy =:> p.exponent
                         p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy

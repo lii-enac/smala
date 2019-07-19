@@ -288,10 +288,11 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/pinch_zoom \
 	gui/fitts_law \
 	gui/redisplay \
-	gui/widgets/checkbox \
-	gui/widgets/tab \
-	gui/widgets/dial \
 	gui/widgets/button \
+	gui/widgets/checkbox \
+	gui/widgets/dial \
+	gui/widgets/scrollbar \
+	gui/widgets/tab \
 	gui/animation/path_animation \
 	gui/clone \
 	network/helloIvy

@@ -430,6 +430,7 @@ namespace Smala
     string new_param_name = input;
     replace(new_param_name.begin(), new_param_name.end(), '.','_');
     replace(new_param_name.begin(), new_param_name.end(), '/','_');
+    replace(new_param_name.begin(), new_param_name.end(), '-','_');
     new_param_name.erase(std::remove(new_param_name.begin(), new_param_name.end(), '"'), new_param_name.end());
     return new_param_name;
   }

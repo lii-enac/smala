@@ -736,11 +736,13 @@ namespace Smala
         print_error_message (error_level::warning,
                              "duplicated name: " + node->name (), 0);
     }
+    std::string native_edge_name = new_name;
     if (node->is_connector ()) {
       indent (os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
       os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
           << ", \"\", " << new_name << ", \"\");\n";
+      native_edge_name = sync_name;
       for (auto t : triggers) {
         indent (os);
         os << sync_name << "->add_source (" << t << ", \"\");\n";
@@ -749,7 +751,8 @@ namespace Smala
     for (auto out : node->get_output_nodes ()) {
       std::pair<std::string, std::string> arg = parse_symbol (out);
       indent (os);
-      os << "Graph::instance ().add_edge (" << new_name << "," << arg.first;
+      os << native_edge_name <<"->add_native_edge (" << new_name << "," << arg.first;
+      //os << "Graph::instance ().add_edge (" << new_name << "," << arg.first;
       if (arg.second.compare (m_null_string) != 0)
         os << "->find_component (" << arg.second << ")";
       os << ");\n";

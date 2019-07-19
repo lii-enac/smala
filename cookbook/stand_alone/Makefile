@@ -108,7 +108,7 @@ $(exe): $(objs)
 	$(LD) $^ -o $@ $(LDFLAGS) $(LIBS)
 
 # .sma to .cpp, .c etc
-$(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma $(smalac)
+$(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma
 	@mkdir -p $(dir $@)
 	@echo smalac $<
 	@$(smalac) -$(target_lang) $<

@@ -41,10 +41,10 @@ Scrollbar(Process f) {
   // ---------------
   // model
   Component model {
-    DoubleProperty low  (0.75)
-    DoubleProperty high (0.9)
+    Double low  (0.75)
+    Double high (0.9)
     // helper properties
-    DoubleProperty delta (0)
+    Double delta (0)
     high - low =:> delta
   }
   //model.low =:> tp.input
@@ -59,8 +59,8 @@ Scrollbar(Process f) {
   // -----------------
   // transform
   Component transform {
-     DoubleProperty ty (100)
-     DoubleProperty  s (400)
+     Double ty (100)
+     Double  s (400)
      //DoubleProperty rot (45) // not yet
   }
 
@@ -76,7 +76,7 @@ Scrollbar(Process f) {
     FillColor   mtp (150,150,255) // grayblue
     Rectangle thumb (0,0,100,100,0,0)        // =
 
-    // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar layout
+    // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
 
                                                   bg.x = 200.0                                 // FIXME? "200" marche pas, pas de message
                                                   bg.x =:> thumb.x, more_arrow.x, less_arrow.x
@@ -127,13 +127,12 @@ Scrollbar(Process f) {
                      model.delta * transform.s =:> picking_view.initial.thumb.height    // =
                        model.low * transform.s =:> picking_view.initial.less_bg.height  // ||
                                                                                         // v
-     }
+    }
 
     Component hyst {
-      //Translation t(50,50)
       FillColor fc (255, 0, 0)
-      Circle c (0,0, 5)                          // °
-      IntProperty offset (0)
+      Circle    c (0,0, 5)                          // °
+      Int       offset (0)
     }
 
     Component dragging {
@@ -144,7 +143,7 @@ Scrollbar(Process f) {
       FillColor mtp (0,0,255) // b
       Rectangle lower_limit (0,0,100,100,0,0)    // || (!)
      
-        // 'one-way constraint' or data-flow of position/size for a regular scrollbar layout
+        // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
 
 	       upper_limit.y +   upper_limit.height =:> dragging_zone.y
        dragging_zone.y + dragging_zone.height =:> lower_limit.y
@@ -154,7 +153,8 @@ Scrollbar(Process f) {
 	     + (picking_view.hyst.offset - picking_view.initial.thumb.y)
 	     -  picking_view.dragging.upper_limit.y =: picking_view.dragging.upper_limit.height
 
-        transform.s - picking_view.initial.thumb.height =: picking_view.dragging.dragging_zone.height
+        transform.s
+          - picking_view.initial.thumb.height =: picking_view.dragging.dragging_zone.height
     } 
   }
 
@@ -193,7 +193,7 @@ Scrollbar(Process f) {
      -model.delta =: p.dv
     }
 
-    State paging_still {}
+    State paging_still
 
     State waiting_hyst {
       // change picking state

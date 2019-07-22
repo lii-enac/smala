@@ -49,6 +49,7 @@ paging(Process model, Process f) {
     
     // ... and repeats it as long as the component is activated
     FSM fsm {
+        State idle
         State veryfirst {
             Clock clock (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!
             clock.tick -> incr_low, incr_high
@@ -66,6 +67,9 @@ paging(Process model, Process f) {
         veryfirst -> first (veryfirst.clock.tick)
         //veryfirst -> first (veryfirst.s)
         first -> others (first.clock.tick)
+        //first -> veryfirst (f.release)
    }
    //fsm.state =:> tp.input
+   this  -> fsm.veryfirst
+   this !-> fsm.idle
 }

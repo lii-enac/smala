@@ -25,9 +25,17 @@ Component root {
   f.close -> ex
 
   Scrollbar sb(f)
-  0 =: sb.transform.tx
-  100 =: sb.transform.ty
+  50 =: sb.transform.tx
+  75 =: sb.transform.ty
   300 =: sb.transform.s
+  50 =: sb.width
+  50 =: sb.arrow_height
+
+  TextPrinter tp
+  "low:   "+isString(sb.model.low) =:> tp.input
+  "high:  "+isString(sb.model.high) =:> tp.input
+  "delta: "+isString(sb.model.delta) =:> tp.input
+  //"--" =:> tp.input
 }
 
 run root

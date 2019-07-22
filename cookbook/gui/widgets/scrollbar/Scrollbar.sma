@@ -67,68 +67,71 @@ Scrollbar(Process f) {
 
   // -----------------
   // display view
-  Component display_view {
+  Double width (100)
+  Double arrow_height(100)
 
-    FillColor    ac (255,255,255) // white
-    Rectangle   more_arrow (0,0,100,100,0,0) // ^
-    Rectangle   less_arrow (0,0,100,100,0,0) // v
-    FillColor   mtc (200,200,200) // gray
-    Rectangle    bg (0,0,100,100,0,0)        // []
-    FillColor   mtp (150,150,255) // grayblue
-    Rectangle thumb (0,0,100,100,0,0)        // =
+  NoOutline _
+
+  Component display_view {
+    FillColor   _ (255,255,255) // white
+    Rectangle   more_arrow (0,0,1,1,0,0) // ^
+    FillColor   _ (200,200,200) // gray
+    Rectangle   bg (0,0,1,1,0,0)        // []
+    FillColor   _ (150,150,255) // grayblue
+    Rectangle   thumb (0,0,1,1,0,0)        // =
+    FillColor   _ (255,255,255) // white
+    Rectangle   less_arrow (0,0,1,1,0,0) // v
 
     // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
 
-                                          transform.tx =:> bg.x, thumb.x, more_arrow.x, less_arrow.x
+                                         width =:> more_arrow.width, bg.width, thumb.width, less_arrow.width
+                                  arrow_height =:> more_arrow.height, less_arrow.height
+                                  transform.tx =:> more_arrow.x, bg.x, thumb.x, less_arrow.x
 
-                              bg.y - more_arrow.height =:> more_arrow.y
-	                            bg.y +         bg.height =:> less_arrow.y
+                                  transform.ty =:> more_arrow.y 
+              more_arrow.y + more_arrow.height =:> bg.y
+                      bg.y +         bg.height =:> less_arrow.y
 
-
-     // transformation of model into display view for background and thumb
-
-                      transform.ty + more_arrow.height =:> bg.y
-                                           transform.s =:> bg.height
-
-                   (1-model.high) * transform.s + bg.y =:> thumb.y
-                             model.delta * transform.s =:> thumb.height
+    // transformation of model into display view for background and thumb
+                               1 * transform.s =:> bg.height
+           (1-model.high) * transform.s + bg.y =:> thumb.y
+                     model.delta * transform.s =:> thumb.height
   }
 
   // -----------------
   // picking view
   // a picking view has a state that depends on the status of the interaction (see controller)
-  Int offset(200)
+  Int xoffset(200)
 
   Switch picking_view (initial) {
 
     Component initial {
       FillColor mac (0,255,0)//green
-      Rectangle more_arrow (0,0,100,100,0,0)  // ^
+      Rectangle more_arrow (0,0,1,1,0,0)  // ^
       FillColor mtb (0,255,255)//cyan
-      Rectangle more_bg (0,0,100,100,0,0)     // ||
+      Rectangle more_bg (0,0,1,1,0,0)     // ||
       FillColor mtc (255,0,255)//purple
-      Rectangle thumb (0,0,100,100,0,0)       // =
+      Rectangle thumb (0,0,1,1,0,0)       // =
       FillColor ltc (255,255,0)//yellow
-      Rectangle less_bg (0,0,100,100,0,0)     // ||
+      Rectangle less_bg (0,0,1,1,0,0)     // ||
       FillColor lac (255,0,0)//red
-      Rectangle less_arrow (0,0,100,100,0,0)  // v
+      Rectangle less_arrow (0,0,1,1,0,0)  // v
      
-        // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
-                         transform.tx + offset =:> more_arrow.x, more_bg.x, thumb.x, less_bg.x, less_arrow.x
+      // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
+                                         width =:> more_bg.width, less_bg.width, thumb.width, more_arrow.width, less_arrow.width
+                                  arrow_height =:> more_arrow.height, less_arrow.height
+                        transform.tx + xoffset =:> more_arrow.x, more_bg.x, thumb.x, less_bg.x, less_arrow.x
 
-                                            // =:> more_arrow.y  // ^
-              more_arrow.y + more_arrow.height =:> more_bg.y     // ||
-                 more_bg.y + more_bg.height    =:> thumb.y       // =
-                 thumb.y   +   thumb.height    =:> less_bg.y     // ||
-                 less_bg.y + less_bg.height    =:> less_arrow.y  // v  
+                                  transform.ty =:> more_arrow.y    // ^ 
+              more_arrow.y + more_arrow.height =:> more_bg.y       // ||
+                 more_bg.y + more_bg.height    =:> thumb.y         // =
+                   thumb.y +   thumb.height    =:> less_bg.y       // ||
+                 less_bg.y + less_bg.height    =:> less_arrow.y    // v  
 
-	      // transformation of model into picking view for background and thumb
-
-                                  transform.ty =:> picking_view.initial.more_arrow.y    // ^     
-                (1 - model.high) * transform.s =:> picking_view.initial.more_bg.height  // ||
-                     model.delta * transform.s =:> picking_view.initial.thumb.height    // =
-                       model.low * transform.s =:> picking_view.initial.less_bg.height  // ||
-                                                                                        // v
+	    // transformation of model into picking view for background and thumb                   
+                (1 - model.high) * transform.s =:> more_bg.height  // ||
+                     model.delta * transform.s =:> thumb.height    // =
+                       model.low * transform.s =:> less_bg.height  // ||
     }
 
     Component hyst {
@@ -139,25 +142,26 @@ Scrollbar(Process f) {
 
     Component dragging {
       FillColor mac (255,0,0) // r
-      Rectangle upper_limit (0,0,100,100,0,0)    // || (!)
+      Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
       FillColor mtc (0,255,0) // g
-      Rectangle dragging_zone (0,0,100,100,0,0)  // || (=)
+      Rectangle dragging_zone (0,0,1,1,0,0)  // || (=)
       FillColor mtp (0,0,255) // b
-      Rectangle lower_limit (0,0,100,100,0,0)    // || (!)
+      Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
      
-        // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
-                        transform.tx + offset =:> upper_limit.x, dragging_zone.x, lower_limit.x
+      // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
+                                         width =:> upper_limit.width, dragging_zone.width, lower_limit.width
+                        transform.tx + xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
-	       upper_limit.y +   upper_limit.height =:> dragging_zone.y
-       dragging_zone.y + dragging_zone.height =:> lower_limit.y
-	            f.height -        lower_limit.y =:> lower_limit.height
+	        upper_limit.y +   upper_limit.height =:> dragging_zone.y
+        dragging_zone.y + dragging_zone.height =:> lower_limit.y
+	             f.height -        lower_limit.y =:> lower_limit.height
 
-          picking_view.initial.more_bg.y
-	     + (picking_view.hyst.offset - picking_view.initial.thumb.y)
-	     -  picking_view.dragging.upper_limit.y =: picking_view.dragging.upper_limit.height
+           picking_view.initial.more_bg.y
+	      + (picking_view.hyst.offset - picking_view.initial.thumb.y)
+	      -  upper_limit.y                       =:> upper_limit.height
 
-        transform.s
-          - picking_view.initial.thumb.height =: picking_view.dragging.dragging_zone.height
+           transform.s
+           - picking_view.initial.thumb.height =:> dragging_zone.height
     } 
   }
 

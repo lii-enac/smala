@@ -221,6 +221,10 @@ Scrollbar(Process f) {
       	 Double dv (0)
 	       //Double zero (0)
 
+         // cycle
+        dv + model.low  =:> model.low
+        dv + model.high =:> model.high
+/*
 	       //  simulate dv + model.low =:> model.low and avoid cycle
 	                     0 =:  add_low.result
 	             model.low =:  add_low.input
@@ -232,7 +236,7 @@ Scrollbar(Process f) {
 	            model.high =:  add_high.input
                       dv =:> add_high.input
          add_high.result =:> model.high
-
+*/
       	 Double dy (0)
       	 //Double cldv (0)
 

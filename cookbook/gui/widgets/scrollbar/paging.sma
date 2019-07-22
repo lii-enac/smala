@@ -19,8 +19,25 @@ import clamp
 
 _define_
 paging(Process model, Process f) {
-    DoubleProperty dv (0) // must be flowed-in by the client
+    Double dv (0) // amount of paging in model unit, must be flowed-in by the client
 
+    Double dvclamped (0)
+    Double maxdv(0)
+    Double mindv(0)
+
+    (1-model.high) =:> maxdv
+    model.low =:> mindv
+          
+    (dv > 0)
+        ? (
+             dv < maxdv ? dv :  maxdv // FIXME: cycle eventually
+        )
+        : (
+            -dv < mindv ? dv : -mindv
+        )
+        =:> dvclamped
+
+    // when dv changed, performs an incr operation on the model...
     Incr incr_low  (0)
     Incr incr_high (0)
 
@@ -29,35 +46,17 @@ paging(Process model, Process f) {
 
          model.high =: incr_high.state
     incr_high.state =:> model.high
-
-    //dv =:> incr_low.delta, incr_high.delta
-    DoubleProperty dvclamped (0)
-    DoubleProperty maxdv(0)
-    DoubleProperty mindv(0)
-
-    (1-model.high) =:> maxdv
-    model.low =:> mindv
-          
-    (dv > 0)
-    ? (
-          dv < maxdv ? dv : maxdv // FIXME: cycle eventually
-    )
-    : (
-         -dv < mindv ? dv : -mindv
-    )
-    =:> dvclamped
-
     
     dvclamped =:> incr_low.delta, incr_high.delta
     //dvclamped =:> incr_high.delta, incr_low.delta
-    TextPrinter tp
+    //TextPrinter tp
     //incr_high.state =:> tp.input
     //incr_low.state =:> tp.input
     //incr_low.delta =:> tp.input
     //dv => tp.input
     //dvclamped =:> tp.input
 
-
+    // ... and repeats it as long as the component is activated
     FSM fsm {
         State veryfirst {
             Clock clock (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!

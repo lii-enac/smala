@@ -18,8 +18,8 @@
 // D = display view - what the user actually sees
 // P = picking view - what the user actually manipulates, without seeing it
 // C = controller - manages interactive state and _triggers_ the translation of user's actions into model operations
-// transformation = transforms the model into the display and the picking views
-// inverse transformation = inverse-transforms user's actions and _performs_ the translation into model operations
+// transform = transforms the model into the display and the picking views
+// inverse transform = inverse transforms user's actions and _performs_ the translation into model operations
 
 // see:
 // Conversy, S., Barboni, E., Navarre, D., Palanque, P. Improving modularity of interactive software with the MDPC architecture. IFIP EIS 2007.
@@ -95,6 +95,7 @@ Scrollbar(Process f) {
 
   // -----------------
   // picking view
+  // a picking view has a state that depends on the status of the interaction (see controller)
   Switch picking_view (initial) {
 
     Component initial {
@@ -232,11 +233,11 @@ Scrollbar(Process f) {
                       dv =:> add_high.input
          add_high.result =:> model.high
 
-      	 DoubleProperty dy (0)
-      	 //DoubleProperty cldv (0)
+      	 Double dy (0)
+      	 //Double cldv (0)
 
 	       // actual inverse transformation
-	       DoubleProperty y (0)
+	       Double y (0)
 	       // FIXME, dependance with view layout, clamping of event coordinate should be implemented in scene graph ?
 	       // or receive dragging_zone.move and leave only
 	       //f.move.y =:> y

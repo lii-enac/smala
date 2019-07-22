@@ -17,7 +17,7 @@ use base
 
 _define_
 clamp(Process in, Process min, Process max, Process out) {
-	TextPrinter tp
-	in =:> tp.input
-  (in < min) ? min : ( in > max ? max : in) =:> out
+	//TextPrinter tp
+	//in =:> tp.input
+  	(in < min) ? min : ( in > max ? max : in) =:> out
 }

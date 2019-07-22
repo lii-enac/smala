@@ -37,7 +37,6 @@ import clamp
 _define_
 Scrollbar(Process f) {
   //TextPrinter tp
-  //f.move.y =:> tp.input
 
   // ---------------
   // model
@@ -68,15 +67,16 @@ Scrollbar(Process f) {
   // -----------------
   // display view
   Component display_view {
-     FillColor   mac (255,255,255) // white
-     Rectangle   more_arrow (0,0,100,100,0,0) // ^
-     Rectangle   less_arrow (0,0,100,100,0,0) // v
-     FillColor   mtc (200,200,200) // gray
-     Rectangle    bg (0,0,100,100,0,0)        // []
-     FillColor   mtp (150,150,255) // grayblue
-     Rectangle thumb (0,0,100,100,0,0)        // =
 
-     // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar layout
+    FillColor    ac (255,255,255) // white
+    Rectangle   more_arrow (0,0,100,100,0,0) // ^
+    Rectangle   less_arrow (0,0,100,100,0,0) // v
+    FillColor   mtc (200,200,200) // gray
+    Rectangle    bg (0,0,100,100,0,0)        // []
+    FillColor   mtp (150,150,255) // grayblue
+    Rectangle thumb (0,0,100,100,0,0)        // =
+
+    // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar layout
 
                                                   bg.x = 200.0                                 // FIXME? "200" marche pas, pas de message
                                                   bg.x =:> thumb.x, more_arrow.x, less_arrow.x
@@ -88,8 +88,10 @@ Scrollbar(Process f) {
      // transformation of model into display view for background and thumb
 
                       transform.ty + more_arrow.height =:> bg.y
-                                           transform.s =:> bg.height     
-     (1-model.high) * transform.s + transform.ty + 100 =:> thumb.y
+                                           transform.s =:> bg.height
+
+     (1-model.high) * transform.s + transform.ty
+                                   + more_arrow.height =:> thumb.y
                   (model.high-model.low) * transform.s =:> thumb.height
   }
 
@@ -99,55 +101,54 @@ Scrollbar(Process f) {
   Switch picking_view (initial) {
 
     Component initial {
-        FillColor mac (0,255,0)//green
-        Rectangle more_arrow (0,0,100,100,0,0)  // ^
-        FillColor mtb (0,255,255)//cyan
-        Rectangle more_bg (0,0,100,100,0,0)     // []
-        FillColor mtc (255,0,255)//purple
-        Rectangle thumb (0,0,100,100,0,0)       // =
-        FillColor ltc (255,255,0)//yellow
-        Rectangle less_bg (0,0,100,100,0,0)     // []
-        FillColor lac (255,0,0)//red
-        Rectangle less_arrow (0,0,100,100,0,0)  // v
+      FillColor mac (0,255,0)//green
+      Rectangle more_arrow (0,0,100,100,0,0)  // ^
+      FillColor mtb (0,255,255)//cyan
+      Rectangle more_bg (0,0,100,100,0,0)     // ||
+      FillColor mtc (255,0,255)//purple
+      Rectangle thumb (0,0,100,100,0,0)       // =
+      FillColor ltc (255,255,0)//yellow
+      Rectangle less_bg (0,0,100,100,0,0)     // ||
+      FillColor lac (255,0,0)//red
+      Rectangle less_arrow (0,0,100,100,0,0)  // v
      
-        // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar layout
+        // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
 
                                             // =:> more_arrow.y  // ^
-              more_arrow.y + more_arrow.height =:> more_bg.y     // []
+              more_arrow.y + more_arrow.height =:> more_bg.y     // ||
                  more_bg.y + more_bg.height    =:> thumb.y       // =
-                 thumb.y   +   thumb.height    =:> less_bg.y     // []
+                 thumb.y   +   thumb.height    =:> less_bg.y     // ||
                  less_bg.y + less_bg.height    =:> less_arrow.y  // v  
 
-	      // transformation of model into display view for background and thumb
+	      // transformation of model into picking view for background and thumb
 
                                   transform.ty =:> picking_view.initial.more_arrow.y    // ^     
-                (1 - model.high) * transform.s =:> picking_view.initial.more_bg.height  // []
-        (model.high - model.low) * transform.s =:> picking_view.initial.thumb.height    // =
-                     (model.low) * transform.s =:> picking_view.initial.less_bg.height  // []
+                (1 - model.high) * transform.s =:> picking_view.initial.more_bg.height  // ||
+                     model.delta * transform.s =:> picking_view.initial.thumb.height    // =
+                       model.low * transform.s =:> picking_view.initial.less_bg.height  // ||
                                                                                         // v
      }
 
     Component hyst {
-        //Translation t(50,50)
-        FillColor fc (255, 0, 0)
-        Circle c (0,0, 5)                          // °
-
-	      IntProperty offset (0)
+      //Translation t(50,50)
+      FillColor fc (255, 0, 0)
+      Circle c (0,0, 5)                          // °
+      IntProperty offset (0)
     }
 
     Component dragging {
-        FillColor mac (255,0,0) // r
-        Rectangle upper_limit (0,0,100,100,0,0)    // [] (!)
-        FillColor mtc (0,255,0) // g
-        Rectangle dragging_zone (0,0,100,100,0,0)  // [] (=)
-        FillColor mtp (0,0,255) // b
-        Rectangle lower_limit (0,0,100,100,0,0)    // [] (!)
+      FillColor mac (255,0,0) // r
+      Rectangle upper_limit (0,0,100,100,0,0)    // || (!)
+      FillColor mtc (0,255,0) // g
+      Rectangle dragging_zone (0,0,100,100,0,0)  // || (=)
+      FillColor mtp (0,0,255) // b
+      Rectangle lower_limit (0,0,100,100,0,0)    // || (!)
      
         // 'one-way constraint' or data-flow of position/size for a regular scrollbar layout
 
-	      upper_limit.y +   upper_limit.height =:> dragging_zone.y
-      dragging_zone.y + dragging_zone.height =:> lower_limit.y
-	           f.height -        lower_limit.y =:> lower_limit.height
+	       upper_limit.y +   upper_limit.height =:> dragging_zone.y
+       dragging_zone.y + dragging_zone.height =:> lower_limit.y
+	            f.height -        lower_limit.y =:> lower_limit.height
 
           picking_view.initial.more_bg.y
 	     + (picking_view.hyst.offset - picking_view.initial.thumb.y)
@@ -158,46 +159,46 @@ Scrollbar(Process f) {
   }
 
   // -----------------
-  // controller = FSM + switch
+  // controller = management of interactive state with an FSM
 
   IntProperty lasty (0)
 
-  Switch sw (idle) {
+  FSM fsm {
 
-    Component idle {
+    State idle {
+      // change picking state
       TextProperty pv_state ("initial")
       pv_state =: picking_view.state
     }
 
-    Component onelining_up {
-    	 paging p(model, f)
-	     Double dv (0.1)
-            dv =: p.dv
+    State onelining_up {
+      paging p(model, f)
+      Double dv (0.1)
+      dv =: p.dv
     }
 
-    Component onelining_down {
-    	 paging p(model, f)
-	     Double dv (-0.1)
-            dv =: p.dv
+    State onelining_down {
+      paging p(model, f)
+      Double dv (-0.1)
+      dv =: p.dv
     }
 
-    Component paging_up {
-    	  paging p(model, f)
-        model.delta =: p.dv
+    State paging_up {
+      paging p(model, f)
+      model.delta =: p.dv
     }
 
-    Component paging_down {
-    	  paging p(model, f)
-        -model.delta =: p.dv
+    State paging_down {
+      paging p(model, f)
+     -model.delta =: p.dv
     }
 
-    Component paging_still {}
+    State paging_still {}
 
-    Component waiting_hyst {
+    State waiting_hyst {
+      // change picking state
       TextProperty pv_state ("hyst")
        pv_state =: picking_view.state
-
-	    //f.press.y =:> tp.input
 
       f.press.x =: picking_view.hyst.c.cx
       f.press.y =: picking_view.hyst.c.cy
@@ -206,127 +207,89 @@ Scrollbar(Process f) {
       f.press.y =: lasty
     }
 
-    Component dragging {
+    State dragging {
+      // change picking state
       TextProperty pv_state ("dragging")
       pv_state =: picking_view.state
       
-      /*DoubleProperty save_low (0)
-      DoubleProperty save_high (0)
-      model.low =: save_low
-      model.high =: save_high*/
-
-      // inverse transformation
+      // inverse transform from user actions to model operations
       Component inverse_transform {
-      	 // first setup dataflow to translate from user's actions to model operations
-      	 Double dv (0)
-	       //Double zero (0)
+        Double dv (0)
+        Double dy (0)
+        Double y (0)
 
-         // cycle
-        dv + model.low  =:> model.low
-        dv + model.high =:> model.high
-/*
-	       //  simulate dv + model.low =:> model.low and avoid cycle
-	                     0 =:  add_low.result
-	             model.low =:  add_low.input
-                      dv =:> add_low.input
-          add_low.result =:> model.low
+        // FIXME: dependency with view layout, clamping of event coordinate should be implemented in scene graph ?
+        // or receive dragging_zone.move and leave only
+        clamp clamp_ (f.move.y, picking_view.dragging.dragging_zone.y, picking_view.dragging.lower_limit.y, y)
 
-	       //  simulate dv + model.high =:> model.high and avoid cycle
-	                     0 =:  add_high.result
-	            model.high =:  add_high.input
-                      dv =:> add_high.input
-         add_high.result =:> model.high
-*/
-      	 Double dy (0)
-      	 //Double cldv (0)
+        AssignmentSequence as(0) {
+          lasty - y =: dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
+          dy / transform.s =: dv
 
-	       // actual inverse transformation
-	       Double y (0)
-	       // FIXME, dependance with view layout, clamping of event coordinate should be implemented in scene graph ?
-	       // or receive dragging_zone.move and leave only
-	       //f.move.y =:> y
-	       clamp clamp_ (f.move.y, picking_view.dragging.dragging_zone.y, picking_view.dragging.lower_limit.y, y)
+          // apply to model
+          dv + model.low  =: model.low
+          dv + model.high =: model.high
 
-               lasty - y =:> dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
-	      dy / transform.s =:> dv
-
-        //save_low + dv =:> model.low
-        //save_high + dv =:> model.high
-
-        //dy =:> tp.input
-
-	       //            cldv =:> dv
-         //(cldv > 1-model.high) ? 1-model.high : cldv =:> dv
-
-	       // update interaction state
-	       //f.move.y =:> lastY
-	       y =:> lasty
+          // remember last pos
+          y =: lasty
+        }
+        f.move -> as
       }
     }
     
-    Component in_upper_zone {
+    State in_upper_zone {
+      AssignmentSequence _(0) {
+        1 - model.delta =: model.low
+        1 =: model.high
+      }
     }
 
-    Component in_lower_zone {
+    State in_lower_zone {
+      AssignmentSequence _(0) {
+        0 =: model.low
+        model.delta =: model.high
+      }
     }
 
-  }
-
-  FSM fsm {
-    State idle
-
-    State onelining_up
-    State onelining_down
-
-    State paging_up
-    State paging_still
-    State paging_down
-
-    State waiting_hyst
-    State dragging
-    State in_upper_zone
-    State in_lower_zone
-    
-
-             idle -> onelining_up   (picking_view.initial.more_arrow.press)     // ^
-             idle -> onelining_down (picking_view.initial.less_arrow.press)     // v
+    // transitions
+                                                                                //   UAN User-Action Notation https://www.semanticscholar.org/paper/The-UAN%3A-A-User-Oriented-Representation-for-Direct-Hartson-Siochi/97a593273fca9460ce05f32031896b752de4dcb9/figure/16
+             idle -> onelining_up   (picking_view.initial.more_arrow.press)     //  [^]v
+             idle -> onelining_down (picking_view.initial.less_arrow.press)     //  [v]v
 
      onelining_up -> idle           (f.release)
    onelining_down -> idle           (f.release)
 
-             idle -> paging_up      (picking_view.initial.more_bg.press)        // [] *
-             idle -> paging_down    (picking_view.initial.less_bg.press)        // [] *
+             idle -> paging_up      (picking_view.initial.more_bg.press)        //  [||]v
+             idle -> paging_down    (picking_view.initial.less_bg.press)        //  [||]v
 
-      paging_down -> paging_up      (picking_view.initial.more_bg.enter)        // [] <-
-        paging_up -> paging_down    (picking_view.initial.less_bg.enter)        // [] <-
+      paging_down -> paging_up      (picking_view.initial.more_bg.enter)        // ~[||]
+        paging_up -> paging_down    (picking_view.initial.less_bg.enter)        // ~[||]
       
-        paging_up -> paging_still   (picking_view.initial.thumb.enter)          //  = <-
-      paging_down -> paging_still   (picking_view.initial.thumb.enter)          //  = <-
+        paging_up -> paging_still   (picking_view.initial.thumb.enter)          // ~[=]
+      paging_down -> paging_still   (picking_view.initial.thumb.enter)          // ~[=]
 
-     paging_still -> paging_up      (picking_view.initial.more_bg.enter)        // [] <-
-     paging_still -> paging_down    (picking_view.initial.less_bg.enter)        // [] <-
+     paging_still -> paging_up      (picking_view.initial.more_bg.enter)        // ~[||]
+     paging_still -> paging_down    (picking_view.initial.less_bg.enter)        // ~[||]
 
-        paging_up -> idle           (f.release)                                 // °
-     paging_still -> idle           (f.release)                                 // °
-      paging_down -> idle           (f.release)                                 // °
+        paging_up -> idle           (f.release)                                 //  ^
+     paging_still -> idle           (f.release)                                 //  ^
+      paging_down -> idle           (f.release)                                 //  ^
 
-             idle -> waiting_hyst   (picking_view.initial.thumb.press)          // o * 
-     waiting_hyst -> idle           (f.release)                                 // °
-     waiting_hyst -> dragging       (picking_view.hyst.c.leave)                 // o ->   // FIXME does not work with fast movements
+             idle -> waiting_hyst   (picking_view.initial.thumb.press)          //  [=]v 
+     waiting_hyst -> idle           (f.release)                                 //  ^
+     waiting_hyst -> dragging       (picking_view.hyst.c.leave)                 //  [o]~   // FIXME does not work with fast movements
 
-         dragging -> dragging       (f.move)                                    // <->
-         dragging -> idle           (f.release)                                 // °
+         //dragging -> dragging       (f.move)                                  //  ~    // in state
+         dragging -> idle           (f.release)                                 //  ^
 
-         dragging -> in_upper_zone  (picking_view.dragging.upper_limit.enter)   // _ <-   // FIXME no message/warning when path is erroneous
-    in_upper_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // = <-
+         dragging -> in_upper_zone  (picking_view.dragging.upper_limit.enter)   // ~[-]   // FIXME no message/warning when path is erroneous
+    in_upper_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]
 
-         dragging -> in_lower_zone  (picking_view.dragging.lower_limit.enter)   // - <-
-    in_lower_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // = <-
+         dragging -> in_lower_zone  (picking_view.dragging.lower_limit.enter)   // ~[_]
+    in_lower_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]
 
-    in_lower_zone -> idle           (f.release)                                 // *^
-    in_upper_zone -> idle           (f.release)                                 // *^
+    in_lower_zone -> idle           (f.release)                                 //  ^
+    in_upper_zone -> idle           (f.release)                                 //  ^
   }
-
-  fsm.state =:> sw.state // FIXME: no check that state names match
-  //sw.state  =:> tp.input
+  //fsm.state  =:> tp.input
 }

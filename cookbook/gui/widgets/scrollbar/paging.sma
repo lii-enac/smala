@@ -47,34 +47,38 @@ paging(Process model, Process f) {
     )
     =:> dvclamped
 
-    TextPrinter tp
-
-    //dv =:> tp.input
+    
     dvclamped =:> incr_low.delta, incr_high.delta
     //dvclamped =:> incr_high.delta, incr_low.delta
+    TextPrinter tp
     //incr_high.state =:> tp.input
     //incr_low.state =:> tp.input
-    incr_low.delta =:> tp.input
+    //incr_low.delta =:> tp.input
+    //dv => tp.input
+    //dvclamped =:> tp.input
 
 
     FSM fsm {
         State veryfirst {
-            Clock timer (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!
-            timer -> incr_low, incr_high
+            Clock clock (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!
+            clock.tick -> incr_low, incr_high
             //"tick" =:> tp.input
+            //Spike s
+            //s -> incr_low, incr_high
         }
         State first {
-            Clock timer (250)
-            timer -> incr_low, incr_high
+            Clock clock (250)
+            clock.tick -> incr_low, incr_high
         }
         State others {
-            Clock timer (80)
-            timer -> incr_low, incr_high
+            Clock clock (80)
+            clock.tick -> incr_low, incr_high
         }
-        veryfirst -> first (veryfirst.timer.tick)
-        first -> others (first.timer.tick)
+        veryfirst -> first (veryfirst.clock.tick)
+        //veryfirst -> first (veryfirst.s)
+        first -> others (first.clock.tick)
     //others -> first (f.release)
     //first -> others on first.timer.tick activate truc
    }
-   fsm.state =:> tp.input
+   //fsm.state =:> tp.input
 }

@@ -34,25 +34,13 @@ use gui
 import paging
 import clamp
 
-
-_action_
-null_func (Process c) 
-%{
-	
-%} // FIXME binding bug
-
-_action_
-myPrint (Process c)
-%{
-  printf("timer\n");
-%}
-
 _define_
 Scrollbar(Process f) {
   TextPrinter tp
 
   //f.move.y =:> tp.input
 
+  // ---------------
   // model
   Component model {
     DoubleProperty low  (0.75)
@@ -69,13 +57,15 @@ Scrollbar(Process f) {
   Incr incr_low(0)
   Incr incr_high(0)
 
-  // transform attributes
+  // -----------------
+  // transform
   Component transform {
      DoubleProperty ty (100)
      DoubleProperty  s (400)
      //DoubleProperty rot (45) // not yet
   }
 
+  // -----------------
   // display view
   Component display_view {
      FillColor   mac (255,255,255) // white
@@ -103,6 +93,7 @@ Scrollbar(Process f) {
                   (model.high-model.low) * transform.s =:> thumb.height
   }
 
+  // -----------------
   // picking view
   Switch picking_view (initial) {
 
@@ -132,7 +123,7 @@ Scrollbar(Process f) {
                 (1 - model.high) * transform.s =:> picking_view.initial.more_bg.height  // []
         (model.high - model.low) * transform.s =:> picking_view.initial.thumb.height    // =
                      (model.low) * transform.s =:> picking_view.initial.less_bg.height  // []
-                                                                                       // v
+                                                                                        // v
      }
 
     Component hyst {
@@ -165,11 +156,10 @@ Scrollbar(Process f) {
     } 
   }
 
-  // "controler" = FSM + switch
+  // -----------------
+  // controller = FSM + switch
 
   IntProperty lasty (0)
-  //DoubleProperty delta(0)
-  //model.delta =: delta
 
   Switch sw (idle) {
 
@@ -180,29 +170,24 @@ Scrollbar(Process f) {
 
     Component onelining_up {
     	 paging p(model, f)
-	     DoubleProperty dv (0.1)
+	     Double dv (0.1)
             dv =: p.dv
     }
 
     Component onelining_down {
     	 paging p(model, f)
-	     DoubleProperty dv (-0.1)
+	     Double dv (-0.1)
             dv =: p.dv
     }
 
-
     Component paging_up {
     	  paging p(model, f)
-        //model.high - model.low =: p.dv
         model.delta =: p.dv
-        //delta =: p.dv
     }
 
     Component paging_down {
     	  paging p(model, f)
-        //model.low - model.high =: p.dv
         -model.delta =: p.dv
-        //-delta =: p.dv
     }
 
     Component paging_still {}
@@ -284,22 +269,6 @@ Scrollbar(Process f) {
 
   }
 
-  // FIXME binding bug
-  NativeAction na_null_func  (null_func, 1)
-
-  picking_view.initial.more_arrow.press->na_null_func
-  picking_view.initial.more_bg.press->na_null_func
-  picking_view.initial.thumb.press->na_null_func
-  picking_view.initial.less_bg.press->na_null_func
-  picking_view.initial.less_arrow.press->na_null_func
-
-  picking_view.hyst.c->na_null_func
-
-  picking_view.dragging.lower_limit->na_null_func
-  picking_view.dragging.dragging_zone->na_null_func
-  picking_view.dragging.upper_limit->na_null_func
-
-
   FSM fsm {
     State idle
 
@@ -316,43 +285,43 @@ Scrollbar(Process f) {
     State in_lower_zone
     
 
-             idle -> onelining_up    (picking_view.initial.more_arrow.press) // ^
-             idle -> onelining_down  (picking_view.initial.less_arrow.press) // v
+             idle -> onelining_up   (picking_view.initial.more_arrow.press)    // ^
+             idle -> onelining_down (picking_view.initial.less_arrow.press)    // v
 
-     onelining_up -> idle         (f.release)
-   onelining_down -> idle         (f.release)
+     onelining_up -> idle           (f.release)
+   onelining_down -> idle           (f.release)
 
-             idle -> paging_up    (picking_view.initial.more_bg.press)       // [] *
-             idle -> paging_down  (picking_view.initial.less_bg.press)       // [] *
+             idle -> paging_up      (picking_view.initial.more_bg.press)       // [] *
+             idle -> paging_down    (picking_view.initial.less_bg.press)       // [] *
 
-      paging_down -> paging_up    (picking_view.initial.more_bg.enter)       // [] <-
-        paging_up -> paging_down  (picking_view.initial.less_bg.enter)       // [] <-
+      paging_down -> paging_up      (picking_view.initial.more_bg.enter)       // [] <-
+        paging_up -> paging_down    (picking_view.initial.less_bg.enter)       // [] <-
       
-        paging_up -> paging_still (picking_view.initial.thumb.enter)         //  = <-
-      paging_down -> paging_still (picking_view.initial.thumb.enter)         //  = <-
+        paging_up -> paging_still   (picking_view.initial.thumb.enter)         //  = <-
+      paging_down -> paging_still   (picking_view.initial.thumb.enter)         //  = <-
 
-     paging_still -> paging_up    (picking_view.initial.more_bg.enter)       // [] <-
-     paging_still -> paging_down  (picking_view.initial.less_bg.enter)       // [] <-
+     paging_still -> paging_up      (picking_view.initial.more_bg.enter)       // [] <-
+     paging_still -> paging_down    (picking_view.initial.less_bg.enter)       // [] <-
 
-        paging_up -> idle         (f.release)                                // °
-     paging_still -> idle         (f.release)                                // °
-      paging_down -> idle         (f.release)                                // °
+        paging_up -> idle           (f.release)                                // °
+     paging_still -> idle           (f.release)                                // °
+      paging_down -> idle           (f.release)                                // °
 
-             idle -> waiting_hyst (picking_view.initial.thumb.press)         // o * 
-     waiting_hyst -> idle         (f.release)                                // °
-     waiting_hyst -> dragging     (picking_view.hyst.c.leave)                // o ->   // FIXME does not work with fast movements
+             idle -> waiting_hyst   (picking_view.initial.thumb.press)         // o * 
+     waiting_hyst -> idle           (f.release)                                // °
+     waiting_hyst -> dragging       (picking_view.hyst.c.leave)                // o ->   // FIXME does not work with fast movements
 
-         dragging -> dragging     (f.move)                                   // <->
-         dragging -> idle         (f.release)                                // °
+         dragging -> dragging       (f.move)                                   // <->
+         dragging -> idle           (f.release)                                // °
 
-         dragging -> in_upper_zone (picking_view.dragging.upper_limit.enter)  //_ <-   // FIXME no message/warning when path is erroneous
-    in_upper_zone -> dragging      (picking_view.dragging.dragging_zone.enter)//= <-
+         dragging -> in_upper_zone (picking_view.dragging.upper_limit.enter)   // _ <-   // FIXME no message/warning when path is erroneous
+    in_upper_zone -> dragging      (picking_view.dragging.dragging_zone.enter) // = <-
 
-         dragging -> in_lower_zone (picking_view.dragging.lower_limit.enter)  //- <-
-    in_lower_zone -> dragging     (picking_view.dragging.dragging_zone.enter) //= <-
+         dragging -> in_lower_zone (picking_view.dragging.lower_limit.enter)   // - <-
+    in_lower_zone -> dragging      (picking_view.dragging.dragging_zone.enter) // = <-
 
-    in_lower_zone -> idle         (f.release)                                 // *^
-    in_upper_zone -> idle         (f.release)                                 // *^
+    in_lower_zone -> idle          (f.release)                                 // *^
+    in_upper_zone -> idle          (f.release)                                 // *^
   }
 
   fsm.state =:> sw.state // FIXME: no check that state names match

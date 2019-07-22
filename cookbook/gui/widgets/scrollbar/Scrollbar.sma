@@ -36,8 +36,7 @@ import clamp
 
 _define_
 Scrollbar(Process f) {
-  TextPrinter tp
-
+  //TextPrinter tp
   //f.move.y =:> tp.input
 
   // ---------------
@@ -45,17 +44,18 @@ Scrollbar(Process f) {
   Component model {
     DoubleProperty low  (0.75)
     DoubleProperty high (0.9)
+    // helper properties
     DoubleProperty delta (0)
     high - low =:> delta
   }
   //model.low =:> tp.input
 
   // model operations 
-  AdderAccumulator add_low (0, 0, 1.5)
+  AdderAccumulator add_low  (0, 0, 1.5)
   AdderAccumulator add_high (0, 0, 1.5)
 
-  Incr incr_low(0)
-  Incr incr_high(0)
+  Incr incr_low  (0)
+  Incr incr_high (0)
 
   // -----------------
   // transform
@@ -150,7 +150,7 @@ Scrollbar(Process f) {
 
           picking_view.initial.more_bg.y
 	     + (picking_view.hyst.offset - picking_view.initial.thumb.y)
-	     - picking_view.dragging.upper_limit.y =: picking_view.dragging.upper_limit.height
+	     -  picking_view.dragging.upper_limit.y =: picking_view.dragging.upper_limit.height
 
         transform.s - picking_view.initial.thumb.height =: picking_view.dragging.dragging_zone.height
     } 
@@ -192,10 +192,9 @@ Scrollbar(Process f) {
 
     Component paging_still {}
 
-
     Component waiting_hyst {
       TextProperty pv_state ("hyst")
-      pv_state =: picking_view.state
+       pv_state =: picking_view.state
 
 	    //f.press.y =:> tp.input
 
@@ -218,18 +217,17 @@ Scrollbar(Process f) {
       // inverse transformation
       Component inverse_transform {
       	 // first setup dataflow to translate from user's actions to model operations
-      	 DoubleProperty dv (0)
-	       DoubleProperty zero (0)
-
+      	 Double dv (0)
+	       //Double zero (0)
 
 	       //  simulate dv + model.low =:> model.low and avoid cycle
-	                  zero =:  add_low.result
+	                     0 =:  add_low.result
 	             model.low =:  add_low.input
                       dv =:> add_low.input
           add_low.result =:> model.low
 
 	       //  simulate dv + model.high =:> model.high and avoid cycle
-	                  zero =:  add_high.result
+	                     0 =:  add_high.result
 	            model.high =:  add_high.input
                       dv =:> add_high.input
          add_high.result =:> model.high
@@ -285,43 +283,43 @@ Scrollbar(Process f) {
     State in_lower_zone
     
 
-             idle -> onelining_up   (picking_view.initial.more_arrow.press)    // ^
-             idle -> onelining_down (picking_view.initial.less_arrow.press)    // v
+             idle -> onelining_up   (picking_view.initial.more_arrow.press)     // ^
+             idle -> onelining_down (picking_view.initial.less_arrow.press)     // v
 
      onelining_up -> idle           (f.release)
    onelining_down -> idle           (f.release)
 
-             idle -> paging_up      (picking_view.initial.more_bg.press)       // [] *
-             idle -> paging_down    (picking_view.initial.less_bg.press)       // [] *
+             idle -> paging_up      (picking_view.initial.more_bg.press)        // [] *
+             idle -> paging_down    (picking_view.initial.less_bg.press)        // [] *
 
-      paging_down -> paging_up      (picking_view.initial.more_bg.enter)       // [] <-
-        paging_up -> paging_down    (picking_view.initial.less_bg.enter)       // [] <-
+      paging_down -> paging_up      (picking_view.initial.more_bg.enter)        // [] <-
+        paging_up -> paging_down    (picking_view.initial.less_bg.enter)        // [] <-
       
-        paging_up -> paging_still   (picking_view.initial.thumb.enter)         //  = <-
-      paging_down -> paging_still   (picking_view.initial.thumb.enter)         //  = <-
+        paging_up -> paging_still   (picking_view.initial.thumb.enter)          //  = <-
+      paging_down -> paging_still   (picking_view.initial.thumb.enter)          //  = <-
 
-     paging_still -> paging_up      (picking_view.initial.more_bg.enter)       // [] <-
-     paging_still -> paging_down    (picking_view.initial.less_bg.enter)       // [] <-
+     paging_still -> paging_up      (picking_view.initial.more_bg.enter)        // [] <-
+     paging_still -> paging_down    (picking_view.initial.less_bg.enter)        // [] <-
 
-        paging_up -> idle           (f.release)                                // °
-     paging_still -> idle           (f.release)                                // °
-      paging_down -> idle           (f.release)                                // °
+        paging_up -> idle           (f.release)                                 // °
+     paging_still -> idle           (f.release)                                 // °
+      paging_down -> idle           (f.release)                                 // °
 
-             idle -> waiting_hyst   (picking_view.initial.thumb.press)         // o * 
-     waiting_hyst -> idle           (f.release)                                // °
-     waiting_hyst -> dragging       (picking_view.hyst.c.leave)                // o ->   // FIXME does not work with fast movements
+             idle -> waiting_hyst   (picking_view.initial.thumb.press)          // o * 
+     waiting_hyst -> idle           (f.release)                                 // °
+     waiting_hyst -> dragging       (picking_view.hyst.c.leave)                 // o ->   // FIXME does not work with fast movements
 
-         dragging -> dragging       (f.move)                                   // <->
-         dragging -> idle           (f.release)                                // °
+         dragging -> dragging       (f.move)                                    // <->
+         dragging -> idle           (f.release)                                 // °
 
-         dragging -> in_upper_zone (picking_view.dragging.upper_limit.enter)   // _ <-   // FIXME no message/warning when path is erroneous
-    in_upper_zone -> dragging      (picking_view.dragging.dragging_zone.enter) // = <-
+         dragging -> in_upper_zone  (picking_view.dragging.upper_limit.enter)   // _ <-   // FIXME no message/warning when path is erroneous
+    in_upper_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // = <-
 
-         dragging -> in_lower_zone (picking_view.dragging.lower_limit.enter)   // - <-
-    in_lower_zone -> dragging      (picking_view.dragging.dragging_zone.enter) // = <-
+         dragging -> in_lower_zone  (picking_view.dragging.lower_limit.enter)   // - <-
+    in_lower_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // = <-
 
-    in_lower_zone -> idle          (f.release)                                 // *^
-    in_upper_zone -> idle          (f.release)                                 // *^
+    in_lower_zone -> idle           (f.release)                                 // *^
+    in_upper_zone -> idle           (f.release)                                 // *^
   }
 
   fsm.state =:> sw.state // FIXME: no check that state names match

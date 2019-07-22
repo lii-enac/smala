@@ -17,6 +17,8 @@ use base
 
 import clamp
 
+// paging up and down regularly while the user holds a press
+
 _define_
 paging(Process model, Process f) {
     Double dv (0) // amount of paging in model unit, must be flowed-in by the client

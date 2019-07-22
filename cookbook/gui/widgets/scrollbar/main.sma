@@ -24,7 +24,10 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-  Scrollbar s(f)
+  Scrollbar sb(f)
+  0 =: sb.transform.tx
+  100 =: sb.transform.ty
+  300 =: sb.transform.s
 }
 
 run root

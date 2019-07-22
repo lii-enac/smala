@@ -59,9 +59,10 @@ Scrollbar(Process f) {
   // -----------------
   // transform
   Component transform {
+     Double tx (200)
      Double ty (100)
      Double  s (400)
-     //DoubleProperty rot (45) // not yet
+     //DoubleProperty rot (90) // not yet
   }
 
   // -----------------
@@ -78,8 +79,7 @@ Scrollbar(Process f) {
 
     // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
 
-                                                  bg.x = 200.0                                 // FIXME? "200" marche pas, pas de message
-                                                  bg.x =:> thumb.x, more_arrow.x, less_arrow.x
+                                          transform.tx =:> bg.x, thumb.x, more_arrow.x, less_arrow.x
 
                               bg.y - more_arrow.height =:> more_arrow.y
 	                            bg.y +         bg.height =:> less_arrow.y
@@ -90,14 +90,15 @@ Scrollbar(Process f) {
                       transform.ty + more_arrow.height =:> bg.y
                                            transform.s =:> bg.height
 
-     (1-model.high) * transform.s + transform.ty
-                                   + more_arrow.height =:> thumb.y
-                  (model.high-model.low) * transform.s =:> thumb.height
+                   (1-model.high) * transform.s + bg.y =:> thumb.y
+                             model.delta * transform.s =:> thumb.height
   }
 
   // -----------------
   // picking view
   // a picking view has a state that depends on the status of the interaction (see controller)
+  Int offset(200)
+
   Switch picking_view (initial) {
 
     Component initial {
@@ -113,6 +114,7 @@ Scrollbar(Process f) {
       Rectangle less_arrow (0,0,100,100,0,0)  // v
      
         // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
+                         transform.tx + offset =:> more_arrow.x, more_bg.x, thumb.x, less_bg.x, less_arrow.x
 
                                             // =:> more_arrow.y  // ^
               more_arrow.y + more_arrow.height =:> more_bg.y     // ||
@@ -131,7 +133,7 @@ Scrollbar(Process f) {
 
     Component hyst {
       FillColor fc (255, 0, 0)
-      Circle    c (0,0, 5)                          // °
+      Circle    c (0,0, 5)                       // °
       Int       offset (0)
     }
 
@@ -144,6 +146,7 @@ Scrollbar(Process f) {
       Rectangle lower_limit (0,0,100,100,0,0)    // || (!)
      
         // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
+                        transform.tx + offset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
 	       upper_limit.y +   upper_limit.height =:> dragging_zone.y
        dragging_zone.y + dragging_zone.height =:> lower_limit.y
@@ -210,7 +213,7 @@ Scrollbar(Process f) {
     State dragging {
       // change picking state
       TextProperty pv_state ("dragging")
-      pv_state =: picking_view.state
+       pv_state =: picking_view.state
       
       // inverse transform from user actions to model operations
       Component inverse_transform {
@@ -223,15 +226,15 @@ Scrollbar(Process f) {
         clamp clamp_ (f.move.y, picking_view.dragging.dragging_zone.y, picking_view.dragging.lower_limit.y, y)
 
         AssignmentSequence as(0) {
-          lasty - y =: dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
+                 lasty - y =: dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
           dy / transform.s =: dv
 
-          // apply to model
-          dv + model.low  =: model.low
-          dv + model.high =: model.high
+           // apply to model
+           dv + model.low  =: model.low
+           dv + model.high =: model.high
 
-          // remember last pos
-          y =: lasty
+           // remember last pos
+                         y =: lasty
         }
         f.move -> as
       }

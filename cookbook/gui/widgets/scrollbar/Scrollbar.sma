@@ -36,7 +36,7 @@ import clamp
 
 _define_
 Scrollbar(Process f) {
-  //TextPrinter tp
+  TextPrinter tp
 
   // ---------------
   // model
@@ -61,8 +61,8 @@ Scrollbar(Process f) {
   Component transform {
      Double tx (200)
      Double ty (100)
-     Double  s (400)
-     //DoubleProperty rot (90) // not yet
+     Double  s (100)
+     Double rot (0) // not yet
   }
 
   // -----------------
@@ -73,6 +73,50 @@ Scrollbar(Process f) {
   NoOutline _
 
   Component display_view {
+    Rotation    rot(0,0,0)
+    Translation tr(0,0)
+    Scaling     sc(1,1, 0,0)
+    
+    transform.rot =:> rot.a
+    transform.tx  =:> tr.tx
+    transform.ty  =:> tr.ty
+    transform.s   =:> sc.sy
+    
+    FillColor   _ (255,255,255) // white
+    Rectangle   more_arrow (0,0,1,1,0,0) // ^
+    FillColor   _ (200,200,200) // gray
+    Rectangle   bg (0,0,1,1,0,0)        // []
+    FillColor   _ (255,255,255) // white
+    Rectangle   less_arrow (0,0,1,1,0,0) // v
+
+    // thumb on top
+    FillColor   _ (150,150,255) // grayblue
+    Rectangle   thumb (0,0,1,1,0,0)      // =
+
+    // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
+    // transformation of model into display view for background and thumb
+
+                                         width =:> more_arrow.width, bg.width, thumb.width, less_arrow.width
+                                             0 =:> more_arrow.x, bg.x, thumb.x, less_arrow.x
+
+                                             0 =:> more_arrow.y 
+                    arrow_height / transform.s =:> more_arrow.height, less_arrow.height
+              more_arrow.y + more_arrow.height =:> bg.y
+                                             1 =:> bg.height
+                              bg.y + bg.height =:> less_arrow.y
+
+                         (1-model.high) + bg.y =:> thumb.y
+                                   model.delta =:> thumb.height
+     
+  }
+
+/*
+  Component display_view {
+    Rotation    r(0,0,0)
+    transform.rot =:> r.a
+    transform.tx =:> r.cx
+    transform.ty =:> r.cy
+    
     FillColor   _ (255,255,255) // white
     Rectangle   more_arrow (0,0,1,1,0,0) // ^
     FillColor   _ (200,200,200) // gray
@@ -97,26 +141,57 @@ Scrollbar(Process f) {
            (1-model.high) * transform.s + bg.y =:> thumb.y
                      model.delta * transform.s =:> thumb.height
   }
+  */
 
   // -----------------
   // picking view
   // a picking view has a state that depends on the status of the interaction (see controller)
-  Int xoffset(200)
+  Int xoffset(300)
 
   Switch picking_view (initial) {
 
     Component initial {
-      FillColor mac (0,255,0)//green
+      
+      Rotation    rot(0,0,0)
+      Translation tr(0,0)
+      Scaling     sc(1,1, 0,0)
+      
+      transform.rot =:> rot.a
+      transform.tx  =:> tr.tx
+      transform.ty  =:> tr.ty
+      transform.s   =:> sc.sy
+  
+      FillColor _ (0,255,0)//green
       Rectangle more_arrow (0,0,1,1,0,0)  // ^
-      FillColor mtb (0,255,255)//cyan
+      FillColor _ (0,255,255)//cyan
       Rectangle more_bg (0,0,1,1,0,0)     // ||
-      FillColor mtc (255,0,255)//purple
-      Rectangle thumb (0,0,1,1,0,0)       // =
-      FillColor ltc (255,255,0)//yellow
+      
+      FillColor _ (255,255,0)//yellow
       Rectangle less_bg (0,0,1,1,0,0)     // ||
-      FillColor lac (255,0,0)//red
+      FillColor _ (255,0,0)//red
       Rectangle less_arrow (0,0,1,1,0,0)  // v
+
+      FillColor _ (255,0,255)//purple
+      Rectangle thumb (0,0,1,1,0,0)       // =
      
+      // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
+      // transformation of model into picking view for background and thumb     
+
+                                         width =:> more_arrow.width, more_bg.width, thumb.width, less_bg.width, less_arrow.width
+                                   0 + xoffset =:> more_arrow.x,     more_bg.x,     thumb.x,     less_bg.x,     less_arrow.x
+
+                                             0 =:> more_arrow.y    // ^
+                    arrow_height / transform.s =:> more_arrow.height
+              more_arrow.y + more_arrow.height =:> more_bg.y       // ||
+                              (1 - model.high) =:> more_bg.height  // ||
+                 more_bg.y +    more_bg.height =:> thumb.y         // =
+                                   model.delta =:> thumb.height    // =
+                   thumb.y +      thumb.height =:> less_bg.y       // ||
+                                     model.low =:> less_bg.height  // ||
+                 less_bg.y +    less_bg.height =:> less_arrow.y    // v 
+                    arrow_height / transform.s =:> less_arrow.height             
+  
+     /*
       // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
                                          width =:> more_bg.width, less_bg.width, thumb.width, more_arrow.width, less_arrow.width
                                   arrow_height =:> more_arrow.height, less_arrow.height
@@ -124,14 +199,15 @@ Scrollbar(Process f) {
 
                                   transform.ty =:> more_arrow.y    // ^ 
               more_arrow.y + more_arrow.height =:> more_bg.y       // ||
-                 more_bg.y + more_bg.height    =:> thumb.y         // =
-                   thumb.y +   thumb.height    =:> less_bg.y       // ||
-                 less_bg.y + less_bg.height    =:> less_arrow.y    // v  
+                 more_bg.y +    more_bg.height =:> thumb.y         // =
+                   thumb.y +      thumb.height =:> less_bg.y       // ||
+                 less_bg.y +    less_bg.height =:> less_arrow.y    // v  
 
 	    // transformation of model into picking view for background and thumb                   
                 (1 - model.high) * transform.s =:> more_bg.height  // ||
                      model.delta * transform.s =:> thumb.height    // =
                        model.low * transform.s =:> less_bg.height  // ||
+           */            
     }
 
     Component hyst {
@@ -141,6 +217,11 @@ Scrollbar(Process f) {
     }
 
     Component dragging {
+      Rotation    r(0,0,0)
+      transform.rot =:> r.a
+      transform.tx + xoffset =:> r.cx
+      transform.ty =:> r.cy
+    
       FillColor mac (255,0,0) // r
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
       FillColor mtc (0,255,0) // g
@@ -223,13 +304,23 @@ Scrollbar(Process f) {
       Component inverse_transform {
         Double dv (0)
         Double dy (0)
+        Double x (0)
         Double y (0)
+        //Double lastv
+
+        Double sina (0)
+        Double cosa (0)
+        cos(0.01745329251 * transform.rot) =:> cosa
+        sin(0.01745329251 * transform.rot) =:> sina
 
         // FIXME: dependency with view layout, clamping of event coordinate should be implemented in scene graph ?
         // or receive dragging_zone.move and leave only
-        clamp clamp_ (f.move.y, picking_view.dragging.dragging_zone.y, picking_view.dragging.lower_limit.y, y)
+        //clamp clamp_ (f.move.y, picking_view.dragging.dragging_zone.y, picking_view.dragging.lower_limit.y, y)
 
         AssignmentSequence as(0) {
+          /*
+                  - f.move.x * sina + f.move.y * cosa =: dv
+
                  lasty - y =: dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
           dy / transform.s =: dv
 
@@ -239,6 +330,20 @@ Scrollbar(Process f) {
 
            // remember last pos
                          y =: lasty
+                         */
+
+                        f.move.y =: y
+
+                 lasty - y =: dy      // should be (lasty - transform.ty) - (f.move.y - transform.ty) =:> dy , but transform.ty self-cancels
+          dy / transform.s =: dv
+
+           // apply to model
+           dv + model.low  =: model.low
+           dv + model.high =: model.high
+
+           // remember last pos
+                         y =: lasty
+
         }
         f.move -> as
       }

@@ -59,10 +59,14 @@ Scrollbar(Process f) {
   // -----------------
   // transform
   Component transform {
-     Double tx (200)
-     Double ty (100)
-     Double  s (100)
-     Double rot (0) // not yet
+    Double tx (200)
+    Double ty (100)
+    Double  s (100)
+    Double rot (10) // not yet
+    Double sina (0)
+    Double cosa (0)
+    cos(0.01745329251 * transform.rot) =:> cosa
+    sin(0.01745329251 * transform.rot) =:> sina
   }
 
   // -----------------
@@ -112,10 +116,6 @@ Scrollbar(Process f) {
 
 /*
   Component display_view {
-    Rotation    r(0,0,0)
-    transform.rot =:> r.a
-    transform.tx =:> r.cx
-    transform.ty =:> r.cy
     
     FillColor   _ (255,255,255) // white
     Rectangle   more_arrow (0,0,1,1,0,0) // ^
@@ -212,37 +212,86 @@ Scrollbar(Process f) {
 
     Component hyst {
       FillColor fc (255, 0, 0)
-      Circle    c (0,0, 5)                       // °
+      /*
+      Rectangle r(0,0,0,0,0,0)
+      r.press -> fc 
+      m aka r.inverted_matrix
+      //Homography _(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1)
+      Homography h
+      m.m11 =: h.m11
+      m.m12 =: h.m12
+      m.m13 =: h.m13
+      m.m14 =: h.m14
+      m.m21 =: h.m21
+      m.m22 =: h.m22
+      m.m23 =: h.m23
+      m.m24 =: h.m24
+      m.m31 =: h.m31
+      m.m32 =: h.m32
+      m.m33 =: h.m33
+      m.m34 =: h.m34
+      m.m41 =: h.m41
+      m.m42 =: h.m42
+      m.m43 =: h.m43
+      m.m44 =: h.m44
+
+      //m.m11 =:> tp.input
+      */
+      
+      Circle    c (0,0, 5)                   // °
       Int       offset (0)
     }
 
     Component dragging {
-      Rotation    r(0,0,0)
-      transform.rot =:> r.a
-      transform.tx + xoffset =:> r.cx
-      transform.ty =:> r.cy
+
+      Rotation    rot(0,0,0)
+      Translation tr(0,0)
+      Scaling     sc(1,1, 0,0)
+      
+      transform.rot =:> rot.a
+      transform.tx  =:> tr.tx
+      transform.ty  =:> tr.ty
+      transform.s   =:> sc.sy
     
-      FillColor mac (255,0,0) // r
+      FillOpacity _(0.5)
+      FillColor _ (0,255,0) // g
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
-      FillColor mtc (0,255,0) // g
+      FillColor _ (0,255,255) // c
       Rectangle dragging_zone (0,0,1,1,0,0)  // || (=)
-      FillColor mtp (0,0,255) // b
+      FillColor _ (255,0,0) // r
       Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
+
+      Double pick_offset (0)
+      Double zero_in_model (0)
+      Double height_in_model (0)
+      
+      // pick_offset in model coordinates
+      (- picking_view.hyst.c.cx * transform.sina + picking_view.hyst.c.cy * transform.cosa - transform.ty) / transform.s =:> pick_offset
+      (0 * transform.cosa - transform.ty) / transform.s =:> zero_in_model
+      (f.height * transform.cosa - transform.ty) / transform.s =:> height_in_model
+
+      //- f.move.x * sina + f.move.y * cosa =: dv
+      //pick_offset =:> tp.input
      
       // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
-                        transform.tx + xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
+                        //transform.tx +
+                        xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
-	        upper_limit.y +   upper_limit.height =:> dragging_zone.y
-        dragging_zone.y + dragging_zone.height =:> lower_limit.y
-	             f.height -        lower_limit.y =:> lower_limit.height
-
+                                 zero_in_model =:> upper_limit.y
            picking_view.initial.more_bg.y
-	      + (picking_view.hyst.offset - picking_view.initial.thumb.y)
-	      -  upper_limit.y                       =:> upper_limit.height
+        + (pick_offset - picking_view.initial.thumb.y)
+        -  upper_limit.y                       =:> upper_limit.height
 
-           transform.s
-           - picking_view.initial.thumb.height =:> dragging_zone.height
+          upper_limit.y +   upper_limit.height =:> dragging_zone.y
+
+           //1 * transform.s
+           1 - picking_view.initial.thumb.height 
+                                               =:> dragging_zone.height
+
+        dragging_zone.y + dragging_zone.height =:> lower_limit.y
+                      //1 -        lower_limit.y =:> lower_limit.height
+	             height_in_model - lower_limit.y =:> lower_limit.height
     } 
   }
 

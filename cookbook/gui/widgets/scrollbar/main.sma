@@ -24,10 +24,12 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  //Scaling _(1.1,1.1,0,0)
+
   Scrollbar sb(f)
   //50 =: sb.transform.tx
   //75 =: sb.transform.ty
-  //50 =:> sb.transform.s
+  //300 =:> sb.transform.s
   //50 =: sb.width
   //50 =: sb.arrow_height
 

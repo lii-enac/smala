@@ -854,9 +854,9 @@ namespace Smala
     string native_name_obj = native_name + "_obj";
 
     os << "\n";
-    os << "struct " << native_name_struct << " : public Action {\n";
+    os << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
     os << "\t" << native_name_struct << R"( (Process *p, const std::string &n, bool string_setter, bool isModel)
-      : Action (p, n, isModel), _string_setter (string_setter)
+      : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
     }

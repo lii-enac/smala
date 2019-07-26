@@ -12,5 +12,5 @@
 #
 
 #sample_app := scrollbar
-objs_cookbook_app := clamp.o paging.o Scrollbar.o main.o
+objs_cookbook_app := clamp.o inverse_transform.o paging.o Scrollbar.o main.o
 djnn_libs_cookbook_app := gui base core display

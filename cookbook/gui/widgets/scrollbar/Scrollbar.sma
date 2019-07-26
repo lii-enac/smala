@@ -33,8 +33,10 @@ use gui
 
 import paging
 import clamp
+import inverse_transform
 
-// TODO: provide an inverse transform function
+// TODO: fix cairo bug with enter/leave when moving shape
+// TODO: make it actually usable
 
 _define_
 Scrollbar(Process f) {
@@ -116,14 +118,13 @@ Scrollbar(Process f) {
                          (1-model.high) + bg.y =:> thumb.y
                                    model.delta =:> thumb.height
 
-     
   }
 
   // -----------------
   // picking view
-  // a picking view has a state that depends on the status of the interaction (see controller)
   Int xoffset(300)
 
+  // a picking view has a state that depends on the status of the interaction (see controller)
   Switch picking_view (initial) {
 
     Component initial {
@@ -161,11 +162,8 @@ Scrollbar(Process f) {
     }
 
     Component hyst {
-      FillColor fc (255, 0, 0)
- 
-
-      // the hysteresis circle is in screen space, inverse graphical transform
-      // LoadIdentity()
+      // the hysteresis circle is in screen space, so we should inverse graphical transform
+      // should be LoadIdentity() it would be more efficient and onpar with the semantics
       Scaling     sc(1,1, 0,0)
       Translation tr(0,0)
       Rotation    rot(0,0,0)
@@ -175,8 +173,8 @@ Scrollbar(Process f) {
        -transform.ty  =:> tr.ty
       1/transform.s   =:> sc.sy
 
+      FillColor fc (255, 0, 0)
       Circle    c (0,0, 5)                   // °
-      Int       offset (0)
     }
 
     Component dragging {
@@ -194,9 +192,10 @@ Scrollbar(Process f) {
       Double height_in_model (0) // idem
       
       // pick_offset in model coordinates
-      ( (- picking_view.hyst.c.cx * transform.sina + picking_view.hyst.c.cy * transform.cosa) - transform.ty) / transform.s =:> pick_offset
-      (0 * transform.cosa - transform.ty) / transform.s =:> zero_in_model
-      (f.height * transform.cosa - transform.ty) / transform.s =:> height_in_model
+      inverse_transform _(transform, picking_view.hyst.c.cx, picking_view.hyst.c.cy, pick_offset)
+      Double zero(0)
+      inverse_transform _(transform, zero, zero, zero_in_model) // not working as planned
+      inverse_transform _(transform, f.height, f.height, height_in_model) // not working as planned
      
       // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
@@ -218,13 +217,11 @@ Scrollbar(Process f) {
   // -----------------
   // controller = management of interactive state with an FSM
 
-  IntProperty lasty (0)
   DoubleProperty lastv (0)
 
   FSM fsm {
 
     State idle {
-      // change picking state
       "initial" =: picking_view.state
     }
 
@@ -250,45 +247,36 @@ Scrollbar(Process f) {
      -model.delta =: p.dv
     }
 
-    State paging_still {
-      TextPrinter tp
-      "yep" =: tp.input
-    }
+    State paging_still // FIXME, enter is not working with cairo when moving shapes
 
     State waiting_hyst {
-      // change picking state
       "hyst" =: picking_view.state
 
       f.press.x =: picking_view.hyst.c.cx
       f.press.y =: picking_view.hyst.c.cy
 
-      f.press.y =: picking_view.hyst.offset
-      f.press.y =: lasty
-
-      ( (- f.press.x * transform.sina + f.press.y * transform.cosa) - transform.ty) / transform.s =: lastv
+      inverse_transform iv(transform, f.press.x, f.press.y, lastv)
     }
 
     State dragging {
-      // change picking state
       "dragging" =: picking_view.state
       
       // inverse transform from user actions to model operations
-      Component inverse_transform {
-        Double dv (0)
-        Double v (0)
-        
-        AssignmentSequence as(0) {
-            // compute inverse and delta
-            ( (- f.move.x * transform.sina + f.move.y * transform.cosa) - transform.ty) / transform.s =: v
-            - (v - lastv) =: dv
-           // remember last pos
-           v =: lastv
-           // apply to model
-           dv + model.low  =: model.low
-           dv + model.high =: model.high
-        }
-        f.move -> as
+      Double dv (0)
+      Double v (0)
+      
+      AssignmentSequence as(0) {
+        // compute inverse and delta
+        inverse_transform iv(transform, f.move.x, f.move.y, v)
+        - (v - lastv) =: dv
+        // remember last pos
+        v =: lastv
+        // apply to model
+        dv + model.low  =: model.low
+        dv + model.high =: model.high
       }
+      f.move -> as
+      
     }
     
     State in_upper_zone {

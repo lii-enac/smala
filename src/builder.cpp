@@ -27,6 +27,7 @@
 #include <algorithm>
 #include "native_code_node.h"
 #include "term_node.h"
+#include "range_node.h"
 
 namespace Smala
 {
@@ -530,15 +531,30 @@ namespace Smala
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
         print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
     }
+    if (dynamic_cast<RangeNode*> (node) != nullptr) {
+      build_range_node (os, node, new_name);
+    } else {
+      indent (os);
+      std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+      print_start_component (os, new_name, constructor);
+      os << " (" << p_name << ", " << name;
+      if (node->has_arguments ())
+        os << ", ";
+      else
+        os << ");\n";
+    }
+    return new_name;
+  }
+
+  void
+  Builder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
+  {
+    RangeNode* n = static_cast<RangeNode*> (node);
+    std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-    print_start_component (os, new_name, constructor);
-    os << " (" << p_name << ", " << name;
-    if (node->has_arguments ())
-      os << ", ";
-    else
-      os << ");\n";
-    return new_name;
+    print_start_component (os, new_name, "SwitchRangeBranch");
+    os << " (" << p_name << ", " << name << ", " << n->lower_arg() << ", " << n->left_open () << ", " << n->upper_arg () << ", " << n->right_open () << ");\n";
   }
 
   void

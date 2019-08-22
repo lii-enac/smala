@@ -46,6 +46,7 @@
   #include "native_code_node.h"
   #include "native_expression_node.h"
   #include "for_node.h"
+  #include "range_node.h"
 
   using namespace std;
 
@@ -255,11 +256,13 @@
 %token <string> NAME_OR_PATH "name_or_path"
 %token <string> URI "URI"
 
+%type <bool> bracket
 %type <int> arguments
 %type <bool> connector_symbol
 %type <int> assignment_symbol
 %type <int> argument_list
 %type <string> function_call
+%type <string> number
 %type <bool> is_model
 %type <ParamType> type
 %type <string> fsm_decl
@@ -440,6 +443,7 @@ statement
 
 new_component
   : simple_process
+  | range
   | dash_array
   | fsm
   | native
@@ -813,6 +817,29 @@ int_array_decl
   :
   | int_array_decl INT COMMA { int_array.push_back (std::stoi ($2)); }
   | int_array_decl INT { int_array.push_back (std::stoi ($2)); }
+
+range
+  : range_decl start_statement_list end_statement_list
+  | range_decl start_statement_list statement_list end_statement_list
+  | range_decl
+
+range_decl
+  : NAME_OR_PATH bracket number COMMA number bracket
+  {
+    RangeNode *node = new RangeNode ($1, $3, $2, $5, !$6);
+    driver.add_node (node);
+    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+    cur_node = node;
+    if (driver.debug()) driver.new_line();
+  }
+
+bracket
+  : LB { $$ = false; }
+  | RB { $$ = true; }
+
+number
+  : INT { $$ = $1; }
+  | DOUBLE { $$ = $1; }
 
 simple_process
   : simple_process_decl arguments start_statement_list statement_list end_statement_list

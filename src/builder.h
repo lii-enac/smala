@@ -120,6 +120,7 @@ namespace Smala {
     virtual void clone (std::ofstream &os, Node *node) {}
     virtual void build_transition_node (std::ofstream &os, CtrlNode *ctrl) = 0;
     std::string build_simple_node (std::ofstream &os, Node *n);
+    void build_range_node (std::ofstream &os, Node *n, const string& new_name);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
     virtual void build_binary_node (std::ofstream &os, Node *n) = 0;
     virtual void build_unary_node (std::ofstream &os, Node *n) = 0;

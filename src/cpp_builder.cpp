@@ -714,7 +714,7 @@ namespace Smala
     }
 
     indent (os);
-    os << native_name << "->finalize_construction ();\n";
+    os << native_name << "->finalize_construction (" << p_name << ");\n";
 
     // indent (os);
     // std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -860,8 +860,8 @@ namespace Smala
     {
       set_is_model (isModel);
     }
-    void finalize_construction () {
-      Process::finalize_construction ();
+    void finalize_construction (Process* p) {
+      Process::finalize_construction (p);
     }
     bool _string_setter;
     void impl_deactivate () override {}

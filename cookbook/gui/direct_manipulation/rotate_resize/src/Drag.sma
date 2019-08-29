@@ -17,7 +17,7 @@ use gui
  *   to capture a press in the same zone (to trigger the drag interaction).
  */
 _define_
-Drag (Component shape, Component transforms) {
+Drag (Process shape, Process transforms) {
 
   FSM fsm {
     State idle

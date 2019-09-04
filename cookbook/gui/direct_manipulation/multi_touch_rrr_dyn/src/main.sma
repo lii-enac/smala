@@ -47,7 +47,7 @@ Component root
 
   TouchMarker tm (frame)
 
-  Clock cl (1000)
+  Clock cl (5000)
   cl.tick -> incr
   cl.tick -> (root) {
     delete root.content

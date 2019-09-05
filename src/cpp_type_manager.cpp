@@ -52,7 +52,8 @@ namespace Smala {
     inputGlobalSymbols = inputGS;
 
     type_entry phidgetsGS[] = {
-//      {"InterfaceKits", "djnInterfaceKits"},
+      {"Phidgets", "Phidgets"},
+      {"InterfaceKits", "djnInterfaceKits"},
       {"0", "0"}
     };
     phidgetsGlobalSymbols = phidgetsGS;

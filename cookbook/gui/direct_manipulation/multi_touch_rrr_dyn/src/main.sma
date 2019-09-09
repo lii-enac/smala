@@ -25,12 +25,15 @@ Component root
   Frame frame ("Multitouch Drag", 0, 1000, 1000, 1000)
 
   Incr incr (0)
-  incr.delta = -10
-  incr.state = 255
+  incr.delta = 1
 
   Component content {
-    FillColor fc($incr.state,0,0)
-    OutlineColor _(0,0,$incr.state)
+
+    FillColor w (255, 255, 255)
+    Text txt (20, 20, "1.000000")
+
+    FillColor fc(255,0,0)
+    OutlineColor _(0,255,255)
 
     Component tt {
       Homography h
@@ -45,7 +48,7 @@ Component root
     ScaleRotateTranslate _ (tt2.r, tt2.h)
   }
 
-  TouchMarker tm (frame)
+  //TouchMarker tm (frame)
 
   Clock cl (5000)
   cl.tick -> incr
@@ -54,8 +57,11 @@ Component root
 
     addChildrenTo root {
        Component content {
-         FillColor fc($root.incr.state,0,0)
-         OutlineColor _(0,0,$root.incr.state)
+          FillColor w (255, 255, 255)
+          Text txt (20, 20, isString(root.incr.state))
+
+         FillColor fc(255,0,0)
+         OutlineColor _(0,0,255)
 
          Component tt {
            Homography h

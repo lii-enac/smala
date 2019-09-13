@@ -19,7 +19,7 @@
 // P = picking view - what the user actually manipulates, without seeing it
 // C = controller - manages interactive state and _triggers_ the translation of user's actions into model operations
 // transform = transforms the model into the display and the picking views
-// inverse transform = inverse transforms user's actions and _performs_ the translation into model operations
+// inverse transform = inverse-transforms user's actions and translates into model operations
 
 // see:
 // Conversy, S., Barboni, E., Navarre, D., Palanque, P. Improving modularity of interactive software with the MDPC architecture. IFIP EIS 2007.
@@ -187,15 +187,15 @@ Scrollbar(Process f) {
       FillColor _ (255,0,0) // r
       Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
 
-      Double pick_offset (0)
+      Double pick_offset_in_model (0)
       Double zero_in_model (0)   // does not work very well
-      Double height_in_model (0) // idem
+      Double win_height_in_model (0) // idem
       
       // pick_offset in model coordinates
-      inverse_transform _(transform, picking_view.hyst.c.cx, picking_view.hyst.c.cy, pick_offset)
+      inverse_transform _(transform, picking_view.hyst.c.cx, picking_view.hyst.c.cy, pick_offset_in_model)
       Double zero(0)
-      inverse_transform _(transform, zero, zero, zero_in_model) // not working as planned
-      inverse_transform _(transform, f.height, f.height, height_in_model) // not working as planned
+      inverse_transform _(transform, zero, zero, zero_in_model) // FIXME? not working as planned
+      inverse_transform _(transform, f.height, f.height, win_height_in_model) // FIXME? not working as planned
      
       // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
@@ -204,13 +204,39 @@ Scrollbar(Process f) {
                                  zero_in_model =:> upper_limit.y
 
            picking_view.initial.more_bg.y
-        + (pick_offset - picking_view.initial.thumb.y)
+        + (pick_offset_in_model - picking_view.initial.thumb.y)
         -  upper_limit.y                       =:> upper_limit.height
 
           upper_limit.y +   upper_limit.height =:> dragging_zone.y
          1 - picking_view.initial.thumb.height =:> dragging_zone.height
         dragging_zone.y + dragging_zone.height =:> lower_limit.y
-	             height_in_model - lower_limit.y =:> lower_limit.height
+	         win_height_in_model - lower_limit.y =:> lower_limit.height
+
+      // transform boundaries to test position of cursor
+      /*Double pick_offset_rel (0)
+      pick_offset_in_model - zero_in_model =:> pick_offset_rel
+      Double cursor_in_model (0)
+      inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
+      Bool delta(0)
+      cursor_in_model - pick_offset_rel =:> delta
+      Bool higher(0)
+      delta > 1 =:> higher
+      Bool lower(0)
+      delta < 0 =:> lower
+      //"--" =:> tp.input
+      TextPrinter tp
+      "higher " + isString(higher) + " " + isString(delta) =:> tp.input
+      "lower " + isString(lower) + " " + isString(delta) =:> tp.input*/
+
+      Double cursor_in_model (0)
+      inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
+
+      Bool higher(0)
+      cursor_in_model > dragging_zone.y + dragging_zone.height =:> higher
+      Bool lower(0)
+      cursor_in_model < dragging_zone.y =:> lower
+      TextPrinter tp
+      "lower " + isString(lower) + " higher " + isString(higher) =:> tp.input
     } 
   }
 

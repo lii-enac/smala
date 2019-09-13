@@ -15,6 +15,13 @@
 use core
 use base
 
+
+_define_
+forward_transform(Process transform, Process in, Process x, Process y) { // WARNING: not tested
+	( (in * transform.s) + transform.tx ) * transform.cosa =:> x
+	( (in * transform.s) + transform.ty ) * transform.sina =:> y
+}
+
 _define_
 inverse_transform(Process transform, Process x, Process y, Process out) {
 	( (- x * transform.sina + y * transform.cosa) - transform.ty) / transform.s =:> out

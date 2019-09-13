@@ -49,6 +49,10 @@ MAKEFLAGS += --no-builtin-rules
 
 ifndef os
 os := $(shell uname -s)
+
+ifeq ($(findstring MINGW,$(os)),MINGW)
+os := MinGW
+endif
 endif
 
 CXXFLAGS += -MMD -g -std=c++14
@@ -66,7 +70,7 @@ LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 endif
 
-ifeq ($(os),MINGW64_NT-10.0)
+ifeq ($(os),MinGW)
 YACC = bison -d
 LD_LIBRARY_PATH=PATH
 debugger := gdb

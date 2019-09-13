@@ -35,6 +35,10 @@ MAKEFLAGS += --no-builtin-rules
 
 ifndef os
 os := $(shell uname -s)
+
+ifeq ($(findstring MINGW,$(os)),MINGW)
+os := MinGW
+endif
 endif
 
 # cross-compile support
@@ -71,7 +75,7 @@ debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lld
 other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 endif
 
-ifeq ($(os),MINGW64_NT-10.0)
+ifeq ($(os),MinGW)
 YACC = bison -d
 LD_LIBRARY_PATH=PATH
 debugger := gdb
@@ -458,7 +462,7 @@ ifeq ($(os),Darwin)
 pkgcmd := brew install
 endif
 
-ifeq ($(os),MINGW64_NT-10.0)
+ifeq ($(os),MinGW)
 #https://www.msys2.org/
 # no need to prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
 pkgcmd := pacman -S

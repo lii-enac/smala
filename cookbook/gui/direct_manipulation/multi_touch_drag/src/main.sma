@@ -14,8 +14,8 @@
 
 use core
 use base
-use gui
 use display
+use gui
 
 import TouchDrag
 import TouchMarker

@@ -15,8 +15,8 @@
 
 use core
 use base
-use gui
 use display
+use gui
 
 
 //this action monitors the distance between the 2 touches 
@@ -50,8 +50,8 @@ Component root
     addChildrenTo root.fixedScene {
       Component fingerConnector {
         Circle finger (-100, -100, 100)
-        t.x =:> finger.cx
-        t.y =:> finger.cy
+        t.move.x =:> finger.cx
+        t.move.y =:> finger.cy
       }
     setRef (&root.d_touch.key, &t)
     setRef (&root.d_touch.value, &fingerConnector)
@@ -79,11 +79,11 @@ Component root
       Double p2x (0)
       Double p2y (0)
 
-      p1.$value.x =:> p1x
-      p1.$value.y =:> p1y
+      p1.$value.move.x =:> p1x
+      p1.$value.move.y =:> p1y
 
-      p2.$value.x =:> p2x
-      p2.$value.y =:> p2y
+      p2.$value.move.x =:> p2x
+      p2.$value.move.y =:> p2y
 
       //compute initial distance between p1 and p2, set the result to property d0
       Previous prev (1)

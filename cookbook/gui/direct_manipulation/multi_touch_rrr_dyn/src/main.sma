@@ -14,8 +14,9 @@
 
 use core
 use base
-use gui
 use display
+use gui
+
 
 import TouchMarker
 

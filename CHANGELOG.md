@@ -8,11 +8,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+#--------------------------------------------
 
 ## [Unreleased]
 ### Changed
 - None
 
+#--------------------------------------------
+
+## [1.5.0] - 2019-09-17
+### compliant with djnn-cpp [1.6.0]
+- please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+ - New operator : "istring ()"" to help compilator generating string from property 
+    eg : isString ( "incr:" + incr.state) => tp.text
+ - New operator : "&" to help compilator generating pointeur from property
+    eg: t = getRef (&root.f.touches.$added), setref (&root.touch.key, &t)
+ - New operator :  "$"  to help compilator to get value from a property (except: string and pointer) 
+        can directly use the double value of a Double in something else
+        eg: Double d(10), Rectangle ($d, $d, 100, 100, 0, 0) // = Rectangle (10, 10, 100, 100, 0, 0)
+ - New can now directly call any C function if declared in _native_code_ bracket. No need CCall anymore
+ - New native action mechanism (perf)
+ - New Switch_range component suport
+ - New cookbook recipes : scrollbar, multi_touch, multi_touch_drag, multi_touch_rrr, multi_touch_rrr_dyn
+ - New cookbook recipes : switch_range
+ - New Phigdets component support
+
+### Added
+
+### Changed
+ - All arguments in _define_ component definition has to be Process instead of Component
+ - refactoring grammar
+ - Improved cookbook recipes : bindings, display, sketching_advanced, drag_pan_zoom
+ - Improved editor_mode
+ - Improved Makefile 
+ - cleaned code
+
+### Fixed
+ - Fixed windows compilation
+
+### Broken
+ - cookbook : pinch_zoom, rotate_resize
+
+#--------------------------------------------
 
 ## [1.4.0] - 2019-06-04
 ### compliant with djnn-cpp [1.5.0]
@@ -62,7 +101,7 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 - Fixed compilation issues on Linux platform
 - Fixed a shift/reduce conflict
 
-
+#--------------------------------------------
 
 ## [1.3.0] - 2019-04-05
 ### compliant with djnn-cpp [1.4.0]
@@ -86,7 +125,7 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 - Improved native expressions efficiency
 - Improved Makefile
 
-
+#--------------------------------------------
 
 ## [1.2.0] - 2019-03-15
 ### compliant with djnn-cpp [1.3.0]
@@ -112,13 +151,13 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 ### Removed
 - removed warning on unknown module
 
-
+#--------------------------------------------
 
 ## [1.1.1] - 2019-02-04 [YANKED]
 ### Added
 - CHANGELOG.md
 
-
+#--------------------------------------------
 
 ## [1.1.0] - 2019-02-01
 ### compliant with djnn-cpp [1.1.0] and [1.2.0]
@@ -129,9 +168,12 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 - API - support for dash-array
 - COOKBOOK - new recipe on binding
 
-
+#--------------------------------------------
 
 ## [1.0.0] - 2018-12-17
+### compliant with djnn-cpp [1.0.0]
+- please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
 note: debut on changelog. This section has to be completed, if we have time. 
 ### NEW
 ### Added

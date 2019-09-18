@@ -1,5 +1,6 @@
 use core
 use base
+use display
 use gui
 
 

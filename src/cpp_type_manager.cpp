@@ -38,6 +38,7 @@ namespace Smala {
       {"InputDevices", "InputDevices"},
       {"Mice", "Mice"},
       {"TouchPanels", "TouchPanels"},
+      {"GPIOs", "GPIOs"},
 #if 0
       {"Styluses", "djnStyluses"},
       {"RawPointers", "djnRawPointers"},

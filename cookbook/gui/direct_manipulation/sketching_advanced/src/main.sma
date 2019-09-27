@@ -95,18 +95,10 @@ Component root {
                 addChildrenTo root.content {
                     //quadratic segment between origin and mid point
                     Path quadraticSegment {
-                        PathMove origin (0, 0)
-                        PathQuadratic end (0, 0, 0, 0)
+                        PathMove origin ($root.prevMidPoint.x, $root.prevMidPoint.y)
+                        PathQuadratic end ($root.prevPoint.x, $root.prevPoint.y, $root.midPoint.x, $root.midPoint.y)
                     }
                 }
-
-                //assign the values to the quadratic segment
-                root.content.quadraticSegment.origin.x =  root.prevMidPoint.x
-                root.content.quadraticSegment.origin.y = root.prevMidPoint.y
-                root.content.quadraticSegment.end.x = root.midPoint.x
-                root.content.quadraticSegment.end.y = root.midPoint.y
-                root.content.quadraticSegment.end.x1 = root.prevPoint.x
-                root.content.quadraticSegment.end.y1 = root.prevPoint.y
 
                 //assign the values to the line segment
                 root.content.lineSegment.origin.x = root.midPoint.x

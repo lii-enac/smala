@@ -73,20 +73,9 @@ Component root {
             f.move -> (root) {
                 addChildrenTo root.content {
                     Path segment {
-                        PathMove origin (0, 0)
-                        PathLine end (100, 100)
+                        PathMove origin ($root.prevPoint.x, $root.prevPoint.y)
+                        PathLine end ($root.currentPoint.x, $root.currentPoint.y)
                     }
-
-                    // Assign the values to the segment
-                    // Get primitive double value from a djnn DoubleProperty,
-                    // then set this value on an already existing property 
-                    // (do not use an assignment as it would create a new Assignment component
-                    //  and add it to the component tree each time this native is invoked)
-                    segment.origin.x = root.prevPoint.x
-                    segment.origin.y = root.prevPoint.y
-
-                    segment.end.x = root.currentPoint.x
-                    segment.end.y = root.currentPoint.y
 
                     // Set the previous point value to prepare the next call
                     root.prevPoint.x = root.currentPoint.x

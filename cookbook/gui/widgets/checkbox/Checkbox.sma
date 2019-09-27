@@ -27,14 +27,18 @@ Checkbox (Process frame, int nb_entry) {
 			Component _ {
 				Int index (n)
 				NoFill nf
-				OutlineColor oc (50, 50, 50)
+				OutlineColor oc (250, 50, 50)
     			Circle c (20, n * 15 + 10, 6)
 				FillColor black (0, 0, 0)
 				Text _label (40, n * 15 + 14, "")
 				label aka _label.text
 				FSM fsm {
 					State st_unselected
-					State st_pressed
+					State st_pressed {
+						NoOutline no
+						FillColor fc (05, 77, 241)
+						Circle s (20, n * 15 + 10, 5)
+					}
 					State st_selected {
 						NoOutline no
 						FillColor fc (105, 177, 241)
@@ -43,10 +47,15 @@ Checkbox (Process frame, int nb_entry) {
 					}
 					st_unselected->st_pressed (c.press)
 					st_pressed->st_selected (c.release, unselectAll)
-					st_pressed->st_unselected (frame.release)
+					st_pressed->st_unselected (c.leave)
+					st_unselected->st_pressed (c.enter)
 					st_selected->st_unselected (unselectAll)
 				}
 				selected aka fsm.st_selected
+
+				//debug
+				LogPrinter lp ("log " + to_string(n) + " :")
+				fsm.state => lp.input
 			}
   		}
 	}

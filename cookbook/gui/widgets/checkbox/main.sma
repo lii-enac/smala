@@ -25,7 +25,7 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-  Checkbox cb (f, 5)
+  Checkbox cb (5)
   cb.entries.1.label = "a"
   cb.entries.2.label = "b"
   cb.entries.3.label = "c"

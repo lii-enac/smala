@@ -9,14 +9,16 @@ FittsTask1D(Process f) {
   Int target_distance(500)
   Int target_time_acquisition(0)
 
+  // scene
+
   // bg
   FillColor _(0,0,0)
   Rectangle bg(0,0, 0,0, 0,0)
   f.width =:> bg.width
   f.height =:> bg.height
 
-  // scene
-  Switch display(starting_area) {
+  // fg
+  Switch display(starting) {
     Component starting {
       FillOpacity o(1)
       FillColor fc(200, 200, 200) // lightgray
@@ -33,15 +35,38 @@ FittsTask1D(Process f) {
     }
   }
 
-  // cursor
+  // 1D cursor
   FillColor _(255,255,255)
   OutlineColor _(0,0,0)
   OutlineWidth _(1)
-  Rectangle cursor(0,0, 2,0, 0,0)
-  f.height =:> cursor.height
-  f.move.x =:> cursor.x
+  Rectangle cursor(-200,0, 2,0, 0,0)
 
-  Bool in(0)
+
+  // performance measurement
+
+  Component chronometer {
+    Counter counter(0, 10)
+
+    Switch status(idle) {
+      Component idle {
+      }
+      Component running {
+        Clock cl(10)
+        cl.tick -> counter.step
+      }
+    }
+    status.idle -> counter.reset
+
+    state aka status.state
+    elapsed aka counter.output
+  }
+
+  // interaction
+
+  f.height =:> cursor.height
+  f.move.x => cursor.x
+
+  //Bool in(0)
 
   FSM control {
     State init {
@@ -49,31 +74,32 @@ FittsTask1D(Process f) {
       tfc aka display.target.fc 
       200 =: sfc.r, sfc.g, sfc.b 
       200 =: tfc.r, tfc.g, tfc.b
-      1 =: display.starting.o.a
+      1 =: display.starting.o.alpha
       "starting" =: display.state
-      f.move.x < 32 =:> in
+      "idle" =: chronometer.state
+      //0 < cursor.x && cursor.x < 32 =:> in
     }
     State on_starting_area {
       255 =: display.starting.fc.g
       Clock start_task(500) // 0.5ms
     }
     State started {
-      //Clock acquisition_time(100000)
-      0 =: display.starting.o.a
+      0 =: display.starting.o.alpha
       "target" =: display.state
+      "running" =: chronometer.state
     }
     State miss {
       255 =: display.target.fc.r
       Clock t(50) // 0.05ms
     }
     State success {
-      //on_starting_area.acquisition_time.elpased =: target_time_acquisition
+      chronometer.elapsed =: target_time_acquisition
       255 =: display.target.fc.g
       Clock t(50) // 0.05ms
     }
 
-    //init -> on_starting_area (display.starting.area.enter)
-    init -> on_starting_area (in.true)
+    init -> on_starting_area (display.starting.area.enter)
+    //init -> on_starting_area (in.true)
     on_starting_area -> init (display.starting.area.leave)    
     on_starting_area -> started (on_starting_area.start_task.tick)
     started -> miss (bg.press)
@@ -81,8 +107,5 @@ FittsTask1D(Process f) {
     miss -> init (miss.t.tick)
     success -> init (success.t.tick)
   }
-
-  //TextPrinter tp
-  //control.state =:> tp.input
 
 }

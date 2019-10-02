@@ -58,20 +58,17 @@ endif
 CXXFLAGS += -MMD -g -std=c++14
 
 ifeq ($(os),Linux)
-YACC = bison -d
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 endif
 
 ifeq ($(os),Darwin)
-YACC = /usr/local/opt/bison/bin/bison -d
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 endif
 
 ifeq ($(os),MinGW)
-YACC = bison -d
 LD_LIBRARY_PATH=PATH
 debugger := gdb
 endif

@@ -301,7 +301,6 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/accumulated_transforms \
 	gui/direct_manipulation/rotate_resize \
 	gui/direct_manipulation/pinch_zoom \
-	gui/direct_manipulation/dnd \
 	gui/fitts_law \
 	gui/redisplay \
 	gui/widgets/switch_range \

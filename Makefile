@@ -303,6 +303,7 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/pinch_zoom \
 	gui/fitts_law \
 	gui/redisplay \
+	gui/widgets/line_edit \
 	gui/widgets/switch_range \
 	gui/widgets/button \
 	gui/widgets/checkbox \

@@ -10,5 +10,5 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := FittsTask1D.o main.o
+objs_cookbook_app := Chronometer.o FittsTask1D.o main.o
 djnn_libs_cookbook_app := gui display base core display

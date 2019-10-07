@@ -11,23 +11,27 @@ Component root
 	Frame f ("my frame", 0, 0, 800, 800)
   	mouseTracking = 1
 
-  	// Typical CHIesque Fitts (not the genuine from the 50's)
+  	// Typical CHIesque Fitts (not the genuine, reciprocal from the 50's)
   	FittsTask1D fitts(f)
 
-    16 =: fitts.target_width
-  	512 =: fitts.target_distance
+    Int target_width(16)
+    Int target_distance(512)
 
+    target_distance =: fitts.target_distance
 
-  	// MacGuffin & Balakrishnan
-  	/*
+    // classic
+    target_width =:> fitts.target_width
+
+  	// MacGuffin & Balakrishnan, 2002
+    /*  	
     f.move.x > 0.9*fitts.target_distance
-  		? 50*2
-  		: 50
+  		? target_width*2
+  		: target_width
   	=:> fitts.target_width
   	*/
-
-  	/*
+  	
   	// Zhai, Conversy, Guiard & Beaudouin-Lafon, 2003
+    /*
   	Double
   	scale(0.5) // FIXME .5 does not work!!
   	//scale(1)
@@ -35,8 +39,8 @@ Component root
   	// should be random
 
 	  f.move.x > 0.9*fitts.target_distance
-  		? 50*scale
-  		: 50
+  		? target_width*scale
+  		: target_width
   	=:> fitts.target_width
   	*/
 

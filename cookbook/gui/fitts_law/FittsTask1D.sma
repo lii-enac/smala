@@ -3,13 +3,15 @@ use base
 use display
 use gui
 
+import Chronometer
+
 _define_
 FittsTask1D(Process f) {
   Int target_width(10)
   Int target_distance(500)
   Int target_time_acquisition(0)
 
-  // scene
+  // graphic scene
 
   // bg
   FillColor _(0,0,0)
@@ -20,10 +22,8 @@ FittsTask1D(Process f) {
   // fg
   Switch display(starting) {
     Component starting {
-      FillOpacity o(1)
       FillColor fc(200, 200, 200) // lightgray
       Rectangle area (0,0, 32,32, 0,0)
-      //(f.height-32)/2 =:> area.y
       f.height =:> area.height
     }
     Component target {
@@ -40,31 +40,15 @@ FittsTask1D(Process f) {
   OutlineColor _(0,0,0)
   OutlineWidth _(1)
   Rectangle cursor(-200,0, 2,0, 0,0)
-
-
-  // performance measurement
-
-  Component chronometer {
-    Counter counter(0, 10)
-
-    Switch status(idle) {
-      Component idle {
-      }
-      Component running {
-        Clock cl(10)
-        cl.tick -> counter.step
-      }
-    }
-    status.idle -> counter.reset
-
-    state aka status.state
-    elapsed aka counter.output
-  }
+  f.height =:> cursor.height
 
   // interaction
 
-  f.height =:> cursor.height
   f.move.x => cursor.x
+
+  // performance measurement
+
+  Chronometer chronometer(10)
 
   //Bool in(0)
 
@@ -74,7 +58,6 @@ FittsTask1D(Process f) {
       tfc aka display.target.fc 
       200 =: sfc.r, sfc.g, sfc.b 
       200 =: tfc.r, tfc.g, tfc.b
-      1 =: display.starting.o.alpha
       "starting" =: display.state
       "idle" =: chronometer.state
       //0 < cursor.x && cursor.x < 32 =:> in
@@ -84,7 +67,6 @@ FittsTask1D(Process f) {
       Clock start_task(500) // 0.5ms
     }
     State started {
-      0 =: display.starting.o.alpha
       "target" =: display.state
       "running" =: chronometer.state
     }

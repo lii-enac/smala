@@ -17,7 +17,7 @@ use base
 use display
 use gui
 
-import Checkbox
+import Radiobutton
 
 _main_
 Component root {
@@ -25,19 +25,19 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-  Checkbox cb (5)
-  cb.entries.1.label = "a"
-  cb.entries.2.label = "b"
-  cb.entries.3.label = "c"
-  cb.entries.4.label = "d"
-  cb.entries.5.label = "e"
+  Radiobutton rb (5)
+  rb.entries.1.label = "a"
+  rb.entries.2.label = "b"
+  rb.entries.3.label = "c"
+  rb.entries.4.label = "d"
+  rb.entries.5.label = "e"
 
   FillColor fc (0, 0, 0)
   Incr incr (1)  
   Text t (150, 50, "")
-  isString ("Selected entry: " + cb.entry + " state: " + incr.state) =:> t.text
+  isString ("Selected entry: " + rb.entry + " state: " + incr.state) =:> t.text
 
-  cb.entries.2.selected -> incr
+  rb.entries.2.selected -> incr
 }
 
 run root

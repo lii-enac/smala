@@ -306,7 +306,7 @@ cookbook_apps := core/bindings \
 	gui/widgets/line_edit \
 	gui/widgets/switch_range \
 	gui/widgets/button \
-	gui/widgets/checkbox \
+	gui/widgets/radiobutton \
 	gui/widgets/dial \
 	gui/widgets/scrollbar \
 	gui/widgets/tab \

@@ -17,7 +17,7 @@ use display
 use gui
 
 _define_
-Radiobutton (int nb_entry) {
+Checkbox (int nb_entry) {
   Int entry (0)
   Spike unselectAll
 

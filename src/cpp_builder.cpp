@@ -1046,7 +1046,7 @@ namespace Smala
         indent (os); indent (os);
         os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
         indent (os); indent (os);
-        os << "delete " << new_name << ";\n";
+        os << new_name << "->schedule_delete ();\n";
         indent (os); indent (os);
         os << new_name << " = nullptr;\n";
         indent (os);
@@ -1064,7 +1064,7 @@ namespace Smala
         os << arg.first << "->get_parent ()->remove_child (" << arg.first
         << ");\n";
         indent (os); indent (os);
-        os << "delete " << arg.first << ";\n";
+        os << arg.first << "->schedule_delete ();\n";
         indent (os); indent (os);
         os << arg.first << " = nullptr;\n";
         indent (os);

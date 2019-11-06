@@ -727,6 +727,8 @@ namespace Smala
     if (pos == std::string::npos) {
       str = m_parent_list.back ()->get_symbol (symbol);
       if (str.empty ()) {
+        if (symbol.substr(0,3) == "DJN")
+          return std::make_pair (symbol, m_null_string);
         print_error_message (error_level::error, "Symbol not found: " + symbol, 1);
         return std::make_pair (symbol, m_null_string);
       } else

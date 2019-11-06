@@ -1096,32 +1096,36 @@ primary_expression
       $$ = n; 
     }
   | NAME_OR_PATH
-    {
-      TermNode *n;
+  {
+    TermNode *n;
+    if ($1.substr(0,3) == "DJN")
+      n = new TermNode (VALUE, $1);
+    else {
       switch (m_cast) {
-        case STRING_CAST:
-          n = new TermNode (CAST_STRING, $1);
-          break;
-        case DOUBLE_CAST:
+       case STRING_CAST:
+         n = new TermNode (CAST_STRING, $1);
+         break;
+       case DOUBLE_CAST:
+         n = new TermNode (CAST_DOUBLE, $1);
+         break;
+       case PROCESS_CAST:
+         n = new TermNode (CAST_PROCESS, $1);
+         break;
+       default: {
+        if (m_in_func)
           n = new TermNode (CAST_DOUBLE, $1);
-          break;
-        case PROCESS_CAST:
-          n = new TermNode (CAST_PROCESS, $1);
-          break;
-        default: {
-          if (m_in_func)
-            n = new TermNode (CAST_DOUBLE, $1);
-          else
-            n = new TermNode (VAR, $1);
+        else
+          n = new TermNode (VAR, $1);
         }
       }
-      if (m_in_arguments || m_in_for)
-        driver.add_node (n);
-      else
-        comp_expression.push_back (n);
-      arg_expression.push_back (n);
-      $$ = n; 
     }
+    if (m_in_arguments || m_in_for)
+      driver.add_node (n);
+    else
+      comp_expression.push_back (n);
+    arg_expression.push_back (n);
+    $$ = n;
+  }
   | NULL
     {
       TermNode *n = new TermNode (SMALA_NULL, "");

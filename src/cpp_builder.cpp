@@ -109,17 +109,19 @@ namespace Smala
   {
     if (!m_in_for)
       indent (os);
-    std::pair<std::string, std::string> arg = parse_symbol (node->name ());
+    std::pair<std::string, std::vector<std::string>> arg = parse_symbol (node->name ());
     if (arg.first.rfind ("cpnt_", 0) == 0) {
       os << "((AbstractProperty*) ";
-      os << arg.first;
-      if (arg.second.compare (m_null_string) != 0)
-        os << "->find_component (" << arg.second << ")";
+      if (!arg.second.empty ())
+        print_find_component (os, node, arg);
+      else
+        os << arg.first;
       os << ")->set_value (";
       os << "((AbstractProperty*) ";
-      os << arg.first;
-      if (arg.second.compare (m_null_string) != 0)
-        os << "->find_component (" << arg.second << ")";
+      if (!arg.second.empty ())
+        print_find_component (os, node, arg);
+      else
+        os << arg.first;
       os << ")->get_double_value ()";
       if (is_incr)
         os << " +";
@@ -160,7 +162,7 @@ namespace Smala
           os << n->arg_value ();
           break;
         case VAR: {
-          std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+          std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
           // if the name contains "var_" then this is a simple variable not a djnn property
           // so write it as is and return
           std::size_t found = p.first.find ("var_");
@@ -169,10 +171,10 @@ namespace Smala
             return;
           }
           os << "((AbstractProperty*)";
-          if (p.second.compare (m_null_string) == 0) {
+          if (p.second.empty ()) {
             os << p.first;
           } else {
-            print_find_component (os, p.first, p.second);
+            print_find_component (os, node, p);
           }
           os << ")->get_string_value ()";
           break;
@@ -218,18 +220,18 @@ namespace Smala
       return;
     }
     std::string constructor = get_constructor (node->djnn_type ());
-    std::pair<std::string, std::string> src, dst;
+    std::pair<std::string, std::vector<std::string>> src, dst;
     bool is_binding = node->djnn_type ().compare ("Binding") == 0;
 
     switch (ctrl->in ()->node_type ()) {
       case BINARY_OP: {
         src.first = ctrl->in ()->build_name ();
-        src.second = "\"result\"";
+        src.second.push_back ( "result");
         break;
       }
       case UNARY_OP: {
         src.first = ctrl->in ()->build_name ();
-        src.second = "\"output\"";
+        src.second.push_back ("output");
         break;
       }
       case LOCAL_NODE: {
@@ -237,7 +239,7 @@ namespace Smala
         src.first = n->root ()->build_name ();
         std::string path = n->path ();
         std::replace (path.begin (), path.end (), '.', '/');
-        src.second = "\"" + path + "\"";
+        src.second.push_back (path);
         break;
       }
       case LITERAL: {
@@ -247,7 +249,7 @@ namespace Smala
         os << "(" << node->parent ()->build_name () << ", " << m_null_string
             << ", " << ctrl->in ()->name () << ");\n";
         src.first = new_name;
-        src.second = m_null_string;
+        //src.second.push_back (m_null_string);
         break;
       }
       case TEXT: {
@@ -257,13 +259,13 @@ namespace Smala
         os << "(" << node->parent ()->build_name () << ", " << m_null_string
             << ", " << ctrl->in ()->name () << ");\n";
         src.first = new_name;
-        src.second = m_null_string;
+        //src.second.push_back (m_null_string);
         break;
       }
       default:
         if (!ctrl->in ()->build_name ().empty ()) {
           src.first = ctrl->in ()->build_name ();
-          src.second = m_null_string;
+          //src.second.push_back (m_null_string);
         } else if (!ctrl->in ()->name ().empty ()) {
           src = parse_symbol (ctrl->in ()->name ());
           std::string prefix = "var_";
@@ -275,7 +277,7 @@ namespace Smala
             os << "(" << node->parent ()->build_name () << ", " << m_null_string
                 << ", " << src.first << ");\n";
             src.first = new_name;
-            src.second = m_null_string;
+            //src.second.push_back (m_null_string);
           }
         } else {
           print_error_message (error_level::warning,
@@ -291,13 +293,13 @@ namespace Smala
         dst.first = n->root ()->build_name ();
         std::string path = n->path ();
         std::replace (path.begin (), path.end (), '.', '/');
-        dst.second = "\"" + path + "\"";
+        dst.second.push_back (path);
         break;
       }
       default:
         if (!ctrl->out ()->build_name ().empty ()) {
           dst.first = ctrl->out ()->build_name ();
-          dst.second = m_null_string;
+          //dst.second.push_back (m_null_string);
         } else if (!ctrl->out ()->name ().empty ()) {
           dst = parse_symbol (ctrl->out ()->name ());
         } else {
@@ -310,15 +312,9 @@ namespace Smala
     if (is_binding) {
       /* check for synchronizer */
       indent (os);
-      os << "if (dynamic_cast<Synchronizer*> (" << dst.first;
-      if (dst.second != m_null_string)
-        os << "->find_component (" << dst.second << ")";
-      os << ") != nullptr) {\n";
+      os << "if (dynamic_cast<Synchronizer*> (" << build_find_component (node, dst) << ") != nullptr) {\n";
       indent (os);
-      os << "\t((Synchronizer*) " << dst.first;
-      if (dst.second != m_null_string)
-        os << "->find_component (" << dst.second << ")";
-      os << ")->add_source (" << src.first << ", " << src.second << ");\n";
+      os << "\t((Synchronizer*) " << build_find_component (node, dst) << ")->add_source (" << build_find_component (node, src) << ", \"\");\n";
       indent (os);
       os << "} else {\n";
       m_indent++;
@@ -336,8 +332,8 @@ namespace Smala
 
       print_component_constructor (os, constructor);
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
-      os << ", " << src.first << ", " << src.second << ", ";
-      os << ctrl->get_in_act () << ", " << dst.first << ", " << dst.second
+      os << ", " << build_find_component (node, src) << ", \"\", ";
+      os << ctrl->get_in_act () << ", " << build_find_component (node, dst) << ", \"\""
           << ", " << ctrl->get_out_act () << ");\n";
       m_indent--;
       indent (os);
@@ -357,8 +353,8 @@ namespace Smala
 
       print_component_constructor (os, constructor);
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
-      os << ", " << src.first << ", " << src.second << ", ";
-      os << dst.first << ", " << dst.second;
+      os << ", " << build_find_component (node, src) << ", \"\"" << ", ";
+      os << build_find_component (node, dst) << ", \"\"";
       if (node->djnn_type ().compare ("Assignment") == 0
           || node->djnn_type ().compare ("PausedAssignment") == 0) {
         os << ", " << node->args ().at (0).second;
@@ -374,7 +370,7 @@ namespace Smala
     std::string p_name =
         node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
     TermNode* arg_node = (TermNode*) node->get_expression ().at (0);
-    std::pair<std::string, std::string> arg;
+    std::pair<std::string, std::vector<std::string>> arg;
     if (arg_node->arg_type () != VAR) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       indent (os);
@@ -385,17 +381,18 @@ namespace Smala
         os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
             << p_name << ", \"\", " << arg_node->arg_value () << ");\n";
       }
-      arg = std::pair<std::string, std::string> (new_name, "\"\"");
+      std::vector<std::string> children;
+      arg = std::pair<std::string, std::vector<std::string>> (new_name, children);
     } else {
       arg = parse_symbol (arg_node->arg_value ());
     }
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-      std::pair<std::string, std::string> out_arg = parse_symbol (
+      std::pair<std::string, std::vector<std::string> >out_arg = parse_symbol (
           node->get_output_nodes ().at (0));
       os << "Process *" << new_name << " = new Assignment ( " << p_name
-          << ", \"\", " << arg.first << ", " << arg.second << ", "
-          << out_arg.first << ", " << out_arg.second << ", "
+          << ", \"\", " << build_find_component (node, arg) << ", \"\","
+          << build_find_component (node, out_arg) << ", \"\", "
           << node->is_model () << ");\n";
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
           && node->duplicate_warning ())
@@ -404,7 +401,7 @@ namespace Smala
     } else {
       for (auto e : node->get_output_nodes ()) {
         indent (os);
-        std::pair<std::string, std::string> out_arg = parse_symbol (e);
+        std::pair<std::string, std::vector<std::string> > out_arg = parse_symbol (e);
         os << "new ";
         if (node->is_paused ())
           os << "Paused";
@@ -412,8 +409,8 @@ namespace Smala
           os << "Connector (";
         else
           os << "Assignment (";
-        os << p_name << ", \"\", " << arg.first << ", " << arg.second << ", "
-            << out_arg.first << ", " << out_arg.second;
+        os << p_name << ", \"\", " << build_find_component (node, arg) << ", \"\","
+                                   << build_find_component (node, out_arg) << ", \"\"";
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
         if (node->is_connector())
           os << ", " << !node->is_model () << ");\n";
@@ -590,7 +587,7 @@ namespace Smala
           || ((TermNode*) e)->arg_type () == CAST_DOUBLE
           || ((TermNode*) e)->arg_type () == CAST_PROCESS)
           && sym.find (((TermNode*) e)->arg_value ()) == sym.end ()) {
-        std::pair<std::string, std::string> arg = parse_symbol (
+        std::pair<std::string, std::vector <std::string>> arg = parse_symbol (
             ((TermNode*)e)->arg_value ());
 
         if (arg.first.compare (0, 6, "d_var_") == 0
@@ -619,11 +616,10 @@ namespace Smala
         } else {
           indent (os);
 
-          if (arg.second.compare (m_null_string) != 0) {
+          if (!arg.second.empty ()) {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             os << "AbstractProperty* " << new_name
-                << " = dynamic_cast<AbstractProperty*> (" << arg.first
-                << "->find_component (" << arg.second << "));\n";
+                << " = dynamic_cast<AbstractProperty*> (" << build_find_component (node, arg) << ");\n";
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
@@ -669,10 +665,10 @@ namespace Smala
 
     for (auto e : node->get_output_nodes ()) {
       if (sym.find (e) == sym.end ()) {
-        std::pair<std::string, std::string> arg = parse_symbol (e);
+        std::pair<std::string, std::vector<std::string>> arg = parse_symbol (e);
         if (arg.first.compare (0, 4, "var_") != 0) {
           indent (os);
-          if (arg.second.compare (m_null_string) == 0) {
+          if (arg.second.empty ()) {
             os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
                 << ") == nullptr) {\n";
             indent (os);
@@ -693,8 +689,7 @@ namespace Smala
           } else {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             os << "AbstractProperty* " << new_name
-                << " = dynamic_cast<AbstractProperty*> (" << arg.first
-                << "->find_component (" << arg.second << "));\n";
+                << " = dynamic_cast<AbstractProperty*> (" << build_find_component (node, arg) << ");\n";
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
@@ -749,12 +744,14 @@ namespace Smala
       }
     }
     for (auto out : node->get_output_nodes ()) {
-      std::pair<std::string, std::string> arg = parse_symbol (out);
+      std::pair<std::string, std::vector <std::string>> arg = parse_symbol (out);
       indent (os);
-      os << native_edge_name <<"->add_native_edge (" << new_name << "," << arg.first;
+      os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
       //os << "Graph::instance ().add_edge (" << new_name << "," << arg.first;
-      if (arg.second.compare (m_null_string) != 0)
-        os << "->find_component (" << arg.second << ")";
+      if (!arg.second.empty ())
+        os << build_find_component (node, arg);
+      else
+        os << arg.first;
       os << ");\n";
     }
   }
@@ -982,11 +979,11 @@ namespace Smala
   {
     InstructionNode *n = static_cast<InstructionNode*> (node);
     for (int i = 0; i < n->cpnt_list ().size (); i++) {
-      std::pair<std::string, std::string> arg = parse_symbol (
+      std::pair<std::string, std::vector <std::string>> arg = parse_symbol (
         n->cpnt_list ().at (i));
       std::string cpnt_name =
-      arg.second.compare (m_null_string) == 0 ?
-      arg.first : arg.first + "->find_component (" + arg.second + ")";
+      arg.second.empty () ?
+      arg.first : build_find_component (node, arg);
       if (arg.first.empty ()) {
         print_error_message (error_level::error,
          "unknown component " + n->cpnt_list ().at (i), 1);
@@ -1003,7 +1000,7 @@ namespace Smala
           indent (os);
           os << "else" << endl ;
           indent (os); indent (os);
-          os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg.second <<  " << endl << endl;" << endl; 
+          os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << cpnt_name <<  " << endl << endl;" << endl;
        }
        else {
         os << " (";
@@ -1036,7 +1033,7 @@ namespace Smala
       break;
       case DELETE:
          /* delete first.second */
-      if (arg.second.compare (m_null_string) != 0) {
+      if (!arg.second.empty ()) {
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
         os << "Process *" << new_name << " = " << cpnt_name << ";\n";
         indent (os);
@@ -1094,12 +1091,13 @@ namespace Smala
                                    "duplicated name: " + node->name (), 0);
       os << "Process* " << var_name << " = ";
     } else {
-      std::pair<std::string, std::string> arg = parse_symbol (node->name ());
+      std::pair<std::string, std::vector<std::string>> arg = parse_symbol (node->name ());
       if (arg.first.rfind ("cpnt_", 0) == 0) {
         os << "((AbstractProperty*) ";
-        os << arg.first;
-        if (arg.second.compare (m_null_string) != 0)
-          os << "->find_component (" << arg.second << ")";
+        if (!arg.second.empty ())
+          print_find_component (os, node, arg);
+        else
+          os << arg.first;
         os << ")->set_value (";
         m_in_set_property = true;
       } else {
@@ -1138,16 +1136,18 @@ namespace Smala
     std::string dst = node->args ()[0].second;
     std::string src = node->args ()[1].second;
     indent (os);
-    std::pair<std::string, std::string> arg = parse_symbol (dst);
+    std::pair<std::string, std::vector<std::string>> arg = parse_symbol (dst);
     os << "((RefProperty*) ";
-    os << arg.first;
-    if (arg.second.compare (m_null_string) != 0)
-      os << "->find_component (" << arg.second << ")";
+    if (!arg.second.empty ())
+      print_find_component (os, node, arg);
+    else
+      os << arg.first;
     os << ")->set_value (";
-    std::pair<std::string, std::string> arg2 = parse_symbol (src);
-    os << arg2.first;
-    if (arg2.second.compare (m_null_string) != 0)
-      os << "->find_component (" << arg2.second << ")";
+    std::pair<std::string, std::vector<std::string>> arg2 = parse_symbol (src);
+    if (!arg2.second.empty ())
+      print_find_component (os, node, arg2);
+    else
+      os << arg2.first;
     os << ", true);\n";
   }
 
@@ -1194,7 +1194,7 @@ namespace Smala
           m_in_switch = false;
           return;
         }
-        std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
         // if the name contains "var_" then this is a simple variable not a djnn property
         // so write it as is and return
         std::size_t found = p.first.find ("var_");
@@ -1203,34 +1203,34 @@ namespace Smala
           return;
         }
 
-        if (p.second.compare (m_null_string) == 0)
+        if (p.second.empty ())
           os << p.first;
         else
-          os << p.first << "->find_component (" << p.second << ")";
+          print_find_component (os, node, p);
 
         break;
       }
       case CAST_PROCESS: {
-        std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
-        if (p.second.compare (m_null_string) == 0)
+        std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
+        if (p.second.empty ())
           os << p.first;
         else
-          os << p.first << "->find_component (" << p.second << ")";
+          print_find_component (os, node, p);
 
         break;
       }
       case CAST_DOUBLE: {
-        std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
         std::size_t found = p.first.find ("var_");
         if (found != std::string::npos) {
           os << p.first;
           return;
         }
         os << "((AbstractProperty*)";
-        if (p.second.compare (m_null_string) == 0)
+        if (p.second.empty ())
           os << p.first;
         else
-          print_find_component (os, p.first, p.second);
+          print_find_component (os, node, p);
         os << ")->get_double_value ()";
         break;
       }
@@ -1253,12 +1253,12 @@ namespace Smala
         break;
       }
       case CAST_STRING: {
-        std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+        std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
         os << "((AbstractProperty*)";
-        if (p.second.compare (m_null_string) == 0)
+        if (p.second.empty ())
           os << p.first;
         else
-          print_find_component (os, p.first, p.second);
+          print_find_component (os, node, p);
         os << ")->get_string_value ()";
         break;
       }
@@ -1302,11 +1302,12 @@ namespace Smala
       os << " " << var_name << " = ";
       os << "((" << node->djnn_type ().substr (3) << "Property*) ";
     }
-    std::pair<std::string, std::string> arg = parse_symbol (
+    std::pair<std::string, std::vector<std::string>> arg = parse_symbol (
         node->args ().at (0).second);
-    os << arg.first;
-    if (arg.second.compare (m_null_string) != 0)
-      os << "->find_component (" << arg.second << ")";
+    if (!arg.second.empty ())
+      print_find_component (os, node, arg);
+    else
+      os << arg.first;
     os << ")->get_value ()";
     if (node->djnn_type ().compare ("doubleToString") == 0
         || node->djnn_type ().compare ("intToString") == 0) {
@@ -1323,11 +1324,11 @@ namespace Smala
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << n->left_arg () << "\", ";
-    std::pair<std::string, std::string> arg = parse_symbol (n->right_arg ());
-    if (arg.second.compare (m_null_string) == 0)
+    std::pair<std::string, std::vector <std::string>> arg = parse_symbol (n->right_arg ());
+    if (arg.second.empty ())
       os << arg.first << ");\n";
     else
-      os << arg.first << "->find_component (" << arg.second << "));\n";
+      os << build_find_component (n, arg) << ");\n";
     indent (os);
     os << "Process *" << new_name << " = " << m_parent_list.back ()->name ()
         << "->find_component ( \"" << n->left_arg () + "\");\n";
@@ -1342,10 +1343,10 @@ namespace Smala
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
-    std::pair<std::string, std::string> left = parse_symbol (n->left_arg ());
-    std::pair<std::string, std::string> right = parse_symbol (n->right_arg ());
-    os << "merge_children (" << left.first << ", " << left.second << ", "
-        << right.first << ", " << right.second << ");\n";
+    std::pair<std::string, std::vector<std::string>> left = parse_symbol (n->left_arg ());
+    std::pair<std::string, std::vector<std::string>> right = parse_symbol (n->right_arg ());
+    os << "merge_children (" << build_find_component (node, left) << ", \"\", "
+        << build_find_component (node, right) << ", \"\");\n";
   }
 
   void
@@ -1353,8 +1354,8 @@ namespace Smala
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
-    std::pair<std::string, std::string> right = parse_symbol (n->left_arg ());
-    std::pair<std::string, std::string> left = parse_symbol (n->right_arg ());
+    std::pair<std::string, std::vector<std::string>> right = parse_symbol (n->left_arg ());
+    std::pair<std::string, std::vector<std::string>> left = parse_symbol (n->right_arg ());
     os << left.first << "->remove_child ( " << right.first << ");\n";
   }
 
@@ -1368,7 +1369,7 @@ namespace Smala
       last = parse_symbol (n->right_arg ()).first;
     else
       last = "nullptr";
-    std::pair<std::string, std::string> left = parse_symbol (n->left_arg ());
+    std::pair<std::string, std::vector<std::string>> left = parse_symbol (n->left_arg ());
     os << left.first << "->get_parent ()->move_child (" << left.first << ", "
         << c << ", " << last << ");\n";
   }
@@ -1434,10 +1435,10 @@ namespace Smala
   void
   CPPBuilder::add_child (std::ofstream &os, Node *node)
   {
-    std::pair<std::string, std::string> s = parse_symbol (
+    std::pair<std::string, std::vector<std::string>> s = parse_symbol (
         node->args ().at (0).second);
     indent (os);
-    if (s.second.compare (m_null_string) == 0) {
+    if (s.second.empty ()) {
       m_parent_list.back ()->add_entry (node->name (), s.first);
       os << m_parent_list.back ()->name () << "->add_child (" << s.first
           << ", \"" << node->name () << "\");\n";
@@ -1447,8 +1448,7 @@ namespace Smala
         print_error_message (error_level::warning,
                              "duplicated name: " + node->name (), 0);
       }
-      os << "Process *" << new_name << " = " << s.first << "->find_component ("
-          << s.second << ");\n";
+      os << "Process *" << new_name << " = " << build_find_component (node, s) << ";\n";
       indent (os);
       os << m_parent_list.back ()->name () << "->add_child (" << new_name
           << ", \"" << node->name () << "\");\n";
@@ -1469,12 +1469,11 @@ namespace Smala
   CPPBuilder::add_children_to (std::ofstream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    std::pair<std::string, std::string> s = parse_symbol (node->name ());
+    std::pair<std::string, std::vector <std::string>> s = parse_symbol (node->name ());
 
-    if (s.second.compare (m_null_string) != 0) {
+    if (!s.second.empty ()) {
       indent (os);
-      os << "Process *" << new_name << " = " << s.first << "->find_component ("
-          << s.second << ");\n";
+      os << "Process *" << new_name << " = " << build_find_component (node, s) << ";\n";
       m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (new_name);
@@ -1500,13 +1499,13 @@ namespace Smala
     } else {
       if (node->args ().size () == 2) {
         string root = m_parent_list.back ()->get_symbol (arg.second);
-        os << root << "->find_component (" << node->args ().at (1).second;
+        os << root << "->find_component (" << node->args ().at (1).second << ")";
       } else {
-        std::pair<std::string, std::string> p = parse_symbol (arg.second);
-        os << p.first << "->find_component (" << p.second;
+        std::pair<std::string, std::vector<std::string>> p = parse_symbol (arg.second);
+        print_find_component (os, node, p);
       }
     }
-    os << ");\n";
+    os << ";\n";
   }
 
   void
@@ -1519,11 +1518,11 @@ namespace Smala
     std::pair<ParamType, std::string> arg = node->args ().at (0);
     indent (os);
     os << "Process *" << new_name << " = ";
-    std::pair<std::string, std::string> p = parse_symbol (arg.second);
-    if (p.second.compare (m_null_string) == 0)
+    std::pair<std::string, std::vector<std::string>> p = parse_symbol (arg.second);
+    if (p.second.empty ())
       os << p.first << "->clone ();\n";
     else
-      os << p.first << "->find_component (" << p.second << ")->clone();\n";
+      os << build_find_component (node, p) << "->clone();\n";
   }
 
   void
@@ -1625,9 +1624,9 @@ namespace Smala
     if (data.compare ("0") == 0)
       data = "nullptr";
     else {
-      std::pair<std::string, std::string> p = parse_symbol (data);
-      if (p.second.compare (m_null_string) != 0) {
-        data = p.first + "->find_component (" + p.second + ")";
+      std::pair<std::string, std::vector<std::string>> p = parse_symbol (data);
+      if (!p.second.empty ()) {
+        data = build_find_component (node, p);
       } else
         data = p.first;
     }
@@ -1642,23 +1641,23 @@ namespace Smala
     os << "new " << constructor << " (" << parse_symbol (ctrl->parent ()->name()).first
         << ", " << m_null_string;
 
-    std::pair<std::string, std::string> src, dst;
+    std::pair<std::string, std::vector<std::string> >src, dst;
     src = parse_symbol (ctrl->in ()->name ());
     dst = parse_symbol (ctrl->out ()->name ());
     std::string src_str =
-        src.second.compare (m_null_string) == 0 ?
-            src.first : src.first + "->find_component (" + src.second + ")";
+        src.second.empty () ?
+            src.first : build_find_component (ctrl, src);
     std::string dst_str =
-        dst.second.compare (m_null_string) == 0 ?
-            dst.first : dst.first + "->find_component (" + dst.second + ")";
+        dst.second.empty () ?
+            dst.first : build_find_component (ctrl, dst);
     os << ", " << src_str << ", " << dst_str << ", ";
-    std::pair<std::string, std::string> trigger = parse_symbol (
+    std::pair<std::string, std::vector<std::string>> trigger = parse_symbol (
         ctrl->args ().at (0).second);
-    os << trigger.first << ", " << trigger.second << ", ";
+    os << build_find_component (ctrl, trigger) << ", \"\", ";
     if (ctrl->args ().size () == 2) {
-      std::pair<std::string, std::string> act = parse_symbol (
+      std::pair<std::string, std::vector<std::string>> act = parse_symbol (
           ctrl->args ().at (1).second);
-      os << act.first << ", " << act.second << ");\n";
+      os << build_find_component (ctrl, act) << ", \"\");\n";
     } else {
       os << "nullptr, \"\");\n";
     }
@@ -1770,7 +1769,7 @@ namespace Smala
                                          const std::string &name,
                                          const std::string &side)
   {
-    std::pair<std::string, std::string> p;
+    std::pair<std::string, std::vector<std::string>> p;
     switch (n->node_type ()) {
       case PATH: {
         p = parse_symbol (n->name ());
@@ -1778,12 +1777,12 @@ namespace Smala
       }
       case BINARY_OP: {
         p = parse_symbol (n->build_name ());
-        p.second = "\"result\"";
+        p.second.push_back ("\"result\"");
         break;
       }
       case UNARY_OP: {
         p = parse_symbol (n->build_name ());
-        p.second = "\"output\"";
+        p.second.push_back ("\"output\"");
         break;
       }
       default:
@@ -1791,7 +1790,7 @@ namespace Smala
     }
     indent (os);
     os << "new Connector (" << m_parent_list.back ()->name () << ", \"\", "
-        << p.first << ", " << p.second << ", " << name << ", " << side
+        << build_find_component (n, p) << ", \"\", " << name << ", " << side
         << ", false);\n";
   }
 
@@ -1883,11 +1882,67 @@ namespace Smala
       os << constructor;
   }
 
-  std::string
-  CPPBuilder::build_find_component (const std::string& first,
-                                    const std::string& second)
+  static bool
+  is_number(const std::string& s)
   {
-    return first + "->find_component (" + second + ")";
+      return !s.empty() && std::find_if(s.begin(),
+          s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+  }
+
+  std::string
+  CPPBuilder::build_find_component (Node *n, const std::pair< std::string, std::vector<std::string> > &sym)
+  {
+    std::string res = sym.first;
+    if (!sym.second.empty ()) {
+      res += "->find_component(\"";
+      std::string last = sym.second.back ();
+      for (int i = 0; i < sym.second.size (); i++) {
+        std::string s = sym.second.at(i);
+        if (s[0] == '[') {
+          bool is_alone = s[s.length()-1] == ']';
+          if (is_alone)
+            s = s.substr (1, s.length() - 2);
+          bool is_num = is_number (s);
+          if (!is_num) {
+            s = m_parent_list.back ()->get_symbol (s);
+          }
+          res += "\")->find_component(";
+          std::size_t found = s.find ("var_");
+          if (is_alone && (found!=std::string::npos || is_num)) {
+            res += s;
+            res += ")";
+            if (s != last) {
+              res += "->find_component(\"";
+            }
+          } else {
+            res+= "(int)((AbstractProperty*)(";
+            s =  m_parent_list.back ()->get_symbol (s.substr (1, s.length() - 2));
+            res+=s;
+            if (is_alone) {
+              res+="))->get_double_value())";
+              if (s != last) {
+                res += "->find_component(\"";
+              }
+            } else {
+              res+="->find_component(\"";
+            }
+          }
+
+        } else if (s[s.length()-1] == ']') {
+          res+=s.substr (0, s.length() - 2);
+          res+="\"))->get_double_value())";
+          if (s != last) {
+            res += "->find_component(\"";
+          }
+        } else {
+          res += s;
+          if (s != last && sym.second.at(i+1)[0] != '[')
+            res += "/";
+        }
+      }
+      res+= "\")";
+    }
+    return  res;
   }
 
   void
@@ -1903,11 +1958,11 @@ namespace Smala
     for (int i = 0; i < size; i++) {
       std::string str;
       if (args.at (i).first == NAME) {
-        std::pair<std::string, std::string> var = parse_symbol (
+        std::pair<std::string, std::vector<std::string>> var = parse_symbol (
             args.at (i).second);
         str =
-            var.second.compare ("0") == 0 ?
-                var.first : var.first + "->find_component (" + var.second + ")";
+            var.second.empty () ?
+                var.first : build_find_component (nullptr, var);
       } else {
         str = args.at (i).second;
       }

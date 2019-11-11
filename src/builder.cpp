@@ -484,14 +484,14 @@ namespace Smala
         break;
       case VAR:
         {
-          std::pair<std::string, std::string> p = parse_symbol (n->arg_value ());
+          std::pair<std::string, std::vector<std::string>> p = parse_symbol (n->arg_value ());
           if (m_in_static_expr && m_in_set_text) {
             os << "((TextProperty*)";
           }
-          if (p.second.compare (m_null_string) == 0)
+          if (p.second.empty ())
             os << p.first;
           else
-            print_find_component (os, p.first, p.second);
+            print_find_component (os, node, p);
           if (m_in_static_expr) {
             if (m_in_set_text)
               os << ")->get_value ()";
@@ -566,20 +566,19 @@ namespace Smala
       return;
     }
     std::string constructor = get_constructor (node->djnn_type ());
-    std::pair<std::string, std::string> src, dst;
-
+    std::pair<std::string, std::vector <std::string>> src, dst;
     switch (ctrl->in ()->node_type ())
       {
       case BINARY_OP:
         {
           src.first = ctrl->in ()->build_name ();
-          src.second = "\"result\"";
+          src.second.push_back ("\"result\"");
           break;
         }
       case UNARY_OP:
         {
           src.first = ctrl->in ()->build_name ();
-          src.second = "\"output\"";
+          src.second.push_back ("\"output\"");
           break;
         }
       case LOCAL_NODE:
@@ -588,7 +587,7 @@ namespace Smala
           src.first = n->root ()->build_name ();
           std::string path = n->path ();
           std::replace (path.begin (), path.end (), '.', '/');
-          src.second = "\"" + path + "\"";
+          src.second.push_back("\"" + path + "\"");
           break;
         }
       case LITERAL:
@@ -599,7 +598,7 @@ namespace Smala
           os << "(" << node->parent ()->build_name () << ", " << m_null_string << ", " << ctrl->in ()->name ()
               << ");\n";
           src.first = new_name;
-          src.second = m_null_string;
+          src.second.push_back (m_null_string);
           break;
         }
       case TEXT:
@@ -610,13 +609,13 @@ namespace Smala
           os << "(" << node->parent ()->build_name () << ", " << m_null_string << ", " << ctrl->in ()->name ()
               << ");\n";
           src.first = new_name;
-          src.second = m_null_string;
+          src.second.push_back (m_null_string);
           break;
         }
       default:
         if (!ctrl->in ()->build_name ().empty ()) {
           src.first = ctrl->in ()->build_name ();
-          src.second = m_null_string;
+          src.second.push_back (m_null_string);
         } else if (!ctrl->in ()->name ().empty ()) {
           src = parse_symbol (ctrl->in ()->name ());
           std::string prefix = "var_";
@@ -627,7 +626,7 @@ namespace Smala
             print_start_component (os, new_name, get_constructor ("Double"));
             os << "(" << node->parent ()->build_name () << ", " << m_null_string << ", " << src.first << ");\n";
             src.first = new_name;
-            src.second = m_null_string;
+            src.second.push_back (m_null_string);
           }
         } else {
           print_error_message (error_level::warning, "anonymous component in input of control node", 1);
@@ -643,13 +642,13 @@ namespace Smala
           dst.first = n->root ()->build_name ();
           std::string path = n->path ();
           std::replace (path.begin (), path.end (), '.', '/');
-          dst.second = "\"" + path + "\"";
+          dst.second.push_back ("\"" + path + "\"");
           break;
         }
       default:
         if (!ctrl->out ()->build_name ().empty ()) {
           dst.first = ctrl->out ()->build_name ();
-          dst.second = m_null_string;
+          dst.second.push_back (m_null_string);
         } else if (!ctrl->out ()->name ().empty ()) {
           dst = parse_symbol (ctrl->out ()->name ());
         } else {
@@ -671,7 +670,7 @@ namespace Smala
 
     print_component_constructor (os, constructor);
     os << " (" << node->parent ()->build_name () << ", " << node->name ();
-    os << ", " << src.first << ", " << src.second << ", " << dst.first << ", " << dst.second;
+    os << ", " << build_find_component (node, src) << ", \"\", " << build_find_component (node, dst) << ", \"\"";
 
     if (node->djnn_type ().compare ("Assignment") == 0 || node->djnn_type ().compare ("PausedAssignment") == 0) {
       os << ", " << node->args ().at (0).second;
@@ -695,9 +694,9 @@ namespace Smala
   }
 
   void
-  Builder::print_find_component (std::ofstream &os, const std::string& first, const std::string& second)
+  Builder::print_find_component (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> > &sym)
   {
-    os << build_find_component (first, second);
+    os << build_find_component (n, sym);
   }
 
   void
@@ -719,29 +718,42 @@ namespace Smala
     return it->second;
   }
 
-  const std::pair<std::string, std::string>
+  const std::pair< std::string, std::vector<std::string> >
   Builder::parse_symbol (const std::string &symbol)
   {
     std::string str;
     std::size_t pos = symbol.find ('.');
+    std::vector <std::string> children;
     if (pos == std::string::npos) {
       str = m_parent_list.back ()->get_symbol (symbol);
       if (str.empty ()) {
         if (symbol.substr(0,3) == "DJN")
-          return std::make_pair (symbol, m_null_string);
+          return std::make_pair (symbol, children);
         print_error_message (error_level::error, "Symbol not found: " + symbol, 1);
-        return std::make_pair (symbol, m_null_string);
+        return std::make_pair (symbol, children);
       } else
-        return std::make_pair (str, m_null_string);
+        return std::make_pair (str, children);
     } else {
       std::string root = m_parent_list.back ()->get_symbol (symbol.substr (0, pos));
       if (root.empty ()) {
         print_error_message (error_level::error, "Symbol not found: " + symbol.substr (0, pos), 1);
-        return std::make_pair (symbol.substr (0, pos), m_null_string);
+        return std::make_pair (symbol.substr (0, pos), children);
       }
-      std::string path = "\"" + symbol.substr (pos + 1, symbol.length () - 1) + "\"";
-      std::replace (path.begin (), path.end (), '.', '/');
-      return std::make_pair (root, path);
+      string path = symbol.substr (pos + 1);
+      while (pos != std::string::npos) {
+        pos = path.find_first_of ('.');
+        if (pos == std::string::npos) {
+          children.push_back (path);
+        } else {
+          string newKey = path.substr (0, pos);
+          children.push_back (newKey);
+          path = path.substr (pos + 1);
+        }
+
+      }
+      //std::string path = "\"" + symbol.substr (pos + 1, symbol.length () - 1) + "\"";
+      //std::replace (path.begin (), path.end (), '.', '/');
+      return std::make_pair (root, children);
     }
   }
   void

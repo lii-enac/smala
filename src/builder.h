@@ -73,7 +73,7 @@ namespace Smala {
     std::map<std::string, std::string> m_types;
     void indent (std::ofstream &os);
     std::string get_constructor (const std::string &type);
-    virtual const std::pair<std::string, std::string> parse_symbol (const std::string &symbol);
+    virtual const std::pair< std::string, std::vector<std::string> > parse_symbol (const std::string &symbol);
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
@@ -101,8 +101,8 @@ namespace Smala {
     virtual void build_native_expression (std::ofstream &os, Node *n) {}
     virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
-    void print_find_component (std::ofstream &os, const std::string&, const std::string&);
-    virtual std::string build_find_component (const std::string&, const std::string&) = 0;
+    void print_find_component (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> >&);
+    virtual std::string build_find_component ( Node *n, const std::pair< std::string, std::vector<std::string> >&) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
     virtual void end_set_property (std::ofstream &os, Node *node) {};
     virtual void end_property (std::ofstream &os, Node *n) {};

@@ -137,6 +137,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 \"(\\.|[^\"])*\"                  { return Smala::Parser::make_STRING (yytext, Smala::location ()); }
 {NAME}(("."({NAME}|{INT}))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
+{NAME}(("."({NAME}|{INT}|("["({NAME}|{INT})"]")))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}((("."({NAME}|{INT}))|("::"({NAME}|{INT})))*) { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}((("."({NAME}|{INT}))|("."\$({NAME}|{INT})))*) { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }

@@ -670,7 +670,7 @@ namespace Smala
 
     print_component_constructor (os, constructor);
     os << " (" << node->parent ()->build_name () << ", " << node->name ();
-    os << ", " << build_find_component (node, src) << ", \"\", " << build_find_component (node, dst) << ", \"\"";
+    os << ", " << build_root_and_path (src) << ", " << build_root_and_path (dst);
 
     if (node->djnn_type ().compare ("Assignment") == 0 || node->djnn_type ().compare ("PausedAssignment") == 0) {
       os << ", " << node->args ().at (0).second;

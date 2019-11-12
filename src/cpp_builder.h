@@ -77,6 +77,7 @@ namespace Smala {
     void print_component_decl (std::ofstream &os, const std::string &name) override;
     void print_component_constructor (std::ofstream &os, const std::string &constructor) override;
     std::string build_find_component (Node *n, const std::pair< std::string, std::vector<std::string> >&) override;
+    std::string build_root_and_path (const std::pair< std::string, std::vector<std::string> >&) override;
     void print_type (std::ofstream &os, ParamType type) override;
     void print_args (std::ofstream &os, std::vector< std::pair<ParamType, std::string> > args, bool is_first);
     std::map<std::string, std::string> m_import_types;

@@ -409,8 +409,8 @@ namespace Smala
           os << "Connector (";
         else
           os << "Assignment (";
-        os << p_name << ", \"\", " << build_find_component (node, arg) << ", \"\","
-                                   << build_find_component (node, out_arg) << ", \"\"";
+        os << p_name << ", \"\", " << build_root_and_path (arg) << ","
+                                   << build_root_and_path (out_arg);
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
         if (node->is_connector())
           os << ", " << !node->is_model () << ");\n";
@@ -1790,7 +1790,7 @@ namespace Smala
     }
     indent (os);
     os << "new Connector (" << m_parent_list.back ()->name () << ", \"\", "
-        << build_find_component (n, p) << ", \"\", " << name << ", " << side
+        << build_root_and_path (p) << ", " << name << ", " << side
         << ", false);\n";
   }
 
@@ -1943,6 +1943,24 @@ namespace Smala
       res+= "\")";
     }
     return  res;
+  }
+
+  std::string
+  CPPBuilder::build_root_and_path (const std::pair< std::string, std::vector<std::string> > &sym)
+  {
+    for (auto s: sym.second) {
+      if (s[0] == '[')
+        return std::string (build_find_component(nullptr, sym) + ", \"\"");
+    }
+    std::string s = sym.first + ", \"";
+    std::string last = sym.second.back ();
+    for (auto ns : sym.second) {
+      s += ns;
+      if (ns != last)
+        s+= "/";
+    }
+    s += "\"";
+    return s;
   }
 
   void

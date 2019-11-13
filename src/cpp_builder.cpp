@@ -1953,11 +1953,13 @@ namespace Smala
         return std::string (build_find_component(nullptr, sym) + ", \"\"");
     }
     std::string s = sym.first + ", \"";
-    std::string last = sym.second.back ();
-    for (auto ns : sym.second) {
-      s += ns;
-      if (ns != last)
-        s+= "/";
+    if (!sym.second.empty()){
+      std::string last = sym.second.back ();
+      for (auto ns : sym.second) {
+        s += ns;
+        if (ns != last)
+          s+= "/";
+      }
     }
     s += "\"";
     return s;

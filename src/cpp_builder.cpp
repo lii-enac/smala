@@ -1895,7 +1895,6 @@ namespace Smala
     std::string res = sym.first;
     if (!sym.second.empty ()) {
       res += "->find_component(\"";
-      std::string last = sym.second.back ();
       for (int i = 0; i < sym.second.size (); i++) {
         std::string s = sym.second.at(i);
         if (s[0] == '[') {
@@ -1911,7 +1910,7 @@ namespace Smala
           if (is_alone && (found!=std::string::npos || is_num)) {
             res += s;
             res += ")";
-            if (s != last) {
+            if (i != sym.second.size ()-1) {
               res += "->find_component(\"";
             }
           } else {
@@ -1920,7 +1919,7 @@ namespace Smala
             res+=s;
             if (is_alone) {
               res+="))->get_double_value())";
-              if (s != last) {
+              if (i != sym.second.size ()-1) {
                 res += "->find_component(\"";
               }
             } else {
@@ -1931,12 +1930,12 @@ namespace Smala
         } else if (s[s.length()-1] == ']') {
           res+=s.substr (0, s.length() - 2);
           res+="\"))->get_double_value())";
-          if (s != last) {
+          if (i != sym.second.size ()-1) {
             res += "->find_component(\"";
           }
         } else {
           res += s;
-          if (s != last && sym.second.at(i+1)[0] != '[')
+          if ( (i != sym.second.size ()-1) && sym.second.at(i+1)[0] != '[')
             res += "/";
         }
       }
@@ -1955,9 +1954,10 @@ namespace Smala
     std::string s = sym.first + ", \"";
     if (!sym.second.empty()){
       std::string last = sym.second.back ();
-      for (auto ns : sym.second) {
+      for (int i = 0; i < sym.second.size (); i++) {
+        auto ns = sym.second.at(i);
         s += ns;
-        if (ns != last)
+        if (i != sym.second.size ()-1)
           s+= "/";
       }
     }

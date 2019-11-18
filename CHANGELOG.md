@@ -16,23 +16,42 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 
 #--------------------------------------------
 
+## [1.6.0] - 2019-11-18
+### compliant with djnn-cpp [1.7.0]
+- please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW cookbook recipe: text field edit
+    - NEW use of djnn constant by using prefix DJN
+    - NEW addition of a new way to access to children by their index (eg. list)
+
+### Added
+    - Added Makefile sanatizer options 
+
+### Changed
+    - Replaced delete by schelude_delete (djnn) in cpp_builder code generator
+    - Improved README for windows instruction
+    - Improved cookbook recipes : sketching, checkbox, fitts_laws
+
+#--------------------------------------------
+
 ## [1.5.0] - 2019-09-17
 ### compliant with djnn-cpp [1.6.0]
 - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
- - New operator : "istring ()"" to help compilator generating string from property 
+ - New operator: "istring ()"" to help compilator generating string from property 
     eg : isString ( "incr:" + incr.state) => tp.text
- - New operator : "&" to help compilator generating pointeur from property
+ - New operator: "&" to help compilator generating pointeur from property
     eg: t = getRef (&root.f.touches.$added), setref (&root.touch.key, &t)
- - New operator :  "$"  to help compilator to get value from a property (except: string and pointer) 
+ - New operator:  "$"  to help compilator to get value from a property (except: string and pointer) 
         can directly use the double value of a Double in something else
         eg: Double d(10), Rectangle ($d, $d, 100, 100, 0, 0) // = Rectangle (10, 10, 100, 100, 0, 0)
  - New can now directly call any C function if declared in _native_code_ bracket. No need CCall anymore
  - New native action mechanism (perf)
  - New Switch_range component suport
- - New cookbook recipes : scrollbar, multi_touch, multi_touch_drag, multi_touch_rrr, multi_touch_rrr_dyn
- - New cookbook recipes : switch_range
+ - New cookbook recipes: scrollbar, multi_touch, multi_touch_drag, multi_touch_rrr, multi_touch_rrr_dyn
+ - New cookbook recipes: switch_range
  - New Phigdets component support
 
 ### Added

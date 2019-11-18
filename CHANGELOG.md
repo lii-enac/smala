@@ -38,9 +38,9 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 
 ### NEW
     - New operator: "istring ()"" to help compilator generating string from property 
-    eg : isString ( "incr:" + incr.state) => tp.text
+        eg : isString ( "incr:" + incr.state) => tp.text
     - New operator: "&" to help compilator generating pointeur from property
-    eg: t = getRef (&root.f.touches.$added), setref (&root.touch.key, &t)
+        eg: t = getRef (&root.f.touches.$added), setref (&root.touch.key, &t)
     - New operator:  "$"  to help compilator to get value from a property (except: string and pointer) 
         can directly use the double value of a Double in something else
         eg: Double d(10), Rectangle ($d, $d, 100, 100, 0, 0) // = Rectangle (10, 10, 100, 100, 0, 0)
@@ -92,8 +92,8 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
     - Added few tests
 
 ### Added
-    -  Managed switch_list component properly
-    -  By default initialize display when using gui
+    - Managed switch_list component properly
+    - By default initialize display when using gui
     - Improved warning compilation
 
 ### Changed
@@ -124,7 +124,7 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 ### New
     - NEW display API NEEDED to use Frame component
         eg: use display 
-          Frame f ("mywindow")
+            Frame f ("mywindow")
     - NEW componant - GenericMouse
     - NEW cookbook recipe - refProperty (dynamicly)
     - NEW cookbook recipe - multi-touch
@@ -149,9 +149,9 @@ smala is deeply link to djnn-cpp developpement : https://github.com/lii-enac/djn
 
 ### Added
     - added NEW smala expressions for "anti-binding": !->, ->!, !->!
-    	eg: A !-> B when A is desactivated, B is Activated
-    	eg: A ->! B when A is Activated, B is desactivated
-    	eg: A !->! B when A is desactivated, B is desactivated
+        eg: A !-> B when A is desactivated, B is Activated
+        eg: A ->! B when A is Activated, B is desactivated
+        eg: A !->! B when A is desactivated, B is desactivated
 
 ### Changed
     - improved Makefile: clean up and mechanism, allow sub-directories in import

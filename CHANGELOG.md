@@ -9,9 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
 
-## [Unreleased]
-### Changed
-    - None
+## [1.6.1] - 2019-11-19 [YANKED]
+### compliant with djnn-cpp [1.7.0]
+    - Please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### Fixed
+    - Fixed a bug in path building
+    - Fixed typo
 
 
 ## [1.6.0] - 2019-11-18

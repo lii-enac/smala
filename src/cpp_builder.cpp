@@ -1912,6 +1912,8 @@ namespace Smala
             res += ")";
             if (i != sym.second.size ()-1) {
               res += "->find_component(\"";
+            } else {
+              return res;
             }
           } else {
             res+= "(int)((AbstractProperty*)(";

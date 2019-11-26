@@ -313,6 +313,7 @@ cookbook_apps := core/bindings \
 	gui/widgets/menu \
 	gui/animation/path_animation \
 	gui/clone \
+	gui/sort \
 	network/helloIvy
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))

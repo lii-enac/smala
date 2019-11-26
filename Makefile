@@ -310,6 +310,7 @@ cookbook_apps := core/bindings \
 	gui/widgets/dial \
 	gui/widgets/scrollbar \
 	gui/widgets/tab \
+	gui/widgets/menu \
 	gui/animation/path_animation \
 	gui/clone \
 	network/helloIvy

@@ -1894,7 +1894,7 @@ namespace Smala
   {
     std::string res = sym.first;
     if (!sym.second.empty ()) {
-      res += "->find_component(\"";
+      res += "->find_component(";
       for (int i = 0; i < sym.second.size (); i++) {
         std::string s = sym.second.at(i);
         if (s[0] == '[') {
@@ -1905,7 +1905,8 @@ namespace Smala
           if (!is_num) {
             s = m_parent_list.back ()->get_symbol (s);
           }
-          res += "\")->find_component(";
+          if (i != 0)
+            res += "\")->find_component(";
           std::size_t found = s.find ("var_");
           if (is_alone && (found!=std::string::npos || is_num)) {
             res += s;
@@ -1936,6 +1937,8 @@ namespace Smala
             res += "->find_component(\"";
           }
         } else {
+          if (i == 0)
+            res +="\"";
           res += s;
           if ( (i != sym.second.size ()-1) && sym.second.at(i+1)[0] != '[')
             res += "/";

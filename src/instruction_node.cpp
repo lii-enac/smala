@@ -34,6 +34,8 @@ namespace Smala
       set_type (RUN);
     else if (name == "Stop")
       set_type (STOP);
+    else if (name == "XMLSerialize")
+      set_type (XMLSERIALIZE);
   }
 
   InstructionNode::InstructionNode () :

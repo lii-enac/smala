@@ -1010,6 +1010,15 @@ namespace Smala
         os << ";\n";
       }
       break;
+      case XMLSERIALIZE:
+        os << "if (" << cpnt_name << ")" << endl ;
+        indent (os); indent (os);
+        os << cpnt_name << "->serialize (\"XML\");\n";
+        indent (os);
+        os << "else" << endl ;
+        indent (os); indent (os);
+        os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << cpnt_name <<  " << endl << endl;" << endl;
+      break;
       case NOTIFY:
       os << cpnt_name << "->notify_activate ();\n";
       break;

@@ -3,6 +3,9 @@ Mathieu Poirier
 Nicolas Saporito
 Stéphane Conversy
 
+1. In sublime text, install package ANSIescape
+2. depending on your OS, do...
+
 macosx:
 cp editor_modes/sublime/smala.sublime-syntax ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/User/
 cp editor_modes/sublime/smala.tmPreferences ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/User/

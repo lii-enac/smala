@@ -32,6 +32,12 @@
       src.erase (remove (src.begin (), src.end (), '\\'), src.end ());
       return src;
     }
+    string
+    hexa_filter(const char *s) {
+      string src (s);
+      src.replace (0, 1, "x").insert(0, "0");
+      return src;
+    }
 %}
 
 %option yylineno
@@ -133,8 +139,9 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
 "print"               { return Smala::Parser::make_PRINT (Smala::location ()); }
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
-{INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }
-{INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
+{INT}                 { return Smala::Parser::make_INT (yytext, Smala::location ()); }
+"#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), Smala::location ()); }
+{INT}"."{INT}         { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 \"(\\.|[^\"])*\"                  { return Smala::Parser::make_STRING (yytext, Smala::location ()); }
 {NAME}(("."({NAME}|{INT}))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }
 {NAME}(("."({NAME}|{INT}|("["({NAME}|{INT})"]")))*)      { return Smala::Parser::make_NAME_OR_PATH (str_filter (yytext), Smala::location ()); }

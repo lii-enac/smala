@@ -725,10 +725,19 @@ namespace Smala
     std::size_t pos = symbol.find ('.');
     std::vector <std::string> children;
     if (pos == std::string::npos) {
+      // first try to find the key in the current symtable
       str = m_parent_list.back ()->get_symbol (symbol);
       if (str.empty ()) {
+        // then check if it is a Djnn symbol that is a key prefixed by DJN
         if (symbol.substr(0,3) == "DJN")
           return std::make_pair (symbol, children);
+        else {
+          // finally check if it is a Smala symbol
+          str = m_type_manager->get_smala_symbol (symbol);
+          if (!str.empty ())
+            return std::make_pair (str, children);
+        }
+        // if everything fails, print an error message
         print_error_message (error_level::error, "Symbol not found: " + symbol, 1);
         return std::make_pair (symbol, children);
       } else

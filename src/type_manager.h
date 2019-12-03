@@ -32,6 +32,7 @@ public:
 	void add_global_symbols (const std::string &module, symtable_t *table);
 	void init_types (const std::string &module, symtable_t &table);
 	void add_types (const std::string &module, symtable_t &table);
+	std::string get_smala_symbol (const std::string& key);
 	void init ();
 protected:
 	void build_table (symtable_t &table, type_entry* types);
@@ -61,6 +62,7 @@ protected:
 	symtable_t djnPowerGlobalSymTable;
 	symtable_t djnGUIGlobalSymTable;
 	symtable_t djnSoundGlobalSymTable;
+  symtable_t smalaGlobalSymTable;
 
 	type_entry *coreGlobalSymbols;
 	type_entry *displayGlobalSymbols;
@@ -86,6 +88,7 @@ protected:
 	type_entry *power_types;
 	type_entry *qtwidgets_types;
 	type_entry *sound_types;
+	type_entry *smala_symbols;
 
 	std::map <std::string, symtable_t> m_types_tables;
 };

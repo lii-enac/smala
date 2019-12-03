@@ -57,6 +57,8 @@ namespace Smala {
     build_table (qtwidgets, qtwidgets_types);
     build_table (sound, sound_types);
 
+    build_table (smalaGlobalSymTable, smala_symbols);
+
     m_types_tables.insert (std::pair<std::string, symtable_t>("Animation", animation));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Base", base));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Core", core));
@@ -74,6 +76,18 @@ namespace Smala {
     m_types_tables.insert (std::pair<std::string, symtable_t>("Power", power));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Qtwidgets", qtwidgets));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Sound", sound));
+  }
+
+  std::string
+  TypeManager::get_smala_symbol (const std::string& key)
+  {
+    std::string res ("");
+    std::map<std::string, std::string>::iterator it;
+    it = smalaGlobalSymTable.find (key);
+    if (it == smalaGlobalSymTable.end ()) {
+      return res;
+    }
+    return it->second;
   }
 
   void

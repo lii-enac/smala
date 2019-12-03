@@ -174,7 +174,7 @@
 %token ASSIGNMENT "=:"
 %token PAUSED_ASSIGNMENT "::"
 %token PROCESS "Process"
-%token STRING_CAST "stringify"
+%token <string> STRING_CAST "toString"
 %token PROCESS_CAST "&"
 %token FSM "FSM"
 %token STATE "State"
@@ -1139,7 +1139,13 @@ primary_expression
   | lp assignment_expression rp { $$ = nullptr; }
 
 cast
-  : STRING_CAST { m_cast = STRING_CAST; }
+  : STRING_CAST 
+      {
+        if ($1 == "isString") {
+          std::cout << "\nWARNING: isString is deprecated, use toString instead\n\n";
+        }
+        m_cast = STRING_CAST;
+      }
   | PROCESS_CAST { m_cast = PROCESS_CAST; }
   | DOLLAR { m_cast = DOUBLE_CAST; }
 

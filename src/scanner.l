@@ -103,7 +103,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "FSM"                 { return Smala::Parser::make_FSM (Smala::location()); }
 "State"               { return Smala::Parser::make_STATE (Smala::location()); }
 "Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
-"isString"            { return Smala::Parser::make_STRING_CAST (Smala::location()); }
+"isString"|"toString" { return Smala::Parser::make_STRING_CAST (str_filter (yytext), Smala::location()); }
 "&"                   { return Smala::Parser::make_PROCESS_CAST (Smala::location()); }
 "NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
 "Alias"               { return Smala::Parser::make_ALIAS (Smala::location()); }

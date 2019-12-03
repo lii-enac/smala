@@ -23,7 +23,7 @@ Component root {
 
   FillColor fc (0, 0, 0)
   Text t (20, 20, "")
-  isString ("frame width =  " + f.width + " frame height = " + f.height) =:> t.text
+  toString ("frame width =  " + f.width + " frame height = " + f.height) =:> t.text
 }
 
 run root

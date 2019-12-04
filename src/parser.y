@@ -100,6 +100,7 @@
   bool m_in_func = false;
   bool has_argument = false;
   int func_num = 0;
+  int loc_node_num = 0;
   cast m_cast = NO_CAST;
 
 
@@ -263,6 +264,7 @@
 %type <int> argument_list
 %type <string> function_call
 %type <string> number
+%type <string> binding_src
 %type <bool> is_model
 %type <ParamType> type
 %type <string> fsm_decl
@@ -1381,7 +1383,7 @@ connector_symbol
   | PAUSED_CONNECTOR { $$ = true; }
 
 binding
-  : NAME_OR_PATH binding_type process_list
+  : binding_src binding_type process_list
     {
       for (int i = 0; i < $3.size (); ++i) {
         CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
@@ -1395,7 +1397,7 @@ binding
         node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
         }
     }
-  | NAME_OR_PATH binding_type lambda
+  | binding_src binding_type lambda
     {
       /* first build the NativeACtion Component */
       vector< pair<ParamType, string> >d_args;
@@ -1415,6 +1417,43 @@ binding
       node->set_out (native);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+    }
+
+binding_src
+  : assignment_expression {
+      if (comp_expression.size () == 1) {
+        TermNode* n = dynamic_cast<TermNode*>(comp_expression.at(0));
+        if (n != nullptr)
+          $$ = n->arg_value ();
+        else
+          driver.set_error ();
+      } else {
+        NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, false, true, false);
+        expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+
+        // build a local bool that will serve as an output for a connector
+        // and an input for the binding in construction
+        std::string loc_name ("loc_bool");
+        loc_name.append (to_string(loc_node_num++));
+        Node *node = new Node ("Bool", loc_name);
+        node->set_has_arguments (true);
+        driver.add_node (node);
+        node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+        TermNode *n = new TermNode (VALUE, "0");
+        driver.add_node (n);
+        n = new TermNode (END, "");
+        driver.add_node (n);
+
+        expr_node->add_output_node (loc_name);
+        driver.add_native_expression (expr_node);
+        driver.add_node (expr_node);
+        comp_expression.clear ();
+        arg_expression.clear ();
+        loc_name.append(".true");
+        $$ = loc_name;
+      }
+      comp_expression.clear ();
+      arg_expression.clear ();
     }
 
 binding_type

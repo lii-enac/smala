@@ -56,8 +56,8 @@ endif
 
 CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
-CFLAGS = -g -MMD
-CXXFLAGS = $(CFLAGS) -std=c++14
+CFLAGS += -g -MMD
+CXXFLAGS += $(CFLAGS) -std=c++14
 LIBS = #-lboost_system
 
 ifeq ($(os),Linux)
@@ -156,7 +156,7 @@ smalac: config.mk $(smalac)
 .PHONY: smalac
 
 $(smalac): $(smalac_objs)
-	$(CXX) $^ -o $@
+	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(smalac): CFLAGS += -Isrc -I$(build_dir)/src
 # -I/usr/include
@@ -314,7 +314,8 @@ cookbook_apps := core/bindings \
 	gui/animation/path_animation \
 	gui/clone \
 	gui/sort \
-	network/helloIvy
+	network/helloIvy \
+	audio/simple_audio
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 

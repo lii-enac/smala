@@ -103,10 +103,10 @@ EMFLAGS := -Wall -Oz -s USE_SDL=2 -s USE_FREETYPE=1 \
 CFLAGS += $(EMFLAGS)
 
 EMCFLAGS += $(EMFLAGS) \
-	-I../ext-libs/libexpat/expat/lib \
-	-I../ext-libs/curl/include \
-	-I../ext-libs/boost_1_68_0 \
-	-I../ext-libs/fontconfig \
+	-I../ext-libs/emscripten/libexpat/expat/lib \
+	-I../ext-libs/emscripten/curl/include \
+	-I../ext-libs/emscripten/boost_1_68_0 \
+	-I../ext-libs/emscripten/fontconfig \
 	-I/usr/local/include #glm
 
 CFLAGS += $(EMCFLAGS)
@@ -116,8 +116,8 @@ CXXFLAGS += $(EMCFLAGS)
 #CXX := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CXX)
 
 LDFLAGS += $(EMFLAGS) \
-	-L../ext-libs/expat-2.2.6/lib/.libs \
-	-L../ext-libs/curl-7.61.0/lib/.libs \
+	-L../ext-libs/emscripten/expat-2.2.6/lib/.libs \
+	-L../ext-libs/emscripten/curl-7.61.0/lib/.libs \
 	$(djnn_lib_path_cpp)/libdjnn-animation.bc\
 	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
 	$(djnn_lib_path_cpp)/libdjnn-display.bc\
@@ -235,7 +235,7 @@ $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 
 ifeq ($$(cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
-$1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
+$1_app_libs += ../ext-libs/emscripten/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/emscripten/curl/lib/.libs/libcurl.dylib --emrun
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 endif

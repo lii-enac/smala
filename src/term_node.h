@@ -29,6 +29,7 @@ namespace Smala {
     CAST_PROCESS,
     END_LCB_BLOCK,
     END,
+    FUNCTION_CALL,
     NONE,
     SMALA_NULL,
     START_LCB_BLOCK,

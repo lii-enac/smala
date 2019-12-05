@@ -36,7 +36,6 @@ namespace Smala {
     ADD_CHILDREN_TO,
     ALIAS,
     BINARY_OP,
-    CCALL,
     CLONE,
     CONTAINER,
     CONTROL,
@@ -96,6 +95,8 @@ namespace Smala {
     WHILE
   };
 
+class TermNode;
+
 class Node
 {
 public:
@@ -126,8 +127,8 @@ public:
     void set_duplicate_warning (bool v);
     bool in_expression () { return m_in_expression; }
     void set_in_expression (bool v) { m_in_expression = v; }
-    void set_expression (std::vector<Node*>& nodes) { m_expression = nodes; }
-    std::vector<Node*>& get_expression () { return m_expression; }
+    void set_expression (std::vector<TermNode*>& nodes) { m_expression = nodes; }
+    std::vector<TermNode*>& get_expression () { return m_expression; }
 private:
     bool m_ignore_parent;
     Node * m_parent;
@@ -138,7 +139,7 @@ private:
     bool m_has_arguments, m_duplicate_warning, m_in_expression;
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
-    std::vector<Node*> m_expression;
+    std::vector<TermNode*> m_expression;
 };
 
 }

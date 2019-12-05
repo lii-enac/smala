@@ -17,7 +17,6 @@
 #include "operator_node.h"
 #include "instruction_node.h"
 #include "binary_instruction_node.h"
-#include "ccall_node.h"
 #include "smala_native.h"
 #include "ctrl_node.h"
 #include "local_node.h"
@@ -371,7 +370,7 @@ namespace Smala
   {
     std::string p_name =
         node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
-    TermNode* arg_node = (TermNode*) node->get_expression ().at (0);
+    TermNode* arg_node = node->get_expression ().at (0);
     std::pair<std::string, std::vector<std::string>> arg;
     if (arg_node->arg_type () != VAR) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -463,13 +462,13 @@ namespace Smala
        << ");\n";
 
     for (auto e : node->get_expression ()) {
-      if ((((TermNode*) e)->arg_type () == VAR
-          || ((TermNode*) e)->arg_type () == CAST_STRING
-          || ((TermNode*) e)->arg_type () == CAST_DOUBLE
-          || ((TermNode*) e)->arg_type () == CAST_PROCESS)
-          && sym.find (((TermNode*) e)->arg_value ()) == sym.end ()) {
+      if ((e->arg_type () == VAR
+          || e->arg_type () == CAST_STRING
+          || e->arg_type () == CAST_DOUBLE
+          || e->arg_type () == CAST_PROCESS)
+          && sym.find (e->arg_value ()) == sym.end ()) {
         std::pair<std::string, std::vector <std::string>> arg = parse_symbol (
-            ((TermNode*)e)->arg_value ());
+            e->arg_value ());
 
         if (arg.first.compare (0, 6, "d_var_") == 0
             || arg.first.compare (0, 6, "i_var_") == 0) {
@@ -478,7 +477,7 @@ namespace Smala
           os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
               << p_name << ", \"\", " << arg.first << ");\n";
           indent (os);
-          string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+          string new_param_name = transform_name(e->arg_value ());
             os << native_name << "->"<< new_param_name <<  "= " << new_name
                 << ";\n";
 
@@ -488,7 +487,7 @@ namespace Smala
           os << "TextProperty *" << new_name << " = new TextProperty ("
               << p_name << ", \"\", " <<arg.first << ");\n";
           indent (os);
-          string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+          string new_param_name = transform_name(e->arg_value ());
             os << native_name << "->"<< new_param_name <<  "= " << new_name
                 << ";\n";
 
@@ -502,34 +501,34 @@ namespace Smala
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
+            os << "\tcerr << \"" << e->arg_value ()
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
             indent (os);
             os << "}\n";
             indent (os);
-            string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            string new_param_name = transform_name(e->arg_value ());
             os << native_name << "->"<< new_param_name <<  "= " << new_name
                 << ";\n";
-            sym[((TermNode*)e)->arg_value ()] = new_name;
+            sym[e->arg_value ()] = new_name;
             triggers.push_back (new_name);
 
           } else {
             os << "if (dynamic_cast<AbstractProperty*>(" << arg.first
                 << ") == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << ((TermNode*)e)->arg_value ()
+            os << "\tcerr << \"" << e->arg_value ()
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
             indent (os);
             os << "}\n";
             indent (os);
-            string new_param_name = transform_name(((TermNode*)e)->arg_value ());
+            string new_param_name = transform_name(e->arg_value ());
             os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg.first
                 << ");\n";
-            sym[((TermNode*)e)->arg_value ()] = arg.first;
+            sym[e->arg_value ()] = arg.first;
             triggers.push_back (arg.first);
             
           }
@@ -679,30 +678,28 @@ namespace Smala
       }
 
       for (auto op : node->get_expression ()) {
-        if (op->node_type () == TERM_NODE) {
-          if (((TermNode*) op)->arg_type () == VAR
-              || ((TermNode*) op)->arg_type () == CAST_DOUBLE) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
+        if (op->arg_type () == VAR
+              || op->arg_type () == CAST_DOUBLE) {
+            string tn = transform_name(op->arg_value ());
             if(already_handled.count(tn)==0) {
               os << "\tAbstractProperty * " << tn << ";\n";
               already_handled[tn] = true;
             }
-          } else if (((TermNode*) op)->arg_type () == CAST_STRING) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
+          } else if (op->arg_type () == CAST_STRING) {
+            string tn = transform_name(op->arg_value ());
             if(already_handled.count(tn)==0) {
               os << "\tAbstractProperty * " << tn << ";\n";
               already_handled[tn] = true;
             }
-          } else if (((TermNode*) op)->arg_type () == CAST_PROCESS) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
+          } else if (op->arg_type () == CAST_PROCESS) {
+            string tn = transform_name(op->arg_value ());
             if(already_handled.count(tn)==0) {
               os << "\tAbstractProperty * " << tn << ";\n";
               already_handled[tn] = true;
             }
-          } else if (((TermNode*) op)->arg_value ().size() >= 1 && ((TermNode*) op)->arg_value ().at (0) == '\"') {
+          } else if (op->arg_value ().size() >= 1 && op->arg_value ().at (0) == '\"') {
           } else {
           }
-        }
       }
     }
     os << "};\n";
@@ -712,31 +709,27 @@ namespace Smala
 
     os << "\nvoid\n" << native_name_struct << "::impl_activate ()\n{\n";
     for (auto n : node->get_output_nodes ()) {
-      os << "\t" << transform_name(n) << "->set_value(";
+      os << "\t" << transform_name (n) << "->set_value(";
       for (auto op : node->get_expression ()) {
-        if (op->node_type () == CCALL) {
-          os << ((FunctionNode*) op)->func_name ();
-        } else if (op->node_type () == TERM_NODE) {
-          if (((TermNode*) op)->arg_type () == VAR
-              || ((TermNode*) op)->arg_type () == CAST_DOUBLE) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << tn << "->get_double_value()";
-          } else if (((TermNode*) op)->arg_type () == CAST_STRING) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << tn << "->get_string_value()";
-          } else if (((TermNode*) op)->arg_type () == CAST_PROCESS) {
-            string tn = transform_name(((TermNode*) op)->arg_value ());
-            os << tn;
-          } else if (((TermNode*) op)->arg_value ().size() >= 1 && ((TermNode*) op)->arg_value ().at (0) == '\"') {
-            os << "std::string (" << ((TermNode*) op)->arg_value () << ")";
-          } else {
-            os << ((TermNode*) op)->arg_value ();
-          }
+        if (op->arg_type () == VAR || (op->arg_type () == CAST_DOUBLE)) {
+          string tn = transform_name (op->arg_value ());
+          os << tn << "->get_double_value()";
+        } else if (op->arg_type () == CAST_STRING) {
+          string tn = transform_name (op->arg_value ());
+          os << tn << "->get_string_value()";
+        } else if (op->arg_type () == CAST_PROCESS) {
+          string tn = transform_name (op->arg_value ());
+          os << tn;
+        } else if (op->arg_value ().size () >= 1
+            && op->arg_value ().at (0) == '\"') {
+          os << "std::string (" << op->arg_value () << ")";
+        } else {
+          os << op->arg_value ();
         }
       }
       os << ", " << !node->is_paused () << ");\n";
     }
-    indent(os);
+    indent (os);
     os << "};\n\n";
 
   }
@@ -977,6 +970,7 @@ namespace Smala
         }
       }
         break;
+      case FUNCTION_CALL:
       case STRING_VALUE:
         os << n->arg_value ();
         break;

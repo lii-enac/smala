@@ -34,13 +34,13 @@ namespace Smala
     void set_has_argument (bool v) { m_has_argument = v; }
     bool has_argument () { return m_has_argument; }
     void set_type (instruction_t type) { m_type = type; }
-    void set_args (std::vector<Node*> &expression) { m_expression = expression; m_has_argument = true; }
-    std::vector<Node*>& args () { return m_expression; }
+    void set_args (std::vector<TermNode*> &expression) { m_expression = expression; m_has_argument = true; }
+    std::vector<TermNode*>& args () { return m_expression; }
     instruction_t type () { return m_type; }
   private:
     std::vector<std::string> m_cpnt_list;
     bool m_has_argument;
-    std::vector<Node*> m_expression;
+    std::vector<TermNode*> m_expression;
     instruction_t m_type;
   };
 

@@ -78,7 +78,6 @@ namespace Smala {
     void build_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
     virtual void build_term_node (std::ofstream &os, Node *node);
-    void build_native_code (std::ofstream &os, Node *node);
     virtual void build_control_node (std::ofstream &os, Node *n);
     void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor);
     virtual void build_activator (std::ofstream &os, ActivatorNode *node) {}

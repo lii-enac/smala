@@ -16,12 +16,10 @@
 #include "operator_node.h"
 #include "instruction_node.h"
 #include "binary_instruction_node.h"
-#include "ccall_node.h"
 #include "smala_native.h"
 #include "ctrl_node.h"
 #include "local_node.h"
 #include "native_action_node.h"
-#include "function_node.h"
 #include "newvar_node.h"
 #include <locale>
 #include <algorithm>
@@ -263,11 +261,6 @@ namespace Smala
         build_native_expression_node (os, node);
         break;
       }
-      case CCALL:
-        {
-          build_native_code (os, node);
-          break;
-        }
       case INSTRUCTION:
         {
           build_instruction (os, node);
@@ -478,6 +471,7 @@ namespace Smala
     TermNode *n = static_cast<TermNode*> (node);
     switch (n->arg_type ())
       {
+      case FUNCTION_CALL:
       case SYMBOL:
       case VALUE:
         os << n->arg_value ();
@@ -676,14 +670,6 @@ namespace Smala
       os << ", " << node->args ().at (0).second;
     }
     os << ");\n";
-  }
-
-  void
-  Builder::build_native_code (std::ofstream &os, Node *node)
-  {
-    FunctionNode *n = static_cast<FunctionNode*> (node);
-    indent (os);
-    os << n->func_name ();
   }
 
   void

@@ -35,8 +35,6 @@
   #include "operator_node.h"
   #include "instruction_node.h"
   #include "binary_instruction_node.h"
-  #include "ccall_node.h"
-  #include "function_node.h"
   #include "smala_native.h"
   #include "ctrl_node.h"
   #include "local_node.h"
@@ -91,7 +89,7 @@
 
   vector<Node*> parent_list;
   vector<Node*> expression;
-  vector<Node*> comp_expression;
+  vector<TermNode*> comp_expression;
   vector<TermNode*> arg_expression;
   vector<int> int_array;
   Node* cur_node;
@@ -263,7 +261,6 @@
 %type <int> assignment_symbol
 %type <int> argument_list
 %type <string> function_call
-%type <string> number
 %type <string> binding_src
 %type <bool> is_model
 %type <ParamType> type
@@ -273,7 +270,7 @@
 %type <Node*> simple_process_decl
 %type <InstructionNode*> start_action
 %type < vector<string> > process_list
-%type <FunctionNode*> start_function
+%type <TermNode*> start_function
 %type <Node*> imperative_assignment
 %type <Node*> start_if
 %type <Node*> start_eq
@@ -483,7 +480,7 @@ imperative_assignment
     { 
         for (auto n: comp_expression) {
           if (n->node_type() == TERM_NODE) {
-            if (((TermNode*)n)->arg_type () == VAR && !((TermNode*)n)->is_in_func ()) ((TermNode*)n)->set_arg_type (CAST_DOUBLE);
+            if (n->arg_type () == VAR && !(n->is_in_func ())) n->set_arg_type (CAST_DOUBLE);
           }
         }
 
@@ -1006,7 +1003,7 @@ function_call
   : start_function argument_list RP
     {
       $1->set_has_arguments ($2);
-      $$ = $1->func_name ();
+      $$ = $1->arg_value ();
       TermNode *n = new TermNode (SYMBOL, ")");
       if (m_in_arguments || m_in_for) {
         driver.add_node (n);
@@ -1019,15 +1016,15 @@ function_call
 start_function
   : primary_expression LP
     {
-      FunctionNode* n = new FunctionNode ($1->arg_value ());
+      TermNode* n = new TermNode (FUNCTION_CALL, $1->arg_value ());
       TermNode *lp = new TermNode (SYMBOL, "(");
       if (m_in_arguments || m_in_for) {
+        driver.remove_node ($1);
         driver.add_node (n);
         driver.add_node (lp);
-        driver.remove_node ($1);
       }
       else {
-        std::vector<Node*>::iterator it = find (comp_expression.begin(), comp_expression.end(), $1);
+        std::vector<TermNode*>::iterator it = find (comp_expression.begin(), comp_expression.end(), $1);
         if (it != comp_expression.end()) {
           comp_expression.erase (it);
         }
@@ -1035,7 +1032,7 @@ start_function
         comp_expression.push_back (lp);
       }
       arg_expression.clear ();
-      if (n->func_name () != "find")
+      if ($1->arg_value () != "find")
         m_in_func = true;
       $$ = n;
     }

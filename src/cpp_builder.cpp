@@ -92,9 +92,11 @@ namespace Smala
         m_display_initialized = true;
       }
     } else if (use.compare ("display") == 0) {
+      if (m_display_initialized)
+        return;
       m_display_initialized = true;
     }
-      os << "#include \"" << use << "/" << use << ".h\"\n";
+    os << "#include \"" << use << "/" << use << ".h\"\n";
   }
 
   void
@@ -1581,11 +1583,23 @@ namespace Smala
     os << "int\nmain () {\n";
     m_indent = 1;
     int size = m_ast.preamble ().use ().size ();
-
+    bool has_display = false;
     /* init modules from use */
     for (int i = 0; i < size; ++i) {
       std::string str = m_ast.preamble ().use ().at (i);
-
+      if (str == "display") {
+        if (!has_display) {
+          has_display = true;
+        }
+        else {
+          continue;
+        }
+      }
+      if (str == "gui" && !has_display) {
+        indent (os);
+        os << "init_display ();\n";
+        has_display = true;
+      }
       /* add cpp init_MODULE corresponding */
       indent (os);
       os << "init_" << str << " ();\n";

@@ -314,8 +314,7 @@ cookbook_apps := core/bindings \
 	gui/animation/path_animation \
 	gui/clone \
 	gui/sort \
-	network/helloIvy \
-	audio/simple_audio
+	network/helloIvy
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 

@@ -281,6 +281,8 @@
 %type < parameter_t > parameter
 %type < pair <std::string, std::string> > binding_type
 %type <TermNode*> primary_expression
+%type < std::vector<TermNode*> >first_bound
+%type < std::vector<TermNode*> >second_bound
 
 /*
 %left QUESTION_MARK COLON
@@ -823,7 +825,7 @@ range
   | range_decl
 
 range_decl
-  : NAME_OR_PATH bracket number COMMA number bracket
+  : NAME_OR_PATH bracket first_bound COMMA second_bound bracket
   {
     RangeNode *node = new RangeNode ($1, $3, $2, $5, !$6);
     driver.add_node (node);
@@ -832,13 +834,41 @@ range_decl
     if (driver.debug()) driver.new_line();
   }
 
+first_bound
+  : assignment_expression {
+    if (comp_expression.size () > 1) {
+      for (auto n: comp_expression) {
+        if (n->arg_type () == VAR) {
+          n->set_arg_type (CAST_DOUBLE);
+        }
+      }
+    } else if (comp_expression.size () == 1 && comp_expression.at(0)->arg_type () == VAR) {
+      comp_expression.at(0)->set_in_func (true);
+    }
+    vector<TermNode*> first (comp_expression);
+    comp_expression.clear ();
+    $$ = first;
+  }
+
+second_bound
+  : assignment_expression {
+    if (comp_expression.size () > 1) {
+      for (auto n: comp_expression) {
+        if (n->arg_type () == VAR) {
+          n->set_arg_type (CAST_DOUBLE);
+        }
+      }
+    } else if (comp_expression.size () == 1 && comp_expression.at(0)->arg_type () == VAR) {
+      comp_expression.at(0)->set_in_func (true);
+    }
+    vector<TermNode*> second (comp_expression);
+    comp_expression.clear ();
+    $$ = second;
+  }
+
 bracket
   : LB { $$ = false; }
   | RB { $$ = true; }
-
-number
-  : INT { $$ = $1; }
-  | DOUBLE { $$ = $1; }
 
 simple_process
   : simple_process_decl arguments start_statement_list statement_list end_statement_list

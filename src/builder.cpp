@@ -548,7 +548,15 @@ namespace Smala
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     print_start_component (os, new_name, "SwitchRangeBranch");
-    os << " (" << p_name << ", " << name << ", " << n->lower_arg() << ", " << n->left_open () << ", " << n->upper_arg () << ", " << n->right_open () << ");\n";
+    os << " (" << p_name << ", " << name << ", ";
+    for (auto term: n->lower_arg()) {
+      build_term_node (os, term);
+    }
+    os << ", " << n->left_open () << ", ";
+    for (auto term: n->upper_arg ()) {
+      build_term_node (os, term);
+    }
+    os << ", " << n->right_open () << ");\n";
   }
 
   void

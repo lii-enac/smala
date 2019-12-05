@@ -781,24 +781,6 @@ namespace Smala
     os << std::endl;
   }
 
-  static bool
-  is_sym (const std::string &s)
-  {
-    return (s.compare ("+") == 0) || (s.compare ("-") == 0)
-        || (s.compare ("/") == 0) || (s.compare ("*") == 0)
-        || (s.compare (0, 1, "<") == 0) || (s.compare (0, 1, ">") == 0)
-        || (s.compare (0, 1, "!") == 0) || (s.compare (0, 1, "&") == 0)
-        || (s.compare (0, 1, "|") == 0) || (s.compare (0, 1, "=") == 0);
-  }
-
-  static bool
-  is_log_sym (const std::string &s)
-  {
-    return (s.compare (0, 1, "<") == 0) || (s.compare (0, 1, ">") == 0)
-        || (s.compare (0, 1, "!") == 0) || (s.compare (0, 1, "&") == 0)
-        || (s.compare (0, 1, "|") == 0) || (s.compare (0, 2, "==") == 0);
-  }
-
   void
   CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
   {

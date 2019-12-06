@@ -69,10 +69,13 @@ endif
 
 ifeq ($(os),Darwin)
 YACC = /usr/local/opt/bison/bin/bison -d
+LEX = /usr/local/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
+CXXFLAGS += -I/usr/local/opt/flex/include
+LDFLAGS += -L/usr/local/opt/flex/lib
 endif
 
 ifeq ($(os),MinGW)
@@ -129,6 +132,8 @@ LDFLAGS += $(EMFLAGS) \
 
 endif
 
+LEX ?= flex
+
 #CFLAGS += -fsanitize=thread -O1
 #LDFLAGS += -fsanitize=thread
 
@@ -139,7 +144,6 @@ endif
 #LDFLAGS += -fsanitize=memory
 
 
-LEX = flex
 
 # -----------
 # smalac

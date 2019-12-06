@@ -132,6 +132,7 @@ LDFLAGS += $(EMFLAGS) \
 
 endif
 
+YACC ?= bison
 LEX ?= flex
 
 #CFLAGS += -fsanitize=thread -O1

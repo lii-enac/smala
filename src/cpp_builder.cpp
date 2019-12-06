@@ -593,7 +593,7 @@ namespace Smala
       indent (os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
       os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
-          << ", \"\", " << new_name << ", \"\");\n";
+          << ", \"sync_"+sync_name+"\", " << new_name << ", \"\");\n";
       native_edge_name = sync_name;
       for (auto t : triggers) {
         indent (os);

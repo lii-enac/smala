@@ -22,6 +22,7 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
   // Store pointer position in localRef coordinates system
   // (used by both zoom and pan management)
   ScreenToLocal s2l (localRef)
+  ScreenToLocal s2l (localRef)
   frame.move.x =:> s2l.inX
   frame.move.y =:> s2l.inY
 
@@ -38,7 +39,6 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
 
     State pressed {
       // Memorize press position in local coordinates
-      ScreenToLocal s2l (localRef)
       frame.press.x =: s2l.inX
       frame.press.y =: s2l.inY
     }

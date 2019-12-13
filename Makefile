@@ -90,27 +90,44 @@ EXE := .html
 launch_cmd := emrun
 ##to test: python -m SimpleHTTPServer 8080
 
-EMFLAGS := -Wall -Oz -s USE_SDL=2 -s USE_FREETYPE=1 \
--s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
--s DEMANGLE_SUPPORT=1 \
+EMFLAGS := -Wall -Wno-unused-variable -Oz \
+-s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
 -DSDL_DISABLE_IMMINTRIN_H \
+-s EXPORT_ALL=1 -s DISABLE_EXCEPTION_CATCHING=0 \
 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
--s ERROR_ON_UNDEFINED_SYMBOLS=0 \
--s USE_WEBGL2=1
+-s ASSERTIONS=2 \
+-s ERROR_ON_UNDEFINED_SYMBOLS=0
 
+#-g4
+
+# -g4 -Wall -Wno-unused-variable -Werror \
+# -s USE_SDL=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
+# -DSDL_DISABLE_IMMINTRIN_H \
+# -s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
+# -s DEMANGLE_SUPPORT=1 \
+# -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
+# -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+# -s ASSERTIONS=2
+
+#-s WASM=0 
+
+#-Oz
 #-s USE_WEBGL2=1 \
 #-s FULL_ES2=1
 #-s FULL_ES3=1
 #-s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
 
-CFLAGS += $(EMFLAGS)
+#CFLAGS += $(EMFLAGS)
 
-EMCFLAGS += $(EMFLAGS) \
-	-I../ext-libs/emscripten/libexpat/expat/lib \
-	-I../ext-libs/emscripten/curl/include \
-	-I../ext-libs/emscripten/boost_1_68_0 \
-	-I../ext-libs/emscripten/fontconfig \
-	-I/usr/local/include #glm
+# EMCFLAGS += $(EMFLAGS) \
+# 	-I../ext-libs/emscripten/libexpat/expat/lib \
+# 	-I../ext-libs/emscripten/curl/include \
+# 	-I../ext-libs/emscripten/boost_1_68_0 \
+# 	-I../ext-libs/emscripten/fontconfig \
+# 	-I/usr/local/include #glm
+
+EMLOCAL := /Users/conversy/recherche/istar/code/ext-libs/emscripten/local
+EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
 
 CFLAGS += $(EMCFLAGS)
 CXXFLAGS += $(EMCFLAGS)
@@ -118,17 +135,28 @@ CXXFLAGS += $(EMCFLAGS)
 #CC := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CC)
 #CXX := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CXX)
 
+#idn2 expat curl fontconfig unistring psl 
+ext_libs := expat curl
+ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs)))
+
 LDFLAGS += $(EMFLAGS) \
-	-L../ext-libs/emscripten/expat-2.2.6/lib/.libs \
-	-L../ext-libs/emscripten/curl-7.61.0/lib/.libs \
-	$(djnn_lib_path_cpp)/libdjnn-animation.bc\
-	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
-	$(djnn_lib_path_cpp)/libdjnn-display.bc\
-	$(djnn_lib_path_cpp)/libdjnn-base.bc\
-	$(djnn_lib_path_cpp)/libdjnn-core.bc \
-	../ext-libs/boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
-	../ext-libs/boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
-	../ext-libs/boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
+	$(ext_libs) \
+	--emrun
+
+# $(djnn_lib_path_cpp)/libdjnn-animation.bc\
+# 	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
+# 	$(djnn_lib_path_cpp)/libdjnn-display.bc\
+# 	$(djnn_lib_path_cpp)/libdjnn-base.bc\
+# 	$(djnn_lib_path_cpp)/libdjnn-core.bc \
+
+# -L../ext-libs/emscripten/expat-2.2.6/lib/.libs \
+#	-L../ext-libs/emscripten/curl-7.61.0/lib/.libs \
+# 	../ext-libs/boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
+# 	../ext-libs/boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
+# 	../ext-libs/boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
+
+
+LDFLAGS += --preload-file asset_dir@/ --pre-js dbg.js
 
 endif
 
@@ -240,7 +268,7 @@ $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 
 ifeq ($$(cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
-$1_app_libs += ../ext-libs/emscripten/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/emscripten/curl/lib/.libs/libcurl.dylib --emrun
+#$1_app_libs += ../ext-libs/emscripten/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/emscripten/curl/lib/.libs/libcurl.dylib --emrun
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 endif
@@ -462,7 +490,7 @@ distclean clear clean:
 .PHONY: distclean clear clean
 
 truc:
-	@echo $(deps)
+	@echo $(ext_libs)
 
 deps += $(smalac_objs:.o=.d)
 -include $(deps)

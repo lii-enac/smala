@@ -35,8 +35,6 @@ Component root {
 
   NativeAction na (myFunc, 1)
 
-  Rotation _(4, 0,0)
-
   List myList {
     for (int n = 0; n < 5; n++) {
       Component _ {

@@ -11,5 +11,5 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 objs_cookbook_app := src/BoolToggleButton.o src/FSMGuard.o src/main.o
-djnn_libs_cookbook_app := gui display base core display
+djnn_libs_cookbook_app := gui display base core
 lang_cookbook_app := cpp

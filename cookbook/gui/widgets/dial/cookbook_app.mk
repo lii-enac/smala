@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := src/Button.o src/Dial.o src/Slider.o src/ToggleButton.o src/main.o
-djnn_libs_cookbook_app := gui display base core display
+djnn_libs_cookbook_app := gui display base core

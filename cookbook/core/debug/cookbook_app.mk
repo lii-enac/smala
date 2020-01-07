@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := debug.o
-djnn_libs_cookbook_app := gui display base core display
+djnn_libs_cookbook_app := gui display base core

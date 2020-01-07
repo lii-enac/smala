@@ -54,8 +54,23 @@ cross_prefix := g
 #cross_prefix := i686-w64-mingw32-
 endif
 
+ifndef cookbook_cross_prefix
+ifeq ($(os),Darwin)
+cookbook_cross_prefix := llvm-g
+endif
+#ifeq ($(os),Linux)
+cookbook_cross_prefix := g
+#endif
+#cross_prefix := arm-none-eabi-
+#cross_prefix := em
+#cross_prefix := i686-w64-mingw32-
+endif
+
+
 CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
+CC_CK := $(cookbook_cross_prefix)cc
+CXX_CK := $(cookbook_cross_prefix)++
 CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
 LIBS = #-lboost_system
@@ -84,7 +99,7 @@ LD_LIBRARY_PATH=PATH
 debugger := gdb
 endif
 
-ifeq ($(cross_prefix),em)
+ifeq ($(cookbook_cross_prefix),em)
 os := em
 EXE := .html
 launch_cmd := emrun
@@ -98,65 +113,20 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s ASSERTIONS=2 \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
 
-#-g4
-
-# -g4 -Wall -Wno-unused-variable -Werror \
-# -s USE_SDL=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
-# -DSDL_DISABLE_IMMINTRIN_H \
-# -s EXPORT_ALL=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 \
-# -s DEMANGLE_SUPPORT=1 \
-# -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
-# -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
-# -s ASSERTIONS=2
-
-#-s WASM=0 
-
-#-Oz
-#-s USE_WEBGL2=1 \
-#-s FULL_ES2=1
-#-s FULL_ES3=1
-#-s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1 \
-
-#CFLAGS += $(EMFLAGS)
-
-# EMCFLAGS += $(EMFLAGS) \
-# 	-I../ext-libs/emscripten/libexpat/expat/lib \
-# 	-I../ext-libs/emscripten/curl/include \
-# 	-I../ext-libs/emscripten/boost_1_68_0 \
-# 	-I../ext-libs/emscripten/fontconfig \
-# 	-I/usr/local/include #glm
-
 EMLOCAL := /Users/conversy/recherche/istar/code/ext-libs/emscripten/local
 EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
 
 CFLAGS += $(EMCFLAGS)
 CXXFLAGS += $(EMCFLAGS)
 
-#CC := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CC)
-#CXX := env EMCC_LOCAL_PORTS='sdl2=/Users/conversy/recherche/istar/code/attic/2d_rendering/SDL2-emscripten-port' $(CXX)
 
 #idn2 expat curl fontconfig unistring psl 
 ext_libs := expat curl
-ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs)))
+ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs))) -lopenal
 
 LDFLAGS += $(EMFLAGS) \
 	$(ext_libs) \
 	--emrun
-
-# $(djnn_lib_path_cpp)/libdjnn-animation.bc\
-# 	$(djnn_lib_path_cpp)/libdjnn-gui.bc\
-# 	$(djnn_lib_path_cpp)/libdjnn-display.bc\
-# 	$(djnn_lib_path_cpp)/libdjnn-base.bc\
-# 	$(djnn_lib_path_cpp)/libdjnn-core.bc \
-
-# -L../ext-libs/emscripten/expat-2.2.6/lib/.libs \
-#	-L../ext-libs/emscripten/curl-7.61.0/lib/.libs \
-# 	../ext-libs/boost_1_68_0/bin.v2/libs/chrono/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_chrono.bc \
-# 	../ext-libs/boost_1_68_0/bin.v2/libs/thread/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/threadapi-pthread/threading-multi/libboost_thread.bc \
-# 	../ext-libs/boost_1_68_0/bin.v2/libs/system/build/emscripten-1.38.12/debug/cxxstd-14-iso/link-static/libboost_system.bc \
-
-
-LDFLAGS += --preload-file asset_dir@/ --pre-js dbg.js
 
 endif
 
@@ -253,6 +223,7 @@ $(build_dir)/src/parser.cpp: src/errors.h
 define cookbookapp_makerule
 libs_cookbook_app :=
 djnn_libs_cookbook_app :=
+res_dir :=
 lang_cookbook_app := cpp
 
 include cookbook/$1/cookbook_app.mk
@@ -265,23 +236,27 @@ $1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
 $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
+$1_res_dir := $$(res_dir)
 
-ifeq ($$(cross_prefix),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
-#$1_app_libs += ../ext-libs/emscripten/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/emscripten/curl/lib/.libs/libcurl.dylib --emrun
+ifeq ($$(cookbook_cross_prefix),em)
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
+	--preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir) \
+	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 endif
 
 
 ifeq ($$(lang_cookbook_app),c)
-$1_app_link := $$(CC)
+$1_app_link := $$(CC_CK)
 endif
 ifeq ($$(lang_cookbook_app),cpp)
-$1_app_link := $$(CXX)
+$1_app_link := $$(CXX_CK)
 endif
 
 $$($1_app_objs): $$($1_app_gensrcs)
+$$($1_app_objs): CC = $$(CC_CK)
+$$($1_app_objs): CXX = $$(CXX_CK)
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
 $$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
@@ -347,7 +322,8 @@ cookbook_apps := core/bindings \
 	gui/animation/path_animation \
 	gui/clone \
 	gui/sort \
-	network/helloIvy
+	network/helloIvy \
+	audio/simple_audio
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 
@@ -363,6 +339,7 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 define testapp_makerule
 libs_test_app :=
 djnn_libs_test_app :=
+res_dir :=
 lang_test_app := cpp
 
 include test/$1/test_app.mk
@@ -379,6 +356,7 @@ $1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
 ifeq ($$(cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
 $1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
+$1_app_libs += --preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_test_app)) $$(libs_test_app)
 endif
@@ -391,7 +369,7 @@ $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
 $$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
 $$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
-$$($1_app_exe): LIBS += $$($1_app_libs)
+$$($1_app_exe): LIBS += $$($1_app_libs) --preload-file $$(res_dir)
 
 $$(notdir $1): $$($1_app_exe)
 

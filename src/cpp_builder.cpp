@@ -664,7 +664,7 @@ namespace Smala
       set_is_model (isModel);
     }
     void finalize_construction (Process* p) {
-      Process::finalize_construction (p);
+      Process::finalize_construction (p, "");
     }
     bool _string_setter;
     void impl_deactivate () override {}

@@ -35,9 +35,9 @@ Component root {
   //50 =: sb.arrow_height
 
   TextPrinter tp
-  //"low:   " + isString(sb.model.low) =:> tp.input
-  //"high:  " + isString(sb.model.high) =:> tp.input
-  //"delta: " + isString(sb.model.delta) =:> tp.input
+  //"low:   " + toString(sb.model.low) =:> tp.input
+  //"high:  " + toString(sb.model.high) =:> tp.input
+  //"delta: " + toString(sb.model.delta) =:> tp.input
   //"--" =:> tp.input
 }
 

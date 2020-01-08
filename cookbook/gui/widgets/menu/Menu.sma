@@ -56,7 +56,7 @@ Menu (Process f, Process list_item, int init_x, int init_y, int _width)
         int y = 0
         for (int i = 1; i <= $list_item.size; i++) {
           MenuItem nt (this, "", 0, y)
-          nt.label = isString (list_item.[i])
+          nt.label = toString (list_item.[i])
           y = y + bkg.height
         }
       }

@@ -59,7 +59,7 @@ Component root
     addChildrenTo root {
        Component content {
           FillColor w (255, 255, 255)
-          Text txt (20, 20, isString(root.incr.state))
+          Text txt (20, 20, toString(root.incr.state))
 
          FillColor fc(255,0,0)
          OutlineColor _(0,0,255)

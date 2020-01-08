@@ -35,7 +35,7 @@ Component root {
   FillColor fc (0, 0, 0)
   Incr incr (1)  
   Text t (150, 50, "")
-  isString ("Selected entry: " + cb.entry + " state: " + incr.state) =:> t.text
+  toString ("Selected entry: " + cb.entry + " state: " + incr.state) =:> t.text
 
   cb.entries.2.selected -> incr
 }

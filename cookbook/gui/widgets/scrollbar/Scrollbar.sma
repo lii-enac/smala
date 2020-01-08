@@ -226,8 +226,8 @@ Scrollbar(Process f) {
       delta < 0 =:> lower
       //"--" =:> tp.input
       TextPrinter tp
-      "higher " + isString(higher) + " " + isString(delta) =:> tp.input
-      "lower " + isString(lower) + " " + isString(delta) =:> tp.input*/
+      "higher " + toString(higher) + " " + toString(delta) =:> tp.input
+      "lower " + toString(lower) + " " + toString(delta) =:> tp.input*/
 
       Double cursor_in_model (0)
       inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
@@ -237,7 +237,7 @@ Scrollbar(Process f) {
       Bool lower(0)
       cursor_in_model < dragging_zone.y =:> lower
       TextPrinter tp
-      "lower " + isString(lower) + " higher " + isString(higher) =:> tp.input
+      "lower " + toString(lower) + " higher " + toString(higher) =:> tp.input
     } 
   }
 

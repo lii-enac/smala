@@ -578,7 +578,8 @@ namespace Smala
     }
 
     indent (os);
-    os << native_name << "->finalize_construction (" << p_name << ");\n";
+    // now that properties are built, call finalize_construction, wich in turn will call impl_activate
+    os << native_name << "->finalize_construction (" << p_name << ", " << n_expr_name << ");\n";
 
     std::string& new_name = native_name;
 
@@ -662,9 +663,14 @@ namespace Smala
       : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
+
+      // note: finalize_construction will call impl_activate before proper properties are fully built, leading to a crash
+      // so delay finalize_construction after building properties
+      // Process::finalize_construction (p, n);
     }
-    void finalize_construction (Process* p) {
-      Process::finalize_construction (p, "");
+    // make finalize_construction public
+    void finalize_construction (Process* p, const string& n) {
+       Process::finalize_construction (p, n);
     }
     bool _string_setter;
     void impl_deactivate () override {}

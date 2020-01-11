@@ -764,8 +764,10 @@ namespace Smala
   {
     const std::string error_level_str[] =
       { "log", "warning", "error" };
-    std::cerr << m_curloc->file () << ":" << m_curloc->line () << ":" << m_curloc->position () << ": "
+    if (m_curloc != nullptr)  {   //TODO investigate why it can be null in lambda expr.
+      std::cerr << m_curloc->file () << ":" << m_curloc->line () << ":" << m_curloc->position () << ": "
         << error_level_str[(int) level] << ": " << message << std::endl;
+    }
     m_error |= error;
   }
 } /* namespace Smala */

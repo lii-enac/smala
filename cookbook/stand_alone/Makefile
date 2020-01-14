@@ -40,6 +40,9 @@ djnn_lib_path_cpp := $(djnn_path)/build
 smala_path := ../..
 smalac := $(smala_path)/build/smalac
 
+# for emscripten
+em_ext_libs_path := ../../../djnn-emscripten-ext-libs
+
 
 # -------------------------------------------------------------------
 # hopefully no need to tweak the lines below
@@ -83,12 +86,12 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 
 #-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=5
 
-EMLOCAL := /Users/conversy/recherche/istar/code/ext-libs/emscripten/local
-EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
+
+EMCFLAGS += $(EMFLAGS) -I$(em_ext_libs_path)/include -I/usr/local/include #glm
 
 #idn2 expat curl fontconfig
 ext_libs :=  psl unistring expat curl
-ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs)))
+ext_libs := $(addprefix $(em_ext_libs_path)/lib/lib,$(addsuffix .a, $(ext_libs)))
 
 CFLAGS += $(EMCFLAGS)
 CXXFLAGS += $(EMCFLAGS)

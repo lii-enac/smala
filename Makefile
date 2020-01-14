@@ -113,7 +113,7 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s ASSERTIONS=2 \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
 
-EMLOCAL := /Users/conversy/recherche/istar/code/ext-libs/emscripten/local
+em_ext_libs_path ?= ../djnn-emscripten-ext-libs
 EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
 
 CFLAGS += $(EMCFLAGS)

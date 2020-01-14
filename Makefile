@@ -73,7 +73,11 @@ CC_CK := $(cookbook_cross_prefix)cc
 CXX_CK := $(cookbook_cross_prefix)++
 CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
-LIBS = #-lboost_system
+#LIBS ?=
+
+djnn_include_path_cpp ?= $(djnn_path)/src
+djnn_lib_path_cpp ?= $(djnn_path)/build
+
 
 ifeq ($(os),Linux)
 CXXFLAGS +=
@@ -89,8 +93,8 @@ LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-CXXFLAGS += -I/usr/local/opt/flex/include
-LDFLAGS += -L/usr/local/opt/flex/lib
+SC_CXXFLAGS += -I/usr/local/opt/flex/include
+SC_LDFLAGS += -L/usr/local/opt/flex/lib
 endif
 
 ifeq ($(os),MinGW)
@@ -100,10 +104,9 @@ debugger := gdb
 endif
 
 ifeq ($(cookbook_cross_prefix),em)
-os := em
+#os := em
 EXE := .html
 launch_cmd := emrun
-##to test: python -m SimpleHTTPServer 8080
 
 EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
@@ -114,24 +117,22 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
 
 em_ext_libs_path ?= ../djnn-emscripten-ext-libs
-EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
-
-CFLAGS += $(EMCFLAGS)
-CXXFLAGS += $(EMCFLAGS)
-
 
 #idn2 expat curl fontconfig unistring psl 
 ext_libs := expat curl
-ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs))) -lopenal
+ext_libs := $(addprefix $(em_ext_libs_path)/lib/lib,$(addsuffix .a, $(ext_libs))) -lopenal
 
-LDFLAGS += $(EMFLAGS) \
+EMCFLAGS += $(EMFLAGS) -I$(em_ext_libs_path)/include -I/usr/local/include #glm
+CFLAGS_CK = $(EMCFLAGS)
+CXXFLAGS_CK += $(EMCFLAGS)
+LDFLAGS_CK += $(EMFLAGS) \
 	$(ext_libs) \
 	--emrun
-
 endif
 
 YACC ?= bison
 LEX ?= flex
+
 
 #CFLAGS += -fsanitize=thread -O1
 #LDFLAGS += -fsanitize=thread
@@ -141,8 +142,6 @@ LEX ?= flex
 
 #CFLAGS += -fsanitize=memory -O1
 #LDFLAGS += -fsanitize=memory
-
-
 
 # -----------
 # smalac
@@ -161,8 +160,10 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-$(smalac): CFLAGS += -Isrc -I$(build_dir)/src
-# -I/usr/include
+$(smalac): CFLAGS = $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src
+$(smalac): CXX = $(cross_prefix)++
+$(smalac): LDFLAGS = $(SC_LDFLAGS)
+
 
 $(build_dir)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -257,11 +258,12 @@ endif
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
+$$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang)) $$(CXXFLAGS_CK)
+$$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang)) $$(LDFLAGS_CK)
+$$($1_app_exe): LIBS += $$($1_app_libs)
+
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
-$$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
-$$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
-$$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
 
@@ -354,7 +356,7 @@ $1_app_gensrcs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
 
-ifeq ($$(cross_prefix),em)
+ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
 $1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
 $1_app_libs += --preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
@@ -412,7 +414,7 @@ $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 # .sma to .c
-$(build_dir)/%.c $(build_dir)/%.h: %.sma $(smalac)
+$(build_dir)/%.c $(build_dir)/%.h: %.sma #$(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
 	$(smalac) -c $< || (c=$$?; rm -f $*.c $*.h $*.java; (exit $$c))

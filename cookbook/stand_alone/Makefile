@@ -81,27 +81,24 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -DSDL_DISABLE_IMMINTRIN_H \
 -s EXPORT_ALL=1 -s DISABLE_EXCEPTION_CATCHING=0 \
 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
--s ERROR_ON_UNDEFINED_SYMBOLS=0 \
--s ASSERTIONS=2
+-s ASSERTIONS=2 \
+-s ERROR_ON_UNDEFINED_SYMBOLS=0
 
-#-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=5
+em_ext_libs_path ?= ../djnn-emscripten-ext-libs
 
+#idn2 expat curl fontconfig unistring psl 
+ext_libs := expat curl
+ext_libs := $(addprefix $(em_ext_libs_path)/lib/lib,$(addsuffix .a, $(ext_libs))) -lopenal
 
 EMCFLAGS += $(EMFLAGS) -I$(em_ext_libs_path)/include -I/usr/local/include #glm
-
-#idn2 expat curl fontconfig
-ext_libs :=  psl unistring expat curl
-ext_libs := $(addprefix $(em_ext_libs_path)/lib/lib,$(addsuffix .a, $(ext_libs)))
-
 CFLAGS += $(EMCFLAGS)
 CXXFLAGS += $(EMCFLAGS)
-
 LDFLAGS += $(EMFLAGS) \
 	$(ext_libs) \
-	--emrun
+	--emrun \
+	--preload-file $(res_dir)@$(res_dir) \
+	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 
-#LDFLAGS += --preload-file $(res_dir)@/
-#--pre-js dbg.js
 endif
 
 CXXFLAGS += -MMD -g -std=c++14
@@ -159,9 +156,7 @@ gensrcs := $(objs_sma:.o=.$(target_lang))
 
 
 ifeq ($(cross_prefix),em)
-app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path_cpp)/libdjnn-,$(djnn_libs))) \
-	--preload-file $(res_dir)@$(res_dir) \
-	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
+app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path_cpp)/libdjnn-,$(djnn_libs)))
 else
 app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif

@@ -12,6 +12,7 @@ redirect: default
 #relative
 src_dir := src
 build_dir := build
+res_dir := res
 
 # cpp example
 exe := button
@@ -29,7 +30,7 @@ target_lang := cpp
 
 djnn_libs := gui display base core
 
-djnn_path := ../../../djnn-cpp
+djnn_path := ../../../djnn-cpp-opengl
 djnn_include_path_cpp := $(djnn_path)/src
 djnn_lib_path_cpp := $(djnn_path)/build
 
@@ -55,6 +56,51 @@ os := MinGW
 endif
 endif
 
+# cross-compile support
+ifndef cross_prefix
+#cross_prefix := g
+cross_prefix := em
+#options: g llvm-g i686-w64-mingw32- arm-none-eabi- em
+#/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-c
+#/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
+endif
+
+CC := $(cross_prefix)cc
+CXX := $(cross_prefix)++
+
+ifeq ($(cross_prefix),em)
+os := em
+EXE := .html
+launch_cmd := emrun
+
+EMFLAGS := -Wall -Wno-unused-variable -Oz \
+-s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
+-DSDL_DISABLE_IMMINTRIN_H \
+-s EXPORT_ALL=1 -s DISABLE_EXCEPTION_CATCHING=0 \
+-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
+-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+-s ASSERTIONS=2
+
+#-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=5
+
+EMLOCAL := /Users/conversy/recherche/istar/code/ext-libs/emscripten/local
+EMCFLAGS += $(EMFLAGS) -I$(EMLOCAL)/include -I/usr/local/include #glm
+
+#idn2 expat curl fontconfig
+ext_libs :=  psl unistring expat curl
+ext_libs := $(addprefix $(EMLOCAL)/lib/lib,$(addsuffix .a, $(ext_libs)))
+
+CFLAGS += $(EMCFLAGS)
+CXXFLAGS += $(EMCFLAGS)
+
+LDFLAGS += $(EMFLAGS) \
+	$(ext_libs) \
+	--emrun
+
+#LDFLAGS += --preload-file $(res_dir)@/
+#--pre-js dbg.js
+endif
+
 CXXFLAGS += -MMD -g -std=c++14
 
 ifeq ($(os),Linux)
@@ -73,6 +119,14 @@ LD_LIBRARY_PATH=PATH
 debugger := gdb
 endif
 
+ifeq ($(os),em)
+LD_LIBRARY_PATH=LD_LIBRARY_PATH
+debugger := gdb
+EXE := .html
+endif
+
+exe := $(exe)$(EXE)
+
 # -- cpp
 
 ifeq ($(target_lang),cpp)
@@ -83,7 +137,7 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(shell pwd)/$(exe))
+	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(launch_cmd) $(shell pwd)/$(exe))
 dbg: $(exe)
 	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(debugger) $(shell pwd)/$(exe))
 .PHONY: test
@@ -100,9 +154,19 @@ objs := $(objs_sma) $(objs_other)
 gensrcs := $(objs_sma:.o=.$(target_lang))
 #$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
 
+
+ifeq ($(cross_prefix),em)
+app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path_cpp)/libdjnn-,$(djnn_libs))) \
+	--preload-file $(res_dir)@$(res_dir) \
+	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
+else
+app_libs := $(addprefix -ldjnn-,$(djnn_libs))
+endif
+
+
 $(objs): CXXFLAGS += -I$(djnn_include_path_cpp) -I$(src_dir) -I$(build_dir)/$(src_dir)
 $(exe): LDFLAGS += -L$(djnn_lib_path_cpp)
-$(exe): LIBS += $(addprefix -ldjnn-,$(djnn_libs))
+$(exe): LIBS += $(app_libs)
 
 $(exe): $(objs)
 	@mkdir -p $(dir $@)

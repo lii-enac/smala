@@ -9,39 +9,47 @@ redirect: default
 #--
 # configuration
 
-#relative
-src_dir := src
-build_dir := build
-res_dir := res
-
 # cpp example
 exe := button
 srcs_sma := src/Button.sma src/main.sma
 #srcs_sma := $(shell find $(src_dir) -name "*.sma")
 srcs_other := src/foo.cpp
 #srcs_other := $(shell find $(src_dir) -name "*.cpp")
-target_lang := cpp
 
+#gui display animation utils comms base core
+djnn_libs := gui display base core
+
+#relative path
+src_dir := src
+build_dir := build
+res_dir := res
+exe_dir := .
+
+# in cookbook
+djnn_path := ../../../djnn-cpp
+# standalone
+#djnn_path := ../djnn-cpp
+djnn_include_path_cpp := $(djnn_path)/src
+djnn_lib_path_cpp := $(djnn_path)/build
+
+# in cookbook
+smala_path := ../..
+# standalone
+#smala_path := ../smala
+smalac := $(smala_path)/build/smalac
+
+# for emscripten
+em_ext_libs_path := ../../../djnn-emscripten-ext-libs
+
+
+#djnn_path := ../../../local-install
+#djnn_java_classpath := ../../../djnn-java/src:../../../djnn-java/src/jna.jar
 # java example
 #exe := MyApp
 #java_package := truc
 #srcs := Button.sma MyApp.sma
 #target_lang := java
-
-djnn_libs := gui display base core
-
-djnn_path := ../../../djnn-cpp
-djnn_include_path_cpp := $(djnn_path)/src
-djnn_lib_path_cpp := $(djnn_path)/build
-
-#djnn_path := ../../../local-install
-#djnn_java_classpath := ../../../djnn-java/src:../../../djnn-java/src/jna.jar
-
-smala_path := ../..
-smalac := $(smala_path)/build/smalac
-
-# for emscripten
-em_ext_libs_path := ../../../djnn-emscripten-ext-libs
+target_lang := cpp
 
 
 # -------------------------------------------------------------------
@@ -137,9 +145,9 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(launch_cmd) $(shell pwd)/$(exe))
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(launch_cmd) $(shell pwd)/$(exe))
 dbg: $(exe)
-	(cd $(src_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(debugger) $(shell pwd)/$(exe))
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(debugger) $(shell pwd)/$(exe))
 .PHONY: test
 
 LD  = $(CXX)

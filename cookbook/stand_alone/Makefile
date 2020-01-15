@@ -16,7 +16,7 @@ srcs_sma := src/Button.sma src/main.sma
 srcs_other := src/foo.cpp
 #srcs_other := $(shell find $(src_dir) -name "*.cpp")
 
-#gui display animation utils comms base core
+#djnn_libs := gui display animation utils comms base core
 djnn_libs := gui display base core
 
 #relative path

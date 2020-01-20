@@ -1,4 +1,5 @@
 build_dir := build
+djnn_path := ../djnn-cpp
 
 cookbook_app_for_make_test := button
 

@@ -372,7 +372,7 @@ $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
 $$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
 $$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
-$$($1_app_exe): LIBS += $$($1_app_libs) --preload-file $$(res_dir)
+$$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
 

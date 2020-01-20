@@ -12,5 +12,10 @@
 #
 
 objs_cookbook_app := simple_audio.o
-djnn_libs_cookbook_app := gui display audio core
+
+ifeq ($(os),Linux)
+libs_cookbook_app := -lopenal
+endif
+
+djnn_libs_cookbook_app := gui display audio base core
 res_dir := res

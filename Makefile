@@ -325,6 +325,7 @@ cookbook_apps := core/bindings \
 	gui/animation/notification_animation \
 	gui/clone \
 	gui/sort \
+	gui/texture \
 	network/helloIvy \
 	audio/simple_audio
 

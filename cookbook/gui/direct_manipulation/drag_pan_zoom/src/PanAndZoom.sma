@@ -45,8 +45,8 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
 
     State panning {
       // Compute added translation
-      s2l.outX - pressed.s2l.outX =:> transforms.rightTranslateBy.dx
-      s2l.outY - pressed.s2l.outY =:> transforms.rightTranslateBy.dy
+      s2l.outX - s2l.inX =:> transforms.rightTranslateBy.dx
+      s2l.outY - s2l.inY =:> transforms.rightTranslateBy.dy
     }
 
     idle -> pressed (bg.press)

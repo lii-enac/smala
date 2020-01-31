@@ -8,6 +8,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.7.0] - 2020-01-31
+### compliant with djnn-cpp [1.8.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW cookbook for a simple Menu widget
+    - NEW cookbook illustrating the use of a Sorter
+    - NEW support for XMLSerialize
+    - NEW mode for IDE: emacs
+    - NEW allow hexadecimal notation for int (eq: #23efFF)
+    - NEW support for html color names
+    - NEW support for djnn audio module
+    - NEW animation cookbook
+    - NEW line edition cookbook
+    - NEW cookbook for Texture
+
+### Added
+    - Enable expressions in bindings
+    - Start support for emscripten
+    - Manage display module import
+    - Improved Stand_alone template.
+    - Added a guard and error message on addChildrenTo (builder)
+
+### Deprecated
+    - Deprecated isString to toString
+
+### Fixed
+    - Fixed drag_pan_zoom cookbook.
+    - Fixed seg_fault in code generation
+    - Fixed new compatibility with djnn 1.8.0
+    - Fixed an issue with find_component generation
+    - Fixed Makefile
+    - Fixed typo and clean-up code
+
 
 ## [1.6.1] - 2019-11-19 [YANKED]
 ### compliant with djnn-cpp [1.7.0]

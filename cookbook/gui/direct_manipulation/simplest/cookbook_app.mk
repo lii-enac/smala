@@ -11,5 +11,5 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := simplest.o
+objs_cookbook_app := mspf.o simplest.o
 djnn_libs_cookbook_app := gui display base core

@@ -898,14 +898,14 @@ start_statement_list
         has_argument = false;
       }
       cur_node->set_node_type (CONTAINER);
-      if (cur_node->djnn_type () == "Switch" || cur_node->djnn_type () == "SwitchList")
+      if (cur_node->djnn_type ().rfind("Switch", 0) == 0)
         cur_node->set_ignore_parent (true);
       parent_list.push_back (cur_node);
     }
 end_statement_list
   : RCB 
     {
-      if (parent_list.back ()->djnn_type () == "Switch" || parent_list.back ()->djnn_type () == "SwitchList") {
+      if (parent_list.back ()->djnn_type ().rfind("Switch", 0) == 0) {
         Node *node = new Node ();
         node->set_node_type (SET_PARENT);
         node->set_name (parent_list.back()->name ());

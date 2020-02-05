@@ -14,13 +14,18 @@ Component root
 	OutlineWidth ow(10)
 	FillColor fc(255,0,0)
   OutlineColor _(0,0,255)
+
+  Component _ {
+  Translation t(0,0)
   
   Circle mobile(100, 100, 40)
-
-  f.move.x =:> mobile.cx
-  f.move.y =:> mobile.cy
-
-  FillColor _(255,255,255)
+  Text _(0,0,"text")
+  //f.move.x =:> mobile.cx
+  //f.move.y =:> mobile.cy
+  f.move.x =:> t.tx
+  f.move.y =:> t.ty
+  }
+  FillColor _(0,0,0)
   mspf _(f)
 }
 

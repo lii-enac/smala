@@ -1156,14 +1156,17 @@ namespace Smala
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
-    string last;
-    if (!n->right_arg ().empty())
-      last = parse_symbol (n->right_arg ()).first;
-    else
-      last = "nullptr";
+    std::string last;
     std::pair<std::string, std::vector<std::string>> left = parse_symbol (n->left_arg ());
-    os << left.first << "->get_parent ()->move_child (" << left.first << ", "
-        << c << ", " << last << ");\n";
+    if (!n->right_arg ().empty()) {
+      std::pair<std::string, std::vector<std::string>> last = parse_symbol (n->right_arg ());
+      os << left.first << "->get_parent ()->move_child (" << left.first << ", "
+              << c << ", " << build_find_component (node, last) << ");\n";
+    }
+    else {
+      os << left.first << "->get_parent ()->move_child (" << left.first << ", "
+        << c << ", nullptr);\n";
+    }
   }
 
   void

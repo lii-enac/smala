@@ -11,6 +11,8 @@
 *
 * note: 
 * you can use "ivyprobe" to send a message to this application : smala (.*)
+* 
+* note: on Mac 127.0.0.1 do not work correctly --> use 224.1.2.3 for test instead 
 */
 
 use core
@@ -43,7 +45,7 @@ Component root {
     FillColor textFill2 (200, 200, 200)
     Text txt2 (90, 130, "...")
 
-    IvyAccess ivybus ("127.0.0.1:2010", "smala", "READY")
+    IvyAccess ivybus ("224.1.2.3:2010", "smala", "READY")
 
     //creating a connector to display incomming messages in the text
     Connector receiverBus (ivybus, "in/smala (.*)/1", txt2, "text")

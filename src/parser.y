@@ -910,7 +910,7 @@ end_statement_list
         node->set_node_type (SET_PARENT);
         node->set_name (parent_list.back()->name ());
         parent_list.pop_back ();
-        node->set_parent (parent_list.back ());
+        //node->set_parent (parent_list.back ());
         driver.add_node (node);
       } else {
         Node *node = new Node ();
@@ -1573,7 +1573,7 @@ fsm
       node->set_node_type (SET_PARENT);
       node->set_name (parent_list.back()->name ());
       parent_list.pop_back ();
-      node->set_parent (parent_list.back ());
+      //node->set_parent (parent_list.back ());
       driver.add_node (node);
     }
 

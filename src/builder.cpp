@@ -364,7 +364,7 @@ namespace Smala
           m_parent_list.pop_back ();
           if (n) delete n;
           std::string parent;
-          if (!node->parent()->name().empty())
+          if (node->parent() != nullptr && !node->parent()->name().empty())
             parent =  parse_symbol(node->parent()->name ()).first;
           else
             parent = m_parent_list.back()->name ();

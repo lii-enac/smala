@@ -2,12 +2,13 @@
 *  Simple Ivy Sender app
 *
 *  The copyright holders for the contents of this file are:
-*  Ecole Nationale de l'Aviation Civile, France (2017)
+*  Ecole Nationale de l'Aviation Civile, France (2017-2020)
 *  See file "license.terms" for the rights and conditions
 *  defined by copyright holders.
 *
 *  Contributors:
 *    Jérémie Garcia    <jeremie.garcia@enac.fr>
+*    Mathieu Poirier   <mathieu.poirier@enac.fr>
 *
 * note: 
 * you can use "ivyprobe" to send a message to this application : smala (.*)
@@ -45,17 +46,27 @@ Component root {
     FillColor textFill2 (200, 200, 200)
     Text txt2 (90, 130, "...")
 
+    /* ------- Log Printer to receive a Message in Terminal ---*/
+    LogPrinter lp ("ivybus: ")
+
     IvyAccess ivybus ("224.1.2.3:2010", "smala", "READY")
+    {
+        // define your regexs
+        String regex ("smala (.*)")
+        //...
+    }
 
     //creating a connector to display incomming messages in the text
-    Connector receiverBus (ivybus, "in/smala (.*)/1", txt2, "text")
-
+    ivybus.in.regex.1 => txt2.text
+    ivybus.in.regex.1 => lp.input
+   
     FSM pressFSM {
         State idle{
             100 =: rectFill.g
         }
         State pressed {
             150 =: rectFill.g
+            // sending messages
             "smala Hello" =: ivybus.out
         }
         idle -> pressed (sender.press)
@@ -64,3 +75,7 @@ Component root {
 }
 run root
 run syshook
+
+
+
+

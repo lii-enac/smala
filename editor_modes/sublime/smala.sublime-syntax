@@ -52,7 +52,7 @@ contexts:
       scope: keyword.other.sma
       push: native_action
 
-    - match: '\b(use|import|aka|_main_|_define_|_action_|for|if|then|else|while|int|double|string)\b'
+    - match: '\b(use|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string)\b'
       scope: keyword.other.sma
 
     - match: '\s*<<\s*|\s*=>\s*|\s*=:>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'

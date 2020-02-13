@@ -12,6 +12,9 @@
  *
  */
 
+#include <locale>
+#include <algorithm>
+
 #include "builder.h"
 #include "operator_node.h"
 #include "instruction_node.h"
@@ -21,8 +24,7 @@
 #include "local_node.h"
 #include "native_action_node.h"
 #include "newvar_node.h"
-#include <locale>
-#include <algorithm>
+#include "set_parent_node.h"
 #include "native_code_node.h"
 #include "term_node.h"
 #include "range_node.h"
@@ -360,16 +362,16 @@ namespace Smala
         }
       case SET_PARENT:
         {
-          BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-          m_parent_list.pop_back ();
-          if (n) delete n;
+          //BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+          //m_parent_list.pop_back ();
+          //if (n) delete n;
+          SetParentNode* spn = static_cast<SetParentNode*> (node);
           std::string parent;
-          if (node->parent() != nullptr && !node->parent()->name().empty())
-            parent =  parse_symbol(node->parent()->name ()).first;
-          else
-            parent = m_parent_list.back()->name ();
-          std::string name = node->name ();
-          fetch_add_child (os, parent, parse_symbol (name).first, name);
+          parent = m_parent_list.back()->name ();
+          std::string name = spn->to_attach()->name();
+          if (name == "_")
+            name = "";
+          fetch_add_child (os, parent, spn->to_attach()->build_name(), name);
           break;
         }
       case CONTROL:

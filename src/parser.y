@@ -30,6 +30,7 @@
   #include <vector>
   #include <stdint.h>
   #include "node.h"
+  #include "set_parent_node.h"
   #include "dash_array_node.h"
   #include "activator_node.h"
   #include "operator_node.h"
@@ -93,6 +94,7 @@
   vector<TermNode*> arg_expression;
   vector<int> int_array;
   Node* cur_node;
+  bool m_in_add_children = false;
   bool m_in_arguments = false;
   bool m_in_for = false;
   bool m_in_func = false;
@@ -147,6 +149,11 @@
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     expression.push_back (node);
     return node;
+  }
+
+  bool exclude_from_no_parent (string type) {
+    // true is start width Path but is not equal to Path or is equal to Point
+    return ((type.rfind ("Path", 0) == 0 && type != "Path") || type == "Point");
   }
 
 }
@@ -264,7 +271,7 @@
 %type <string> binding_src
 %type <bool> is_model
 %type <ParamType> type
-%type <string> fsm_decl
+%type <Node*> fsm_decl
 %type <string> dash_array_decl
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
@@ -872,11 +879,39 @@ bracket
 
 simple_process
   : simple_process_decl arguments start_statement_list statement_list end_statement_list
+  {
+    if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+      SetParentNode *node = new SetParentNode ($1);
+      driver.add_node (node);
+    }
+  }
   | simple_process_decl arguments start_statement_list end_statement_list
+  {
+    if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+      SetParentNode *node = new SetParentNode ($1);
+      driver.add_node (node);
+    }
+  }
   | simple_process_decl start_statement_list statement_list end_statement_list
+  {
+    if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+      SetParentNode *node = new SetParentNode ($1);
+      driver.add_node (node);
+    }
+  }
   | simple_process_decl start_statement_list end_statement_list
+  {
+    if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+      SetParentNode *node = new SetParentNode ($1);
+      driver.add_node (node);
+    }
+  }
   | simple_process_decl arguments
     {
+      if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+        SetParentNode *node = new SetParentNode ($1);
+        driver.add_node (node);
+      }
       if ($2) {
         $1->set_has_arguments (true);
         has_argument = false;
@@ -885,6 +920,10 @@ simple_process
     }
   | simple_process_decl
     {
+      if (m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) {
+        SetParentNode *node = new SetParentNode ($1);
+        driver.add_node (node);
+      }
       m_in_arguments = false;
       if (driver.debug()) driver.new_line(); 
     }
@@ -898,26 +937,15 @@ start_statement_list
         has_argument = false;
       }
       cur_node->set_node_type (CONTAINER);
-      if (cur_node->djnn_type ().rfind("Switch", 0) == 0)
-        cur_node->set_ignore_parent (true);
       parent_list.push_back (cur_node);
     }
 end_statement_list
   : RCB 
-    {
-      if (parent_list.back ()->djnn_type ().rfind("Switch", 0) == 0) {
-        Node *node = new Node ();
-        node->set_node_type (SET_PARENT);
-        node->set_name (parent_list.back()->name ());
-        parent_list.pop_back ();
-        //node->set_parent (parent_list.back ());
-        driver.add_node (node);
-      } else {
-        Node *node = new Node ();
-        node->set_node_type (END_CONTAINER);
-        driver.add_node (node);
-        parent_list.pop_back ();
-      }
+    { 
+      Node *node = new Node ();
+      node->set_node_type (END_CONTAINER);
+      driver.add_node (node);   
+      parent_list.pop_back ();
     }
 
 simple_process_decl
@@ -925,6 +953,8 @@ simple_process_decl
     {
       Node *node = new Node ($1, $2);
       driver.add_node (node);
+      if (m_in_add_children && !exclude_from_no_parent ($1))
+        node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       m_in_arguments = true;
       arg_expression.clear ();
@@ -1554,6 +1584,7 @@ add_children_to
       node->set_node_type (END_CONTAINER);
       driver.add_node (node);
       parent_list.pop_back ();
+      m_in_add_children = false;
     }
 
 start_add_children_to
@@ -1564,17 +1595,20 @@ start_add_children_to
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (n);
       driver.add_node (n);
+      m_in_add_children = true;
     }
 
 fsm
   : fsm_decl fsm_items
-    { 
+    {      
       Node *node = new Node ();
-      node->set_node_type (SET_PARENT);
-      node->set_name (parent_list.back()->name ());
-      parent_list.pop_back ();
-      //node->set_parent (parent_list.back ());
+      node->set_node_type (END_CONTAINER);
       driver.add_node (node);
+      if (m_in_add_children) {
+        SetParentNode *node = new SetParentNode ($1);
+        driver.add_node (node);
+      }
+      parent_list.pop_back ();
     }
 
 fsm_decl
@@ -1582,12 +1616,13 @@ fsm_decl
     {
       Node *node = new Node  ("FSM", $2);
       node->set_node_type (FSM);
-      node->set_ignore_parent (true);
+      if (m_in_add_children)
+        node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (node);
       driver.add_node (node);
       if (driver.debug()) driver.new_line();
-      $$ = $2;
+      $$ = node;
     }
 
 fsm_items

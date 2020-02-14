@@ -66,8 +66,6 @@ Component root
       unfolded->fold (recf.enter)
       fold->folded (end_anim)
     }
-    TextPrinter log
-    fsm.state => log.input
   }
 
 

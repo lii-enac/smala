@@ -45,7 +45,7 @@ Component root {
 
     // Clear background on double click
     Spike clear
-    DoubleClick doubleClick (bgRect, f)
+    DoubleClick doubleClick (f, bgRect)
     doubleClick.double_click -> clear
     clear -> (root) {
         delete root.content

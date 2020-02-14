@@ -44,6 +44,7 @@ Component root {
     Component content
 
     // Clear background on double click
+    TextPrinter tp
     Spike clear
     DoubleClick doubleClick (f, bgRect)
     doubleClick.double_click -> clear

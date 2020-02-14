@@ -37,19 +37,25 @@ DoubleClick (Process f, Process shape)
       f.move.y =:> p2.y
     }
 
-    State second_press {
-      Timer t (CLICK_DELAY)
-    }
+    //State second_press {
+    //  Timer t (CLICK_DELAY)
+    //}
 
     idle -> first_press (shape.press)
-    first_press -> idle (first_press.t.end)
-    first_press -> first_release (shape.release)
 
-    first_release -> second_press (shape.press)
+    //first_press -> idle (first_press.t.end)
+    first_press -> first_release (shape.release)
+    //first_press -> first_release (shape.press)
+
+    //first_release -> second_press (shape.press)
+    first_release -> idle (shape.press, double_click)
     first_release -> idle (first_release.t.end)
     first_release -> idle (max_distance.true)
 
-    second_press -> idle (shape.release, double_click)
-    second_press -> idle (second_press.t.end)
+    //second_press -> idle (shape.release, double_click)
+    //second_press -> idle (second_press.t.end)
   }
+
+  //TextPrinter tp
+  //fsm.state => tp.input
 }

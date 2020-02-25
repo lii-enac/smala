@@ -106,20 +106,16 @@ Component root
     }
   }
   update_size->(icons) {
-    for (int i = 1; i <= $icons.size; i++) {
-      if (i > 1) {
-        int prev = i - 1
-        setRef (&icons.[i].prev, &icons.[prev])
-      }
+    for (int i = 2; i <= $icons.size; i++) {
+      int prev = i - 1
+      setRef (&icons.[i].prev, &icons.[prev])
     }
   }
   to_delete->(root) {
     item = getRef (&root.to_delete)
     if (&item != null) {
-      for (int i = 1; i <= $root.icons.size; i++) {
-        if (i > 1) {
-          delete root.icons.[i].pos_cnt
-        }
+      for (int i = 2; i <= $root.icons.size; i++) {
+        delete root.icons.[i].pos_cnt
       }
       delete item
       setRef (&root.to_delete, null)

@@ -105,12 +105,6 @@ Component root
       }
     }
   }
-  update_size->(icons) {
-    for (int i = 2; i <= $icons.size; i++) {
-      int prev = i - 1
-      setRef (&icons.[i].prev, &icons.[prev])
-    }
-  }
   to_delete->(root) {
     item = getRef (&root.to_delete)
     if (&item != null) {
@@ -119,7 +113,10 @@ Component root
       }
       delete item
       setRef (&root.to_delete, null)
-      run root.update_size
+      for (int j = 2; j <= $root.icons.size; j++) {
+        int prev = j - 1
+        setRef (&root.icons.[j].prev, &root.icons.[prev])
+      }
     }
   }
 }

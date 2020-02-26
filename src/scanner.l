@@ -68,6 +68,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "("                   { return Smala::Parser::make_LP (Smala::location ()); }
 ")"                   { return Smala::Parser::make_RP (Smala::location ()); }
 ","                   { return Smala::Parser::make_COMMA (Smala::location ()); }
+"|->"                 { return Smala::Parser::make_ACTIVATOR (Smala::location ()); }
 "->"                  { return Smala::Parser::make_ARROW (Smala::location ()); }
 "!->"                 { return Smala::Parser::make_NOT_ARROW (Smala::location ()); }
 "!->!"                { return Smala::Parser::make_NOT_ARROW_NOT (Smala::location ()); }

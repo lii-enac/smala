@@ -101,7 +101,7 @@ Component root {
         _ [60, 70]{
         }
       }
-      radius_inc.state => animationSteps.state
+      radius_inc.state => animationSteps.input
     }
     stopped -> running (start_r.press)
     running -> stopped (res.true)

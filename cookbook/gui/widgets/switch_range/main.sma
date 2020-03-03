@@ -30,7 +30,7 @@ Component root {
   }
 
   Rectangle r (0, 0, 70, 50, 5, 5)
-  r.y => swr.state
+  r.y => swr.input
   FSM fsm {
     State idle
     State drag {

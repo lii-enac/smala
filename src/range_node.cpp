@@ -20,6 +20,7 @@ namespace Smala
   RangeNode::RangeNode (const std::string& name, std::vector <TermNode*> lower_arg, bool left_open, std::vector <TermNode*> upper_arg, bool right_open) :
       Node (), m_lower_arg (lower_arg), m_upper_arg (upper_arg), m_left_open (left_open), m_right_open (right_open)
   {
+    set_name(name);
   }
 
   RangeNode::RangeNode () :

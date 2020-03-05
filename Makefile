@@ -148,7 +148,7 @@ LEX ?= flex
 
 smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o driver.o node.o smala_native.o ctrl_node.o \
 	newvar_node.o operator_node.o local_node.o instruction_node.o binary_instruction_node.o native_code_node.o \
-	native_expression_node.o native_action_node.o range_node.o set_parent_node.o preamble.o ast.o builder.o cpp_builder.o main.o parser.o scanner.o
+	native_expression_node.o native_action_node.o range_node.o preamble.o ast.o builder.o cpp_builder.o main.o parser.o scanner.o
 
 smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))
 

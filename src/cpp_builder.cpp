@@ -1272,10 +1272,9 @@ namespace Smala
       m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (new_name);
-      indent (os);
       os << "if (" << new_name << " == nullptr)\n";
       indent (os);
-      os << "\tcerr <<  endl << endl << \"ERROR - processing addChildrenTo - the component \\\"\" << \"" << node->name () << "\\\"\" << \" is null or do not exist yet\" << endl << endl;\n";
+      os << " cerr <<  endl << endl << \"ERROR - processing addChildrenTo - the component \\\"\" << \"" << node->name () << "\\\"\" << \" is null or do not exist yet\" << endl << endl;\n";
     } else {
       m_parent_list.push_back (new BuildNode (s.first, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/

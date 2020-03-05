@@ -894,8 +894,8 @@ simple_process
     Node *node = new Node ("Activator", "_");
     node->set_has_arguments (true);
     driver.add_node (node);
-    if (m_in_add_children)
-      node->set_ignore_parent (true);
+    //if (m_in_add_children)
+    //  node->set_ignore_parent (true);
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     TermNode *n = new TermNode (VAR, $2);
     driver.add_node (n);

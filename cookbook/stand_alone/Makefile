@@ -145,9 +145,9 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(launch_cmd) $(shell pwd)/$(exe))
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path_cpp))":$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
 dbg: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(abspath $(djnn_lib_path_cpp)):$$$(LD_LIBRARY_PATH) $(debugger) $(shell pwd)/$(exe))
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path_cpp))":$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
 .PHONY: test
 
 LD  = $(CXX)

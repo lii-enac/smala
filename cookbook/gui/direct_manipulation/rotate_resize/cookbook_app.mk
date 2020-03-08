@@ -12,4 +12,4 @@
 #		Jérémie Garcia 	  <jeremie.garcia@enac.fr>
 
 objs_cookbook_app := src/LocalToLocal.o src/Drag.o src/HandleN.o src/HandleNE.o src/HandleE.o src/HandleSE.o src/HandleS.o src/HandleSW.o src/HandleW.o src/HandleNW.o src/RotationHandle.o src/RotateResizeRectangle.o src/main.o
-djnn_libs_cookbook_app := gui display base core
+djnn_libs_cookbook_app := gui display base exec_env core

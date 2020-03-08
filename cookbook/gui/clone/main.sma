@@ -12,10 +12,11 @@
  *
  */
 
- use core
- use base
- use display
- use gui
+use core
+use exec_env
+use base
+use display
+use gui
 
 _native_code_
 %{

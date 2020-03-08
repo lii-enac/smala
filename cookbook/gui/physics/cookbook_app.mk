@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := physics.o
-djnn_libs_cookbook_app := gui display base core physics
+djnn_libs_cookbook_app := gui display base exec_env core physics

@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := src/TouchData.o src/TouchDrag.o src/TouchMarker.o src/main.o
-djnn_libs_cookbook_app := gui display base core 
+djnn_libs_cookbook_app := gui display base exec_env core 

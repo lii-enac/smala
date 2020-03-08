@@ -12,5 +12,5 @@
 #
 
 objs_cookbook_app := main.o
-djnn_libs_cookbook_app := gui display base core
+djnn_libs_cookbook_app := gui display base exec_env core
 lang_cookbook_app := cpp

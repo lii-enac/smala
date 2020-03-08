@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := pinch_zoom.o
-djnn_libs_cookbook_app := gui base core display
+djnn_libs_cookbook_app := gui display base exec_env core 

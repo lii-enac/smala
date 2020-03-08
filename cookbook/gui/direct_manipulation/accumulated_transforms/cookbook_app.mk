@@ -12,4 +12,4 @@
 #		Jérémie Garcia 	  <jeremie.garcia@enac.fr>
 
 objs_cookbook_app := src/DemoLeft.o src/DemoRight.o src/main.o
-djnn_libs_cookbook_app := gui display base core
+djnn_libs_cookbook_app := gui display base exec_env core

@@ -12,4 +12,4 @@
 #
 
 objs_cookbook_app := Button.o Strip.o StripBoard.o main.o
-djnn_libs_cookbook_app := animation gui display base core
+djnn_libs_cookbook_app := animation gui display base exec_env core

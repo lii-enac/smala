@@ -11,4 +11,4 @@
 #
 
 objs_cookbook_app := texture.o
-djnn_libs_cookbook_app := gui display base core
+djnn_libs_cookbook_app := gui display base exec_env core

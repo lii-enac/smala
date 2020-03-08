@@ -17,5 +17,5 @@ ifeq ($(os),Linux)
 libs_cookbook_app := -lopenal
 endif
 
-djnn_libs_cookbook_app := gui display audio base core
+djnn_libs_cookbook_app := gui display audio base exec_env core
 res_dir := res

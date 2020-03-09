@@ -1,5 +1,4 @@
 use core
-use exec_env
 use base
 use audio
 use display

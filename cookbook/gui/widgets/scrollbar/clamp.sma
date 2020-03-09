@@ -13,7 +13,6 @@
 */
 
 use core
-use exec_env
 use base
 
 _define_

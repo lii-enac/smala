@@ -47,7 +47,7 @@ namespace Smala
   {}
 
   void
-  InstructionNode::add_cpnt (std::string &cpnt)
+  InstructionNode::add_cpnt (const std::string &cpnt)
   {
     m_cpnt_list.push_back (cpnt);
   }

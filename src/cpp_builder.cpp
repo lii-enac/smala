@@ -1418,6 +1418,17 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_end_main (std::ofstream &os, Node *node)
+  {
+    if (m_ast.get_root_node() == nullptr)
+      return;
+    indent (os);
+    os << m_ast.get_root_node ()->build_name () << "->activate ();\n";
+    indent (os);
+    os << "MainLoop::instance ().activate ();\n";
+  }
+
+  void
   CPPBuilder::build_native_action_component (std::ofstream &os, Node *node)
   {
     std::string constructor = get_constructor (node->djnn_type ());

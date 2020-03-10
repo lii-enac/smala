@@ -40,7 +40,3 @@ Component root {
   rectR !->! rectB
   show.click -> rectB
 }
-
-run root
-stop root.rectG
-run syshook

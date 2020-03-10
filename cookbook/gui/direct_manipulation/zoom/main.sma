@@ -48,5 +48,3 @@ Component root {
   Rectangle rectangle (100, 100, 100, 100, 0, 0)
 }
 
-run root
-run syshook

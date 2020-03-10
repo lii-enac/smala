@@ -48,6 +48,7 @@ namespace Smala {
     END_ELSE,
     END_IF_EXPRESSION,
     END_LOOP,
+    END_MAIN,
     END_NATIVE,
     END_PROPERTY,
     END_REPEAT,

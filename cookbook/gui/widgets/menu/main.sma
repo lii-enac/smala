@@ -30,6 +30,3 @@ Component root
   Text choice (250, 26, "Choice 1")
   menu.selected =:> choice.text
 }
-
-run root
-run syshook

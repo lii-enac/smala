@@ -39,6 +39,3 @@ Component root {
   Button b (f, "myButton", 10, 100)
   b.click -> na
 }
-
-run root
-run syshook

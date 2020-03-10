@@ -45,6 +45,8 @@ public:
     void add_native_expression (NativeExpressionNode *node);
     void add_native_java (const std::string &code);
     void add_define_node (Node *defineNode);
+    void set_root_node (Node* root) { m_root = root; }
+    Node* get_root_node () { return m_root; }
     void set_is_main (bool val);
     void set_in_preamble (bool val) { m_in_preamble = val; }
     void end_preamble ();
@@ -65,6 +67,7 @@ private:
     std::vector<Node*> m_define_nodes;
     bool m_is_main;
     bool m_in_preamble;
+    Node* m_root;
 };
 
 }

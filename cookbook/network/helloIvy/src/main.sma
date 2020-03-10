@@ -73,9 +73,3 @@ Component root {
         pressed -> idle (sender.release)
     }
 }
-run root
-run syshook
-
-
-
-

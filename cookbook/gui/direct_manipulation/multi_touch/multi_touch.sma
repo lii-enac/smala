@@ -51,6 +51,3 @@ Component root
     delete p
   }
 }
-
-run root
-run syshook

@@ -73,7 +73,3 @@ buildPath (const char* file)
 
 }
 
-run root
-run syshook
-
-

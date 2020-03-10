@@ -44,6 +44,3 @@ Component root {
   edit.off -> d.exec, s.exec
 
 }
-
-run root
-run syshook

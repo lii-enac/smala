@@ -44,6 +44,8 @@ public:
     void add_native_expression (NativeExpressionNode *node);
     void add_native_java (const std::string &code);
     void add_define_node (Node *node);
+    void set_main_node (Node *root) { m_ast.set_root_node (root); }
+    Node* get_main_node () { return m_ast.get_root_node(); }
     void set_is_main (bool val);
     void set_error ();
     void set_error (const std::string& msg);

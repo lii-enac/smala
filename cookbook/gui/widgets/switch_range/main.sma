@@ -44,7 +44,3 @@ Component root {
     drag->idle (f.release)
   }
 }
-
-
-run root
-run syshook

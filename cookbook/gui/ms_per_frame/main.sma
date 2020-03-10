@@ -39,6 +39,3 @@ Component root
   FillColor _(0,0,0)
   mspf _(f)
 }
-
-run root
-run syshook

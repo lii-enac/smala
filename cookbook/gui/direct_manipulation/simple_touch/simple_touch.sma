@@ -39,6 +39,3 @@ Component root
     delete root.connector
   }
 }
-
-run root
-run syshook

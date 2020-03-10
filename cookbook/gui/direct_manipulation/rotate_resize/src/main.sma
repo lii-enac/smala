@@ -41,6 +41,3 @@ Component root {
 	RotateResizeRectangle r1 (f, 150, 200)
 	RotateResizeRectangle r2 (f, 350, 100)
 }
-
-run root
-run syshook

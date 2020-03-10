@@ -52,5 +52,3 @@ Component root {
   f.width > 200 ? 150 : 10 =:> b2.x
 }
 
-run root
-run syshook

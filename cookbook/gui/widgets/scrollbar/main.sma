@@ -40,6 +40,3 @@ Component root {
   //"delta: " + toString(sb.model.delta) =:> tp.input
   //"--" =:> tp.input
 }
-
-run root
-run syshook

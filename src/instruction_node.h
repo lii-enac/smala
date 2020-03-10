@@ -29,7 +29,7 @@ namespace Smala
     InstructionNode (const std::string& name);
     virtual ~InstructionNode ();
 
-    void add_cpnt (std::string&);
+    void add_cpnt (const std::string&);
     std::vector<std::string>& cpnt_list ();
     void set_has_argument (bool v) { m_has_argument = v; }
     bool has_argument () { return m_has_argument; }

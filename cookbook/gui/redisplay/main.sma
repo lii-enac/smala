@@ -67,7 +67,5 @@
   }
 }
 
-run root
-run syshook
 
 

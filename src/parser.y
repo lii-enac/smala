@@ -92,7 +92,7 @@
   vector<TermNode*> comp_expression;
   vector<TermNode*> arg_expression;
   vector<int> int_array;
-  Node* cur_node;
+  Node *cur_node, *root;
   bool m_in_arguments = false;
   bool m_in_for = false;
   bool m_in_func = false;
@@ -368,7 +368,17 @@ rough_code
     }
 
 body
-  : start_main statement_list { driver.end_debug (); }
+  : start_main statement_list
+  {
+    Node *node = new Node ();
+    node->set_node_type (END_CONTAINER);
+    driver.add_node (node);
+    parent_list.pop_back ();
+    Node *end_main = new Node ();
+    end_main->set_node_type (END_MAIN);
+    driver.add_node (end_main);
+    driver.end_debug ();
+  }
   | define_list
 
 define_list
@@ -396,6 +406,12 @@ start_main
       start->set_node_type (START_MAIN);
       driver.add_node (start);
       driver.set_is_main (true);
+      root = new Node ("Component", "_");
+      driver.add_node (root);
+      driver.set_main_node (root);
+      root->set_parent (nullptr);
+      root->set_node_type (CONTAINER);
+      parent_list.push_back (root);
     }
 
 start_define

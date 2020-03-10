@@ -67,5 +67,3 @@ Component root {
     DemoRight _ (frameRight)
 }
 
-run root
-run syshook

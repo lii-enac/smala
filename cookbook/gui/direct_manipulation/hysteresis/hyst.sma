@@ -65,6 +65,3 @@ Component root {
   TextPrinter tp
   fsm.state =:> tp.input
 }
-
-run root
-run syshook

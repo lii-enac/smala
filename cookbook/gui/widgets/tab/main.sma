@@ -82,6 +82,3 @@ Component root {
 
   Activator select_tab (tabManager.tabs.1.select)
 }
-
-run root
-run syshook

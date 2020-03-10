@@ -17,7 +17,7 @@
 using namespace Smala;
 
 Ast::Ast () :
-    m_node_list (), m_is_main (false), m_in_preamble (true)
+    m_node_list (), m_is_main (false), m_in_preamble (true), m_root (nullptr)
 {
 
 }

@@ -37,5 +37,3 @@ Component root {
   tle.validated_text =:> t.text
 }
 
-run root
-run syshook

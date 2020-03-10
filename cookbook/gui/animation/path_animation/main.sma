@@ -51,6 +51,3 @@ Component root {
   end.true -> sl.next
 
 }
-
-run root
-run syshook

@@ -44,5 +44,3 @@ Component root {
   f.width > 400 ? "greater" : "lower" =:> sw.state
 }
 
-run root
-run syshook

@@ -114,6 +114,3 @@ Component root
   }
   test.false -> set_null
 }
-
-run root
-run syshook

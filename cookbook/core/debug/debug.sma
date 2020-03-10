@@ -40,6 +40,3 @@ Component root {
 	  clock->idle (r.press)
   }
 }
-
-run root
-run syshook

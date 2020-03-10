@@ -96,5 +96,3 @@ Component root {
 
 }
 
-run root
-run syshook

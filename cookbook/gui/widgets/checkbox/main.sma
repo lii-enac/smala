@@ -39,6 +39,3 @@ Component root {
 
   cb.entries.2.selected -> incr
 }
-
-run root
-run syshook

@@ -51,6 +51,3 @@ Component root
 
   TouchMarker tm (frame)
 }
-
-run root
-run syshook

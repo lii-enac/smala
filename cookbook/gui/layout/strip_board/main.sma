@@ -45,5 +45,3 @@ Component root {
   desc.click->board.descending
 }
 
-run root
-run syshook

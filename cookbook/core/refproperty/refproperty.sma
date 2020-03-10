@@ -35,5 +35,3 @@ Component root
   i.state=:>tp.input
 }
 
-run root
-run syshook

@@ -49,5 +49,3 @@ Component root
     fitts.target_time_acquisition => tp.input
 }
 
-run root
-run syshook

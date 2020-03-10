@@ -215,10 +215,10 @@ namespace Smala
         break;
       }
       case END_DEFINE:
-        {
-          build_end_define (os, node);
-          break;
-        }
+      {
+        build_end_define (os, node);
+        break;
+      }
       case END_CONTAINER:
         {
           BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
@@ -226,6 +226,11 @@ namespace Smala
           if (n) delete n;
           break;
         }
+      case END_MAIN:
+      {
+        build_end_main (os, node);
+        break;
+      }
       case FOR:
       {
         build_for (os, node);

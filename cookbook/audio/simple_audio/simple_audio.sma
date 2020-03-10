@@ -14,6 +14,3 @@ Component root
 	Clock cl(2000)
 	cl.tick -> s
 }
-
-run root
-run syshook

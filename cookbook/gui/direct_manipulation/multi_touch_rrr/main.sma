@@ -33,6 +33,3 @@ Component root
   ScaleRotateTranslate _ (tt.r, tt.h)
   ScaleRotateTranslate _ (tt2.r, tt2.h)
 }
-
-run root
-run syshook

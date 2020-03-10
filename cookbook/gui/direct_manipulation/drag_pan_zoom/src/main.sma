@@ -86,6 +86,3 @@ Component root {
     Text t (100, 400, "... and this text which is not transformed at all")
   }
 }
-
-run root
-run syshook

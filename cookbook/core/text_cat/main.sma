@@ -26,5 +26,3 @@ Component root {
   toString ("frame width =  " + f.width + " frame height = " + f.height) =:> t.text
 }
 
-run root
-run syshook

@@ -948,18 +948,24 @@ simple_process
       m_in_arguments = false;
       if (driver.debug()) driver.new_line(); 
     }
-  | ACTIVATOR NAME_OR_PATH
+  | ACTIVATOR process_list
   {
-    Node *node = new Node ("Activator", "_");
-    node->set_has_arguments (true);
-    driver.add_node (node);
-    if (m_in_add_children)
-      node->set_ignore_parent (true);
-    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-    TermNode *n = new TermNode (VAR, $2);
-    driver.add_node (n);
-    n = new TermNode (END, "");
-    driver.add_node (n);
+    for (int i = 0; i < $2.size (); ++i) {
+      Node *node = new Node ("Activator", "_");
+      node->set_has_arguments (true);
+      driver.add_node (node);
+      if (m_in_add_children)
+        node->set_ignore_parent (true);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      TermNode *n = new TermNode (VAR, $2.at(i));
+      driver.add_node (n);
+      n = new TermNode (END, "");
+      driver.add_node (n);
+      if (m_in_add_children) {
+        SetParentNode *sp = new SetParentNode (node);
+        driver.add_node (sp);
+      }
+    }
   }
 
 start_statement_list

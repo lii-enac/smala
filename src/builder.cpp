@@ -188,6 +188,12 @@ namespace Smala
         m_in_static_expr = false;
         break;
       }
+      case BREAK:
+      {
+        indent (os);
+        os << node->djnn_type() << ";\n";
+        break;
+      }
       case INCREMENT:
       {
         build_step (os, node, true);

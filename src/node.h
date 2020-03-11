@@ -36,6 +36,7 @@ namespace Smala {
     ADD_CHILDREN_TO,
     ALIAS,
     BINARY_OP,
+    BREAK,
     CLONE,
     CONTAINER,
     CONTROL,

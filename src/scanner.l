@@ -53,6 +53,7 @@ PATH ("Path"|"PathClip")
 PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
 GRADIENT ("LinearGradient"|"RadialGradient")
 ACTION ("run"|"stop"|"dump"|"notify"|"delete"|"XMLSerialize")
+BREAK ("break"|"continue"|"return")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 %%
 
@@ -120,6 +121,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "_native_code_"       { return Smala::Parser::make_NATIVE_CODE (Smala::location ()); }
 "_native_java_"       { return Smala::Parser::make_NATIVE_JAVA (Smala::location ()); }
 {ACTION}              { return Smala::Parser::make_ACTION (yytext, Smala::location ()); }
+{BREAK}               { return Smala::Parser::make_BREAK (yytext, Smala::location ()); }
 "use"                 { return Smala::Parser::make_USE (Smala::location ()); }
 "import"              { return Smala::Parser::make_IMPORT (Smala::location ()); }
 "merge"               { return Smala::Parser::make_MERGE (Smala::location ()); }

@@ -173,6 +173,7 @@
 %define parse.error verbose
 %define api.token.prefix {TOKEN_}
 
+%token <string> BREAK "break|continue|return"
 %token ACTIVATOR "|->"
 %token DOLLAR "$"
 %token ARROW "->"
@@ -469,6 +470,7 @@ statement
   | expression { if (driver.debug()) driver.new_line(); }
   | tree_action
   | imperative_statement { if (driver.debug()) driver.new_line(); }
+  | break_loop
 
 new_component
   : simple_process
@@ -549,6 +551,13 @@ start_eq
       driver.add_node (n);
       m_in_arguments = true;
       $$ = n;
+    }
+break_loop
+  : BREAK
+    {
+      Node *n = new Node ($1, "");
+      n->set_node_type (BREAK);
+      driver.add_node (n);
     }
 
 type

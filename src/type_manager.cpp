@@ -37,7 +37,7 @@ namespace Smala {
     build_table (djnPhidgetsGlobalSymTable, phidgetsGlobalSymbols);
     build_table (djnPowerGlobalSymTable, powerGlobalSymbols);
     build_table (djnGUIGlobalSymTable, guiGlobalSymbols);
-    build_table (djnSoundGlobalSymTable, soundGlobalSymbols);
+    build_table (djnAudioGlobalSymTable, audioGlobalSymbols);
 
     build_table (animation, animation_types);
     build_table (base, base_types);
@@ -55,7 +55,7 @@ namespace Smala {
     build_table (phidgets, phidgets_types);
     build_table (power, power_types);
     build_table (qtwidgets, qtwidgets_types);
-    build_table (sound, sound_types);
+    build_table (audio, audio_types);
 
     build_table (smalaGlobalSymTable, smala_symbols);
 
@@ -75,7 +75,7 @@ namespace Smala {
     m_types_tables.insert (std::pair<std::string, symtable_t>("Phidgets", phidgets));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Power", power));
     m_types_tables.insert (std::pair<std::string, symtable_t>("Qtwidgets", qtwidgets));
-    m_types_tables.insert (std::pair<std::string, symtable_t>("Sound", sound));
+    m_types_tables.insert (std::pair<std::string, symtable_t>("Audio", audio));
   }
 
   std::string
@@ -112,8 +112,8 @@ namespace Smala {
     else if (module.compare ("Power") == 0) {
       symtable = djnPowerGlobalSymTable;
     }
-    else if (module.compare ("Sound") == 0) {
-      symtable = djnSoundGlobalSymTable;
+    else if (module.compare ("Audio") == 0) {
+      symtable = djnAudioGlobalSymTable;
     }
     else {
       return;

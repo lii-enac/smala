@@ -53,7 +53,7 @@ protected:
 	symtable_t phidgets;
 	symtable_t power;
 	symtable_t qtwidgets;
-	symtable_t sound;
+	symtable_t audio;
 
 	symtable_t djnCoreGlobalSymTable;
 	symtable_t djnDisplayGlobalSymTable;
@@ -61,8 +61,8 @@ protected:
 	symtable_t djnPhidgetsGlobalSymTable;
 	symtable_t djnPowerGlobalSymTable;
 	symtable_t djnGUIGlobalSymTable;
-	symtable_t djnSoundGlobalSymTable;
-  symtable_t smalaGlobalSymTable;
+	symtable_t djnAudioGlobalSymTable;
+  	symtable_t smalaGlobalSymTable;
 
 	type_entry *coreGlobalSymbols;
 	type_entry *displayGlobalSymbols;
@@ -70,7 +70,7 @@ protected:
 	type_entry *phidgetsGlobalSymbols;
 	type_entry *powerGlobalSymbols;
 	type_entry *guiGlobalSymbols;
-	type_entry *soundGlobalSymbols;
+	type_entry *audioGlobalSymbols;
 	type_entry *animation_types;
 	type_entry *base_types;
 	type_entry *comms_types;
@@ -87,7 +87,7 @@ protected:
 	type_entry *phidgets_types;
 	type_entry *power_types;
 	type_entry *qtwidgets_types;
-	type_entry *sound_types;
+	type_entry *audio_types;
 	type_entry *smala_symbols;
 
 	std::map <std::string, symtable_t> m_types_tables;

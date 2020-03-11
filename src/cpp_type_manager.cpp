@@ -77,11 +77,12 @@ namespace Smala {
     };
     guiGlobalSymbols = guiGS;
 
-    type_entry soundGS[] = {
+    type_entry audioGS[] = {
       //{"PortAudio", "djnPortAudio"},
+      {"DefaultAudioListener", "default_audio_listener"},
       {"0", "0"}
     };
-    soundGlobalSymbols = soundGS;
+    audioGlobalSymbols = audioGS;
 
     type_entry animation_t[] = {
       {"0", "0"}
@@ -332,10 +333,10 @@ namespace Smala {
     };
     qtwidgets_types = qtwidgets_t;
 
-    type_entry sound_t[] = {
+    type_entry audio_t[] = {
       {"0", "0"}
     };
-    sound_types = sound_t;
+    audio_types = audio_t;
 
     init ();
   }

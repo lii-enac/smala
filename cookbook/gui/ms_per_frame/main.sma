@@ -23,7 +23,8 @@ _main_
 Component root
 {
 	Frame f ("ms_per_frame", 0, 0, 512, 512)
-
+  Exit ex (0, 1)
+  f.close -> ex
 	OutlineWidth ow(10)
 	FillColor fc(255,0,0)
   OutlineColor _(0,0,255)

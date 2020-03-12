@@ -6,7 +6,8 @@ use gui
 _main_
 Component root {
   Frame f ("my frame", 0, 0, 400, 600)
-
+  Exit ex (0, 1)
+  f.close -> ex
   FillColor c (0, 0, 0)
   
   SwitchRange swr (0) {

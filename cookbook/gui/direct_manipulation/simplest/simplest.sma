@@ -21,7 +21,8 @@ use gui
 
 _main_
 Frame f ("simplest", 0, 0, 600, 600)
-
+Exit ex (0, 1)
+f.close -> ex
 Translation _(-650,0)
 Translation t(0,0)
 

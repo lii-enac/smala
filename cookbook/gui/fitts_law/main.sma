@@ -9,6 +9,8 @@ _main_
 Component root
 {
 	Frame f ("my frame", 0, 0, 800, 800)
+  Exit ex (0, 1)
+  f.close -> ex
   	mouseTracking = 1
 
   	// Typical CHIesque Fitts (not the genuine, reciprocal from the 50's)

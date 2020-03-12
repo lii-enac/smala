@@ -24,7 +24,8 @@ _main_
 Component root
 {
   Frame frame ("Multitouch Drag", 0, 1000, 1000, 1000)
-
+  Exit ex (0, 1)
+  frame.close -> ex
   Component r1 {
     Translation initial_position (400, 400)
     Homography transforms

@@ -7,7 +7,8 @@ _main_
 Component root
 {
   Frame f ("my frame", 0, 0, 500, 300)
-
+  Exit ex (0, 1)
+  f.close -> ex
   FillColor _ (100, 100, 100)
   Rectangle r1 (10, 10, 200, 100, 0, 0)
   Rectangle r2 (250, 10, 150, 70, 0, 0)

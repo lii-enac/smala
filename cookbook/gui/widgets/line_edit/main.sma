@@ -23,6 +23,8 @@ import TextLineEdit
 _main_
 Component root {
   Frame f ("my frame", 500, 500, 500, 500)
+  Exit ex (0, 1)
+  f.close -> ex
   mouseTracking = 1
   NoOutline _
   FillColor _ (50, 50, 50)

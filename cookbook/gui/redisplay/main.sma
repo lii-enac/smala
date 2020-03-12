@@ -24,6 +24,8 @@
  Component root
  {
   Frame f ("redisplay", 0, 0, 1000, 1000)
+  Exit ex (0, 1)
+  f.close -> ex
   //mouseTracking = 1
 
   OutlineWidth ow(10)

@@ -7,7 +7,8 @@ _main_
 Component root
 {
 	Frame f ("my frame", 0, 0, 1000, 1000)
-
+  Exit ex (0, 1)
+  f.close -> ex
 	FillColor fc(255,0,0)
   OutlineColor _(0,0,255)
 

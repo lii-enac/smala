@@ -43,7 +43,8 @@ buildPath (const char* file)
  {
 
   Frame f ("clone", 0, 0, 600, 600)
-
+  Exit ex (0, 1)
+  f.close -> ex
   Group p1 {
     Rectangle rect1 (100, 100, 100, 100, 0, 0)
     Circle cric1 (300, 100, 50)

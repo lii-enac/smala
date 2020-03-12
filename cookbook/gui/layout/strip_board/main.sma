@@ -24,6 +24,8 @@ _main_
 Component root {
   
   Frame f ("my frame", 0, 0, 400, 400)
+  Exit ex (0, 1)
+  f.close -> ex
   mouseTracking = 1
 
   NoOutline _()

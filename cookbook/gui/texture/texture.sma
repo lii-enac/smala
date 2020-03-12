@@ -7,6 +7,8 @@ _main_
 Component root
 {
   Frame f ("my frame", 0, 0, 600, 300)
+  Exit ex (0, 1)
+  f.close -> ex
   NoOutline _()
  
   Texture t ("texture.png")

@@ -9,6 +9,8 @@ import Segment
 _main_
 Component root {
   Frame f ("f", 0, 0, 800, 800)
+  Exit ex (0, 1)
+  f.close -> ex
   NoOutline _
   FillColor _ (50, 50, 50)
   Rectangle bg (0, 0, 0, 0, 0, 0)

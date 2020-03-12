@@ -22,6 +22,8 @@ _main_
 Component root
 {
   Frame f ("Dock", 0, 0, 512, 512)
+  Exit ex (0, 1)
+  f.close -> ex
   mouseTracking = 1
 
   FillColor _ (30, 30, 30)

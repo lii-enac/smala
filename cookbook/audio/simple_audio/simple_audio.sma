@@ -9,6 +9,8 @@ Component root
 {
 	// sadly emscripten audio does not work without gui
 	Frame f("simple audio", 0, 0, 100, 100)
+  Exit ex (0, 1)
+  f.close -> ex
 	Volume v(0.5)
 	0.9 =: DefaultAudioListener.gain
 	Sample s("res/shutter.wav")

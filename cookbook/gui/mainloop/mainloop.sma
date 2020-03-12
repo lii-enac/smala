@@ -22,7 +22,7 @@ use gui
 _main_
 Component root
 {
-  Frame f ("simplest", 0, 0, 600, 600)
+  Frame f ("mainloop", 0, 0, 600, 600)
 
   FontSize _ (DJN_PX, 14)
   Text t (50, 50, "Drag the rectangle, then close the window.")

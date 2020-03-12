@@ -61,7 +61,8 @@ _main_
 Component root {
 
 	Frame f ("f", 0, 0, 500, 600)
-
+    Exit ex (0, 1)
+    f.close -> ex
 	FillColor fc (255, 255, 255)
 
 	Rectangle _ (200, 100, 100, 100, 0, 0)

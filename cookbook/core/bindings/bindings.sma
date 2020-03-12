@@ -22,6 +22,8 @@ import Button
 _main_
 Component root {
   Frame f ("my frame", 0, 0, 1200, 600)
+  Exit ex (0, 1)
+  f.close -> ex
   Button show (f, "Show", 50, 50)
   Button hide (f, "Hide", 50, 150)
 

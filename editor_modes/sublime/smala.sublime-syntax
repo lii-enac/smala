@@ -55,7 +55,7 @@ contexts:
     - match: '\b(use|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string)\b'
       scope: keyword.other.sma
 
-    - match: '\s*<<\s*|\s*=>\s*|\s*=:>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*'
+    - match: '\s*<<\s*|\s*=>\s*|\s*=:>\s*|\s*=:\s*|\s*!?->!?\s*|\s*::>\s*|\s*::\s*|\s*\|->\s*'
       scope: keyword.operator.sma
 
     - match: '^\s*(\b[A-Z].[a-zA-Z0-9]*\b)'

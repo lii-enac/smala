@@ -8,6 +8,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.8.0] - 2020-03-13
+### compliant with djnn-cpp [1.9.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW allow break, continue and return statements
+    - NEW the symbol '|->'' for activator :  |-> spike
+    - NEW cookbook: layout
+    - NEW cookbook: audio
+    - New cookbook: mainloop
+    - NEW root and syshook auto-magically run ! : no need to run root and run syshook at the end
+
+### Added
+    - Added 'mspf' child to windows component: millisecond per frame informations
+    - Enabled path in move child
+    - Adapte to new djnn module: exec_env AND auto-intialize
+
+### Changed
+    - Improved editor_mode for SublimeText
+    - Improved DoubleClick recipe
+    - Improved code
+    - Made cookbooks quit on window closing
+
+### Fixed
+    - Fixed parenting mechanism in main program as in dynamic program (AddChildrenTo)
+    - Fixed HelloIvy cookbook to work on every platform
+    - Fixed naming branch in SwitchRange
+
+
 ## [1.7.0] - 2020-01-31
 ### compliant with djnn-cpp [1.8.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
@@ -229,6 +258,4 @@ note: debut on changelog. This section has to be completed, if we have time.
 ### Deprecated
 ### Removed
 ### Fixed
-### Security
-
 

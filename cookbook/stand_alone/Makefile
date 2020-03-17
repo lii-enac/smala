@@ -17,7 +17,7 @@ srcs_other := src/foo.cpp
 #srcs_other := $(shell find $(src_dir) -name "*.cpp")
 
 #djnn_libs := gui display animation utils comms base core
-djnn_libs := gui display base core
+djnn_libs := gui display exec_env base core
 
 #relative path
 src_dir := src

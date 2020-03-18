@@ -28,6 +28,7 @@
   #include <iostream>
   #include <string>
   #include <vector>
+  #include <algorithm>
   #include <stdint.h>
   #include "node.h"
   #include "set_parent_node.h"

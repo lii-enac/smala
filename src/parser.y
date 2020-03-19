@@ -31,6 +31,7 @@
   #include <algorithm>
   #include <stdint.h>
   #include "node.h"
+  #include "end_main_node.h"
   #include "set_parent_node.h"
   #include "dash_array_node.h"
   #include "activator_node.h"
@@ -94,7 +95,7 @@
   vector<TermNode*> comp_expression;
   vector<TermNode*> arg_expression;
   vector<int> int_array;
-  Node *cur_node, *root;
+  Node *cur_node, *root = nullptr;
   bool m_in_add_children = false;
   bool m_in_arguments = false;
   bool m_in_for = false;
@@ -383,12 +384,11 @@ rough_code
 body
   : start_main statement_list
   {
-    Node *node = new Node ();
+    /*Node *node = new Node ();
     node->set_node_type (END_CONTAINER);
     driver.add_node (node);
-    parent_list.pop_back ();
-    Node *end_main = new Node ();
-    end_main->set_node_type (END_MAIN);
+    parent_list.pop_back ();*/
+    EndMainNode *end_main = new EndMainNode (root);
     driver.add_node (end_main);
     driver.end_debug ();
   }
@@ -419,12 +419,12 @@ start_main
       start->set_node_type (START_MAIN);
       driver.add_node (start);
       driver.set_is_main (true);
-      root = new Node ("Component", "_");
+      /*root = new Node ("Component", "_");
       driver.add_node (root);
       driver.set_main_node (root);
       root->set_parent (nullptr);
       root->set_node_type (CONTAINER);
-      parent_list.push_back (root);
+      parent_list.push_back (root);*/
     }
 
 start_define
@@ -1002,6 +1002,8 @@ simple_process_decl
   : NAME_OR_PATH NAME_OR_PATH
     {
       Node *node = new Node ($1, $2);
+      if (root == nullptr)
+        root = node;
       driver.add_node (node);
       if ((m_in_add_children && !exclude_from_no_parent ($1)) || is_switch ($1))
         node->set_ignore_parent (true);

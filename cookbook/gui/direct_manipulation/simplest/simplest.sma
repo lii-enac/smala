@@ -20,6 +20,7 @@ use display
 use gui
 
 _main_
+Component root {
 Frame f ("simplest", 0, 0, 600, 600)
 Exit ex (0, 1)
 f.close -> ex
@@ -61,4 +62,4 @@ Path _ {
 
 f.move.x =:> t.tx
 f.move.y =:> t.ty
-
+}

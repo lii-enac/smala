@@ -13,6 +13,7 @@
  */
 
 #include "cpp_builder.h"
+#include "end_main_node.h"
 #include "native_expression_node.h"
 #include "operator_node.h"
 #include "instruction_node.h"
@@ -1426,10 +1427,11 @@ namespace Smala
   void
   CPPBuilder::build_end_main (std::ofstream &os, Node *node)
   {
-    if (m_ast.get_root_node() == nullptr)
+    EndMainNode* e_node = static_cast<EndMainNode*> (node);
+    if (e_node == nullptr || e_node->node () == nullptr)
       return;
     indent (os);
-    os << m_ast.get_root_node ()->build_name () << "->activate ();\n";
+    os << e_node->node ()->build_name () << "->activate ();\n";
     indent (os);
     os << "MainLoop::instance ().activate ();\n";
   }

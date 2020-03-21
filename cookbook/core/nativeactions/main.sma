@@ -27,11 +27,11 @@ cpp_action (Process c)
 	// To get the user_data:
  	Process *data = (Process*) get_native_user_data (c);
 
- 	Process *fc = data->find_component ("fc");
+ 	Process *fc = data->find_child ("fc");
 
- 	((IntProperty*) fc->find_component ("r"))->set_value (250, 1)  ;
- 	((IntProperty*) fc->find_component ("g"))->set_value (0, 1)  ;
- 	((IntProperty*) fc->find_component ("b"))->set_value (0, 1)  ;
+ 	((IntProperty*) fc->find_child ("r"))->set_value (250, 1)  ;
+ 	((IntProperty*) fc->find_child ("g"))->set_value (0, 1)  ;
+ 	((IntProperty*) fc->find_child ("b"))->set_value (0, 1)  ;
 
     // To print the component tree:
  	fc->dump(0);

@@ -498,7 +498,7 @@ namespace Smala
           if (p.second.empty ())
             os << p.first;
           else
-            print_find_component (os, node, p);
+            print_find_child (os, node, p);
           if (m_in_static_expr) {
             if (m_in_set_text)
               os << ")->get_value ()";
@@ -701,9 +701,9 @@ namespace Smala
   }
 
   void
-  Builder::print_find_component (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> > &sym)
+  Builder::print_find_child (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> > &sym)
   {
-    os << build_find_component (n, sym);
+    os << build_find_child (n, sym);
   }
 
   void

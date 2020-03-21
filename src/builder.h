@@ -101,8 +101,8 @@ namespace Smala {
     virtual void build_native_expression (std::ofstream &os, Node *n) {}
     virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
-    void print_find_component (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> >&);
-    virtual std::string build_find_component ( Node *n, const std::pair< std::string, std::vector<std::string> >&) = 0;
+    void print_find_child (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> >&);
+    virtual std::string build_find_child ( Node *n, const std::pair< std::string, std::vector<std::string> >&) = 0;
     virtual std::string build_root_and_path (const std::pair< std::string, std::vector<std::string> >&) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
     virtual void end_set_property (std::ofstream &os, Node *node) {};

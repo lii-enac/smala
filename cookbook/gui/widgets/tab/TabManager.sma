@@ -22,26 +22,26 @@ _action_
 reorder_tabs_action (Process c)
 %{
 	Process *my_tab_manager = (Process*) get_native_user_data (c);
-	List *tabs_list = (List*) my_tab_manager->find_component ("tabs");
+	List *tabs_list = (List*) my_tab_manager->find_child ("tabs");
 	char spec[16];
 
 	// The old selected tab is at the end of the tabs list,
 	// get it, tell it to unselect itself...
 	sprintf (spec, "%d", tabs_list->size());
-	Process *old_selected_tab = (Process*) tabs_list->find_component (spec);
-	Spike *unselect = (Spike*) old_selected_tab->find_component ("unselect");
+	Process *old_selected_tab = (Process*) tabs_list->find_child (spec);
+	Spike *unselect = (Spike*) old_selected_tab->find_child ("unselect");
 	unselect->activate ();
 	// get its original index...
-	int old_selected_index = ((IntProperty*) old_selected_tab->find_component ("index"))->get_value ();
+	int old_selected_index = ((IntProperty*) old_selected_tab->find_child ("index"))->get_value ();
 	sprintf (spec, "<%d", old_selected_index);
 	// ...and move it back to its original place
 	tabs_list->remove_child (old_selected_tab);
 	tabs_list->insert (old_selected_tab, spec);
 
 	// Find the new selected tab and move it to the end of the tabs list
-	int new_selected_index = ((IntProperty*) my_tab_manager->find_component ("selected_index"))->get_value ();
+	int new_selected_index = ((IntProperty*) my_tab_manager->find_child ("selected_index"))->get_value ();
 	for (Process *tab : tabs_list->children()) {
-		int tab_index = ((IntProperty*) tab->find_component ("index"))->get_value ();
+		int tab_index = ((IntProperty*) tab->find_child ("index"))->get_value ();
 		if (tab_index == new_selected_index) {
 			tabs_list->remove_child (tab);
 			tabs_list->add_child (tab, "");

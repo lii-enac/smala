@@ -67,7 +67,7 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
     - Fixed drag_pan_zoom cookbook.
     - Fixed seg_fault in code generation
     - Fixed new compatibility with djnn 1.8.0
-    - Fixed an issue with find_component generation
+    - Fixed an issue with find_child generation
     - Fixed Makefile
     - Fixed typo and clean-up code
 

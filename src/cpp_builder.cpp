@@ -60,6 +60,7 @@ namespace Smala
     os << "#include <string>\n";
     os << "#include \"core/core-dev.h\"\n";
     os << "#include \"exec_env/exec_env.h\"\n";
+    os << "#include \"core/utils/error.h\"\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
     int size = m_ast.preamble ().import ().size ();

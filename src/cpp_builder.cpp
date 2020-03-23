@@ -59,8 +59,7 @@ namespace Smala
     os << "#include <iostream>\n";
     os << "#include <string>\n";
     os << "#include \"core/core-dev.h\"\n";
-    os << "#include \"exec_env/exec_env.h\"\n";
-    os << "#include \"core/utils/error.h\"\n";
+    os << "#include \"exec_env/exec_env.h\"\n\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
     int size = m_ast.preamble ().import ().size ();
@@ -71,6 +70,8 @@ namespace Smala
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
     build_preamble (os);
+
+    os << "#include \"core/utils/error.h\"\n\n";
 
     size = m_ast.node_list ().size ();
     for (int i = 0; i < size; ++i) {

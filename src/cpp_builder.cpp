@@ -62,6 +62,10 @@ namespace Smala
     os << "#include \"exec_env/exec_env.h\"\n\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";
 
+    os << "#include \"core/utils/error.h\" // for Context class\n";
+    os << "#undef error // avoid name clash with error macro and possible following #include\n";
+    os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
+
     int size = m_ast.preamble ().import ().size ();
     for (int i = 0; i < size; ++i) {
       /* add the import name to the possible types */
@@ -69,9 +73,8 @@ namespace Smala
       m_types.insert (std::pair<std::string, std::string> (name, name));
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
-    build_preamble (os);
 
-    os << "#include \"core/utils/error.h\"\n\n";
+    build_preamble (os);
 
     size = m_ast.node_list ().size ();
     for (int i = 0; i < size; ++i) {

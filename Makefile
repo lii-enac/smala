@@ -331,8 +331,12 @@ cookbook_apps := core/bindings \
 	gui/texture \
 	gui/ms_per_frame \
 	network/helloIvy \
-	audio/simple_audio \
-	extra/crazyflie
+	audio/simple_audio
+
+#	extra/crazyflie
+
+cookbook_apps += $(cookbook_apps_extra)
+
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 

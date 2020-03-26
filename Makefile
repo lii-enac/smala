@@ -75,8 +75,8 @@ CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
 #LIBS ?=
 
-djnn_include_path_cpp ?= $(djnn_path)/src
-djnn_lib_path_cpp ?= $(djnn_path)/build
+djnn_include_path_cpp ?= $(djnn_path)/build/include/djnn-cpp
+djnn_lib_path_cpp ?= $(djnn_path)/build/lib
 
 
 ifeq ($(os),Linux)

@@ -1,6 +1,6 @@
 # canonical Makefile for smala applications
 # 1. copy stand_alone directory somwhere: cp -r cookbook/stand_alone /some/where/else
-# 2. edit configuration part (executable name, srcs, target_lang, djnn_libs, path to djnn-cpp and smalac)
+# 2. edit configuration part (executable name, srcs, djnn_libs, path to djnn-cpp and smalac)
 # 3. make test
 
 redirect: default
@@ -29,8 +29,8 @@ djnn-pkgconf = djnn-cpp-dev
 #djnn-pkgconf = djnn-cpp
 djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
 djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
-djnn_lib_path_cpp := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-djnn_lib_path_cpp := $(subst -L, , $(djnn_lib_path_cpp))
+djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 
 # in cookbook
 smala_path := ../..
@@ -40,17 +40,6 @@ smalac := $(smala_path)/build/smalac
 
 # for emscripten
 em_ext_libs_path := ../../../djnn-emscripten-ext-libs
-
-
-#djnn_path := ../../../local-install
-#djnn_java_classpath := ../../../djnn-java/src:../../../djnn-java/src/jna.jar
-# java example
-#exe := MyApp
-#java_package := truc
-#srcs := Button.sma MyApp.sma
-#target_lang := java
-target_lang := cpp
-
 
 # -------------------------------------------------------------------
 # hopefully no need to tweak the lines below
@@ -134,44 +123,39 @@ EXE := .html
 endif
 
 exe := $(exe)$(EXE)
-
-# -- cpp
-
-ifeq ($(target_lang),cpp)
-
 exe := $(build_dir)/$(exe)
 
 default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path_cpp))":$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
 dbg: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path_cpp))":$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
 .PHONY: test
 
 LD  = $(CXX)
 
 objs_sma := $(srcs_sma:.sma=.o)
 objs_sma := $(addprefix $(build_dir)/,$(objs_sma))
-objs_other := $(srcs_other:.$(target_lang)=.o)
+objs_other := $(srcs_other:.cpp=.o)
 objs_other := $(addprefix $(build_dir)/,$(objs_other))
 
 objs := $(objs_sma) $(objs_other)
 
-gensrcs := $(objs_sma:.o=.$(target_lang))
+gensrcs := $(objs_sma:.o=.cpp)
 #$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
 
 
 ifeq ($(cross_prefix),em)
-app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path_cpp)/libdjnn-,$(djnn_libs)))
+app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,$(djnn_libs)))
 else
 app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif
 
 
-$(objs): CXXFLAGS += $(djnn_include_path_cpp) -I$(src_dir) -I$(build_dir)/$(src_dir)
-$(exe): LDFLAGS += $(djnn_lib_path_cpp)
+$(objs): CXXFLAGS += $(djnn_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
+$(exe): LDFLAGS += $(djnn_ldflags)
 $(exe): LIBS += $(app_libs)
 
 $(exe): $(objs)
@@ -179,11 +163,11 @@ $(exe): $(objs)
 	$(LD) $^ -o $@ $(LDFLAGS) $(LIBS)
 
 # .sma to .cpp, .c etc
-$(build_dir)/%.$(target_lang) $(build_dir)/%.h: %.sma
+$(build_dir)/%.cpp $(build_dir)/%.h: %.sma
 	@mkdir -p $(dir $@)
 	@echo smalac $<
-	@$(smalac) -$(target_lang) $<
-	@mv $*.$(target_lang) $(build_dir)/$(*D)
+	@$(smalac) -cpp $<
+	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 #@if [ -f $*.h ] && ! cmp -s $*.h $(build_dir)/$*.h; then mv $*.h $(build_dir)/$(*D); fi;
@@ -212,51 +196,12 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 deps := $(objs:.o=.d)
 -include $(deps)
 
-endif
-
-
-# -- java
-
-ifeq ($(target_lang),java)
-
-.PHONY: $(exe)
-
-build_dir_old := $(build_dir)
-build_dir := $(build_dir)/$(java_package)
-exe_full := $(build_dir)/$(exe)
-
-default: $(exe_full)
-.PHONY: default
-
-test: $(exe_full)
-	java -classpath $(djnn_java_classpath):$(build_dir_old) -Djna.library.path=$(djnn_path)/lib -XstartOnFirstThread $(java_package)/$(exe)
-.PHONY: test
-
-classes := $(srcs:.sma=.class)
-classes := $(addprefix $(build_dir)/,$(classes))
-srcs_java := $(srcs:.sma=.java)
-srcs_java := $(addprefix $(build_dir)/,$(srcs_java))
-
-
-$(exe_full): $(classes)
-$(classes): $(srcs_java)
-	javac -classpath $(djnn_java_classpath) $?
-
-# .sma
-$(build_dir)/%.java: %.sma
-	@mkdir -p $(dir $@)
-	@echo $(smalac) -j -package $(java_package) $<
-	@$(smalac) -j -package $(java_package) $< || (c=$$?; rm -f $*.c $*.h $*.java; (exit $$c))
-	@if [ -f $*.java ]; then mv $*.java $(build_dir)/$(*D); fi;
-
-endif
-
 # --
 
 distclean clear:
 	rm -rf build
 clean:
-	rm -f $(gensrcs) $(objs) $(deps) $(classes) $(srcs_java)
+	rm -f $(gensrcs) $(objs) $(deps)
 .PHONY: clean clear distclean
 
 foo:

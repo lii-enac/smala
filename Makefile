@@ -226,15 +226,13 @@ define cookbookapp_makerule
 libs_cookbook_app :=
 djnn_libs_cookbook_app :=
 res_dir :=
-lang_cookbook_app := cpp
 
 include cookbook/$1/cookbook_app.mk
 
 ckappname := $$(notdir $1)
-$1_app_lang := $$(lang_cookbook_app)
 $1_app_srcs_dir := cookbook/$1
 $1_app_objs := $$(objs_cookbook_app)
-$1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
+$1_app_gensrcs := $$($1_app_objs:.o=.cpp)
 $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
@@ -248,13 +246,7 @@ else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 endif
 
-
-ifeq ($$(lang_cookbook_app),c)
-$1_app_link := $$(CC_CK)
-endif
-ifeq ($$(lang_cookbook_app),cpp)
 $1_app_link := $$(CXX_CK)
-endif
 
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
@@ -282,8 +274,6 @@ $$(notdir $1)_clean:
 $$(notdir $1)_dbg_print:
 	@echo $1_dbg
 	@echo $$($1_app_objs)
-	@echo $$($1_app_lang)
-	@echo $$($1_app_objs:.o=.$$($1_app_lang))
 	@echo $$($1_app_gensrcs)
 
 deps += $$($1_app_objs:.o=.d)
@@ -353,15 +343,13 @@ define testapp_makerule
 libs_test_app :=
 djnn_libs_test_app :=
 res_dir :=
-lang_test_app := cpp
 
 include test/$1/test_app.mk
 
 ckappname := $$(notdir $1)
-$1_app_lang := $$(lang_test_app)
 $1_app_srcs_dir := test/$1
 $1_app_objs := $$(objs_test_app)
-$1_app_gensrcs := $$($1_app_objs:.o=.$$($1_app_lang))
+$1_app_gensrcs := $$($1_app_objs:.o=.cpp)
 $1_app_gensrcs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
@@ -400,8 +388,6 @@ $$(notdir $1)_clean:
 $$(notdir $1)_dbg_print:
 	@echo $1_dbg
 	@echo $$($1_app_objs)
-	@echo $$($1_app_lang)
-	@echo $$($1_app_objs:.o=.$$($1_app_lang))
 	@echo $$($1_app_gensrcs)
 
 deps += $$($1_app_objs:.o=.d)

@@ -1,7 +1,7 @@
 #	djnn smalac compiler
 #
 #	The copyright holders for the contents of this file are:
-#		Ecole Nationale de l'Aviation Civile, France (2017-2018)
+#		Ecole Nationale de l'Aviation Civile, France (2017-2020)
 #	See file "license.terms" for the rights and conditions
 #	defined by copyright holders.
 #
@@ -75,9 +75,10 @@ CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
 #LIBS ?=
 
-djnn_include_path_cpp ?= $(djnn_path)/build/include/djnn-cpp
-djnn_lib_path_cpp ?= $(djnn_path)/build/lib
-
+djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
+djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
+djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 
 ifeq ($(os),Linux)
 CXXFLAGS +=
@@ -92,7 +93,7 @@ LEX = /usr/local/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
-other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
+#other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 SC_CXXFLAGS += -I/usr/local/opt/flex/include
 SC_LDFLAGS += -L/usr/local/opt/flex/lib
 endif
@@ -240,7 +241,7 @@ $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_res_dir := $$(res_dir)
 
 ifeq ($$(cookbook_cross_prefix),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
 	--preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir) \
 	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 else
@@ -258,8 +259,8 @@ endif
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang)) $$(CXXFLAGS_CK)
-$$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang)) $$(LDFLAGS_CK)
+$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK)
+$$($1_app_exe): LDFLAGS += $$(djnn_ldflags) $$(LDFLAGS_CK)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)
@@ -268,9 +269,9 @@ $$($1_app_exe): $$($1_app_objs)
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path)" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path)" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
 	rm $$($1_app_exe) $$($1_app_objs)
@@ -366,7 +367,7 @@ $1_app_objs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
 
 ifeq ($$(cookbook_cross_prefix),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path_cpp)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
 $1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
 $1_app_libs += --preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
 else
@@ -379,16 +380,16 @@ $1_app_link := $$(CXX)
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
-$$($1_app_objs): CFLAGS += -I$$(djnn_include_path_$$($1_app_lang))
-$$($1_app_exe): LDFLAGS += -L$$(djnn_lib_path_$$($1_app_lang))
+$$($1_app_objs): CFLAGS += -I$$(djnn_cflags)
+$$($1_app_exe): LDFLAGS += -L$$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path_$$($1_app_lang))):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
+	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
 
 $$(notdir $1)_clean:
 	rm $$($1_app_exe) $$($1_app_objs)

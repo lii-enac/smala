@@ -16,21 +16,21 @@ srcs_sma := src/Button.sma src/main.sma
 srcs_other := src/foo.cpp
 #srcs_other := $(shell find $(src_dir) -name "*.cpp")
 
-#djnn_libs := gui display animation utils comms base core
-djnn_libs := gui display exec_env base core
-
 #relative path
 src_dir := src
 build_dir := build
 res_dir := res
 exe_dir := .
 
-# in cookbook
-djnn_path := ../../../djnn-cpp
-# standalone
-#djnn_path := ../djnn-cpp
-djnn_include_path_cpp := $(djnn_path)/build/include/djnn-cpp
-djnn_lib_path_cpp := $(djnn_path)/build/lib
+
+# djnn devel
+djnn-pkgconf = djnn-cpp-dev
+# djnn install (github)
+#djnn-pkgconf = djnn-cpp
+djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
+djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
+djnn_lib_path_cpp := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_lib_path_cpp := $(subst -L, , $(djnn_lib_path_cpp))
 
 # in cookbook
 smala_path := ../..
@@ -170,8 +170,8 @@ app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif
 
 
-$(objs): CXXFLAGS += -I$(djnn_include_path_cpp) -I$(src_dir) -I$(build_dir)/$(src_dir)
-$(exe): LDFLAGS += -L$(djnn_lib_path_cpp)
+$(objs): CXXFLAGS += $(djnn_include_path_cpp) -I$(src_dir) -I$(build_dir)/$(src_dir)
+$(exe): LDFLAGS += $(djnn_lib_path_cpp)
 $(exe): LIBS += $(app_libs)
 
 $(exe): $(objs)

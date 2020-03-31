@@ -1,6 +1,6 @@
 build_dir := build
 
-djnn_path :=
+djnn_path := ../djnn-cpp
 
 #devel
 djnn-pkgconf = djnn-cpp-dev

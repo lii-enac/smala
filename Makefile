@@ -273,7 +273,10 @@ $$(notdir $1)_dbg: $$(notdir $1)
 	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
-	rm -f $$($1_app_exe) $$($1_app_objs)
+	rm -f $$($1_app_exe) $$($1_app_objs) $$($1_app_gensrcs)
+$$(notdir $1)_clear:
+	rm -rf $(build_dir)/cookbook/$1
+
 
 
 .PHONY: $1 $1_test $1_dbg

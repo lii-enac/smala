@@ -1,5 +1,7 @@
 build_dir := build
 
+djnn_path :=
+
 #devel
 djnn-pkgconf = djnn-cpp-dev
 #install (github)

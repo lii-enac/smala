@@ -75,10 +75,17 @@ CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
 #LIBS ?=
 
+ifeq ($(djnn_path),) 
 djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
 djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+else
+djnn_cflags := -I$(djnn_path)/src
+djnn_ldflags := -L$(djnn_path)/build/lib -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+djnn_lib_path := $(djnn_path)/build/lib
+endif
+
 
 ifeq ($(os),Linux)
 CXXFLAGS +=

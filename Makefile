@@ -330,6 +330,7 @@ cookbook_apps := core/bindings \
 	gui/sort \
 	gui/texture \
 	gui/ms_per_frame \
+	gui/regex \
 	network/helloIvy \
 	audio/simple_audio
 

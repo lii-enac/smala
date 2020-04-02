@@ -154,13 +154,15 @@ LEX ?= flex
 # -----------
 # smalac
 
+bin_name := smalac
+
 smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o driver.o node.o smala_native.o ctrl_node.o \
 	newvar_node.o operator_node.o local_node.o instruction_node.o binary_instruction_node.o native_code_node.o \
 	native_expression_node.o native_action_node.o range_node.o set_parent_node.o preamble.o ast.o builder.o cpp_builder.o main.o parser.o scanner.o
 
 smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))
 
-smalac := $(build_dir)/smalac
+smalac := $(build_dir)/$(bin_name)
 
 smalac: config.mk $(smalac)
 .PHONY: smalac
@@ -449,6 +451,24 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
+# -----------
+# install
+
+ifeq ($(prefix),)
+# dev install
+install_prefix :=  $(abspath $(build_dir))
+else
+# pkg install (brew, deb, arch)
+install_prefix := $(abspath $(prefix))
+endif
+
+install_bin: $(addprefix $(install_prefix)/bin/,$(bin_name))
+
+$(install_prefix)/bin/$(bin_name): build/$(bin_name)
+	@mkdir -p $(dir $@)
+	install -m 755 $< $@
+
+install: default install_bin
 
 # -----------
 

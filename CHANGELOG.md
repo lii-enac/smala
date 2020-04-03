@@ -8,6 +8,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.9.0] - 2018-12-17
+### compliant with djnn-cpp [1.10.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW cookbook recipe on crazyflie
+    - New cookbook recipe on Regex
+
+### Added
+    - Makefile: depend on djnn-cpp pkg-conf
+    - Makefile: added "make install" and "make install prefix=" rules
+    - Makefile: new tree architecture in build_dir
+
+### Changed
+    - Changed find_component -> fond_child
+    - Changed cookbook: RefProperty
+    - Changed config.default.mk : Please delete your config.mk
+    - Cleaned Makefike of any Java legacy and C legacy
+
+### Deprecated
+### Removed
+    - Removed useless pinch_zoom cookbook
+
+### Fixed
+    - Fixed standalone Makefile
+    - Fixed the fake_root
+    - Fixed headers generation
+    - Fixed error macro
+    - Fixed compilation
+    - Fixed some clean rules
+
 ## [1.8.0] - 2020-03-13
 ### compliant with djnn-cpp [1.9.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

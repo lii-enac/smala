@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/../djnn-cpp-master/src/**"
+                "${workspaceFolder}/../djnn-cpp-master/src"
             ],
             "defines": [],
             "macFrameworkPath": [],

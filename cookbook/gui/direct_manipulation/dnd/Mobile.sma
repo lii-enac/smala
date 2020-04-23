@@ -24,15 +24,12 @@ Mobile (Process ref, Process f, int x, int y)
 {
   Translation t (x, y)
   Circle circ (0, 0, 40)
-  RefProperty null_p (0)
-  RefProperty this_p (this)
   FSM fsm {
     State idle {
       1 =: circ.pickable
-      Assignment _ (null_p, "", ref, "", 0)
     }
     State dragging {
-      Assignment _ (this_p, "", ref, "", 0)
+      this =: ref
       0 =: circ.pickable
       Int off_x (0)
       Int off_y (0)

@@ -11,5 +11,5 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := dnd.o main.o
+objs_cookbook_app := Mobile.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core

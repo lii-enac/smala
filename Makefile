@@ -314,6 +314,7 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/accumulated_transforms \
 	gui/direct_manipulation/rotate_resize \
 	gui/direct_manipulation/dynamic_rectangle \
+	gui/direct_manipulation/dnd \
 	gui/fitts_law \
 	gui/layout/dock \
 	gui/layout/strip_board \
@@ -335,6 +336,7 @@ cookbook_apps := core/bindings \
 	gui/ms_per_frame \
 	gui/regex \
 	network/helloIvy \
+	network/midi \
 	audio/simple_audio
 
 #	extra/crazyflie

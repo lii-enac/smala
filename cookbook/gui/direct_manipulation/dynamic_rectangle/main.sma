@@ -21,11 +21,11 @@ _action_
 delete_rectangle (Process src, Process data)
 {
   /*
-     src = release
-     we need to found is parent: the rectagnle to delete it.
+     src = release (rect.release)
+     we need to found is parent/parent : the grect to delete at once the rectangle + the binding
   */
-  rect = find (src, "..")
-  delete rect
+  grect = find (src, "../..")
+  delete grect
 }
 
 // _action_
@@ -35,8 +35,10 @@ delete_rectangle (Process src, Process data)
 //   //data = root
 
 //   addChildrenTo data {
-//     Rectangle rect ( $data.background.move.x, $data.background.move.y, 100, 100, 0, 0)
-//     rect.release -> data.na_delete_rectangle
+//     Component grect {
+//        Rectangle rect ( $root.background.move.x, $root.background.move.y, 100, 100, 0, 0)
+//        rect.release -> root.na_delete_rectangle
+//      }
 //   }
 // }
 
@@ -49,10 +51,15 @@ Component root {
   
   FillColor bg_color (#FFFFFF)
   Rectangle background (0, 0, $frame.width, $frame.height, 0, 0)
+  /* if you want to bind the size of the background with the size of your window */
+  frame.width => background.width
+  frame.height => background.height
+
 
   FillColor fg_color (#373737)
   OutlineColor fg_color_outline (#FF0000)
-  Text explanation (10, 20, "Press and release on the window to create a rectangle. then press and release a rectangle to delete it !")
+  Text explanation1 (10, 20, "Press and release on the window to create a rectangle")
+  Text explanation2 (10, 40, "then press and release a rectangle to delete it !")
 
   //NativeAction na_create_rectangle (create_rectangle, root, 1)
   //background.release -> na_create_rectangle
@@ -61,14 +68,17 @@ Component root {
 
   background.release -> (root) {
     addChildrenTo root {
-      Rectangle rect ( $root.background.move.x, $root.background.move.y, 100, 100, 0, 0)
-      rect.release -> root.na_delete_rectangle
+      /* we have to create a group to delete at once the rect and the associated binding */
+      Component grect {
+        Rectangle rect ( $root.background.move.x, $root.background.move.y, 100, 100, 0, 0)
+        rect.release -> root.na_delete_rectangle
 
-      // should work, no !!
-      // rect.release -> () {
-      //   rect = find (src, "..")
-      //   delete rect
-      // }
+        // should work, no !!
+        // rect.release -> () {
+        //   rect = find (src, "..")
+        //   delete rect
+        // }
+      }
     }
   }
   
@@ -77,12 +87,12 @@ Component root {
 /*
 problèmes:
 1 - des rectangle apparaissent a des endroits ou l'on n'a pas cliqué 
-2 - le graph n'est pas correctement nettoyer après le delete !!! --- le binding entre le rect.release et root.na_delete_rectangle ?? 
-3 - pas d'accès a "src" depuis une lambda
-4 - la génération du code de la native "smala" génère l'activation d'un composant en dehors de sont scope !!
-5 - si on supprime cpnt5->activate () (le truc généré en trop par la question 4) --- le programme n'affiche plus rien. pourtant ce code semble inutile
-6 - obligé de mettre un background pour éviter les abonnements a frame.release qui sont toujours lever et qui recrérait un rectangle sous un rectangle
-7 - release x, y n'existent pas - on doit utiliser move.x, move.y (qui sont les derniers)
+2 - pas d'accès a "src" depuis une lambda
+3 - la génération du code de la native "smala" génère l'activation d'un composant en dehors de sont scope !!
+4 - si on supprime cpnt5->activate () (le truc généré en trop par la question 4) --- le programme n'affiche plus rien. pourtant ce code semble inutile
+5 - release x, y n'existent pas - on doit utiliser move.x, move.y (qui sont les derniers)
+6 - FIX - dependance a notre model - obligé de mettre un background pour éviter les abonnements a frame.release qui sont toujours lever et qui recrérait un rectangle sous un rectangle
+7 - FIX - faire un groupe - le graph n'est pas correctement nettoyer après le delete !!! --- le binding entre le rect.release et root.na_delete_rectangle ?? 
  */
 
 

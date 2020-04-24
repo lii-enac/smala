@@ -92,6 +92,8 @@ CXXFLAGS +=
 YACC = bison -d
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
+lib_suffix =.so
+DYNLIB = -shared
 endif
 
 ifeq ($(os),Darwin)
@@ -103,12 +105,16 @@ debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lld
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 SC_CXXFLAGS += -I/usr/local/opt/flex/include
 SC_LDFLAGS += -L/usr/local/opt/flex/lib
+lib_suffix =.dylib
+DYNLIB = -dynamiclib
 endif
 
 ifeq ($(os),MinGW)
 YACC = bison -d
 LD_LIBRARY_PATH=PATH
 debugger := gdb
+lib_suffix =.dll
+DYNLIB = -shared
 endif
 
 ifeq ($(cookbook_cross_prefix),em)
@@ -170,10 +176,31 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-$(smalac): CFLAGS = $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src
+$(smalac): CFLAGS = $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 $(smalac): CXX = $(cross_prefix)++
 $(smalac): LDFLAGS = $(SC_LDFLAGS)
 
+# ------------
+# smala lib
+
+smala_lib := $(build_dir)/lib/libsmala$(lib_suffix)
+smala_lib_dir := lib
+smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
+smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
+smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
+$(smala_lib_objs): CFLAGS += $(djnn_cflags)
+$(smala_lib_objs): CXX = $(CXX_CK)
+
+$(smala_lib): $(smala_lib_objs)
+	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_ldflags)
+
+smala_lib: $(smala_lib) $(smala_lib_headers)
+
+truc:
+	@echo $(smala_lib_objs)
+
+# ------------
+# automatic rules
 
 $(build_dir)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -315,7 +342,6 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/accumulated_transforms \
 	gui/direct_manipulation/rotate_resize \
 	gui/direct_manipulation/dynamic_rectangle \
-	gui/direct_manipulation/dnd \
 	gui/fitts_law \
 	gui/layout/dock \
 	gui/layout/strip_board \
@@ -419,20 +445,20 @@ test_apps: $(notdir $(test_apps))
 $(foreach a,$(test_apps),$(eval $(call testapp_makerule,$a)))
 
 # .sma to .cpp
-$(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
+$(build_dir)/%.cpp $(build_dir)/%.h: %.sma #$(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
 	$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
-# .sma to .c
-$(build_dir)/%.c $(build_dir)/%.h: %.sma #$(smalac)
-	@mkdir -p $(dir $@)
-	@echo smalac $<
-	$(smalac) -c $< || (c=$$?; rm -f $*.c $*.h $*.java; (exit $$c))
-	@mv $*.c $(build_dir)/$(*D)
-	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+# # .sma to .c
+# $(build_dir)/%.c $(build_dir)/%.h: %.sma #$(smalac)
+# 	@mkdir -p $(dir $@)
+# 	@echo smalac $<
+# 	$(smalac) -c $< || (c=$$?; rm -f $*.c $*.h $*.java; (exit $$c))
+# 	@mv $*.c $(build_dir)/$(*D)
+# 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 # from .c user sources
 $(build_dir)/%.o: %.c
@@ -501,8 +527,6 @@ distclean clear clean:
 	rm -rf $(build_dir)
 .PHONY: distclean clear clean
 
-truc:
-	@echo $(ext_libs)
 
 deps += $(smalac_objs:.o=.d)
 -include $(deps)

@@ -17,8 +17,11 @@ use base
 use display
 use gui
 
+// local version
 import Button
 
+// smala lib
+//import gui.widgets.Button
 
 _action_
 myFunc (Process c) 

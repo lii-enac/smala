@@ -19,18 +19,22 @@ srcs_other := src/foo.cpp
 #relative path
 src_dir := src
 build_dir := build
+smala_lib_dir := $(build_dir)/lib
 res_dir := res
 exe_dir := .
 
 
 # djnn devel
-djnn-pkgconf = djnn-cpp-dev
+#djnn-pkgconf = djnn-cpp-dev
 # djnn install (github)
-#djnn-pkgconf = djnn-cpp
+djnn-pkgconf = djnn-cpp
 djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
 djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+
+#djnn_cpp_path := ../../../djnn-cpp
+#djnn_cflags := -I$(djnn_cpp_path)/src -I$(djnn_cpp_path)/build/src -I../../build/lib
 
 # in cookbook
 smala_path := ../..
@@ -154,7 +158,7 @@ app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif
 
 
-$(objs): CXXFLAGS += $(djnn_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
+$(objs): CXXFLAGS += $(djnn_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
 $(exe): LDFLAGS += $(djnn_ldflags)
 $(exe): LIBS += $(app_libs)
 

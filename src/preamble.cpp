@@ -31,13 +31,13 @@ Preamble::~Preamble()
 
 void
 Preamble::add_import (const std::string &import) {
-  std::size_t pos = import.find ('.');
+  std::size_t pos = import.rfind ('.');
   std::string ns, name;
   if (pos == std::string::npos) {
     ns = import;
   }
   else {
-    ns = import.substr (0, pos);
+    //ns = import.substr (0, pos);
     name = import.substr (pos + 1, import.length () - 1);
   }
   Node *n = new Node ("", import);

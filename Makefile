@@ -15,7 +15,7 @@
 default: config.mk smalac
 .PHONY: default
 
-all: config.mk smalac cookbook_apps test_apps
+all: config.mk smalac smala_lib cookbook_apps test_apps
 .PHONY: all
 
 help:
@@ -196,8 +196,6 @@ $(smala_lib): $(smala_lib_objs)
 
 smala_lib: $(smala_lib) $(smala_lib_headers)
 
-truc:
-	@echo $(smala_lib_objs)
 
 # ------------
 # automatic rules

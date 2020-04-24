@@ -4,7 +4,7 @@ use display
 use gui
 use extra
 
-import Button
+import gui.widgets.Button
 
 
 _main_

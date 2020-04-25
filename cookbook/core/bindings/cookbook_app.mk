@@ -11,5 +11,8 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := Button.o bindings.o
+#objs_cookbook_app := Button.o bindings.o
+objs_cookbook_app := bindings.o
+
 djnn_libs_cookbook_app := gui display base exec_env core
+smala_libs_cookbook_app := smala

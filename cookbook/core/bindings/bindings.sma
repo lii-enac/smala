@@ -17,7 +17,8 @@ use base
 use display
 use gui
 
-import Button
+//import Button
+import gui.widgets.Button
 
 _main_
 Component root {

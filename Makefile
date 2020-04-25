@@ -259,6 +259,7 @@ $(build_dir)/src/parser.cpp: src/errors.h
 define cookbookapp_makerule
 libs_cookbook_app :=
 djnn_libs_cookbook_app :=
+smala_libs_cookbook_app :=
 res_dir :=
 
 include cookbook/$1/cookbook_app.mk
@@ -278,6 +279,9 @@ $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_
 	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
+ifneq ($$(smala_libs_cookbook_app),)
+$1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+endif
 endif
 
 $1_app_link := $$(CXX_CK)

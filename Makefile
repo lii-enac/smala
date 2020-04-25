@@ -195,7 +195,7 @@ $(smala_lib): $(smala_lib_objs)
 	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_ldflags)
 
 smala_lib: $(smala_lib) $(smala_lib_headers)
-
+lib: smala_lib
 
 # ------------
 # automatic rules

@@ -29,6 +29,10 @@ config.mk:
 include config.default.mk
 -include config.mk
 
+MAJOR = 1
+MINOR = 9
+MINOR2 = 0
+
 # remove builtin rules : speed up build process and help debug
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
@@ -66,6 +70,7 @@ cookbook_cross_prefix := g
 #cross_prefix := i686-w64-mingw32-
 endif
 
+lib_smala_name = libsmala
 
 CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
@@ -183,8 +188,8 @@ $(smalac): LDFLAGS = $(SC_LDFLAGS)
 # ------------
 # smala lib
 
-smala_lib := $(build_dir)/lib/libsmala$(lib_suffix)
-smala_lib_dir := lib
+smala_lib_dir := src_lib
+smala_lib := $(build_dir)/lib/$(lib_smala_name)$(lib_suffix)
 smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
@@ -192,6 +197,7 @@ $(smala_lib_objs): CFLAGS += $(djnn_cflags)
 $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs)
+	@mkdir -p $(dir $@)
 	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_ldflags)
 
 smala_lib: $(smala_lib) $(smala_lib_headers)
@@ -482,25 +488,70 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# ---------------------------------------
+# package config
+
+ifeq ($(prefix),)
+# dev install
+smala_install_prefix :=  $(abspath $(build_dir))
+pkg_config_install_prefix := /usr/local
+else
+# pkg install (brew, deb, arch)
+smala_install_prefix := $(abspath $(prefix))
+pkg_config_install_prefix := $(abspath $(prefix))
+endif
+
+pkgconfig_targets = smala-dev.pc smala.pc
+pkgconfig_targets := $(addprefix $(build_dir)/, $(pkgconfig_targets))
+
+pkgconf: $(pkgconfig_targets)
+
+$(build_dir)/%.pc: %.pc.in
+	@mkdir -p $(dir $@)
+	@sed -e 's,@PREFIX@,$(smala_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
+
 
 # -----------
 # install
 
+install_pkgconf: pkgconf
+	test -d $(pkg_config_install_prefix)/lib/pkgconfig || mkdir -p $(pkg_config_install_prefix)/lib/pkgconfig	
 ifeq ($(prefix),)
-# dev install
-install_prefix :=  $(abspath $(build_dir))
+	install -m 644 $(build_dir)/smala-dev.pc	$(pkg_config_install_prefix)/lib/pkgconfig
 else
-# pkg install (brew, deb, arch)
-install_prefix := $(abspath $(prefix))
+	install -m 644 $(build_dir)/smala.pc	$(pkg_config_install_prefix)/lib/pkgconfig
 endif
 
-install_bin: $(addprefix $(install_prefix)/bin/,$(bin_name))
+all_lib_headers = $(shell find $(build_dir)/src_lib -type f -name "*.h")
+all_lib_headers_no_src = $(patsubst $(build_dir)/src_lib/%,%,$(all_lib_headers))
 
-$(install_prefix)/bin/$(bin_name): build/$(bin_name)
+all_libs_no_build_dir = $(patsubst $(build_dir)/lib/%,%,$(lib_smala_name)$(lib_suffix))
+
+install_headers: $(addprefix $(smala_install_prefix)/include/smala/,$(all_lib_headers_no_src))
+
+install_bin: $(addprefix $(smala_install_prefix)/bin/,$(bin_name))
+
+install_libs: $(addprefix $(smala_install_prefix)/lib/,$(all_libs_no_build_dir))	
+
+$(smala_install_prefix)/include/smala/%.h: $(build_dir)/src_lib/%.h
+	@mkdir -p $(dir $@)
+	install -m 644 $< $@
+
+$(smala_install_prefix)/lib/%$(lib_suffix): $(build_dir)/lib/%$(lib_suffix)
+	@mkdir -p $(dir $@)
+ifneq ($(prefix),)
+	install -m 644 $< $@
+endif
+
+$(smala_install_prefix)/bin/$(bin_name): build/$(bin_name)
 	@mkdir -p $(dir $@)
 	install -m 755 $< $@
 
-install: default install_bin
+install: default smala_lib install_pkgconf install_headers install_libs install_bin
+
+ddbug :
+	echo $(all_lib_headers)
+	echo $(all_lib_headers_no_src)
 
 # -----------
 

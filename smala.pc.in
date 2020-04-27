@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/smala
+
+Name: smala
+Description: The smala library
+Version: @MAJOR@.@MINOR@.@MINOR2@
+#Libs.private:
+Cflags: -I${includedir}
+Libs: -L${libdir} -lsmala

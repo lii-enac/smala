@@ -23,24 +23,51 @@ smala_lib_dir := $(build_dir)/lib
 res_dir := res
 exe_dir := .
 
+#---- new system -- 
+# install made with 
+# 	- make install in djnn-cpp and smala
+#   - or with package system : brew, apt, pacman ... 
 
-# djnn devel
-#djnn-pkgconf = djnn-cpp-dev
-# djnn install (github)
-djnn-pkgconf = djnn-cpp
-djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
-djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
-djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+# # djnn devel
+# djnn_pkgconf = djnn-cpp-dev
+# # djnn install (github)
+# #djnn_pkgconf = djnn-cpp
+# djnn_cflags := $(shell pkg-config $(djnn_pkgconf) --cflags)
+# djnn_ldflags := $(shell pkg-config $(djnn_pkgconf) --libs)
+# djnn_lib_path := $(shell pkg-config $(djnn_pkgconf) --libs-only-L)
+# djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 
-#djnn_cpp_path := ../../../djnn-cpp
-#djnn_cflags := -I$(djnn_cpp_path)/src -I$(djnn_cpp_path)/build/src -I../../build/lib
+# # smala devel
+# smala_pkgconf = smala-dev
+# smalac := ../smala/build/smalac
+# # smala install (github)
+# #smala_pkgconf = smala
+# #smalac := "should be in /usr/(local)/bin"
+# smala_cflags := $(shell pkg-config $(smala_pkgconf) --cflags)
+# smala_ldflags := $(shell pkg-config $(smala_pkgconf) --libs)
+# smala_lib_path := $(shell pkg-config $(smala_pkgconf) --libs-only-L)
+# smala_lib_path := $(subst -L, , $(smala_lib_path))
+
+#---- old system or in cookbook
+
+# in cookbook
+djnn_cpp_path := ../../../djnn-cpp
+# standalone
+# djnn_cpp_path := ../djnn-cpp
+djnn_cflags := -I$(djnn_cpp_path)/src -I$(djnn_cpp_path)/src -I../../build/lib
+djnn_ldflags := -L$(djnn_cpp_path)/build/lib -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio \
+				-ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui \
+				-ldjnn-input -ldjnn-utils
+djnn_lib_path := $(djnn_cpp_path)/build/lib
 
 # in cookbook
 smala_path := ../..
 # standalone
-#smala_path := ../smala
+# smala_path := ../smala
 smalac := $(smala_path)/build/smalac
+smala_cflags := -I$(smala_path)/build/src_lib
+smala_ldflags := -L$(smala_path)/build/lib -lsmala
+smala_lib_path := $(smala_path)/build/lib
 
 # for emscripten
 em_ext_libs_path := ../../../djnn-emscripten-ext-libs
@@ -133,9 +160,9 @@ default: $(exe)
 .PHONY: default
 
 test: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":"$(abspath $(smala_lib_path))":$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
 dbg: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)="$(abspath $(djnn_lib_path))":"$(abspath $(smala_lib_path))":$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
 .PHONY: test
 
 LD  = $(CXX)
@@ -158,8 +185,8 @@ app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif
 
 
-$(objs): CXXFLAGS += $(djnn_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
-$(exe): LDFLAGS += $(djnn_ldflags)
+$(objs): CXXFLAGS += $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
+$(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
 $(exe): LIBS += $(app_libs)
 
 $(exe): $(objs)

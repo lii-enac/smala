@@ -31,8 +31,8 @@ cpp_action (Process c)
 
     ((IntProperty*) fc->find_child ("value"))->set_value (0xFF0000, 1)  ;
 
-    // To print the component tree:
- 	fc->dump(0);
+    // to print the component tree:
+ 	//fc->dump(0);
 %}
 
 // Define a smala native action
@@ -50,7 +50,8 @@ smala_action (Process src, Process data)
     // The value change is propagated.
     data.value = #00FF00
 
-    dump data
+    // to print the component tree:
+    //dump data
 }
 
 _main_
@@ -116,10 +117,10 @@ Component root {
             root.line2.y = 400
         }
 
-        // just for display
-        for (int i = 0; i < 5; i++) {
-            dump root.fc
-        }
+        // to print the component tree:
+        // for (int i = 0; i < 5; i++) {
+        //     dump root.fc
+        // }
 	}
 }
 

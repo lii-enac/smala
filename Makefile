@@ -203,6 +203,7 @@ $(smala_lib): $(smala_lib_objs)
 smala_lib: $(smala_lib) $(smala_lib_headers)
 lib: smala_lib
 
+
 # ------------
 # automatic rules
 
@@ -286,6 +287,7 @@ $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 ifneq ($$(smala_libs_cookbook_app),)
+CFLAGS += -I$$(build_dir)/$(smala_lib_dir)
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
 endif
 endif
@@ -295,7 +297,7 @@ $1_app_link := $$(CXX_CK)
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) -I$$(build_dir)/lib
+$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK)
 $$($1_app_exe): LDFLAGS += $$(djnn_ldflags) #-L$$(build_dir)/lib -lsmala $$(LDFLAGS_CK)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 

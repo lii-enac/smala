@@ -301,7 +301,7 @@ $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
 $$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK)
-$$($1_app_exe): LDFLAGS += $$(djnn_ldflags) #-L$$(build_dir)/lib -lsmala $$(LDFLAGS_CK)
+$$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)

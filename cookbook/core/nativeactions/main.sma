@@ -29,9 +29,7 @@ cpp_action (Process c)
 
  	Process *fc = data->find_child ("fc");
 
- 	((IntProperty*) fc->find_child ("r"))->set_value (250, 1)  ;
- 	((IntProperty*) fc->find_child ("g"))->set_value (0, 1)  ;
- 	((IntProperty*) fc->find_child ("b"))->set_value (0, 1)  ;
+    ((IntProperty*) fc->find_child ("value"))->set_value (0xFF0000, 1)  ;
 
     // To print the component tree:
  	fc->dump(0);
@@ -50,9 +48,7 @@ smala_action (Process src, Process data)
     // do not use an assignment as it would create a new Assignment component
     // and add it to the component tree each time this native is invoked.
     // The value change is propagated.
-    data.r =  0
-    data.g = 255
-    data.b = 0
+    data.value = #00FF00
 
     dump data
 }
@@ -63,15 +59,26 @@ Component root {
 	Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
-	FillColor fc (255, 255, 255)
+	FillColor fcc (#FFFFFF)
+    Text explanation1 (10, 20, "Press color rectangle to give his color to the upper rectangle")
+    Text explanation2 (10, 40, "!! Blue rectangle has 3 press zone that will change his y position")
+    Text explanation3 (10, 60, "- if blue.press.x < 380 then blue.y = 350 ")
+    Text explanation4 (10, 80, "- if 380 < blue.press.x < 420 then blue.y = 450 ")
+    Text explanation5 (10, 100, "- if 420 < blue.press.x then blue.y = 400 ")
 
-	Rectangle _ (200, 100, 100, 100, 0, 0)
-	FillColor _ (255, 0, 0)
+    FillColor fc (#FFFFFF)
+	Rectangle _ (200, 200, 100, 100, 0, 0)
+	FillColor _ (#FF0000)
 	Rectangle red (50, 400, 100, 100, 0, 0)
-	FillColor _ (0, 255, 0)
+	FillColor _ (#00FF00)
 	Rectangle green (200, 400, 100, 100, 0, 0)
-	FillColor _ (0, 0, 255)
+	FillColor _ (#0000FF)
 	Rectangle blue (350, 400, 100, 100, 0, 0)
+    FillColor _ (#000000)
+    Rectangle line1 (380, 400, 1, 100, 0, 0)
+    Rectangle line2 (420, 400, 1, 100, 0, 0)
+   
+
 
     // Bind a C++ native action
 	NativeAction cpp_na (cpp_action, root, 1)
@@ -93,17 +100,23 @@ Component root {
         // do not use an assignment as it would create a new Assignment component
         // and add it to the component tree each time this native is invoked.
         // The value change is propagated.
-        root.fc.r--
-        root.fc.g = 0
-        root.fc.b = 255
-        if (root.blue.press.x < 400) {
-            root.blue.y = 100
-        } else if (root.blue.press.x > 430) {
-            root.blue.y = 500
+        root.fc.value = (#0000FF)
+
+        if (root.blue.press.x < 380) {
+            root.blue.y = 350
+            root.line1.y = 350
+            root.line2.y = 350
+        } else if (root.blue.press.x > 420) {
+            root.blue.y = 450
+            root.line1.y = 450
+            root.line2.y = 450
         } else {
             root.blue.y = 400
+            root.line1.y = 400
+            root.line2.y = 400
         }
 
+        // just for display
         for (int i = 0; i < 5; i++) {
             dump root.fc
         }

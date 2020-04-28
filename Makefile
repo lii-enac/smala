@@ -526,16 +526,15 @@ else
 	install -m 644 $(build_dir)/smala.pc	$(pkg_config_install_prefix)/lib/pkgconfig
 endif
 
-all_lib_headers = $(shell find $(build_dir)/src_lib -type f -name "*.h")
-all_lib_headers_no_src = $(patsubst $(build_dir)/src_lib/%,%,$(all_lib_headers))
+smala_lib_headers_no_src = $(patsubst $(build_dir)/src_lib/%,%,$(smala_lib_headers))
 
-all_libs_no_build_dir = $(patsubst $(build_dir)/lib/%,%,$(lib_smala_name)$(lib_suffix))
+smala_libs_no_build_dir = $(patsubst $(build_dir)/lib/%,%,$(lib_smala_name)$(lib_suffix))
 
-install_headers: $(addprefix $(smala_install_prefix)/include/smala/,$(all_lib_headers_no_src))
+install_headers: $(addprefix $(smala_install_prefix)/include/smala/,$(smala_lib_headers_no_src))
 
 install_bin: $(addprefix $(smala_install_prefix)/bin/,$(bin_name))
 
-install_libs: $(addprefix $(smala_install_prefix)/lib/,$(all_libs_no_build_dir))	
+install_libs: $(addprefix $(smala_install_prefix)/lib/,$(smala_libs_no_build_dir))	
 
 $(smala_install_prefix)/include/smala/%.h: $(build_dir)/src_lib/%.h
 	@mkdir -p $(dir $@)
@@ -552,10 +551,6 @@ $(smala_install_prefix)/bin/$(bin_name): build/$(bin_name)
 	install -m 755 $< $@
 
 install: default smala_lib install_pkgconf install_headers install_libs install_bin
-
-ddbug :
-	echo $(all_lib_headers)
-	echo $(all_lib_headers_no_src)
 
 # -----------
 

@@ -291,6 +291,7 @@ $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook
 ifneq ($$(smala_libs_cookbook_app),)
 CFLAGS += -I$$(build_dir)/$(smala_lib_dir)
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+$$($1_app_objs): $$(smala_lib)
 endif
 endif
 

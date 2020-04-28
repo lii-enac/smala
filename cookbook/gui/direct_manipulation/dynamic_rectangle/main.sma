@@ -86,13 +86,11 @@ Component root {
 
 /*
 problèmes:
-1 - des rectangle apparaissent a des endroits ou l'on n'a pas cliqué 
-2 - pas d'accès a "src" depuis une lambda
-3 - la génération du code de la native "smala" génère l'activation d'un composant en dehors de sont scope !!
-4 - si on supprime cpnt5->activate () (le truc généré en trop par la question 4) --- le programme n'affiche plus rien. pourtant ce code semble inutile
-5 - release x, y n'existent pas - on doit utiliser move.x, move.y (qui sont les derniers)
-6 - FIX - dependance a notre model - obligé de mettre un background pour éviter les abonnements a frame.release qui sont toujours lever et qui recrérait un rectangle sous un rectangle
-7 - FIX - faire un groupe - le graph n'est pas correctement nettoyer après le delete !!! --- le binding entre le rect.release et root.na_delete_rectangle ?? 
+1 - FIXME - des rectangle apparaissent a des endroits ou l'on n'a pas cliqué du au TOUCHPAD du mac, aucun soucis avec une souris !!
+2 - TODO - pas d'accès a "src" depuis une lambda. Ajouter le composant "_src_" depuis une smala
+3 - TODO - la génération du code de la native "smala" génère l'activation d'un composant en dehors de sont scope !! - A CORRIGER dans parser.y end_main root = nullptr
+4 - FIXED - dependance a notre model - obligé de mettre un background pour éviter les abonnements a frame.release qui sont toujours lever et qui recrérait un rectangle sous un rectangle
+5 - FIXED - faire un groupe - le graph n'est pas correctement nettoyer après le delete !!! --- le binding entre le rect.release et root.na_delete_rectangle ?? 
  */
 
 

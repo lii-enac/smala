@@ -17,26 +17,26 @@
 namespace Smala
 {
 
-  BinaryInstructionNode::BinaryInstructionNode (const std::string& left_arg, const std::string& right_arg) :
-      Node (), m_left_arg (left_arg), m_right_arg (right_arg)
+  BinaryInstructionNode::BinaryInstructionNode (NodeType type, PathNode* left_arg, PathNode* right_arg) :
+      Node (type), m_left_arg (left_arg), m_right_arg (right_arg)
   {
   }
 
-  BinaryInstructionNode::BinaryInstructionNode () :
-      Node ()
+  BinaryInstructionNode::BinaryInstructionNode (NodeType type) :
+      Node (type), m_left_arg (nullptr), m_right_arg (nullptr)
   {
   }
 
   BinaryInstructionNode::~BinaryInstructionNode ()
   {}
 
-  std::string&
+  PathNode*
   BinaryInstructionNode::left_arg ()
   {
     return m_left_arg;
   }
 
-  std::string&
+  PathNode*
   BinaryInstructionNode::right_arg ()
   {
     return m_right_arg;

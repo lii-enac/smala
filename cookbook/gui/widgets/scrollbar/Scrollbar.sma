@@ -237,7 +237,7 @@ Scrollbar(Process f) {
       Bool lower(0)
       cursor_in_model < dragging_zone.y =:> lower
       TextPrinter tp
-      "lower " + toString(lower) + " higher " + toString(higher) =:> tp.input
+      "lower " + lower + " higher " + higher =:> tp.input
     } 
   }
 

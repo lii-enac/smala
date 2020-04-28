@@ -82,9 +82,9 @@ Ast::add_use (const std::string &val)
 }
 
 void
-Ast::add_import (const std::string &import)
+Ast::add_import (PathNode *path)
 {
-  m_preamble.add_import (import);
+  m_preamble.add_import (path);
 }
 
 void
@@ -113,14 +113,6 @@ Ast::add_native_expression (NativeExpressionNode *node)
 {
   m_native_expression_list.push_back (node);
   //m_preamble.add_node (node);
-}
-
-void
-Ast::add_native_java (const std::string &code)
-{
-  NativeCodeNode *node = new NativeCodeNode (code);
-  node->set_node_type (NATIVE_JAVA);
-  m_preamble.add_java_code_node (node);
 }
 
 const std::vector<Node*>&

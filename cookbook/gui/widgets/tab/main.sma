@@ -80,5 +80,5 @@ Component root {
     }
   }
 
-  Activator select_tab (tabManager.tabs.1.select)
+  Activator select_tab (&tabManager.tabs.[3].select)
 }

@@ -17,7 +17,6 @@
 #include <fstream>
 #include <vector>
 #include "error_location.h"
-#include "activator_node.h"
 #include "dash_array_node.h"
 #include "ctrl_node.h"
 #include "type_manager.h"
@@ -41,6 +40,7 @@ namespace Smala {
     BuildNode ();
     virtual ~BuildNode ();
     std::string get_symbol (const std::string &key) const;
+    std::string get_key (const std::string &value) const;
     std::map<std::string, std::string>* sym_table ();
     const std::string& name () const;
     int add_entry (const std::string &key, const std::string &value);
@@ -69,24 +69,22 @@ namespace Smala {
     std::string m_null_symbol, m_null_string, m_filename;
     TypeManager *m_type_manager;
     Ast m_ast;
+    std::string m_cur_building_name;
     std::vector<BuildNode*> m_parent_list;
     std::map<std::string, std::string> m_types;
     void indent (std::ofstream &os);
     std::string get_constructor (const std::string &type);
-    virtual const std::pair< std::string, std::vector<std::string> > parse_symbol (const std::string &symbol);
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
-    virtual void build_term_node (std::ofstream &os, Node *node);
-    virtual void build_control_node (std::ofstream &os, Node *n);
+    virtual void build_term_node (std::ofstream &os, Node *node) = 0;
+    virtual void build_control_node (std::ofstream &os, Node *n) = 0;
     void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor);
-    virtual void build_activator (std::ofstream &os, ActivatorNode *node) {}
-    virtual void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) = 0;
     virtual void print_component_decl (std::ofstream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ofstream &os, const std::string &constructor) = 0;
     virtual void print_type (std::ofstream &os, ParamType type) = 0;
     virtual void build_use (std::ofstream &os, std::string use) = 0;
-    virtual void build_import (std::ofstream &os, std::string import) = 0;
+    virtual void build_import (std::ofstream &os, Node* n) = 0;
     virtual void build_main_node (std::ofstream &os) = 0;
     virtual void build_define_node (std::ofstream &os, Node *node) = 0;
     virtual void build_end_define (std::ofstream &os, Node *node) = 0;
@@ -101,9 +99,6 @@ namespace Smala {
     virtual void build_native_expression (std::ofstream &os, Node *n) {}
     virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
-    void print_find_child (std::ofstream &os, Node *n, const std::pair< std::string, std::vector<std::string> >&);
-    virtual std::string build_find_child ( Node *n, const std::pair< std::string, std::vector<std::string> >&) = 0;
-    virtual std::string build_root_and_path (const std::pair< std::string, std::vector<std::string> >&) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
     virtual void end_set_property (std::ofstream &os, Node *node) {};
     virtual void end_property (std::ofstream &os, Node *n) {};
@@ -112,19 +107,13 @@ namespace Smala {
     virtual void merge (std::ofstream &os, Node *n) = 0;
     virtual void remove (std::ofstream &os, Node *n) = 0;
     virtual void move (std::ofstream &os, Node *n, const string& c) {};
-    virtual void repeat (std::ofstream &os, Node *n) = 0;
-    virtual void load_xml (std::ofstream &os, Node *n) = 0;
     virtual void add_child (std::ofstream &os, Node *n) = 0;
     virtual void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) {};
     virtual void add_children_to (std::ofstream &os, Node *n) = 0;
-    virtual void find (std::ofstream &os, Node *n) = 0;
-    virtual void clone (std::ofstream &os, Node *node) {}
-    virtual void build_transition_node (std::ofstream &os, CtrlNode *ctrl) = 0;
+    virtual void build_transition_node (std::ofstream &os, Node *ctrl) = 0;
     std::string build_simple_node (std::ofstream &os, Node *n);
     void build_range_node (std::ofstream &os, Node *n, const string& new_name);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
-    virtual void build_binary_node (std::ofstream &os, Node *n) = 0;
-    virtual void build_unary_node (std::ofstream &os, Node *n) = 0;
     virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
         os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
     }

@@ -33,9 +33,9 @@ namespace Smala
     void set_out (Node *out);
 
     void add_expression (std::vector<TermNode*> expression) { m_expression.insert (m_expression.begin (), expression.begin (), expression.end ()); }
-    std::vector<TermNode*> expression () { return m_expression; }
-    void add_output_node (std::string n) { m_vout.push_back (n); }
-    std::vector<std::string> get_output_nodes () { return m_vout; }
+    std::vector<TermNode*>& expression () { return m_expression; }
+    void add_output_node (PathNode *n) { m_vout.push_back (n); }
+    std::vector<PathNode*>& get_output_nodes () { return m_vout; }
     std::string& get_in_act () { return m_in_act; }
     std::string& get_out_act () { return m_out_act; }
 
@@ -44,7 +44,7 @@ namespace Smala
     Node *m_out;
     std::string m_in_act, m_out_act;
     std::vector<TermNode*> m_expression;
-    std::vector<std::string> m_vout;
+    std::vector<PathNode*> m_vout;
   };
 
 } /* namespace Smala */

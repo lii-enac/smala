@@ -18,7 +18,7 @@
 #include <string>
 #include "node.h"
 #include "term_node.h"
-
+#include "path_node.h"
 namespace Smala
 {
 
@@ -29,8 +29,8 @@ namespace Smala
     InstructionNode (const std::string& name);
     virtual ~InstructionNode ();
 
-    void add_cpnt (const std::string&);
-    std::vector<std::string>& cpnt_list ();
+    void add_path (PathNode *n);
+    std::vector<PathNode*>& path_list ();
     void set_has_argument (bool v) { m_has_argument = v; }
     bool has_argument () { return m_has_argument; }
     void set_type (instruction_t type) { m_type = type; }
@@ -38,7 +38,7 @@ namespace Smala
     std::vector<TermNode*>& args () { return m_expression; }
     instruction_t type () { return m_type; }
   private:
-    std::vector<std::string> m_cpnt_list;
+    std::vector<PathNode*> m_path_list;
     bool m_has_argument;
     std::vector<TermNode*> m_expression;
     instruction_t m_type;

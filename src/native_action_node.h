@@ -22,13 +22,13 @@ namespace Smala
   class NativeActionNode : public Node
   {
   public:
-    NativeActionNode ();
-    NativeActionNode (const std::string &action_name, const std::string &param_name, const std::string &code);
-    virtual ~NativeActionNode ();
+    NativeActionNode () : Node (NATIVE_ACTION), m_action_name (""), m_param_name (""), m_code ("") {}
+    NativeActionNode (const std::string &action_name, const std::string & param_name, const std::string &code) : Node (NATIVE_ACTION), m_action_name (action_name), m_param_name (param_name), m_code (code) {}
+    virtual ~NativeActionNode () {}
 
-    const std::string& action_name () const;
-    const std::string& param_name () const;
-    const std::string& code () const;
+    const std::string& action_name () const { return m_action_name;}
+    const std::string& param_name () const { return m_param_name; }
+    const std::string& code () const { return m_code; }
 
 
   private:

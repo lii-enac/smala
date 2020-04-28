@@ -15,6 +15,7 @@
 #pragma once
 
 #include "node.h"
+#include "path_node.h"
 
 namespace Smala
 {
@@ -22,16 +23,16 @@ namespace Smala
   class BinaryInstructionNode : public Node
   {
   public:
-    BinaryInstructionNode ();
-    BinaryInstructionNode (const std::string& left_arg, const std::string& right_arg);
+    BinaryInstructionNode (NodeType type);
+    BinaryInstructionNode (NodeType type, PathNode* left_arg, PathNode* right_arg);
     virtual ~BinaryInstructionNode ();
 
-    std::string& left_arg ();
-    std::string& right_arg ();
+    PathNode* left_arg ();
+    PathNode* right_arg ();
 
   private:
-    std::string m_left_arg;
-    std::string m_right_arg;
+    PathNode* m_left_arg;
+    PathNode* m_right_arg;
   };
 
 } /* namespace Smala */

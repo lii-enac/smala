@@ -18,9 +18,8 @@ namespace Smala
 {
 
   InstructionNode::InstructionNode (const std::string& name) :
-      Node (), m_has_argument (false), m_type (UNKNOWN)
+      Node (INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
   {
-    set_node_type (INSTRUCTION);
     set_name (name);
 
     // DELETE, DUMP, NOTIFY, RUN, STOP
@@ -39,7 +38,7 @@ namespace Smala
   }
 
   InstructionNode::InstructionNode () :
-      Node (), m_has_argument (false), m_type (UNKNOWN)
+      Node (INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
   {
   }
 
@@ -47,15 +46,15 @@ namespace Smala
   {}
 
   void
-  InstructionNode::add_cpnt (const std::string &cpnt)
+  InstructionNode::add_path (PathNode* path)
   {
-    m_cpnt_list.push_back (cpnt);
+    m_path_list.push_back (path);
   }
 
-  std::vector<std::string>&
-  InstructionNode::cpnt_list ()
+  std::vector<PathNode*>&
+  InstructionNode::path_list ()
   {
-    return m_cpnt_list;
+    return m_path_list;
   }
 
 } /* namespace Smala */

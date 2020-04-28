@@ -24,7 +24,7 @@ delete_rectangle (Process src, Process data)
      src = release (rect.release)
      we need to found is parent/parent : the grect to delete at once the rectangle + the binding
   */
-  grect = find (src, "../..")
+  grect = find (&src, "../..")
   delete grect
 }
 

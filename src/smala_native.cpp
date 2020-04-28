@@ -19,15 +19,13 @@
 using namespace Smala;
 
 SmalaNative::SmalaNative () :
-    Node (), m_fct (""), m_src (""), m_data ("")
+    Node (SMALA_NATIVE), m_fct (""), m_src (""), m_data (nullptr)
 {
-  set_node_type (SMALA_NATIVE);
 }
 
-SmalaNative::SmalaNative (const std::string &fct, const std::string &src, const std::string &data) :
-    Node (), m_fct (fct), m_src (src), m_data (data)
+SmalaNative::SmalaNative (const std::string &fct, const std::string &src, PathNode* data) :
+    Node (SMALA_NATIVE), m_fct (fct), m_src (src), m_data (data)
 {
-  set_node_type (SMALA_NATIVE);
 }
 
 
@@ -47,7 +45,7 @@ SmalaNative::src () const
   return m_src;
 }
 
-const std::string&
+PathNode*
 SmalaNative::data () const
 {
   return m_data;

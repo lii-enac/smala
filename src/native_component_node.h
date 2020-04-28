@@ -19,16 +19,22 @@
 namespace Smala
 {
 
-  class ActivatorNode : public Node
+  class NativeComponentNode : public Node
   {
   public:
-    ActivatorNode (Node* n) : Node (), m_node (n) { set_node_type (ACTIVATOR); }
-    virtual ~ActivatorNode () {}
-    void set_node (Node* n) { m_node = n; };
-    Node* node () { return m_node; }
+    NativeComponentNode ();
+    NativeComponentNode (const std::string &action_name, PathNode *path_data, const std::string &is_model);
+    virtual ~NativeComponentNode ();
+
+    const std::string& function_name () const;
+    PathNode* path_data () const;
+    const std::string& is_model () const;
+
 
   private:
-    Node* m_node;
+    std::string m_function_name;
+    PathNode* m_path_data;
+    std::string m_is_model;
   };
 
 } /* namespace Smala */

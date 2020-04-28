@@ -24,20 +24,20 @@ class SmalaNative : public Node
 {
 public:
     SmalaNative ();
-    SmalaNative (const std::string &fct, const std::string &src, const std::string &data);
+    SmalaNative (const std::string &fct, const std::string &src, PathNode *data);
     ~SmalaNative ();
     
     const std::string& fct () const;
     const std::string& src () const;
-    const std::string& data () const;
+    PathNode* data () const;
     
     void set_src (const std::string &src) { m_src = src; }
-    void set_data (const std::string &data) { m_data = data; }
+    void set_data (PathNode* data) { m_data = data; }
 
 private:
     std::string m_fct;
     std::string m_src;
-    std::string m_data;
+    PathNode* m_data;
 };
 
 }

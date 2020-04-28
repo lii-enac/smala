@@ -86,7 +86,7 @@ StripBoard (Process parent, double _x, double _y)
       run item.deselect
       for (int i = 1; i <= $this.selected_items.size; i++) {
         sel_item = getRef (&this.selected_items.[i])
-        if (&sel_item == item) {
+        if (&sel_item == &item) {
           delete this.selected_items.[i]
         }
       }

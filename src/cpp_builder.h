@@ -27,33 +27,28 @@ namespace Smala {
   private:
     void build_define (const std::string &prefix);
     void build_use (std::ofstream &os, std::string use) override;
-    void build_import (std::ofstream &os, std::string import) override;
+    void build_import (std::ofstream &os, Node* n) override;
     void build_instruction (std::ofstream &os, Node *node) override;
     void build_term_node (std::ofstream &os, Node *node) override;
-    void build_set_string (std::ofstream &os, const std::string &cpnt_name, const std::string &spec, const std::string &value) override;
     void build_for (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
     void build_print (std::ofstream &os, Node *node) override;
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;
+    std::string build_fake_name (PathNode* n);
+    std::string build_term_str (TermNode* n);
+    std::string build_find (PathNode* n);
     void set_property (std::ofstream &os, Node *node) override;
     void end_set_property (std::ofstream &os, Node *node) override;
-    bool known_symbol (const string &name);
-    void set_ref_property (std::ofstream &os, Node *node);
     void end_property (std::ofstream &os, Node *n) override;
     void get_property (std::ofstream &os, Node *node) override;
     void alias (std::ofstream &os, Node *node) override;
     void merge (std::ofstream &os, Node *node) override;
     void remove (std::ofstream &os, Node *node) override;
-    void move (std::ofstream &os, Node *n, const string &c) override;
-    void repeat (std::ofstream &os, Node *node) override;
-    void load_xml (std::ofstream &os, Node *node) override;
+    void move (std::ofstream &os, Node *n, const std::string &c) override;
     void add_child (std::ofstream &os, Node *node) override;
     void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) override;
     void add_children_to (std::ofstream &os, Node *node) override;
-    void find (std::ofstream &os, Node *node) override;
-    void clone (std::ofstream &os, Node *node) override;
     void build_control_node (std::ofstream &os, Node *n) override;
-    void build_activator (std::ofstream &os, ActivatorNode *n) override;
     void build_native_action_component (std::ofstream &os, Node *n) override;
     void build_native_action (std::ofstream &os, Node *n) override;
     void build_native_expression (std::ofstream &os, Node *n) override;
@@ -63,9 +58,7 @@ namespace Smala {
     void build_this_node (std::ofstream &os, Node *node) override;
     void build_define_node (std::ofstream &os, Node *node) override;
     void build_end_define (std::ofstream &os, Node *node) override;
-    void build_binary_node (std::ofstream &os, Node *node) override;
-    void build_unary_node (std::ofstream &os, Node *node) override;
-    void build_transition_node (std::ofstream &os, CtrlNode *ctrl) override;
+    void build_transition_node (std::ofstream &os, Node *ctrl) override;
     void build_smala_native (std::ofstream &os, Node *node) override;
     void build_new_line (std::ofstream &os, NewLineNode *n) override {
         Builder::build_new_line (os, n);
@@ -73,14 +66,10 @@ namespace Smala {
     }
     void build_simple_control_node (std::ofstream &os, NativeExpressionNode *n);
     void build_dash_array (std::ofstream &os, DashArrayNode *n) override;
-    void check_and_build_connector (std::ofstream &os, Node *n, const std::string &name, const std::string &side);
     void print_native_code (std::ofstream &os);
     void print_component_decl (std::ofstream &os, const std::string &name) override;
     void print_component_constructor (std::ofstream &os, const std::string &constructor) override;
-    std::string build_find_child (Node *n, const std::pair< std::string, std::vector<std::string> >&) override;
-    std::string build_root_and_path (const std::pair< std::string, std::vector<std::string> >&) override;
     void print_type (std::ofstream &os, ParamType type) override;
-    void print_args (std::ofstream &os, std::vector< std::pair<ParamType, std::string> > args, bool is_first);
     std::map<std::string, std::string> m_import_types;
   private:
     bool m_display_initialized;

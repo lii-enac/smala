@@ -39,15 +39,15 @@ ToggleButton (Process frame, string l, double _x, double _y) {
   gbutton = loadFromXML (buildPath("img/button.svg"))
   FSM fsm {
     State idle {
-      r = addChild (gbutton.idle)
+      r << gbutton.idle
     }
     State pressed {
-      r = addChild (gbutton.pressed)
+      r << gbutton.pressed
     }
     idle->pressed (idle.r.press, on)
     pressed->idle (pressed.r.press, off)
   }
-  glabel = addChild (gbutton.label)
+  glabel << gbutton.label
   label =:> glabel.text
   glabel.width + 30 =:> fsm.idle.r.width, fsm.pressed.r.width, getwidth
   fsm.idle.r.height =:> getheight

@@ -40,16 +40,16 @@ Button (Process frame, string l, double _x, double _y) {
 
   FSM fsm {
     State idle {
-      r = addChild (gbutton.idle)
+      r << gbutton.idle
     }
     State pressed {
-      r = addChild (gbutton.pressed)
+      r << gbutton.pressed
     }
     idle->pressed (idle.r.press)
     pressed->idle (pressed.r.release, click)
     pressed->idle (frame.release)
   }
-  glabel = addChild (gbutton.label)
+  glabel << gbutton.label
   label =:> glabel.text
   glabel.width + 30 =:> fsm.idle.r.width, fsm.pressed.r.width, getwidth
   fsm.idle.r.height =:> getheight

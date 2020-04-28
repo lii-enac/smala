@@ -28,7 +28,7 @@ Menu (Process f, Process list_item, int init_x, int init_y, int _width)
     selector << graphics.layer1.selector
   }
   mask_selector << graphics.layer1.mask_selector
-  list_item.1 =: selected_item.label.text, selected
+  list_item.[1] =: selected_item.label.text, selected
 
 
   /* geometry management */

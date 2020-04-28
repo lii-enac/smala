@@ -22,7 +22,7 @@ namespace Smala
   class ForNode : public Node
   {
   public:
-    ForNode () : m_first (nullptr), m_third (nullptr) { set_node_type (FOR); };
+    ForNode () : Node (FOR), m_first (nullptr), m_third (nullptr) {};
     virtual ~ForNode () {}
 
     Node* first_st () const { return m_first; }

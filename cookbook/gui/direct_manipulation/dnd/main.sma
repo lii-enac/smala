@@ -34,7 +34,7 @@ Component root
   Spike s_delete
   s_delete->(selected) {
     obj = getRef (&selected)
-    if (obj != null) {
+    if (&obj != null) {
       delete obj
       setRef (&selected, null)
     }

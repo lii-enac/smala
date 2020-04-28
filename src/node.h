@@ -31,17 +31,15 @@ namespace Smala {
 
   enum NodeType
   {
-    ACTIVATOR,
     ADD_CHILD,
     ADD_CHILDREN_TO,
     ALIAS,
-    BINARY_OP,
     BREAK,
-    CLONE,
     CONTAINER,
     CONTROL,
     DASH_ARRAY,
     DECREMENT,
+    END_ADD_CHILD,
     END_ASSIGNMENT,
     END_BLOCK,
     END_CONTAINER,
@@ -54,15 +52,14 @@ namespace Smala {
     END_PROPERTY,
     END_REPEAT,
     END_SET_PROPERTY,
-    FIND,
     FOR,
     FSM,
     GET_PROPERTY,
     IMPORT,
     INCREMENT,
     INSTRUCTION,
+    LAMBDA,
     LITERAL,
-    LOAD_XML,
     LOCAL_NODE,
     MERGE,
     MOVE_AFTER,
@@ -78,6 +75,7 @@ namespace Smala {
     NEW_VAR,
     PATH,
     PRINT,
+    RANGE,
     REMOVE,
     REPEAT,
     SET_PARENT,
@@ -89,22 +87,27 @@ namespace Smala {
     START_ELSEIF,
     START_IF,
     START_MAIN,
+    SUBPATH,
     TERM_NODE,
     TEXT,
     THIS,
-    UNARY_OP,
+    TRANSITION,
     USE,
     WHILE
   };
 
 class TermNode;
+class PathNode;
+
+typedef void* user_data_t;
 
 class Node
 {
 public:
-    Node ();
-    Node (const std::string &type, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
-    Node (const std::string &type, const std::string &name);
+    Node (NodeType type);
+    Node (NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
+    Node (NodeType type, const std::string &value, const std::string &name);
+    Node (NodeType type, const std::string &value, PathNode* path);
     void set_node_type (NodeType type);
     void set_build_name (const std::string& build_name);
     void set_parent (Node *p);
@@ -124,16 +127,24 @@ public:
     bool ignore_parent () { return m_ignore_parent; }
     void set_ignore_parent (bool ignore) { m_ignore_parent = ignore; }
     bool has_arguments ();
+    bool has_path () { return m_has_path; }
     void set_has_arguments (bool v);
     bool duplicate_warning ();
     void set_duplicate_warning (bool v);
     bool in_expression () { return m_in_expression; }
     void set_in_expression (bool v) { m_in_expression = v; }
-    void set_expression (std::vector<TermNode*>& nodes) { m_expression = nodes; }
-    std::vector<TermNode*>& get_expression () { return m_expression; }
-private:
-    bool m_ignore_parent;
-    Node * m_parent;
+    void set_expr_data (std::vector<TermNode*>& nodes) { m_expression = nodes; }
+    std::vector<TermNode*>& get_expr_data () { return m_expression; }
+    void set_args_data (std::vector< std::pair<ParamType, std::string> > args) { m_args = args; }
+    std::vector< std::pair<ParamType, std::string> >& get_args_data () { return m_args; }
+    PathNode* get_path () { return m_path; }
+    void set_path (PathNode* p) { m_path = p; }
+    void set_user_data (user_data_t data) { m_data = data; }
+    user_data_t get_user_data () { return m_data; }
+ private:
+    bool m_ignore_parent, m_has_path;
+    Node *m_parent;
+    PathNode *m_path;
     std::string m_djnn_type;
     std::string m_name;
     std::string m_build_name;
@@ -142,6 +153,7 @@ private:
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
     std::vector<TermNode*> m_expression;
+    user_data_t m_data;
 };
 
 }

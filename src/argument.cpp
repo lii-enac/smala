@@ -27,37 +27,8 @@ namespace Smala
       std::string str (argv[i]);
       if (str.size() > 4 && str.compare (str.size () - 4, 4, ".sma") == 0) {
         m_filenames.push_back (str);
-      } else {
-        if (str.compare ("-c") == 0) {
-          _lang = C;
-        }
-        else if (str.compare ("-java") == 0) {
-          _lang = JAVA;
-        }
-        else if (str.compare ("-cpp") == 0) {
-          _lang = CPP;
-        }
-        else if (str.compare ("-package") == 0) {
-          i++;
-          if (i < argc)
-            m_options.insert (std::make_pair ("package", argv[i]));
-          else {
-            usage ();
-            return;
-          }
-        }
-        else if (str.compare ("-builddir") == 0) {
-          ++i;
-          if (i < argc)
-            m_options.insert (std::make_pair ("builddir", argv[i]));
-          else {
-            usage ();
-            return;
-          }
-        }
-        else if (str.compare ("-g") == 0) {
-          _debug = true;
-        }
+      } else if (str.compare ("-g") == 0) {
+         _debug = true;
       }
     }
     if (m_filenames.empty ()) {
@@ -98,7 +69,6 @@ namespace Smala
   {
     std::cout << "USAGE: smala " <<  "<filenames> [options]\n";
     std::cout << "Options:\n";
-    std::cout << "  -j -package <package name>\tgenerates java file\n";
-    std::cout << "  -builddir <dir name>\tbuild directory for java files\n";
+    std::cout << "  -g \t enable debug\n";
   }
 } /* namespace Smala */

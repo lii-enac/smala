@@ -44,7 +44,7 @@ Component root {
     }
   }
 
-  e = find (myList.1.b)
+  e = find (&myList.[1].b)
   e.x = 100.0
 
   Button b2 (f, "myVeryLongButton", 10, 150)

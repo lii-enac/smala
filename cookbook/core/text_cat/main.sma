@@ -24,6 +24,6 @@ Component root {
   f.close -> ex
   FillColor fc (0, 0, 0)
   Text t (20, 20, "")
-  toString ("frame width =  " + f.width + " frame height = " + f.height) =:> t.text
+  "frame width =  " + f.width + " frame height = " + f.height =:> t.text
 }
 

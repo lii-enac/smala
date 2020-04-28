@@ -96,9 +96,9 @@ Driver::add_use (const std::string &val)
 }
 
 void
-Driver::add_import (const std::string &val)
+Driver::add_import (PathNode *path)
 {
-  m_ast.add_import (val);
+  m_ast.add_import (path);
 }
 
 void
@@ -117,12 +117,6 @@ void
 Driver::add_native_expression (NativeExpressionNode* node)
 {
   m_ast.add_native_expression (node);
-}
-
-void
-Driver::add_native_java (const std::string &code)
-{
-  m_ast.add_native_java (code);
 }
 
 void

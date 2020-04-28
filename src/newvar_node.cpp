@@ -19,15 +19,13 @@ namespace Smala
 
   NewVarNode::NewVarNode (
       ParamType type, const std::string &name) :
-      Node (), m_type (type), m_var_name (name)
+      Node (NEW_VAR), m_type (type), m_var_name (name)
   {
-    set_node_type (NEW_VAR);
   }
 
   NewVarNode::NewVarNode () :
-      Node (), m_type (VOID), m_var_name ("")
+      Node (NEW_VAR), m_type (VOID), m_var_name ("")
   {
-    set_node_type (NEW_VAR);;
   }
 
   NewVarNode::~NewVarNode ()

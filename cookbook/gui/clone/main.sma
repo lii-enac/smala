@@ -52,12 +52,12 @@ buildPath (const char* file)
 
   /* clone the all group */
   Translation t1 (0, 200)
-  dolly1 << clone (p1)
+  dolly1 << clone (&p1)
 
   /* clone only circle */
   Translation t2 (0, 200)
   FillColor  _ (255, 0, 0)
-  dolly2 << clone (dolly1.cric1)
+  dolly2 << clone (&dolly1.cric1)
 
   /* test with SVG */
   svg = loadFromXML (buildPath ("img/aircraft.svg"))
@@ -69,7 +69,7 @@ buildPath (const char* file)
   }
 
   Translation t4 (0, 200)
-  aircraft_clone << clone (aircraft)
+  aircraft_clone << clone (&aircraft)
   aircraft_clone.label.text = "CLONE" 
 
 }

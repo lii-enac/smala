@@ -26,16 +26,16 @@ Component root {
   f.close -> ex
 
   Checkbox cb (5)
-  cb.entries.1.label = "a"
-  cb.entries.2.label = "b"
-  cb.entries.3.label = "c"
-  cb.entries.4.label = "d"
-  cb.entries.5.label = "e"
+  cb.entries.[1].label = "a"
+  cb.entries.[2].label = "b"
+  cb.entries.[3].label = "c"
+  cb.entries.[4].label = "d"
+  cb.entries.[5].label = "e"
 
   FillColor fc (0, 0, 0)
   Incr incr (1)  
   Text t (150, 50, "")
-  toString ("Selected entry: " + cb.entry + " state: " + incr.state) =:> t.text
+  "Selected entry: " + cb.entry + " state: " + incr.state =:> t.text
 
-  cb.entries.2.selected -> incr
+  cb.entries.[2].selected -> incr
 }

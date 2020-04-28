@@ -35,8 +35,8 @@ Component root {
   Text foo_value (80, 50, "")
   Text bar_value (80, 70, "")
 
-  regex.1 => foo_value.text
-  regex.2 => bar_value.text
+  regex.[1] => foo_value.text
+  regex.[2] => bar_value.text
 
   Incr i1 (0)
   Incr i2 (0)
@@ -48,7 +48,7 @@ Component root {
 
   AssignmentSequence assign (1) {
 
-    "foo=" + to_string(df1.output) +  " bar=" + to_string(df2.output) =: reg_value.text
+    "foo=" + toString(df1.output) +  " bar=" + toString(df2.output) =: reg_value.text
     reg_value.text =: regex.input
   }
 

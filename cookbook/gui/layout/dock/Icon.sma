@@ -23,7 +23,7 @@ Icon (Process holder, Process _prev, int _x, int _y)
   x aka pos.tx
   y aka pos.ty
 
-  if (_prev != null) {
+  if (&_prev != null) {
     Component pos_cnt {
       _prev.x + _prev.width =:> x
     }
@@ -31,7 +31,7 @@ Icon (Process holder, Process _prev, int _x, int _y)
   
   prev->(this) {
     prev = getRef (&this.prev)
-    if (prev != null) {
+    if (&prev != null) {
       addChildrenTo this {
         Component pos_cnt {
           prev.x + prev.width =:> this.x

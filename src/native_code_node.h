@@ -22,11 +22,11 @@ namespace Smala
   class NativeCodeNode : public Node
   {
   public:
-    NativeCodeNode ();
-    NativeCodeNode (const std::string &code);
-    virtual ~NativeCodeNode ();
+    NativeCodeNode () : Node (NATIVE_CODE), m_code () {}
+    NativeCodeNode (const std::string &code) : Node (NATIVE_CODE), m_code (code) {}
+    virtual ~NativeCodeNode () {}
 
-    const std::string& code () const;
+    const std::string& code () const { return m_code; }
 
   private:
 

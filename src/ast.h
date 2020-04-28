@@ -39,11 +39,10 @@ public:
     void add_node (Node *node);
     void remove_node (Node *node);
     void add_use (const std::string &val);
-    void add_import (const std::string &val);
+    void add_import (PathNode *path);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
     void add_native_expression (NativeExpressionNode *node);
-    void add_native_java (const std::string &code);
     void add_define_node (Node *defineNode);
     void set_root_node (Node* root) { m_root = root; }
     Node* get_root_node () { return m_root; }

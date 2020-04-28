@@ -18,16 +18,14 @@ namespace Smala
 {
 
   SetParentNode::SetParentNode () :
-      Node (), m_to_attach (nullptr)
+      Node (SET_PARENT), m_to_attach (nullptr)
   {
-    set_node_type (SET_PARENT);
   }
 
   SetParentNode::SetParentNode (
       Node* to_attach) :
-      Node (), m_to_attach (to_attach)
+      Node (SET_PARENT), m_to_attach (to_attach)
   {
-    set_node_type (SET_PARENT);
   }
 
   SetParentNode::~SetParentNode ()

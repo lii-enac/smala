@@ -57,8 +57,8 @@ Component root {
     }
 
     //creating a connector to display incomming messages in the text
-    ivybus.in.regex.1 => txt2.text
-    ivybus.in.regex.1 => lp.input
+    ivybus.in.regex.[1] => txt2.text
+    ivybus.in.regex.[1] => lp.input
    
     FSM pressFSM {
         State idle{

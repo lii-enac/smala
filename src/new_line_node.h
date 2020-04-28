@@ -23,9 +23,7 @@ class NewLineNode : public Node {
 public:
 
   NewLineNode (const std::string& filename, int line_number)
-  : Node(), _filename (filename), _line_number (line_number) {
-    set_node_type (NEW_LINE);
-  }
+  : Node(NEW_LINE), _filename (filename), _line_number (line_number) {}
 
 //private:
   std::string _filename;

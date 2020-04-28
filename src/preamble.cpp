@@ -30,18 +30,17 @@ Preamble::~Preamble()
 }
 
 void
-Preamble::add_import (const std::string &import) {
-  std::size_t pos = import.rfind ('.');
+Preamble::add_import (PathNode *path) {
   std::string ns, name;
-  if (pos == std::string::npos) {
-    ns = import;
+  int sz = path->get_subpath_list ().size ();
+  if (path->get_subpath_list ().size () == 1) {
+    ns = path->get_subpath_list ().at (0)->get_subpath();
   }
   else {
     //ns = import.substr (0, pos);
-    name = import.substr (pos + 1, import.length () - 1);
+    name = path->get_subpath_list ().at (sz - 1)->get_subpath();
   }
-  Node *n = new Node ("", import);
-  n->set_node_type (IMPORT);
+  Node *n = new Node (IMPORT, "", path);
   add_node (n);
   if (!name.empty ())
     m_import_list.push_back (name);
@@ -52,8 +51,7 @@ Preamble::add_import (const std::string &import) {
 void
 Preamble::add_use (const std::string &use)
 {
-  Node *n = new Node ("", use);
-  n->set_node_type(USE);
+  Node *n = new Node (USE, "", use);
   m_use_list.push_back (use);
   add_node (n);
 }
@@ -73,19 +71,11 @@ Preamble::nodes () const {
   return m_node_list;
 }
 
-std::vector<NativeCodeNode*>
-Preamble::java_code_nodes () const {
-  return m_java_node_list;
-}
-
 void Preamble::add_node (Node *node) {
 	m_node_list.push_back (node);
 }
 void Preamble::remove_node (Node *node) {
   m_node_list.erase (std::remove (m_node_list.begin (), m_node_list.end (), node), m_node_list.end ());
-}
-void Preamble::add_java_code_node (NativeCodeNode *node) {
-  m_java_node_list.push_back (node);
 }
 
 void Preamble::clear () {

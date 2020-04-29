@@ -243,6 +243,8 @@
 %type <string> dash_array_decl
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
+%type <Node*> assignment_sequence
+%type <Node*> start_assignment_sequence
 %type <InstructionNode*> start_action
 %type < vector<PathNode*> > process_list
 %type < vector<std::string> > state_list
@@ -1305,6 +1307,48 @@ binding
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
+    | binding_src binding_type assignment_sequence {
+      CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
+      Node *in = new Node (PATH, "Name", $1);
+      node->set_in (in);
+      PathNode *path = new PathNode();
+      path->add_subpath (new SubPathNode ($3->name(), START));
+      Node *out = new Node (PATH, "Name", path);
+      node->set_out (out);
+      driver.add_node (node);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+    }
+
+assignment_sequence
+  : start_assignment_sequence assignment_list RCB
+    { 
+      driver.add_node (new Node (END_CONTAINER));
+      parent_list.pop_back ();
+      $$ = $1;
+    }
+
+start_assignment_sequence
+  : LCB
+    {
+      std::string loc_name ("loc_ass_seq_" + std::to_string(loc_node_num++));
+      Node *node = new Node (SIMPLE, "AssignmentSequence", loc_name);
+      driver.add_node (node);
+
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      node->set_has_arguments (true);
+
+      driver.add_node (new TermNode (VALUE, "1"));
+      driver.add_node (new TermNode (END, ""));
+
+      node->set_node_type (CONTAINER);
+      parent_list.push_back (node);
+      cur_node = node;
+      $$ = node;
+    }
+
+assignment_list
+  : assignment
+  | assignment_list assignment
 
 binding_src
   : assignment_expression

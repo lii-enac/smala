@@ -26,18 +26,30 @@
 
   using namespace std;
   
-    string
-    str_filter(const char* s) {
-      string src (s);
-      src.erase (remove (src.begin (), src.end (), '\\'), src.end ());
-      return src;
-    }
-    string
-    hexa_filter(const char *s) {
-      string src (s);
-      src.replace (0, 1, "x").insert(0, "0");
-      return src;
-    }
+  string
+  str_filter(const char* s) {
+    string src (s);
+    src.erase (remove (src.begin (), src.end (), '\\'), src.end ());
+    return src;
+  }
+  string
+  hexa_filter(const char *s) {
+    string src (s);
+    src.replace (0, 1, "x").insert(0, "0");
+    return src;
+  }
+
+  static bool _exp_mode = false;
+
+  void lexer_expression_mode_on()
+  {
+    _exp_mode = true;
+  }
+  void lexer_expression_mode_off()
+  {
+    _exp_mode = false;
+  }
+
 %}
 
 %option yylineno
@@ -146,8 +158,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 
 {NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }
 <<EOF>>               { return yyterminate (); }
-[\t \.]+             {}
-[\n]                  {}
+[\t \.]+              {}
+[\n]                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ());}
 %%
 
 ////("+"|"-")?{INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }

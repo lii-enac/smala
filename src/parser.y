@@ -59,6 +59,9 @@
   typedef pair<Smala::ParamType, string> parameter_t;
   typedef vector<parameter_t> parameters_t;
 
+  extern void lexer_expression_mode_on();
+  extern void lexer_expression_mode_off();
+
 }
 
 %code top
@@ -95,6 +98,7 @@
   bool m_in_add_children = false;
   bool m_in_arguments = false;
   bool m_in_for = false;
+  bool m_in_imperative = false;
   bool has_argument = false;
   int func_num = 0;
   int loc_node_num = 0;
@@ -123,7 +127,7 @@
   add_term_node (Smala::Driver &driver, TermNode* n, bool add_to_arg){
     if (is_in_expr ()) {
       name_context_list.back ()->add_term (n);
-    } else if (m_in_arguments || m_in_for) {
+    } else if (m_in_arguments || m_in_for || m_in_imperative) {
       driver.add_node (n);
     } else
       comp_expression.push_back (n);
@@ -143,6 +147,7 @@
 %define parse.error verbose
 %define api.token.prefix {TOKEN_}
 
+%token EOL "EOL"
 %token <string> BREAK "break|continue|return"
 %token ACTIVATOR "|->"
 %token DOLLAR "$"
@@ -231,7 +236,7 @@
 %type <cast_type> cast
 %type <bool> bracket
 %type <int> arguments
-%type <bool> connector_symbol
+%type <int> connector_symbol
 %type <int> assignment_symbol
 %type <int> argument_list
 %type <string> function_call
@@ -457,15 +462,17 @@ imperative_statement
     }
 
 imperative_assignment
-  : assignment_expression 
+  : step EOL { lexer_expression_mode_off (); }
+  | function_call EOL
     { 
       for (auto n: comp_expression) {
         driver.add_node (n);
       }
       comp_expression.clear ();
+      lexer_expression_mode_off ();
       $$ = nullptr; 
     }
-  |  start_eq assignment_expression
+  | start_eq assignment_expression EOL
     {
       Node *n = new Node (END_SET_PROPERTY);
       driver.add_node (n);
@@ -480,23 +487,56 @@ imperative_assignment
         }
       }
       arg_expression.clear ();
-      m_in_arguments = false;
+      m_in_imperative = false;
+      lexer_expression_mode_off ();
       $$ = n;
+    }
+
+for_imperative_assignment
+  : step
+  | function_call
+    {
+      for (auto n: comp_expression) {
+        driver.add_node (n);
+      }
+      comp_expression.clear ();
+    }
+  | start_eq assignment_expression
+    {
+      Node *n = new Node (END_SET_PROPERTY);
+      driver.add_node (n);
+      bool has_op = false;
+      for (auto n: arg_expression) {
+        if (n->arg_type() == OPERATOR)
+          has_op = true;
+      }
+      for (auto n: arg_expression) {
+        if (n->arg_type () == VAR && !has_op && n->path_arg_value()->get_cast () == NO_CAST) {
+          n->path_arg_value()->set_cast (BY_VALUE);
+        }
+      }
+      arg_expression.clear ();
+      m_in_imperative = false;
     }
 
 start_eq
   : type NAME SIMPLE_EQ
-    {
+    { 
+      if (!m_in_for)
+        lexer_expression_mode_on ();
       NewVarNode *n = new NewVarNode ($1, $2);
       driver.add_node (n);
-      m_in_arguments = true;
+      m_in_imperative = true;
       $$ = n;
     }
-  | name_or_path SIMPLE_EQ
+  | 
+    name_or_path SIMPLE_EQ
     {
+      if (!m_in_for)
+        lexer_expression_mode_on ();
       Node *n = new Node (SET_PROPERTY, "set", new PathNode ($1));
       driver.add_node (n);
-      m_in_arguments = true;
+      m_in_imperative = true;
       name_context_list.pop_back ();
       $$ = n;
     }
@@ -593,11 +633,12 @@ for
   : for_loop lcb statement_list rcb
 
 for_loop
-  : start_for lp imperative_assignment semicolon assignment_expression semicolon imperative_assignment rp
+  : start_for lp for_imperative_assignment semicolon assignment_expression semicolon for_imperative_assignment rp
     {
       Node* n = new Node (END_LOOP);
       m_in_for = false;
     }
+
 start_for
   : FOR
     {
@@ -749,16 +790,18 @@ native
     }
 
 add_child
-  : start_add assignment_expression
+  : start_add assignment_expression EOL
     {
       Node *n = new Node (END_ADD_CHILD);
       driver.add_node (n);
       arg_expression.clear ();
       m_in_arguments = false;
+      lexer_expression_mode_off ();
     }
 start_add
   : NAME INSERT
     {
+      lexer_expression_mode_on ();
       Node* n = new Node (ADD_CHILD, "addChild", $1);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -952,7 +995,8 @@ argument
     }
 
 assignment_expression
-  : conditional_expression
+  : 
+  conditional_expression
   {
     bool has_op = false;
     for (auto n: arg_expression) {
@@ -1021,13 +1065,19 @@ unary_operator
 unary_expression
   : postfix_expression
   | unary_operator unary_expression
-  | name_or_path INCR
+
+step
+  : name_or_path INCR
     {
+      if (!m_in_for && !m_in_arguments)
+        lexer_expression_mode_on ();
       name_context_list.pop_back ();
       driver.add_node (new Node (INCREMENT, "incr", new PathNode ($1)));
     }
   | name_or_path DECR
     {
+      if (!m_in_for && !m_in_arguments)
+        lexer_expression_mode_on ();
       name_context_list.pop_back ();
       driver.add_node (new Node (DECREMENT, "incr", new PathNode ($1)));
     }
@@ -1040,25 +1090,21 @@ function_call
       add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
     }
 start_function
-  : primary_expression LP
+  : NAME LP
     {
-      std::string func_name = $1->path_arg_value ()->get_subpath_list ().at (0)->get_subpath ();
-      TermNode* n = new TermNode (FUNCTION_CALL, func_name);
+      if (!m_in_for && !m_in_arguments) {
+        lexer_expression_mode_on ();
+      } 
+      TermNode* n = new TermNode (FUNCTION_CALL, $1);
       TermNode *lp = new TermNode (SYMBOL, std::string ("("));
       if (is_in_expr ()) {
         NameContext* name_context = name_context_list.back ();
-        name_context->remove_term ($1);
         name_context->add_term (n);
         name_context->add_term (lp);
-      } else if (m_in_arguments || m_in_for) {
-        driver.remove_node ($1);
+      } else if (m_in_arguments || m_in_for || m_in_imperative) {
         driver.add_node (n);
         driver.add_node (lp);
       } else  {
-        std::vector<TermNode*>::iterator it = find (comp_expression.begin(), comp_expression.end(), $1);
-        if (it != comp_expression.end()) {
-          comp_expression.erase (it);
-        }
         comp_expression.push_back (n);
         comp_expression.push_back (lp);
       }
@@ -1068,7 +1114,7 @@ start_function
 
 postfix_expression
   : primary_expression
-  | function_call 
+  | function_call
 
 primary_expression
   : INT
@@ -1116,7 +1162,7 @@ primary_expression
         driver.add_node (n);
       else
         name_context_list.back ()->add_term (n);
-    } else if (m_in_arguments || m_in_for) {
+    } else if (m_in_arguments || m_in_for || m_in_imperative) {
       driver.add_node (n);
     } else
       comp_expression.push_back (n);
@@ -1247,19 +1293,7 @@ colon
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, true, true);
-      expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      for (int i = 0; i < $3.size (); ++i) {
-        expr_node->add_output_node ($3.at (i));
-      }
-      driver.add_native_expression (expr_node);
-      driver.add_node (expr_node);
-      comp_expression.clear ();
-      arg_expression.clear (); 
-    }
-  | assignment_expression ASSGNT_CONN process_list
-    {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, false, true, false);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? true:false);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1271,8 +1305,9 @@ connector
     }
 
 connector_symbol
-  : CONNECTOR { $$ = false; }
-  | PAUSED_CONNECTOR { $$ = true; }
+  : CONNECTOR { lexer_expression_mode_off (); }
+  | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = 0; }
+  | ASSGNT_CONN { lexer_expression_mode_off (); $$ = 2; }
 
 binding
   : binding_src binding_type process_list
@@ -1394,10 +1429,10 @@ binding_src
   }
 
 binding_type
-  : ARROW { $$ = make_pair ("true", "true"); }
-  | NOT_ARROW { $$ = make_pair ("false", "true"); }
-  | NOT_ARROW_NOT { $$ = make_pair ("false", "false"); }
-  | ARROW_NOT { $$ = make_pair ("true", "false"); }
+  : ARROW { $$ = make_pair ("true", "true"); lexer_expression_mode_off (); }
+  | NOT_ARROW { $$ = make_pair ("false", "true"); lexer_expression_mode_off (); }
+  | NOT_ARROW_NOT { $$ = make_pair ("false", "false"); lexer_expression_mode_off (); }
+  | ARROW_NOT { $$ = make_pair ("true", "false"); lexer_expression_mode_off (); }
 
 lambda
   : start_lambda LCB statement_list RCB
@@ -1436,8 +1471,8 @@ assignment
 
 
 assignment_symbol
-  : ASSIGNMENT { $$ = false; }
-  | PAUSED_ASSIGNMENT { $$ = true; }
+  : ASSIGNMENT { $$ = false; lexer_expression_mode_off (); }
+  | PAUSED_ASSIGNMENT { $$ = true; lexer_expression_mode_off (); }
 
 is_model
   : { $$ = false; }

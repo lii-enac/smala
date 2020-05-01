@@ -42,7 +42,7 @@ note_on (Process p)
 %{
     init_midi_if_not_inited ();
 
-    Process *data = reinterpret_cas<Process*> (get_native_user_data (p));
+    Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
     auto val0 = dynamic_cast<IntProperty*> (data->find_child("val0"))->get_value ();
     auto val1 = dynamic_cast<IntProperty*> (data->find_child("val1"))->get_value ();
     auto val2 = dynamic_cast<IntProperty*> (data->find_child("val2"))->get_value ();

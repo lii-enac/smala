@@ -141,6 +141,8 @@ public:
     void set_path (PathNode* p) { m_path = p; }
     void set_user_data (user_data_t data) { m_data = data; }
     user_data_t get_user_data () { return m_data; }
+    void set_keep_name (bool keep) { m_keep_name = keep; }
+    bool keep_name () { return m_keep_name; }
  private:
     bool m_ignore_parent, m_has_path;
     Node *m_parent;
@@ -149,7 +151,7 @@ public:
     std::string m_name;
     std::string m_build_name;
     std::vector< std::pair<ParamType, std::string> > m_args;
-    bool m_has_arguments, m_duplicate_warning, m_in_expression;
+    bool m_has_arguments, m_duplicate_warning, m_in_expression, m_keep_name;
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
     std::vector<TermNode*> m_expression;

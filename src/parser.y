@@ -147,6 +147,7 @@
 %define parse.error verbose
 %define api.token.prefix {TOKEN_}
 
+%token KEEP "_keep_"
 %token EOL "EOL"
 %token <string> BREAK "break|continue|return"
 %token ACTIVATOR "|->"
@@ -233,6 +234,7 @@
 %token <string> NAME "name"
 %token <string> URI "URI"
 
+%type <bool> keep
 %type <cast_type> cast
 %type <bool> bracket
 %type <int> arguments
@@ -520,11 +522,11 @@ for_imperative_assignment
     }
 
 start_eq
-  : type NAME SIMPLE_EQ
+  : type keep NAME SIMPLE_EQ
     { 
       if (!m_in_for)
         lexer_expression_mode_on ();
-      NewVarNode *n = new NewVarNode ($1, $2);
+      NewVarNode *n = new NewVarNode ($1, $3, $2);
       driver.add_node (n);
       m_in_imperative = true;
       $$ = n;
@@ -540,6 +542,11 @@ start_eq
       name_context_list.pop_back ();
       $$ = n;
     }
+
+keep
+  : { $$ = 0; }
+  | KEEP { $$ = 1; }
+
 break_loop
   : BREAK
     {
@@ -948,9 +955,10 @@ end_statement_list
     }
 
 simple_process_decl
-  : NAME NAME
+  : NAME keep NAME
     {
-      Node *node = new Node (SIMPLE, $1, $2);
+      Node *node = new Node (SIMPLE, $1, $3);
+      node->set_keep_name ($2);
       if (root == nullptr)
         root = node;
       driver.add_node (node);

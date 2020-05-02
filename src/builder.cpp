@@ -458,21 +458,25 @@ namespace Smala
           indent (os);
         print_type (os, n->type ());
         std::string new_name;
-        switch (n->type ()) {
-          case INT:
-            new_name = "i_var_" + std::to_string (m_var_num++);
-            break;
-          case DOUBLE:
-            new_name = "d_var_" + std::to_string (m_var_num++);
-            break;
-          case STRING:
-            new_name = "s_var_" + std::to_string (m_var_num++);
-            break;
-          case PROCESS:
-            new_name = "var_" + std::to_string (m_cpnt_num++);
-            break;
-          default:
-            new_name =  "";
+        if (n->keep_name ())
+          new_name = n->var_name ();
+        else {
+          switch (n->type ()) {
+            case INT:
+              new_name = "i_var_" + std::to_string (m_var_num++);
+              break;
+            case DOUBLE:
+              new_name = "d_var_" + std::to_string (m_var_num++);
+              break;
+            case STRING:
+              new_name = "s_var_" + std::to_string (m_var_num++);
+              break;
+            case PROCESS:
+              new_name = "var_" + std::to_string (m_cpnt_num++);
+              break;
+            default:
+              new_name =  "";
+          }
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
           print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
@@ -511,7 +515,12 @@ namespace Smala
 
     if (node->name ().compare ("_") == 0)
       node->set_name ("");
-    std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+    std::string new_name;
+
+    if (node->keep_name () && !node->name ().empty ())
+      new_name = node->name ();
+    else
+      new_name = "cpnt_" + std::to_string (m_cpnt_num++);
 
     node->set_build_name (new_name);
     if (!node->name ().empty ()) {

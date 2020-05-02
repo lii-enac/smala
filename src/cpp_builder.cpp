@@ -673,12 +673,9 @@ namespace Smala
 
       // note: finalize_construction will call impl_activate before proper properties are fully built, leading to a crash
       // so delay finalize_construction after building properties
-      // Process::finalize_construction (p, n);
+      // finalize_construction (p, n);
     }
-    // make finalize_construction public
-    void finalize_construction (Process* p, const string& n) {
-       Process::finalize_construction (p, n);
-    }
+
     bool _string_setter;
     void impl_deactivate () override {}
     void impl_activate () override;)" << "\n";

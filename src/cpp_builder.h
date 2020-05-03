@@ -34,7 +34,7 @@ namespace Smala {
     void build_while (std::ofstream &os, Node *node) override;
     void build_print (std::ofstream &os, Node *node) override;
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;
-    std::string build_fake_name (PathNode* n);
+    std::string build_fake_name (PathNode* n, bool out);
     std::string build_term_str (TermNode* n);
     std::string build_find (PathNode* n);
     void set_property (std::ofstream &os, Node *node) override;
@@ -73,6 +73,7 @@ namespace Smala {
     std::map<std::string, std::string> m_import_types;
   private:
     bool m_display_initialized;
+    int m_expr_in, m_expr_out;
   };
 
 } /* namespace Smala */

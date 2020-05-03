@@ -29,7 +29,7 @@ namespace Smala
 {
 
   CPPBuilder::CPPBuilder () :
-      Builder (), m_display_initialized (false)
+      Builder (), m_display_initialized (false), m_expr_in (0), m_expr_out (0)
   {
     m_type_manager = new CPPTypeManager ();
     m_null_symbol = "nullptr";
@@ -117,12 +117,16 @@ namespace Smala
   }
 
   std::string
-  CPPBuilder::build_fake_name (PathNode* n)
+  CPPBuilder::build_fake_name (PathNode* n, bool out)
   {
     std::string fake = n->get_subpath_list ().at (0)->get_subpath();
     for (int i = 1; i < n->get_subpath_list ().size (); i++) {
-      if (n->get_subpath_list ().at (i)->get_path_type() == EXPR)
-        fake += ".expr_";
+      if (n->get_subpath_list ().at (i)->get_path_type() == EXPR) {
+        if (out)
+          fake += ".expr_out" + std::to_string (m_expr_out++);
+        else
+          fake += ".expr_in" + std::to_string (m_expr_in++);
+      }
       else
         fake += "." + n->get_subpath_list ().at (i)->get_subpath ();
     }
@@ -480,6 +484,7 @@ namespace Smala
   void
   CPPBuilder::build_native_expression_node (std::ofstream &os, Node *n)
   {
+    m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
     if (node->get_expression ().size () == 1) {
       build_simple_control_node (os, node);
@@ -547,7 +552,7 @@ namespace Smala
             indent (os);
             os << "}\n";
             indent (os);
-            std::string fake_name = build_fake_name (e->path_arg_value ());
+            std::string fake_name = build_fake_name (e->path_arg_value (), false);
             std::string new_param_name = transform_name (fake_name);
             os << native_name << "->"<< new_param_name <<  "= " << new_name
                 << ";\n";
@@ -609,7 +614,7 @@ namespace Smala
             indent (os);
             os << "}\n";
             indent (os);
-            std::string fake_name = build_fake_name (e);
+            std::string fake_name = build_fake_name (e, true);
             std::string new_param_name = transform_name (fake_name);
             os << native_name << "->" << new_param_name << " = " << new_name << ";\n";
             sym[fake_name] = new_name;
@@ -702,8 +707,9 @@ namespace Smala
     void impl_deactivate () override {}
     void impl_activate () override;)" << "\n";
 
+    m_expr_in = m_expr_out = 0;
     for (auto n : node->get_output_nodes ()) {
-      std::string tn = transform_name(build_fake_name(n));
+      std::string tn = transform_name(build_fake_name(n, true));
       if(already_handled.count(tn)==0) {
         os << "\tAbstractProperty * " << tn << ";\n";
         already_handled[tn] = true;
@@ -711,7 +717,7 @@ namespace Smala
 
       for (auto op : node->get_expression ()) {
         if (op->arg_type () == VAR) {
-            std::string tn = transform_name(build_fake_name (op->path_arg_value ()));
+            std::string tn = transform_name(build_fake_name (op->path_arg_value (), false));
             if(already_handled.count(tn)==0) {
               os << "\tAbstractProperty * " << tn << ";\n";
               already_handled[tn] = true;
@@ -723,14 +729,14 @@ namespace Smala
 
 
     // second pass: generate nat
-
+    m_expr_in = m_expr_out = 0;
     os << "\nvoid\n" << native_name_struct << "::impl_activate ()\n{\n";
     for (auto n : node->get_output_nodes ()) {
-      os << "\t" << transform_name (build_fake_name(n)) << "->set_value(";
+      os << "\t" << transform_name (build_fake_name(n, true)) << "->set_value(";
       for (auto op : node->get_expression ()) {
         std::string tn;
         if (op->path_arg_value())
-          tn = transform_name (build_fake_name (op->path_arg_value ()));
+          tn = transform_name (build_fake_name (op->path_arg_value (), false));
         if (op->arg_type () == VAR) {
           switch (op->path_arg_value()->get_cast ()) {
             case BY_PROCESS:
@@ -748,7 +754,7 @@ namespace Smala
           }
         } else if (tn.size () >= 1
             && tn.at (0) == '\"') {
-          os << "std::string (" << build_fake_name (op->path_arg_value ()) << ")";
+          os << "std::string (" << build_fake_name (op->path_arg_value (), false) << ")";
         } else {
           os << op->str_arg_value ();
         }

@@ -70,8 +70,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 %%
 
 
-"/*"([^*]|\*+[^*/])*\*+"/"            { }
-"//"[^\n]*                { }
+"/*"([^*]|\*+[^*/])*\*+"/" {}
+"//"[^\n]*            {}
 "$"                   { return Smala::Parser::make_DOLLAR (Smala::location ());}
 ";"                   { return Smala::Parser::make_SEMICOLON (Smala::location ()); }
 "{"                   { return Smala::Parser::make_LCB (Smala::location ()); }
@@ -155,12 +155,11 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {INT}"."              { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 {NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), Smala::location ()); }
 \"(\\.|[^\"])*\"      { return Smala::Parser::make_STRING (yytext, Smala::location ()); }
-
-
 {NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }
-<<EOF>>               { return yyterminate (); }
 [\t \.]+              {}
-[\n]                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ());}
+"\\\n"                {}
+"\n"                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ()); }
+<<EOF>>               { return yyterminate (); }
 %%
 
 ////("+"|"-")?{INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }

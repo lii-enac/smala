@@ -433,7 +433,6 @@ statement
 
 new_component
   : simple_process
-  | range
   | dash_array
   | fsm
   | native
@@ -588,6 +587,12 @@ name_or_path
       $$ = ctxt->path ();
    }
   | name_or_path DOT start_name_expr assignment_expression end_name_expr
+    {
+      NameContext *ctxt = name_context_list.back ();
+      ctxt->build_and_add_expression ();
+      $$ = ctxt->path ();
+    }
+  | name_or_path start_name_expr assignment_expression end_name_expr
     {
       NameContext *ctxt = name_context_list.back ();
       ctxt->build_and_add_expression ();
@@ -819,6 +824,10 @@ int_array_decl
   | int_array_decl INT COMMA { int_array.push_back (std::stoi ($2)); }
   | int_array_decl INT { int_array.push_back (std::stoi ($2)); }
 
+range_list
+  : range
+  | range_list range
+
 range
   : range_decl start_statement_list end_statement_list
   | range_decl start_statement_list statement_list end_statement_list
@@ -854,6 +863,12 @@ bracket
 
 simple_process
   : simple_process_decl arguments start_statement_list statement_list end_statement_list
+  {
+    if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
+      driver.add_node (new SetParentNode ($1));
+    }
+  }
+  | simple_process_decl arguments start_statement_list range_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));

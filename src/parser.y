@@ -638,6 +638,7 @@ start_while
       comp_expression.clear ();
       arg_expression.clear ();
       driver.add_node (n);
+      lexer_expression_mode_off ();
     }
 
 for
@@ -670,6 +671,7 @@ if_exp
     $1->set_expr_data (comp_expression);
     comp_expression.clear ();
     arg_expression.clear ();
+    lexer_expression_mode_off ();
     }
 
 start_if

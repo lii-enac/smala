@@ -32,6 +32,7 @@
     src.erase (remove (src.begin (), src.end (), '\\'), src.end ());
     return src;
   }
+
   string
   hexa_filter(const char *s) {
     string src (s);
@@ -39,8 +40,8 @@
     return src;
   }
 
+  // use EOL as delimiter outside expression
   static bool _exp_mode = false;
-
   void lexer_expression_mode_on()
   {
     _exp_mode = true;
@@ -60,13 +61,16 @@
 
 NAME [a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
 INT [0-9]+
+ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
+BREAK ("break"|"continue"|"return")
+NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
+/* unused
 POLY ("Polygon"|"Polyline")
 PATH ("Path"|"PathClip")
 PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
 GRADIENT ("LinearGradient"|"RadialGradient")
-ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
-BREAK ("break"|"continue"|"return")
-NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
+*/
+
 %%
 
 
@@ -161,7 +165,3 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "\n"                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ()); }
 <<EOF>>               { return yyterminate (); }
 %%
-
-////("+"|"-")?{INT}                   { return Smala::Parser::make_INT (yytext, Smala::location ()); }
-//("+"|"-")?{INT}"."{INT}           { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
-

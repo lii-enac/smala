@@ -36,7 +36,7 @@ namespace Smala {
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;
     std::string build_fake_name (PathNode* n, bool out);
     std::string build_term_str (TermNode* n);
-    std::string build_find (PathNode* n);
+    std::string build_find (PathNode* n, bool ignore_cast);
     void set_property (std::ofstream &os, Node *node) override;
     void end_set_property (std::ofstream &os, Node *node) override;
     void end_property (std::ofstream &os, Node *n) override;

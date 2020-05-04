@@ -146,7 +146,7 @@ namespace Smala
         break;
       }
       case VAR: {
-        std::string p = build_find (term->path_arg_value ());
+        std::string p = build_find (term->path_arg_value (), false);
         // if the name contains "var_" then this is a simple variable not a djnn property
         // so write it as is
         std::size_t found = p.find ("var_");
@@ -163,7 +163,7 @@ namespace Smala
   }
 
   std::string
-  CPPBuilder::build_find (PathNode* n)
+  CPPBuilder::build_find (PathNode* n, bool ignore_cast)
   {
     std::vector<SubPathNode*> n_list = n->get_subpath_list ();
     if (n_list.empty ())
@@ -172,17 +172,19 @@ namespace Smala
     std::string prefix;
     std::string symbol = n_list.at (0)->get_subpath ();
     std::string str = m_parent_list.back ()->get_symbol (symbol);
-    switch (n->get_cast ()) {
-      case NO_CAST:
-      case BY_PROCESS:
-        prefix = "";
-        break;
-      case BY_VALUE:
-        prefix = "((AbstractProperty*)";
-        break;
-      case BY_REF:
-        prefix = "(*((AbstractProperty*)";
-        break;
+    if (!ignore_cast) {
+      switch (n->get_cast ()) {
+        case NO_CAST:
+        case BY_PROCESS:
+          prefix = "";
+          break;
+        case BY_VALUE:
+          prefix = "((AbstractProperty*)";
+          break;
+        case BY_REF:
+          prefix = "(*((AbstractProperty*)";
+          break;
+      }
     }
     if (str.empty ()) {
       // then check if it is a Djnn symbol that is a key prefixed by DJN
@@ -216,15 +218,17 @@ namespace Smala
         str += ")";
       }
     }
-    switch (n->get_cast ()) {
-      case BY_VALUE:
-        str += ")->get_double_value ()";
-        break;
-      case BY_REF:
-        str += "))";
-        break;
-      default:
-        break;
+    if (!ignore_cast) {
+      switch (n->get_cast ()) {
+        case BY_VALUE:
+          str += ")->get_double_value ()";
+          break;
+        case BY_REF:
+          str += "))";
+          break;
+        default:
+          break;
+      }
     }
   return prefix + str;
 }
@@ -234,7 +238,7 @@ namespace Smala
   {
     if (!m_in_for)
       indent (os);
-    std::string find = build_find (node->get_path());
+    std::string find = build_find (node->get_path(), false);
     if (find.rfind ("cpnt_", 0) == 0) {
       os << "((AbstractProperty*) " << find << ")->set_value (";
       os << "((AbstractProperty*) " << find << ")->get_double_value ()";
@@ -279,7 +283,7 @@ namespace Smala
           os << n->str_arg_value ();
           break;
         case VAR: {
-          std::string p = build_find (n->path_arg_value ());
+          std::string p = build_find (n->path_arg_value (), false);
           // if the name contains "var_" then this is a simple variable not a djnn property
           // so write it as is and return
           std::size_t found = p.find ("var_");
@@ -329,7 +333,7 @@ namespace Smala
     std::string constructor = get_constructor (node->djnn_type ());
     bool is_binding = node->djnn_type ().compare ("Binding") == 0;
 
-    std::string src = build_find (ctrl->in ()->get_path());
+    std::string src = build_find (ctrl->in ()->get_path(), false);
     std::string src_name, dst;
     std::string prefix = "var_";
     bool _is_var = src.substr (0, prefix.size ()) == prefix;
@@ -344,7 +348,7 @@ namespace Smala
     if (!ctrl->out ()->build_name ().empty ()) {
       dst = ctrl->out ()->build_name ();
     } else
-      dst = build_find (ctrl->out ()->get_path());
+      dst = build_find (ctrl->out ()->get_path(), false);
     if (dst.empty ()) {
       print_error_message (error_level::error,
                                "anonymous component in output of control node",
@@ -425,11 +429,11 @@ namespace Smala
       }
       arg = new_name;
     } else {
-      arg = build_find (arg_node->path_arg_value ());
+      arg = build_find (arg_node->path_arg_value (), false);
     }
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-      std::string out_arg = build_find (node->get_output_nodes ().at (0));
+      std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
       os << "Process *" << new_name << " = new Assignment ( " << p_name
           << ", \"\", " << arg << ", \"\","
           << out_arg << ", \"\", "
@@ -441,7 +445,7 @@ namespace Smala
     } else {
       for (auto e : node->get_output_nodes ()) {
         indent (os);
-        std::string out_arg = build_find (e);
+        std::string out_arg = build_find (e, false);
         os << "new ";
         if (node->is_paused ())
           os << "Paused";
@@ -512,7 +516,7 @@ namespace Smala
     for (auto e : node->get_expression ()) {
       if ((e->arg_type () == VAR)
           && sym.find (e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()) == sym.end ()) {
-        std::string arg = build_find (e->path_arg_value());
+        std::string arg = build_find (e->path_arg_value(), true);
 
         if (arg.compare (0, 6, "d_var_") == 0
             || arg.compare (0, 6, "i_var_") == 0) {
@@ -583,7 +587,7 @@ namespace Smala
 
     for (auto e : node->get_output_nodes ()) {
       if (sym.find (e->get_subpath_list().at (0)->get_subpath()) == sym.end ()) {
-        std::string arg = build_find (e);
+        std::string arg = build_find (e, false);
         if (arg.compare (0, 4, "var_") != 0) {
           indent (os);
           if (arg.find ("->") == std::string::npos) {
@@ -648,7 +652,7 @@ namespace Smala
       }
     }
     for (auto out : node->get_output_nodes ()) {
-      std::string arg = build_find (out);
+      std::string arg = build_find (out, false);
       indent (os);
       os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
       os << arg << ");\n";
@@ -787,7 +791,7 @@ namespace Smala
   {
     InstructionNode *n = static_cast<InstructionNode*> (node);
     for (int i = 0; i < n->path_list ().size (); i++) {
-      std::string arg = build_find (n->path_list ().at (i));
+      std::string arg = build_find (n->path_list ().at (i), false);
       if (arg.empty ()) {
         print_error_message (error_level::error,
          "unknown component " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
@@ -887,7 +891,7 @@ namespace Smala
                                    "duplicated name: " + node->name (), 0);
       os << "Process *" << var_name << " = ";
     } else {
-      prop_name = build_find (node->get_path());
+      prop_name = build_find (node->get_path(), false);
       if (prop_name.rfind ("cpnt_", 0) == 0) {
         os << "((AbstractProperty*) "<< prop_name << ")->set_value (";
         m_in_set_property = true;
@@ -953,7 +957,7 @@ namespace Smala
           m_in_switch = false;
           return;
         }
-        std::string p = build_find (n->path_arg_value ());
+        std::string p = build_find (n->path_arg_value (), false);
         os << p;
         break;
       }
@@ -999,7 +1003,7 @@ namespace Smala
     } else if (node->djnn_type ().compare ("intToString") == 0) {
       os << "std::string " << var_name << " = std::to_string (((IntProperty*) ";
     }
-    std::string arg = build_find (node->get_path());
+    std::string arg = build_find (node->get_path(), false);
     os << arg;
     os << ")->get_value ()";
     if (node->djnn_type ().compare ("doubleToString") == 0
@@ -1017,7 +1021,7 @@ namespace Smala
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << n->left_arg ()->get_subpath_list().at(0)->get_subpath() << "\", ";
-    std::string arg = build_find (n->right_arg ());
+    std::string arg = build_find (n->right_arg (), false);
     os << arg << ");\n";
     indent (os);
     os << "Process *" << new_name << " = " << m_parent_list.back ()->name ()
@@ -1033,8 +1037,8 @@ namespace Smala
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
-    std::string left = build_find (n->left_arg ());
-    std::string right = build_find (n->right_arg ());
+    std::string left = build_find (n->left_arg (), false);
+    std::string right = build_find (n->right_arg (), false);
     os << "merge_children (" << left << ", \"\", "
         << right << ", \"\");\n";
   }
@@ -1044,8 +1048,8 @@ namespace Smala
   {
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
-    std::string left = build_find (n->left_arg ());
-    std::string right = build_find (n->right_arg ());
+    std::string left = build_find (n->left_arg (), false);
+    std::string right = build_find (n->right_arg (), false);
     os << left << "->remove_child ( " << right << ");\n";
   }
 
@@ -1055,9 +1059,9 @@ namespace Smala
     BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string last;
-    std::string left = build_find (n->left_arg ());
+    std::string left = build_find (n->left_arg (), false);
     if (n->right_arg ()) {
-      std::string last = build_find (n->right_arg ());
+      std::string last = build_find (n->right_arg (), false);
       os << left << "->get_parent ()->move_child (" << left << ", "
               << c << ", " << last << ");\n";
     }
@@ -1094,7 +1098,7 @@ namespace Smala
   CPPBuilder::add_children_to (std::ofstream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    std::string s = build_find (node->get_path());
+    std::string s = build_find (node->get_path(), false);
 
     if (node->get_path()->get_subpath_list().size ()> 1) {
       indent (os);
@@ -1242,7 +1246,7 @@ namespace Smala
     if (node->path_data() == nullptr)
       data = "nullptr";
     else
-      data = build_find(node->path_data());
+      data = build_find(node->path_data(), false);
     os << data << ", " << node->is_model () << ");\n ";
   }
 
@@ -1259,10 +1263,10 @@ namespace Smala
     src = m_parent_list.back ()->get_symbol (ctrl->get_src ());
     dst = m_parent_list.back ()->get_symbol (ctrl->get_dst ());
     os << ", " << src << ", " << dst << ", ";
-    std::string trigger = build_find (ctrl->get_trigger());
+    std::string trigger = build_find (ctrl->get_trigger(), false);
     os << trigger << ", \"\", ";
     if (ctrl->get_action()) {
-      os << build_find (ctrl->get_action()) << ", \"\");\n";
+      os << build_find (ctrl->get_action(), false) << ", \"\");\n";
     } else {
       os << "nullptr, \"\");\n";
     }

@@ -162,7 +162,6 @@
 %token ASSIGNMENT "=:"
 %token PAUSED_ASSIGNMENT "::"
 %token PROCESS "Process"
-%token <string> STRING_CAST "toString"
 %token PROCESS_CAST "&"
 %token FSM "FSM"
 %token STATE "State"

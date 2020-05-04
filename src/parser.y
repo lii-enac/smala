@@ -1301,7 +1301,7 @@ colon
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? true:false);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1313,7 +1313,7 @@ connector
     }
 
 connector_symbol
-  : CONNECTOR { lexer_expression_mode_off (); }
+  : CONNECTOR { lexer_expression_mode_off (); $$ = 1; }
   | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = 0; }
   | ASSGNT_CONN { lexer_expression_mode_off (); $$ = 2; }
 

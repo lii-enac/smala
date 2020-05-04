@@ -82,12 +82,16 @@ CXXFLAGS += $(CFLAGS) -std=c++14
 
 ifeq ($(djnn_path),) 
 djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
-djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
+djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_ldlibs := $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
+djnn_libs := $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 else
 djnn_cflags := -I$(djnn_path)/src
-djnn_ldflags := -L$(djnn_path)/build/lib #-ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+djnn_ldflags := -L$(djnn_path)/build/lib
+djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
 endif
 
@@ -200,7 +204,7 @@ $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
-	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_ldflags)
+	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_libs)
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)

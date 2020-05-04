@@ -252,7 +252,6 @@
 %type <Node*> simple_process_decl
 %type <Node*> assignment_sequence
 %type <Node*> start_assignment_sequence
-%type <InstructionNode*> start_action
 %type < vector<PathNode*> > process_list
 %type < vector<std::string> > state_list
 %type <TermNode*> start_function

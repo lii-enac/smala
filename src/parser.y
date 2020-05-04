@@ -735,25 +735,6 @@ action
       }
       driver.add_node (node);
     }
-  | start_action argument_list RP
-    {
-      TermNode *n = new TermNode (END, nullptr);
-      comp_expression.push_back (n);
-      $1->set_args (comp_expression);
-      comp_expression.clear ();
-    }
-
-start_action
-  : ACTION name_or_path LP
-    {
-      $1[0] = std::toupper ($1[0]);
-      InstructionNode *node = new InstructionNode ($1);
-      node->add_path (new PathNode ($2));
-      node->set_has_argument (true);
-      driver.add_node (node);
-      name_context_list.pop_back ();
-      $$ = node;
-    }
 
 alias
   : name_or_path AKA name_or_path

@@ -64,7 +64,7 @@ POLY ("Polygon"|"Polyline")
 PATH ("Path"|"PathClip")
 PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
 GRADIENT ("LinearGradient"|"RadialGradient")
-ACTION ("run"|"stop"|"dump"|"notify"|"delete"|"XMLSerialize")
+ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
 BREAK ("break"|"continue"|"return")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 %%

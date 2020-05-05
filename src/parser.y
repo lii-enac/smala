@@ -241,6 +241,7 @@
 %type <bool> is_model
 %type <ParamType> type
 %type <Node*> fsm_decl
+%type <string> subname
 %type <string> dash_array_decl
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
@@ -561,7 +562,7 @@ name_or_path
       ctxt->add_subpath (new SubPathNode ($2, START, $1));
       $$ = ctxt->path ();
     }
-  | name_or_path DOT NAME
+  | name_or_path DOT subname
     {
       NameContext *ctxt = name_context_list.back ();
       ctxt->add_subpath (new SubPathNode ($3, ITEM));
@@ -573,12 +574,6 @@ name_or_path
       ctxt->add_subpath (new SubPathNode ("$" + $4, REF));
       $$ = ctxt->path ();
     }
-  | name_or_path DOT ACTION
-    {
-      NameContext *ctxt = name_context_list.back ();
-      ctxt->add_subpath (new SubPathNode ($3, ITEM));
-      $$ = ctxt->path ();
-   }
   | name_or_path DOT start_name_expr assignment_expression end_name_expr
     {
       NameContext *ctxt = name_context_list.back ();
@@ -591,6 +586,9 @@ name_or_path
       ctxt->build_and_add_expression ();
       $$ = ctxt->path ();
     }
+
+subname
+: ACTION { $$ = 1; }| NAME { $$ = 1; } | FROM { $$ = 1; }
 
 cast
 : PROCESS_CAST { $$ = BY_PROCESS; }

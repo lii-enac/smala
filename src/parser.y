@@ -102,7 +102,7 @@
   bool has_argument = false;
   int func_num = 0;
   int loc_node_num = 0;
-
+  int m_in_func = 0;
 }
 
 
@@ -1005,6 +1005,8 @@ assignment_expression
     for (auto n: arg_expression) {
       if (n->arg_type () == VAR && has_op && n->path_arg_value()->get_cast () == NO_CAST) {
         n->path_arg_value()->set_cast (BY_REF);
+      } else if (m_in_func > 0 && n->arg_type () == VAR && !has_op && n->path_arg_value()->get_cast () == NO_CAST) {
+        n->path_arg_value()->set_cast (BY_VALUE);
       }
     }
     has_op = false;
@@ -1087,6 +1089,8 @@ function_call
       $1->set_has_arguments ($2);
       $$ = $1->str_arg_value ();
       add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+      if ($1->str_arg_value ().compare("toString") != 0)
+        m_in_func--;
     }
 start_function
   : NAME LP
@@ -1108,6 +1112,8 @@ start_function
         comp_expression.push_back (lp);
       }
       arg_expression.clear ();
+      if ($1.compare("toString") != 0)
+        m_in_func++;
       $$ = n;
     }
 

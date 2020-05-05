@@ -194,7 +194,6 @@
 %token DOT "."
 %token COMMA ","
 %token IF "if"
-%token THEN "then"
 %token ELSE "else"
 %token FOR "for"
 %token WHILE "while"
@@ -205,7 +204,6 @@
 %token STRING_T "string"
 %token USE "use"
 %token NULL "null"
-%token ADD_CHILD "addChild"
 %token ADD_CHILDREN_TO "addChildrenTo"
 %token MERGE "merge"
 %token REMOVE "remove"
@@ -218,8 +216,6 @@
 %token NATIVE_ACTION "_action_"
 %token NATIVE_CODE "_native_code_"
 %token <string> CODE "<native code>"
-%token <string> VERBOSE ";;"
-%token ALIAS "Alias"
 %token DASHARRAY "DashArray"
 %token <string> INT "<int>"
 %token <string> DOUBLE "<double>"
@@ -231,7 +227,6 @@
 %token IMPORT "import"
 %token END 0 "end of file"
 %token <string> NAME "name"
-%token <string> URI "URI"
 
 %type <bool> keep
 %type <cast_type> cast

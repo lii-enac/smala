@@ -64,13 +64,6 @@ INT [0-9]+
 ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
 BREAK ("break"|"continue"|"return")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
-/* unused
-POLY ("Polygon"|"Polyline")
-PATH ("Path"|"PathClip")
-PATH_POINT ("PathArc"|"PathClosure"|"PathCubic"|"PathLine"|"PathQuadratic"|"PathSubpath"|"PathMove")
-GRADIENT ("LinearGradient"|"RadialGradient")
-*/
-
 %%
 
 
@@ -130,7 +123,6 @@ GRADIENT ("LinearGradient"|"RadialGradient")
 "Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
 "&"                   { return Smala::Parser::make_PROCESS_CAST (Smala::location()); }
 "NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
-"Alias"               { return Smala::Parser::make_ALIAS (Smala::location()); }
 "_main_"              { return Smala::Parser::make_MAIN (Smala::location ()); }
 "_define_"            { return Smala::Parser::make_DEFINE (Smala::location ()); }
 "_action_"            { return Smala::Parser::make_NATIVE_ACTION (Smala::location ()); }
@@ -144,10 +136,8 @@ GRADIENT ("LinearGradient"|"RadialGradient")
 "moveChild"           { return Smala::Parser::make_MOVE (Smala::location ()); }
 "with"                { return Smala::Parser::make_WITH (Smala::location ()); }
 "from"                { return Smala::Parser::make_FROM (Smala::location ()); }
-"addChild"            { return Smala::Parser::make_ADD_CHILD (Smala::location ()); }
 "addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (Smala::location ()); }
 "if"                  { return Smala::Parser::make_IF (Smala::location ()); }
-"then"                { return Smala::Parser::make_THEN (Smala::location ()); }
 "else"                { return Smala::Parser::make_ELSE (Smala::location ()); }
 "for"                 { return Smala::Parser::make_FOR (Smala::location ()); }
 "while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
@@ -159,7 +149,8 @@ GRADIENT ("LinearGradient"|"RadialGradient")
 {INT}"."              { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 {NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), Smala::location ()); }
 \"(\\.|[^\"])*\"      { return Smala::Parser::make_STRING (yytext, Smala::location ()); }
-{NAME}":"{NAME}(("."({NAME}|{INT}))*)   { return Smala::Parser::make_URI (str_filter (yytext), Smala::location ()); }
+
+<<EOF>>               { return yyterminate (); }
 [\t \.]+              {}
 "\\\n"                {}
 "\n"                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ()); }

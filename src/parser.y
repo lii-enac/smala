@@ -588,7 +588,7 @@ name_or_path
     }
 
 subname
-: ACTION { $$ = 1; }| NAME { $$ = 1; } | FROM { $$ = 1; }
+: ACTION { $$ = 1; }| NAME { $$ = 1; } | FROM { $$ = "from"; }
 
 cast
 : PROCESS_CAST { $$ = BY_PROCESS; }

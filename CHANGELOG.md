@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## IMPORTANT
 
+
+-------------------------------------------------------------
+SMALA 1.10.0 major refactoring
+
+main changes:
+ - the path p.1  must be written p.[1]
+ - more generally it is now possible to write p.[<expr>]
+    ex.: p.[i+1] = 10
+ - toString is a function that takes a process as 
+    argument and returns a literal string
+    ex.: string s = toString (p)
+ - string concatenation can be done with the + operator but
+    the first term must be explicitly a string
+    ex.: "foo" + p + "bar" => t
+    ex.: toString(p) + "bar" => t
+ - the comparison between processes requires an explicit
+    cast
+    ex.: &p1 == &p2
+- addchild remove
+    on écrit directement a << b
+    ou a << myfunc () // par exemple clone, ou loadFromXML
+
+- assignement sequence anonyme a->{b =: c}
+- $(expression) ====> $name_or_path
+
+pour le $
+[09:02] Mathieu MAGNAUDET
+    le principe qu'il faut faire fonctionner c'est que dans un appel de fonction les noms de composants doivent générer un get_double_value s'il n'y a pas de cast explicite donc on ne devrait pas mettre de $
+​[09:03] Mathieu MAGNAUDET
+    à l'inverse dans les constructeurs de nouveaux composants ils sont passés comme pointeurs donc si on veut la valeur il faut mettre un $
+
+
+----------------------------------------------------------------
+
+
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
 ## [1.9.0] - 2018-12-17

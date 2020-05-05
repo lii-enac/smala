@@ -54,7 +54,7 @@ Component root {
   }
 
   my_scene.$added -> (root) {
-    new_cpnt = getRef(root.my_scene.$added)
+    new_cpnt = getRef(&root.my_scene.$added)
     addChildrenTo root {
       new_cpnt.enter -> { new_cpnt =: root.toDrag }
       new_cpnt.leave -> { root.null_ref =: root.toDrag }
@@ -62,7 +62,7 @@ Component root {
   }
   
   toDrag->(toDrag) {
-    src = getRef (toDrag)
+    src = getRef (&toDrag)
     if (&src != null) {
       moveChild src >>
     }

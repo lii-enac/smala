@@ -145,6 +145,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
 {INT}                 { return Smala::Parser::make_INT (yytext, Smala::location ()); }
 "#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), Smala::location ()); }
+"0x"[0-9A-Fa-f]+      { return Smala::Parser::make_INT (hexa_filter(&yytext[1]), Smala::location ()); }
 {INT}"."{INT}         { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 {INT}"."              { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
 {NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), Smala::location ()); }

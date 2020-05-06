@@ -457,8 +457,8 @@ imperative_statement
     }
 
 imperative_assignment
-  : step EOL { lexer_expression_mode_off (); }
-  | function_call EOL
+  : step eol { lexer_expression_mode_off (); }
+  | function_call eol
     { 
       for (auto n: comp_expression) {
         driver.add_node (n);
@@ -467,7 +467,7 @@ imperative_assignment
       lexer_expression_mode_off ();
       $$ = nullptr; 
     }
-  | start_eq assignment_expression EOL
+  | start_eq assignment_expression eol
     {
       Node *n = new Node (END_SET_PROPERTY);
       driver.add_node (n);
@@ -776,7 +776,7 @@ native
     }
 
 add_child
-  : start_add assignment_expression EOL
+  : start_add assignment_expression eol
     {
       Node *n = new Node (END_ADD_CHILD);
       driver.add_node (n);
@@ -855,37 +855,37 @@ bracket
   | RB { $$ = true; }
 
 simple_process
-  : simple_process_decl arguments start_statement_list statement_list end_statement_list
+  : simple_process_decl arguments opt_eol start_statement_list statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));
     }
   }
-  | simple_process_decl arguments start_statement_list range_list end_statement_list
+  | simple_process_decl arguments opt_eol start_statement_list range_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));
     }
   }
-  | simple_process_decl arguments start_statement_list end_statement_list
+  | simple_process_decl arguments opt_eol start_statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));
     }
   }
-  | simple_process_decl start_statement_list statement_list end_statement_list
+  | simple_process_decl opt_eol start_statement_list statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));
     }
   }
-  | simple_process_decl start_statement_list end_statement_list
+  | simple_process_decl opt_eol start_statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode ($1));
     }
   }
-  | simple_process_decl arguments
+  | simple_process_decl arguments opt_eol
     {
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
         driver.add_node (new SetParentNode ($1));
@@ -896,8 +896,9 @@ simple_process
       }
       if (driver.debug()) driver.new_line();
     }
-  | simple_process_decl
+  | simple_process_decl eol
     {
+      lexer_expression_mode_off ();
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
         driver.add_node (new SetParentNode ($1));
       }
@@ -924,6 +925,14 @@ simple_process
     }
   }
 
+opt_eol
+  : %empty { lexer_expression_mode_off ();}
+  | eol { lexer_expression_mode_off ();}
+
+eol
+  : EOL
+  | eol EOL
+
 start_statement_list
   : LCB
     {
@@ -946,6 +955,7 @@ end_statement_list
 simple_process_decl
   : NAME keep NAME
     {
+      lexer_expression_mode_on ();
       Node *node = new Node (SIMPLE, $1, $3);
       node->set_keep_name ($2);
       if (root == nullptr)

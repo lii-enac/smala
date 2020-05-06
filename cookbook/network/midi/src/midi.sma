@@ -21,12 +21,13 @@ init_midi_if_not_inited ()
         std::cout << "No ports available!\n";
         return;
     }
+    std::cerr << midiout->getPortName () << std::endl;
     // Open first available port.
     midiout->openPort( 0 );
 }
 
 void
-send_midi(int command, int channel, int val1, int val2)
+send_midi(int channel, int command, int val1, int val2)
 {
     init_midi_if_not_inited ();
 
@@ -35,23 +36,35 @@ send_midi(int command, int channel, int val1, int val2)
     message[1] = val1;
     message[2] = val2;
     midiout->sendMessage( &message );
-    std::cout << command << " " << channel << " " << val1 << " " << val2 << std::endl;
-    
+    std::cout << hex << channel << " " << command << " " << val1 << " " << val2 << dec << std::endl;
 }
 
 void
 midi_cmd_2(Process* p)
 {
     Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
-    auto cmd = dynamic_cast<IntProperty*> (data->find_child("command"))->get_value ();
     auto channel = dynamic_cast<IntProperty*> (data->find_child("channel"))->get_value ();
+    auto cmd = dynamic_cast<IntProperty*> (data->find_child("command"))->get_value ();
     auto val1 = dynamic_cast<IntProperty*> (data->find_child("val1"))->get_value ();
     auto val2 = dynamic_cast<IntProperty*> (data->find_child("val2"))->get_value ();
 
-    send_midi (cmd, channel, val1, val2);
+    send_midi (channel, cmd, val1, val2);
 }
 
 %}
+
+_define_
+midi (int chan, int cmd, int v1, int v2)
+{
+    Int channel (chan)
+    Int command (cmd)
+    Int val1 (v1)
+    Int val2 (v2)
+
+    NativeAction midi_cmd_na (midi_cmd_2, this, 1)
+    Spike do_it
+    do_it -> midi_cmd_na
+}
 
 /*
 https://ccrma.stanford.edu/~craig/articles/linuxmidi/misc/essenmidi.html
@@ -89,47 +102,10 @@ command 	meaning 	                                # param
 0xFE 	    Active Sensing (Sys Realtime) 	
 0xFF
 
+Control Change:
 https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
 
-*/
+0x78: all sound off
+0x7B: all notes off
 
-_define_
-midi (int cmd, int chan, int v1, int v2)
-{
-    Int command (cmd)
-    Int channel (chan)
-    Int val1 (v1)
-    Int val2 (v2)
-
-    NativeAction midi_cmd_na (midi_cmd_2, this, 1)
-    Spike do_it
-    do_it -> midi_cmd_na
-}
-
-// attic
-/*    Int a(0)
-    NativeAction cpp_na (cpp_action, this, 1)
-
-    Int command(0x90)
-    Int channel(0)
-    Int note (64)
-    Int velocity (90)
-
-    Int val0(0)
-    Int val1(0)
-    Int val2(0)
-
-    AssignmentSequence set_note_on_values (1) {
-        channel =: val0
-        note =: val1
-        velocity =: val2
-    }
-
-    NativeAction note_on_na (note_on, this, 1)
-    Spike note_on
-    note_on->set_note_on_values
-    set_note_on_values->note_on_na
-
-    TextPrinter tp
-    val1 => tp.input
 */

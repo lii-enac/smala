@@ -9,7 +9,7 @@
 #  	Contributors:
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 
-objs_cookbook_app := src/midi.o src/main.o
+objs_cookbook_app := src/midi.o src/midi_p.o src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core comms
 libs_cookbook_app := -lrtmidi
 

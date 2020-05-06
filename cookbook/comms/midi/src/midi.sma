@@ -36,7 +36,7 @@ send_midi(int channel, int command, int val1, int val2)
     message[1] = val1;
     message[2] = val2;
     midiout->sendMessage( &message );
-    std::cout << hex << channel << " " << command << " " << val1 << " " << val2 << dec << std::endl;
+    //std::cout << hex << channel << " " << command << " " << val1 << " " << val2 << dec << std::endl;
 }
 
 void
@@ -48,7 +48,7 @@ send_midi(int channel, int command, int val1)
     message[0] = command | channel;
     message[1] = val1;
     midiout->sendMessage( &message );
-    std::cout << hex << channel << " " << command << " " << val1 << dec << std::endl;
+    //std::cout << hex << channel << " " << command << " " << val1 << dec << std::endl;
 }
 
 void

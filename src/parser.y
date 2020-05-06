@@ -281,7 +281,7 @@ program
   : preamble body
 
 preamble
-  :
+  : %empty
   | preamble use
   | preamble import
   | preamble native_code { driver.end_debug (); }
@@ -397,7 +397,7 @@ start_define
     }
 
 parameters
-  : { vector< pair<ParamType, string> > params; $$ = params; }
+  : %empty { vector< pair<ParamType, string> > params; $$ = params; }
   | parameters parameter COMMA
     {
       $1.push_back ($2);
@@ -537,7 +537,7 @@ start_eq
     }
 
 keep
-  : { $$ = 0; }
+  : %empty { $$ = 0; }
   | KEEP { $$ = 1; }
 
 break_loop
@@ -813,7 +813,7 @@ dash_array_decl
     }
 
 int_array_decl
-  :
+  : %empty
   | int_array_decl INT COMMA { int_array.push_back (std::stoi ($2)); }
   | int_array_decl INT { int_array.push_back (std::stoi ($2)); }
 
@@ -977,7 +977,7 @@ arguments
     }
 
 argument_list
-  : { $$ = 0;}
+  : %empty { $$ = 0;}
   | non_empty_argument_list { $$ = 1; }
 
 non_empty_argument_list
@@ -1478,7 +1478,7 @@ assignment_symbol
   | PAUSED_ASSIGNMENT { $$ = true; lexer_expression_mode_off (); }
 
 is_model
-  : { $$ = false; }
+  : %empty { $$ = false; }
   | COLON INT { if ($2.compare ("0") == 0) $$ = false; else $$ = true; }
 
 process_list
@@ -1570,7 +1570,7 @@ end_fsm_state
     }
 
 fsm_transition_list
-  :
+  : %empty
   | fsm_transition_list transition
 
 transition

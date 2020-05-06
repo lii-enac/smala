@@ -11,22 +11,18 @@ _main_
 Component root
 {
     Frame f ("midi", 0, 0, 500, 500)
-    Exit ex(0,1)
 
     Text _(10,20, "Press: note on - Release: note off - Drag X: pan - Drag Y: volume")
 
-    //Int toto\-titi(0)
-    //Int gfx(0)
-    //icon << gfx.Operators\-bar.Operator
+    Int channel (0)
 
-    midi all_note_off (0, 0xB0, 0x7b, 0) // doesn't seem to work with helm...
-    midi all_sound_off (0, 0xB0, 0x78, 0) // doesn't seem to work with helm...
+    midi all_note_off ($channel, 0xB0, 0x7b, 0) // working
+    midi all_sound_off ($channel, 0xB0, 0x78, 0) // working
     f.close -> all_note_off.do_it
     f.close -> all_sound_off.do_it
 
+    Exit ex(0,1)
     f.close -> ex
-
-    Int channel (0)
 
     Component C3 {
         // noteon noteoff: working

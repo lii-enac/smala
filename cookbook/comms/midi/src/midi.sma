@@ -136,4 +136,7 @@ https://www.midi.org/specifications-old/item/table-3-control-change-messages-dat
 0x78: all sound off
 0x7B: all notes off
 
+also:
+http://midi.teragonaudio.com/tech/midispec.htm
+
 */

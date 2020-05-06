@@ -39,8 +39,8 @@ Component root
         // control change: midi msg sent, and understood by midimonitor, but no change in synth ?!
         Int cc_midi_cmd(0xB0)
 
-        //Int cc_pan(0x0A)
-        Int cc_pan(0x01) // modwheel: works with dexed
+        Int cc_pan(0x0A) // works with apple internal synth
+        //Int cc_pan(0x01) // modwheel: works with dexed
         Int pan(0)
         midi_p cc_pan_cmd (channel, cc_midi_cmd, cc_pan, pan)
         127*f.move.x/f.width => pan

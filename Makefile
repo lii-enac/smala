@@ -384,8 +384,8 @@ cookbook_apps := core/bindings \
 	gui/texture \
 	gui/ms_per_frame \
 	gui/regex \
-	network/helloIvy \
-	network/midi \
+	comms/helloIvy \
+	comms/midi \
 	audio/simple_audio
 
 #	extra/crazyflie

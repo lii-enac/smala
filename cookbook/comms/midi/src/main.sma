@@ -31,8 +31,8 @@ Component root
     Component C3 {
         // noteon noteoff: working
         Rectangle r (50, 50, 50, 50)
-        midi note_on ($channel, 0x90, 64, 90)
-        midi note_off ($channel, 0x80, 64, 90)
+        midi note_on ($channel, 0x90, 60, 90)
+        midi note_off ($channel, 0x80, 60, 90)
         r.press -> note_on.do_it_2
         f.release -> note_off.do_it_2
 

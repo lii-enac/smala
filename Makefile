@@ -98,7 +98,7 @@ endif
 
 ifeq ($(os),Linux)
 CXXFLAGS +=
-CFLAGS +=  -fpic -g -MMD -Wall
+CFLAGS +=  -fpic -g -MMD
 YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
@@ -107,7 +107,7 @@ DYNLIB = -shared
 endif
 
 ifeq ($(os),Darwin)
-CFLAGS += -g -MMD -Wall
+CFLAGS += -g -MMD
 YACC = /usr/local/opt/bison/bin/bison -d -W #--report=state
 LEX = /usr/local/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
@@ -121,7 +121,7 @@ DYNLIB = -dynamiclib
 endif
 
 ifeq ($(os),MinGW)
-CFLAGS += -fpic -g -MMD -Wall
+CFLAGS += -fpic -g -MMD
 YACC = bison -d -W
 LD_LIBRARY_PATH=PATH
 debugger := gdb

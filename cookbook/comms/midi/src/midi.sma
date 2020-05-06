@@ -44,7 +44,7 @@ send_midi(int channel, int command, int val1)
 {
     init_midi_if_not_inited ();
 
-    std::vector<unsigned char> message(3);
+    std::vector<unsigned char> message(2);
     message[0] = command | channel;
     message[1] = val1;
     midiout->sendMessage( &message );

@@ -52,14 +52,18 @@ Component root
         // program change/bank select: midi msg sent, and understood by midimonitor, but no change in synth ?!
         Rectangle r2 (150, 50, 50, 50)
         Int pc_midi_cmd(0xC0)
-        //Int cc_program_change(0x00)
         Int pc(1)
         midi_p cc_pc_cmd (channel, pc_midi_cmd, pc, _val1)
         r2.release -> cc_pc_cmd.do_it_1
-        //Int cc_bank_select(0x20)
-        //Int bank(1)
-        //midi_p cc_bank_cmd (channel, cc_midi_cmd, cc_bank, bank)
-        //r2.release -> cc_bank_cmd.do_it
+
+        Int cc_bank_select_msb (0x0)
+        Int bank_msb(1)
+        midi_p bank_msb_cmd (channel, cc_midi_cmd, cc_bank_select_msb, bank_msb)
+        Int cc_bank_select_lsb (0x20)
+        Int bank_lsb(7)
+        midi_p bank_lsb_cmd (channel, cc_midi_cmd, cc_bank_select_lsb, bank_lsb)
+        r2.release -> bank_msb_cmd.do_it_2
+        r2.release -> bank_lsb_cmd.do_it_2
     }
 }
 

@@ -3,6 +3,7 @@ use base
 
 _native_code_
 %{
+extern void midi_cmd_1(Process* p);
 extern void midi_cmd_2(Process* p);
 %}
 
@@ -19,9 +20,13 @@ midi_p (Process chan, Process cmd, Process v1, Process v2)
     v1 =:> val1
     v2 =:> val2
 
-    NativeAction midi_cmd_na (midi_cmd_2, this, 1)
-    Spike do_it
-    do_it -> midi_cmd_na
+    NativeAction midi_cmd_na_2 (midi_cmd_2, this, 1)
+    Spike do_it_2
+    do_it_2 -> midi_cmd_na_2
+
+    NativeAction midi_cmd_na_1 (midi_cmd_1, this, 1)
+    Spike do_it_1
+    do_it_1 -> midi_cmd_na_1
 }
 
 // attic

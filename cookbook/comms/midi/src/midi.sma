@@ -40,6 +40,18 @@ send_midi(int channel, int command, int val1, int val2)
 }
 
 void
+send_midi(int channel, int command, int val1)
+{
+    init_midi_if_not_inited ();
+
+    std::vector<unsigned char> message(3);
+    message[0] = command | channel;
+    message[1] = val1;
+    midiout->sendMessage( &message );
+    std::cout << hex << channel << " " << command << " " << val1 << dec << std::endl;
+}
+
+void
 midi_cmd_2(Process* p)
 {
     Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
@@ -51,6 +63,18 @@ midi_cmd_2(Process* p)
     send_midi (channel, cmd, val1, val2);
 }
 
+void
+midi_cmd_1(Process* p)
+{
+    Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
+    auto channel = dynamic_cast<IntProperty*> (data->find_child("channel"))->get_value ();
+    auto cmd = dynamic_cast<IntProperty*> (data->find_child("command"))->get_value ();
+    auto val1 = dynamic_cast<IntProperty*> (data->find_child("val1"))->get_value ();
+   
+    send_midi (channel, cmd, val1);
+}
+
+
 %}
 
 _define_
@@ -61,9 +85,13 @@ midi (int chan, int cmd, int v1, int v2)
     Int val1 (v1)
     Int val2 (v2)
 
-    NativeAction midi_cmd_na (midi_cmd_2, this, 1)
-    Spike do_it
-    do_it -> midi_cmd_na
+    NativeAction midi_cmd_na_2 (midi_cmd_2, this, 1)
+    Spike do_it_2
+    do_it_2 -> midi_cmd_na_2
+
+    NativeAction midi_cmd_na_1 (midi_cmd_2, this, 1)
+    Spike do_it_1
+    do_it_1 -> midi_cmd_na_1
 }
 
 /*

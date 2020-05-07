@@ -31,6 +31,12 @@ main changes:
 - assignement sequence anonyme a->{b =: c}
 - $(expression) ====> $name_or_path
 
+- ATTNETION dump (0) plus possible => dump toto simplement
+
+ - appell a _src_ dans lambda
+
+
+
 pour le $
 [09:02] Mathieu MAGNAUDET
     le principe qu'il faut faire fonctionner c'est que dans un appel de fonction les noms de composants doivent générer un get_double_value s'il n'y a pas de cast explicite donc on ne devrait pas mettre de $

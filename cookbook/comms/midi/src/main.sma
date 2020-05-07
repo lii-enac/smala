@@ -75,8 +75,23 @@ Component root
     midi_p bank_lsb_cmd (channel, cc_midi_cmd, cc_bank_select_lsb, bank_lsb)
     // order-dependent !!
     btn_bs.click -> bank_msb_cmd.do_it_2
-    btn_bs.click -> bank_lsb_cmd.do_it_2
-    btn_bs.click -> cc_pc_cmd.do_it_1 // a bank select must be followed by a program change
+    bank_msb_cmd.do_it_2 -> bank_lsb_cmd.do_it_2
+    bank_lsb_cmd.do_it_2 -> cc_pc_cmd.do_it_1
+
+    /* ideal syntax :
+       btn_bs.click
+    -> bank_msb_cmd.do_it_2
+    -> bank_lsb_cmd.do_it_2
+    -> cc_pc_cmd.do_it_1
+
+    voire mixer des assignments:
+       btn_bs.click
+    -> bank_msb_cmd.do_it_2
+    -> bank_lsb_cmd.do_it_2
+    -> toInt(edit_box.value) =: _val1
+    -> cc_pc_cmd.do_it_1
+    */
+
 }
 
 /*

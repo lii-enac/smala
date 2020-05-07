@@ -3,51 +3,76 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-
-## IMPORTANT
-
-
--------------------------------------------------------------
-SMALA 1.10.0 major refactoring
-
-main changes:
- - the path p.1  must be written p.[1]
- - more generally it is now possible to write p.[<expr>]
-    ex.: p.[i+1] = 10
- - toString is a function that takes a process as 
-    argument and returns a literal string
-    ex.: string s = toString (p)
- - string concatenation can be done with the + operator but
-    the first term must be explicitly a string
-    ex.: "foo" + p + "bar" => t
-    ex.: toString(p) + "bar" => t
- - the comparison between processes requires an explicit
-    cast
-    ex.: &p1 == &p2
-- addchild remove
-    on écrit directement a << b
-    ou a << myfunc () // par exemple clone, ou loadFromXML
-
-- assignement sequence anonyme a->{b =: c}
-- $(expression) ====> $name_or_path
-
-- ATTNETION dump (0) plus possible => dump toto simplement
-
- - appell a _src_ dans lambda
-
-
-
-pour le $
-[09:02] Mathieu MAGNAUDET
-    le principe qu'il faut faire fonctionner c'est que dans un appel de fonction les noms de composants doivent générer un get_double_value s'il n'y a pas de cast explicite donc on ne devrait pas mettre de $
-​[09:03] Mathieu MAGNAUDET
-    à l'inverse dans les constructeurs de nouveaux composants ils sont passés comme pointeurs donc si on veut la valeur il faut mettre un $
-
-
-----------------------------------------------------------------
-
-
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
+
+## [1.10.0] - 2020-05-07
+### compliant with djnn-cpp [1.11.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW MAJOR REFACTORING - see the HowTo below
+        - Path as p.1 must be written p.[1]
+        - It is now possible to write: p.[<expr>] as 
+            ex.: p.[i+1] = 10
+        - toString is a function that takes a process as argument and returns a literal string
+            ex.: string s = toString (p)
+        - String concatenation can be done with the + operator but the first term must be explicitly a string
+            ex.: "foo" + p + "bar" => t
+            ex.: toString(p) + "bar" => t
+        - the comparison between processes requires an explicit cast
+            ex.: &p1 == &p2
+        - Addchild has been remove and replace by : <<
+            ex.: a << b
+            ex.: a << myfunc () // such as clone, or loadFromXML ...
+        - the use of "$" (get_value() of a int/bool/double property ) has changed. 
+            $(expression) is now directly written $expression.
+            ex.: $(foo.bar) ==> $foo.bar
+          The sign is not needed when it is obvious : 
+            ex.: sqrt(foo.angle)
+          But it is needed when you call constructors :
+            ex: My_rectangle rect ($foo.x, $foo.y, 100, 100)
+        - Added anonymous assignmentSequence : a -> { b =: c }
+        - (for now) the use a the "dump" function has changed. cannot specify the dump level 
+            ex.: dump foo
+        - You can ask for the source of a native action using keyword : _src_
+            ex.: rect.press -> (root) {
+                foo = _src_
+            }
+        - Improved EOL management : should use "\" sign if a instruction is write on several lines.
+        - Added support of "0x" prefix for int (hexa)
+        - (test) added new keyword : _keep_ to keep the name of a c++ variable
+
+    - NEW libsmala.dylib/so : a lib with widgets, behavior and others shared code.
+        - just start need to be fill. for now : simpleDrag, button
+    - NEW added install rule and pkg-config support for libsmala in Makefile
+    - NEW Drag'n Drop (dnd) cookbook recipe 
+    - NEW dynamic_rectangle cookbook recipe
+    - NEW midi cookbook recipe
+    - NEW brew tab for macOs
+
+
+### Changed
+    - the use of "$" (get_value() of a int/bool/double property ) has changed. 
+            $(expression) is now directly written $expression.
+            ex.: $(foo.bar) ==> $foo.bar
+          The sign is not needed when it is obvious : 
+            ex.: sqrt(foo.angle)
+          But it is needed when you call constructors :
+            ex: My_rectangle rect ($foo.x, $foo.y, 100, 100)
+    - Renamed cookbook/network ==> cookbook/comms
+    - Improved nativeaction cookbook recipe
+    - Improved editor_mode for sublime_text: toString, _src_
+    - made finalize_construction public now in class NativeExpressionAction, no need to generate it
+    - Cleaned code
+
+### Deprecated
+    - (for now) the use a the "dump" function has changed. cannot specify the dump level 
+            ex.: dump foo
+### Removed
+    - AddChild has been remove and replace by : <<
+### Fixed
+    - Fixed grammar ambiguous rules
+
 
 ## [1.9.0] - 2018-12-17
 ### compliant with djnn-cpp [1.10.0]

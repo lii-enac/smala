@@ -1100,21 +1100,26 @@ function_call
       add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
       m_in_func--;
     }
-  | TO_STRING LP name_or_path RP
+  | start_to_string name_or_path RP
   {
-    if (!m_in_for && !m_in_arguments) {
-      lexer_expression_mode_on ();
-    }
+
     TermNode* n = new TermNode (FUNCTION_CALL, "toString");
     add_term_node (driver, n, false);
     add_term_node (driver, new TermNode (SYMBOL, std::string ("(")), false);
-    n = new TermNode (VAR, new PathNode ($3));
+    n = new TermNode (VAR, new PathNode ($2));
     n->path_arg_value()->set_cast (BY_REF);
     add_term_node (driver, n, false);
     add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
     arg_expression.clear ();
     $$ = "toString";
   }
+
+start_to_string
+  : TO_STRING LP
+    {
+      if (!m_in_for && !m_in_arguments)
+        lexer_expression_mode_on ();
+    }
 
 start_function
   : NAME LP

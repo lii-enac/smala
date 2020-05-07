@@ -205,6 +205,7 @@
 %token USE "use"
 %token NULL "null"
 %token ADD_CHILDREN_TO "addChildrenTo"
+%token TO_STRING "toString"
 %token MERGE "merge"
 %token REMOVE "remove"
 %token MOVE "move"
@@ -1097,9 +1098,24 @@ function_call
       $1->set_has_arguments ($2);
       $$ = $1->str_arg_value ();
       add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
-      if ($1->str_arg_value ().compare("toString") != 0)
-        m_in_func--;
+      m_in_func--;
     }
+  | TO_STRING LP name_or_path RP
+  {
+    if (!m_in_for && !m_in_arguments) {
+      lexer_expression_mode_on ();
+    }
+    TermNode* n = new TermNode (FUNCTION_CALL, "toString");
+    add_term_node (driver, n, false);
+    add_term_node (driver, new TermNode (SYMBOL, std::string ("(")), false);
+    n = new TermNode (VAR, new PathNode ($3));
+    n->path_arg_value()->set_cast (BY_REF);
+    add_term_node (driver, n, false);
+    add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+    arg_expression.clear ();
+    $$ = "toString";
+  }
+
 start_function
   : NAME LP
     {
@@ -1120,8 +1136,7 @@ start_function
         comp_expression.push_back (lp);
       }
       arg_expression.clear ();
-      if ($1.compare("toString") != 0)
-        m_in_func++;
+      m_in_func++;
       $$ = n;
     }
 

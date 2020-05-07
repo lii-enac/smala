@@ -31,7 +31,7 @@ include config.default.mk
 
 MAJOR = 1
 MINOR = 10
-MINOR2 = 0 
+MINOR2 = 1
 
 # remove builtin rules : speed up build process and help debug
 MAKEFLAGS += --no-builtin-rules

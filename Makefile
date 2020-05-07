@@ -274,9 +274,10 @@ $(build_dir)/src/parser.cpp: src/errors.h
 # cookbook apps
 
 define cookbookapp_makerule
-libs_cookbook_app :=
 djnn_libs_cookbook_app :=
 smala_libs_cookbook_app :=
+libs_cookbook_app :=
+cppflags_cookbook_app :=
 res_dir :=
 
 include cookbook/$1/cookbook_app.mk
@@ -289,6 +290,7 @@ $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
 $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_res_dir := $$(res_dir)
+$1_app_cppflags := $$(cppflags_cookbook_app)
 
 ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
@@ -297,7 +299,7 @@ $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 ifneq ($$(smala_libs_cookbook_app),)
-CFLAGS += -I$$(build_dir)/$(smala_lib_dir)
+$1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
 $$($1_app_objs): $$(smala_lib)
 endif
@@ -308,7 +310,7 @@ $1_app_link := $$(CXX_CK)
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK)
+$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags)
 $$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 

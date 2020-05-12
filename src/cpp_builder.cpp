@@ -163,6 +163,32 @@ namespace Smala
   }
 
   std::string
+  CPPBuilder::build_path (PathNode* n)
+  {
+    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
+    std::string symbol = n_list.at (0)->get_subpath ();
+    std::string str = m_parent_list.back ()->get_symbol (symbol);
+    str += "->find_child (\"";
+    std::string pref = "";
+    for (int i = 1; i < n->get_subpath_list ().size (); i++) {
+      str += pref;
+      if (n->get_subpath_list ().at (i)->get_path_type () != EXPR)
+        str += n->get_subpath_list ().at (i)->get_subpath ();
+      else {
+        std::vector <TermNode*> terms = n->get_subpath_list ().at (i)->get_expr ();
+        if (terms.size () != 1) {
+          std::cerr << "\n\nexpression is not allowed in ivy path specification\n\n";
+          exit (1);
+        }
+        str += build_term_str (terms.at (0));
+       }
+     pref = "/";
+    }
+    str += "\")";
+    return str;
+  }
+
+  std::string
   CPPBuilder::build_find (PathNode* n, bool ignore_cast)
   {
     std::vector<SubPathNode*> n_list = n->get_subpath_list ();
@@ -172,6 +198,8 @@ namespace Smala
     std::string prefix;
     std::string symbol = n_list.at (0)->get_subpath ();
     std::string str = m_parent_list.back ()->get_symbol (symbol);
+    if (str.substr (0, 4) == "ivy_")
+      return build_path (n);
     if (!ignore_cast) {
       switch (n->get_cast ()) {
         case NO_CAST:

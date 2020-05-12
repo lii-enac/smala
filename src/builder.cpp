@@ -519,9 +519,12 @@ namespace Smala
 
     if (node->keep_name () && !node->name ().empty ())
       new_name = node->name ();
-    else
+    else {
       new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-
+      if (constructor.compare ("IvyAccess") == 0) {
+        new_name = "ivy_" + std::to_string (m_cpnt_num++);
+      }
+    }
     node->set_build_name (new_name);
     if (!node->name ().empty ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())

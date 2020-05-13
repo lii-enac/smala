@@ -168,24 +168,38 @@ namespace Smala
     std::vector<SubPathNode*> n_list = n->get_subpath_list ();
     std::string symbol = n_list.at (0)->get_subpath ();
     std::string str = m_parent_list.back ()->get_symbol (symbol);
+    if (n_list.size () == 1)
+      return str;
     str += "->find_child (\"";
     std::string pref = "";
-    for (int i = 1; i < n->get_subpath_list ().size (); i++) {
+    for (int i = 1; i < n_list.size (); i++) {
       str += pref;
-      if (n->get_subpath_list ().at (i)->get_path_type () != EXPR)
+      if (n_list.at (i)->get_path_type () != EXPR)
         str += n->get_subpath_list ().at (i)->get_subpath ();
       else {
         std::vector <TermNode*> terms = n->get_subpath_list ().at (i)->get_expr ();
-        if (terms.size () != 1) {
-          std::cerr << "\n\nexpression is not allowed in ivy path specification\n\n";
-          exit (1);
-        }
         str += build_term_str (terms.at (0));
        }
      pref = "/";
     }
     str += "\")";
     return str;
+  }
+
+  static bool
+  has_complex_term (PathNode* n)
+  {
+    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
+    for (auto n: n_list) {
+      if (n->get_path_type () == EXPR) {
+        std::vector <TermNode*> terms = n->get_expr ();
+        if (terms.size () > 1)
+          return true;
+        else if (terms.at (0)->arg_type() != VALUE)
+          return true;
+      }
+    }
+    return false;
   }
 
   std::string
@@ -195,11 +209,18 @@ namespace Smala
     if (n_list.empty ())
       return "";
 
+    std::string str;
     std::string prefix;
     std::string symbol = n_list.at (0)->get_subpath ();
-    std::string str = m_parent_list.back ()->get_symbol (symbol);
-    if (str.substr (0, 4) == "ivy_")
-      return build_path (n);
+    bool complex_term = has_complex_term (n);
+
+    /* check for complex expression in terms, if not build classic path*/
+    if (!complex_term)
+      str = build_path (n);
+    else
+      str = m_parent_list.back ()->get_symbol (symbol);
+
+
     if (!ignore_cast) {
       switch (n->get_cast ()) {
         case NO_CAST:
@@ -235,15 +256,17 @@ namespace Smala
         || str.compare (0, 4, "var_") == 0) {
       return str;
     }
-    for (auto it = n_list.begin() + 1; it != n_list.end(); ++it) {
-      if ((*it)->get_path_type () != EXPR)
-        str += "->find_child (\"" + (*it)->get_subpath () + "\")";
-      else {
-        str += "->find_child (";
-        for (auto term : (*it)->get_expr ()) {
-          str += build_term_str (term);
+    if (complex_term) {
+      for (auto it = n_list.begin() + 1; it != n_list.end(); ++it) {
+        if ((*it)->get_path_type () != EXPR)
+          str += "->find_child (\"" + (*it)->get_subpath () + "\")";
+        else {
+          str += "->find_child (";
+          for (auto term : (*it)->get_expr ()) {
+            str += build_term_str (term);
+          }
+          str += ")";
         }
-        str += ")";
       }
     }
     if (!ignore_cast) {

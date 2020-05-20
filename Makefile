@@ -557,6 +557,38 @@ $(smala_install_prefix)/bin/$(bin_name): build/$(bin_name)
 
 install: default smala_lib install_pkgconf install_headers install_libs install_bin
 
+#----------------------------------------
+# package builder
+
+#deb
+
+#note: 
+# use dpkg-depcheck -d make to find out all dependency on smala
+# last tryon ubuntu 18_04: 
+#      	bison, flex, m4
+# install with:
+#		sudo dpkg -i smala_x.x.x.deb
+# remove with:
+#		sudo dpkg -r smala
+deb_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2)
+deb_prefix = $(deb_prefix_version)/usr
+deb:	
+	make -j6  install prefix=$(deb_prefix)
+	test -d $(deb_prefix_version)/DEBIAN || mkdir -p $(deb_prefix_version)/DEBIAN
+	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' deb/control > $(deb_prefix_version)/DEBIAN/control
+# cp triggers file
+	cp deb/triggers $(deb_prefix_version)/DEBIAN/triggers
+# remove debug symbol from library
+	cd $(deb_prefix)/lib ; strip --strip-debug --strip-unneeded *.so
+	cd $(deb_prefix)/bin ; strip --strip-debug --strip-unneeded *
+# remove rpath from library
+#	cd $(deb_prefix)/lib ; chrpath -d *.so
+# build package with fakeroot
+	cd "build/deb" ; fakeroot dpkg-deb --build smala_$(MAJOR).$(MINOR).$(MINOR2)
+# check integrity of the build package. We still have error
+#	cd "build/deb" ; lintian smala_$(MAJOR).$(MINOR).$(MINOR2).deb
+.PHONY: deb
+
 # -----------
 
 test: $(cookbook_app_for_make_test)_test

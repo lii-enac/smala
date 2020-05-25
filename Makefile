@@ -372,6 +372,7 @@ cookbook_apps := core/bindings \
 	gui/mainloop \
 	gui/redisplay \
 	gui/widgets/line_edit \
+	gui/widgets/potentiometer \
 	gui/widgets/switch_range \
 	gui/widgets/button \
 	gui/widgets/checkbox \

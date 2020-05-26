@@ -517,7 +517,7 @@ pkgconfig_targets := $(addprefix $(build_dir)/, $(pkgconfig_targets))
 
 pkgconf: $(pkgconfig_targets)
 
-$(build_dir)/%.pc: %.pc.in
+$(build_dir)/%.pc: distrib/%.pc.in
 	@mkdir -p $(dir $@)
 	@sed -e 's,@PREFIX@,$(smala_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
 
@@ -577,9 +577,9 @@ deb_prefix = $(deb_prefix_version)/usr
 deb:	
 	make -j6  install prefix=$(deb_prefix)
 	test -d $(deb_prefix_version)/DEBIAN || mkdir -p $(deb_prefix_version)/DEBIAN
-	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' deb/control > $(deb_prefix_version)/DEBIAN/control
+	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' distrib/deb/control > $(deb_prefix_version)/DEBIAN/control
 # cp triggers file
-	cp deb/triggers $(deb_prefix_version)/DEBIAN/triggers
+	cp distrib/deb/triggers $(deb_prefix_version)/DEBIAN/triggers
 # remove debug symbol from library
 	cd $(deb_prefix)/lib ; strip --strip-debug --strip-unneeded *.so
 	cd $(deb_prefix)/bin ; strip --strip-debug --strip-unneeded *

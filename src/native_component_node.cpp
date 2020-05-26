@@ -18,14 +18,14 @@ namespace Smala
 {
 
   NativeComponentNode::NativeComponentNode () :
-      Node (NATIVE_ACTION_CPNT), m_function_name (""), m_path_data (nullptr), m_is_model ("1")
+      Node (NATIVE_ACTION_CPNT), m_function_name (""), m_path_data (nullptr), m_is_model ("1"), m_is_async (false)
   {
     set_djnn_type ("NativeAction");
   }
 
   NativeComponentNode::NativeComponentNode (
-      const std::string &action_name, PathNode *path, const std::string &is_model) :
-      Node (NATIVE_ACTION_CPNT), m_function_name (action_name), m_path_data (path), m_is_model (is_model)
+      const std::string &action_name, PathNode *path, const std::string &is_model, bool is_async) :
+      Node (NATIVE_ACTION_CPNT), m_function_name (action_name), m_path_data (path), m_is_model (is_model), m_is_async (is_async)
   {
     set_djnn_type ("NativeAction");
   }

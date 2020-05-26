@@ -123,6 +123,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
 "&"                   { return Smala::Parser::make_PROCESS_CAST (Smala::location()); }
 "NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
+"NativeAsyncAction"   { return Smala::Parser::make_NATIVE_ASYNC (Smala::location()); }
 "_main_"              { return Smala::Parser::make_MAIN (Smala::location ()); }
 "_define_"            { return Smala::Parser::make_DEFINE (Smala::location ()); }
 "_action_"            { return Smala::Parser::make_NATIVE_ACTION (Smala::location ()); }

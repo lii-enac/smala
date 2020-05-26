@@ -1278,7 +1278,7 @@ namespace Smala
   CPPBuilder::build_native_action_component (std::ofstream &os, Node *n)
   {
     NativeComponentNode* node = static_cast<NativeComponentNode*> (n);
-    std::string constructor = get_constructor (node->djnn_type ());
+    std::string constructor = node->is_async() ? "NativeAsyncAction" : "NativeAction";
     std::string name =
         node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));

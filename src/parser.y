@@ -214,6 +214,7 @@
 %token MAIN "_main_"
 %token DEFINE "_define_"
 %token NATIVE "NativeAction"
+%token NATIVE_ASYNC "NativeAsyncAction"
 %token NATIVE_ACTION "_action_"
 %token NATIVE_CODE "_native_code_"
 %token <string> CODE "<native code>"
@@ -229,6 +230,7 @@
 %token END 0 "end of file"
 %token <string> NAME "name"
 
+%type <bool> start_native
 %type <bool> keep
 %type <cast_type> cast
 %type <bool> bracket
@@ -760,21 +762,25 @@ remove
     }
 
 native
-  : NATIVE NAME LP NAME COMMA INT RP
+  : start_native NAME LP NAME COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, $6);
+      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, $6, $1);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
-  | NATIVE NAME LP NAME COMMA name_or_path COMMA INT RP
+  | start_native NAME LP NAME COMMA name_or_path COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), $8);
+      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), $8, $1);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
     }
+
+start_native
+  : NATIVE { $$ = false; }
+  | NATIVE_ASYNC { $$ = true; }
 
 add_child
   : start_add assignment_expression eol
@@ -1484,7 +1490,7 @@ start_lambda
       string new_name ("func_" + std::to_string (func_num++));
       SmalaNative *native = new SmalaNative (new_name, "_src_", new PathNode ($2));
       driver.add_node (native);
-      $$ = new NativeComponentNode (new_name, new PathNode ($2), "1");
+      $$ = new NativeComponentNode (new_name, new PathNode ($2), "1", 0);
     }
 
 assignment

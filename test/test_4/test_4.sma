@@ -36,7 +36,7 @@ Component root
     small->large (test.true)
   }
   fsm.state => sw.state
-  isString(fsm.state + " " + width) => tp.input
+  toString(fsm.state) + " " + toString(width) => tp.input
 }
 
 run root

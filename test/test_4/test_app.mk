@@ -11,4 +11,4 @@
 #
 
 objs_test_app := test_4.o
-djnn_libs_test_app := gui display base core
+djnn_libs_test_app := gui display base exec_env core

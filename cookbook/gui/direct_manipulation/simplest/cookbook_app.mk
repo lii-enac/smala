@@ -13,4 +13,4 @@
 #
 
 objs_cookbook_app := simplest.o
-djnn_libs_cookbook_app := gui display base exec_env core
+djnn_libs_cookbook_app := utils gui display base exec_env core

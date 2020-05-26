@@ -437,8 +437,8 @@ $1_app_link := $$(CXX)
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
-$$($1_app_objs): CFLAGS += -I$$(djnn_cflags)
-$$($1_app_exe): LDFLAGS += -L$$(djnn_ldflags)
+$$($1_app_objs): CFLAGS += $$(djnn_cflags)
+$$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$(notdir $1): $$($1_app_exe)
@@ -462,7 +462,7 @@ $$(notdir $1)_dbg_print:
 deps += $$($1_app_objs:.o=.d)
 endef
 
-test_apps := test_1 test_2 test_3 test_4
+test_apps := test_1 test_2 test_3 test_4 test_action
 
 test_apps: $(notdir $(test_apps))
 .PHONY: test_apps $(notdir $(test_apps))

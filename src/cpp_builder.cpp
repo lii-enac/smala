@@ -427,11 +427,13 @@ namespace Smala
         node->set_name (m_null_string);
       }
 
-      print_component_constructor (os, constructor);
+      //print_component_constructor (os, constructor);
+      indent (os);
+      os << "new SimpleBinding ";
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
-      os << ", " << src << ", \"\", ";
-      os << ctrl->get_in_act () << ", " << dst << ", \"\""
-          << ", " << ctrl->get_out_act () << ");\n";
+      os << ", " << src << ", "; //\"\", ";
+      os << "(activation_flag_e)" << ctrl->get_in_act () << ", " << dst //<< ", \"\""
+          << ", " << "(activation_flag_e)" << ctrl->get_out_act () << ");\n";
       m_indent--;
       indent (os);
       os << "}\n";
@@ -485,9 +487,10 @@ namespace Smala
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
-      os << "Process *" << new_name << " = new Assignment ( " << p_name
-          << ", \"\", " << arg << ", \"\","
-          << out_arg << ", \"\", "
+      os << "auto *" << new_name << " = new SimpleAssignment ( " << p_name
+          << ", "//\"\", "
+          << arg << ", "//\"\","
+          << out_arg << ", "//\"\", "
           << node->is_model () << ");\n";
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
           && node->duplicate_warning ())
@@ -501,11 +504,12 @@ namespace Smala
         if (node->is_paused ())
           os << "Paused";
         if (node->is_connector ())
-          os << "Connector (";
+          os << "SimpleConnector (";
         else
-          os << "Assignment (";
-        os << p_name << ", \"\", " <<   arg << "," << "\"\","
-                                   << out_arg << ", \"\"";
+          os << "SimpleAssignment (";
+        os << p_name << ", \"\", " <<   arg << ", " // << "\"\","
+                                   << out_arg //<< ", \"\""
+                                   ;
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
         if (node->is_connector())
           os << ", " << !node->is_model () << ");\n";
@@ -902,7 +906,7 @@ namespace Smala
       case DELETE: {
          /* delete first.second */
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-        os << "Process *" << new_name << " = " << arg << ";\n";
+        os << "auto *" << new_name << " = " << arg << ";\n";
         indent (os);
         os << "if (" << new_name << ") {\n";
         indent (os); indent (os);
@@ -943,7 +947,7 @@ namespace Smala
                 && node->duplicate_warning ())
               print_error_message (error_level::warning,
                                    "duplicated name: " + node->name (), 0);
-      os << "Process *" << var_name << " = ";
+      os << "auto *" << var_name << " = ";
     } else {
       prop_name = build_find (node->get_path(), false);
       if (prop_name.rfind ("cpnt_", 0) == 0) {
@@ -1078,7 +1082,7 @@ namespace Smala
     std::string arg = build_find (n->right_arg (), false);
     os << arg << ");\n";
     indent (os);
-    os << "Process *" << new_name << " = " << m_parent_list.back ()->name ()
+    os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
         << "->find_child ( \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\");\n";
     if (m_parent_list.back ()->add_entry (n->left_arg ()->get_subpath_list().at(0)->get_subpath(), new_name) == 1
         && node->duplicate_warning ())
@@ -1135,7 +1139,7 @@ namespace Smala
                            "duplicated name: " + node->name (), 0);
     }
     m_cur_building_name = new_name;
-    os << "Process *" << new_name << " = ";
+    os << "auto *" << new_name << " = ";
   }
 
   void
@@ -1156,7 +1160,7 @@ namespace Smala
 
     if (node->get_path()->get_subpath_list().size ()> 1) {
       indent (os);
-      os << "Process *" << new_name << " = " << s << ";\n";
+      os << "auto *" << new_name << " = " << s << ";\n";
       m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (new_name);
@@ -1423,7 +1427,7 @@ namespace Smala
       case NAME:
       case PROCESS:
       {
-        os << "djnn::Process*";
+        os << "djnn::CoreProcess*";
         break;
       }
       default:

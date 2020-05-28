@@ -52,7 +52,7 @@ send_midi(int channel, int command, int val1)
 }
 
 void
-midi_cmd_2(Process* p)
+midi_cmd_2(CoreProcess* p)
 {
     Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
     auto channel = dynamic_cast<IntProperty*> (data->find_child("channel"))->get_value ();
@@ -64,7 +64,7 @@ midi_cmd_2(Process* p)
 }
 
 void
-midi_cmd_1(Process* p)
+midi_cmd_1(CoreProcess* p)
 {
     Process *data = reinterpret_cast<Process*> (get_native_user_data (p));
     auto channel = dynamic_cast<IntProperty*> (data->find_child("channel"))->get_value ();

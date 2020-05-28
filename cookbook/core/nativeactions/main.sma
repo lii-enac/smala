@@ -27,7 +27,7 @@ cpp_action (Process c)
 	// To get the user_data:
  	Process *data = (Process*) get_native_user_data (c);
 
- 	Process *fc = data->find_child ("fc");
+ 	Process *fc = dynamic_cast<Process*>(data->find_child ("fc"));
 
     ((IntProperty*) fc->find_child ("value"))->set_value (0xFF0000, 1)  ;
 

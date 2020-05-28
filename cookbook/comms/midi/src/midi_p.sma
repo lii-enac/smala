@@ -3,8 +3,8 @@ use base
 
 _native_code_
 %{
-extern void midi_cmd_1(Process* p);
-extern void midi_cmd_2(Process* p);
+extern void midi_cmd_1(CoreProcess* p);
+extern void midi_cmd_2(CoreProcess* p);
 %}
 
 _define_

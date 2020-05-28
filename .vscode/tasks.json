@@ -15,6 +15,14 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+        {
+            "label": "cookbook_apps",
+            "type": "shell",
+            "command": "make -j cookbook_apps",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

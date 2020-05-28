@@ -719,7 +719,7 @@ namespace Smala
   {
     NativeActionNode *node = static_cast<NativeActionNode*> (n);
     os << "void\n";
-    os << node->action_name () << "(Process *" << node->param_name () << ")\n";
+    os << node->action_name () << "(CoreProcess *" << node->param_name () << ")\n";
     const std::string code = node->code ();
     if (code[0] != '{') {
       os << "{\n";
@@ -915,7 +915,7 @@ namespace Smala
         os << "if (" << new_name << "->get_parent ())\n";
         indent (os); indent (os);
         indent (os);
-        os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
+        os << new_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_name << "));\n";
         indent (os); indent (os);
         os << new_name << "->schedule_delete ();\n";
         indent (os); indent (os);
@@ -1080,7 +1080,7 @@ namespace Smala
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << n->left_arg ()->get_subpath_list().at(0)->get_subpath() << "\", ";
     std::string arg = build_find (n->right_arg (), false);
-    os << arg << ");\n";
+    os << "dynamic_cast<FatChildProcess*>(" << arg << "));\n";
     indent (os);
     os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
         << "->find_child ( \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\");\n";
@@ -1108,7 +1108,7 @@ namespace Smala
     indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
-    os << left << "->remove_child ( " << right << ");\n";
+    os << left << "->remove_child ( dynamic_cast<FatChildProcess*>(" << right << "));\n";
   }
 
   void
@@ -1120,11 +1120,11 @@ namespace Smala
     std::string left = build_find (n->left_arg (), false);
     if (n->right_arg ()) {
       std::string last = build_find (n->right_arg (), false);
-      os << left << "->get_parent ()->move_child (" << left << ", "
+      os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
               << c << ", " << last << ");\n";
     }
     else {
-      os << left << "->get_parent ()->move_child (" << left << ", "
+      os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
         << c << ", nullptr);\n";
     }
   }
@@ -1149,7 +1149,7 @@ namespace Smala
     if (parent =="nullptr")
       return;
     indent (os);
-    os << parent << "->add_child (" << child << ", \"" << name << "\");\n";
+    os << parent << "->add_child (dynamic_cast<FatChildProcess*>(" << child << "), \"" << name << "\");\n";
   }
 
   void
@@ -1370,8 +1370,8 @@ namespace Smala
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));
-    os << "\nstatic void\n" << n->fct () << " (Process* c) {\n";
-    os << "\tProcess *" << src_name << " = c->get_activation_source ();\n";
+    os << "\nstatic void\n" << n->fct () << " (CoreProcess* c) {\n";
+    os << "\tauto *" << src_name << " = c->get_activation_source ();\n";
     os << "\tProcess *" << data_name
         << " = (Process *) get_native_user_data (c);\n";
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1)

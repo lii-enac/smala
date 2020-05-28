@@ -50,7 +50,7 @@ namespace Smala
     m_ast = ast;
     m_types.clear ();
     m_parent_list.clear ();
-    m_parent_list.push_back (new BuildNode ("nullptr")); // the first parent is null
+    m_parent_list.push_back (new BuildNode (m_null_symbol)); // the first parent is null
     if (!ast.is_main ())
       build_define (prefix);
     m_filename = std::string (prefix) + ".cpp";
@@ -467,7 +467,7 @@ namespace Smala
                                          NativeExpressionNode *node)
   {
     std::string p_name =
-        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+        node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     TermNode* arg_node = node->get_expression ().at (0);
     std::string arg;
     if (arg_node->arg_type () != VAR) {
@@ -501,20 +501,25 @@ namespace Smala
         indent (os);
         std::string out_arg = build_find (e, false);
         os << "new ";
+        os << "Simple";
         if (node->is_paused ())
           os << "Paused";
         if (node->is_connector ())
-          os << "SimpleConnector (";
+          os << "Connector (";
         else
-          os << "SimpleAssignment (";
+          os << "Assignment (";
         os << p_name << ", \"\", " <<   arg << ", " // << "\"\","
                                    << out_arg //<< ", \"\""
                                    ;
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
-        if (node->is_connector())
-          os << ", " << !node->is_model () << ");\n";
-        else
-          os << ", " << node->is_model () << ");\n";
+        if (!node->is_paused ()) {
+          if(node->is_connector())
+          os << ", " << !node->is_model ();
+            else
+          os << ", " << node->is_model ();
+        }
+
+        os << ");\n";
       }
     }
   }
@@ -552,7 +557,7 @@ namespace Smala
     std::map<std::string, std::string> sym;
     std::string sym_name ("sym_" + std::to_string (m_sym_num++));
     std::string p_name =
-        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+        node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     std::vector<std::string> triggers;
     indent (os);
 
@@ -1146,7 +1151,7 @@ namespace Smala
   CPPBuilder::fetch_add_child (std::ofstream &os, const std::string &parent,
                                const std::string &child, const std::string &name)
   {
-    if (parent =="nullptr")
+    if (parent == m_null_symbol)
       return;
     indent (os);
     os << parent << "->add_child (dynamic_cast<FatChildProcess*>(" << child << "), \"" << name << "\");\n";
@@ -1297,12 +1302,12 @@ namespace Smala
     }
     indent (os);
     std::string p_name =
-        node->parent () == nullptr ? "nullptr" : node->parent ()->build_name ();
+        node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     os << "Process* " << new_name << " = new " << constructor << " (" << p_name
         << ", " << name << ", " << node->function_name () << ", ";
     std::string data;
     if (node->path_data() == nullptr)
-      data = "nullptr";
+      data = m_null_symbol;
     else
       data = build_find(node->path_data(), false);
     os << data << ", " << node->is_model () << ");\n ";

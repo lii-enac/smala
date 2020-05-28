@@ -40,7 +40,7 @@ reorder_tabs_action (Process c)
 
 	// Find the new selected tab and move it to the end of the tabs list
 	int new_selected_index = ((IntProperty*) my_tab_manager->find_child ("selected_index"))->get_value ();
-	for (Process *tab : tabs_list->children()) {
+	for (auto *tab : tabs_list->children()) {
 		int tab_index = ((IntProperty*) tab->find_child ("index"))->get_value ();
 		if (tab_index == new_selected_index) {
 			tabs_list->remove_child (tab);

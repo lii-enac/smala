@@ -95,7 +95,8 @@
   vector<NameContext*> name_context_list;
   vector<int> int_array;
   Node *cur_node, *root = nullptr;
-  bool m_in_add_children = false;
+  //bool m_in_add_children = false;
+  int m_in_add_children = 0;
   bool m_in_arguments = false;
   bool m_in_for = false;
   bool m_in_imperative = false;
@@ -1535,7 +1536,8 @@ add_children_to
     {
       driver.add_node (new Node (END_CONTAINER));
       parent_list.pop_back ();
-      m_in_add_children = false;
+      //m_in_add_children = false;
+      --m_in_add_children;
     }
 
 start_add_children_to
@@ -1546,7 +1548,8 @@ start_add_children_to
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (n);
       driver.add_node (n);
-      m_in_add_children = true;
+      //m_in_add_children = true;
+      ++m_in_add_children;
     }
 
 fsm

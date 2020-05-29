@@ -27,7 +27,7 @@ Button (Process frame, string label, double x_, double y_) {
   /*----- interface -----*/
 
   FillColor fc (50, 50, 50)
-  Rectangle r (0, 0, 100, 70, 10, 10)
+  Rectangle r (0, 0, 100, 40, 10, 10)
 
   FSM fsm {
     State idle {
@@ -42,9 +42,11 @@ Button (Process frame, string label, double x_, double y_) {
   }
 
   FillColor w (255, 255, 255)
+  TextAnchor _ (DJN_MIDDLE_ANCHOR)
   Text thisLabel (10, 10, label)
 
-  r.height / 2 =: thisLabel.y
-  //thisLabel.width + 20 =:> r.width
+  r.height / 2 + 3 =: thisLabel.y
+  thisLabel.width + 20 =:> r.width
+  r.width / 2 =:> thisLabel.x
   //thisLabel.width + 20 =:> r.width
 }

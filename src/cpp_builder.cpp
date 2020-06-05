@@ -432,8 +432,8 @@ namespace Smala
       os << "new SimpleBinding ";
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
       os << ", " << src << ", "; //\"\", ";
-      os << "(activation_flag_e)" << ctrl->get_in_act () << ", " << dst //<< ", \"\""
-          << ", " << "(activation_flag_e)" << ctrl->get_out_act () << ");\n";
+      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" )<< ", " << dst //<< ", \"\""
+          << ", " << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" ) << ");\n";
       m_indent--;
       indent (os);
       os << "}\n";

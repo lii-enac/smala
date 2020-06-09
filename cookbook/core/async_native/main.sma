@@ -52,8 +52,8 @@ Component root {
   
   FillColor fcc (#000000)
   Text explanation1 (10, 20, "Click the button to launch the async action")
-  Text explanation2 (10, 40, "the, drag the rectangle to check the application is not freezed")
-  Text explanation3 (10, 60, "When the action finished, end should appear")
+  Text explanation2 (10, 40, "then, drag the rectangle to check that the application is not freezed")
+  Text explanation3 (10, 60, "When the action is terminated, \"end\" should appear")
 
   Text t (10, 120, "")
 

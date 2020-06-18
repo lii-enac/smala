@@ -37,6 +37,8 @@ Icon (Process holder, Process _prev, int _x, int _y)
           prev.x + prev.width =:> this.x
         }
       }
+    } else {
+      this.x = 0
     }
   }
 

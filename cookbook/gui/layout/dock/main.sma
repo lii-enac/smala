@@ -114,10 +114,13 @@ Component root
         delete root.icons.[i].pos_cnt
       }
       delete item
-      setRef (&root.to_delete, null)
-      for (int j = 2; j <= $root.icons.size; j++) {
-        int prev = j - 1
-        setRef (&root.icons.[j].prev, &root.icons.[prev])
+      if ($root.icons.size > 0) {
+        setRef (&root.to_delete, null)
+        setRef (&root.icons.[1].prev, null)
+        for (int j = 2; j <= $root.icons.size; j++) {
+          int prev = j - 1
+          setRef (&root.icons.[j].prev, &root.icons.[prev])
+        }
       }
     }
   }

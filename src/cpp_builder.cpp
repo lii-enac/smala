@@ -1087,8 +1087,8 @@ namespace Smala
     std::string arg = build_find (n->right_arg (), false);
     os << "dynamic_cast<FatChildProcess*>(" << arg << "));\n";
     indent (os);
-    os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
-        << "->find_child ( \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\");\n";
+    os << "auto *" << new_name << " = dynamic_cast <FatProcess*> (" << m_parent_list.back ()->name ()
+        << "->find_child ( \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\"));\n";
     if (m_parent_list.back ()->add_entry (n->left_arg ()->get_subpath_list().at(0)->get_subpath(), new_name) == 1
         && node->duplicate_warning ())
       print_error_message (error_level::warning,

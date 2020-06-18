@@ -908,6 +908,9 @@ namespace Smala
         indent (os); indent (os);
         os << new_name << "->deactivate ();\n";
         indent (os); indent (os);
+        os << "if (" << new_name << "->get_parent ())\n";
+        indent (os); indent (os);
+        indent (os);
         os << new_name << "->get_parent ()->remove_child (" << new_name << ");\n";
         indent (os); indent (os);
         os << new_name << "->schedule_delete ();\n";

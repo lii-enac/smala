@@ -757,7 +757,7 @@ namespace Smala
 
     os << "\n";
     os << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
-    os << "\t" << native_name_struct << R"( (Process *p, const std::string &n, bool string_setter, bool isModel)
+    os << "\t" << native_name_struct << R"( (ParentProcess *p, const std::string &n, bool string_setter, bool isModel)
       : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
@@ -1189,7 +1189,7 @@ namespace Smala
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     indent (os);
-    os << "Process* " << new_name << " = new Component  (p, n);\n";
+    os << "auto* " << new_name << " = new Component  (p, n);\n";
 
     /* We make the hypothesis that "this" is the first node after _define_ thus
      * the symbols in the sym_table should be the arguments of the function.
@@ -1205,7 +1205,7 @@ namespace Smala
   CPPBuilder::build_define_node (std::ofstream &os, Node *node)
   {
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
-    os << "Process*\n" << node->name () << " (Process *p, const string &n";
+    os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
     std::vector< std::pair<ParamType, std::string> > data = node->get_args_data();
     for (int j = 0; j < data.size (); j++) {
       std::pair<ParamType, std::string> arg = data.at (j);
@@ -1303,7 +1303,7 @@ namespace Smala
     indent (os);
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
-    os << "Process* " << new_name << " = new " << constructor << " (" << p_name
+    os << "auto* " << new_name << " = new " << constructor << " (" << p_name
         << ", " << name << ", " << node->function_name () << ", ";
     std::string data;
     if (node->path_data() == nullptr)
@@ -1401,8 +1401,8 @@ namespace Smala
     os << "#pragma once\n#include <string>\n\n";
     for (int i = 0; i < m_ast.define_node_list ().size (); i++) {
       Node *def = m_ast.define_node_list ().at (i);
-      os << "djnn::Process* " << def->name ()
-          << " (djnn::Process*, const std::string &";
+      os << "djnn::ParentProcess* " << def->name ()
+          << " (djnn::ParentProcess*, const std::string &";
       for (int j = 0; j < def->args ().size (); j++) {
         std::pair<ParamType, std::string> arg = def->args ().at (j);
         os << ", ";
@@ -1443,7 +1443,7 @@ namespace Smala
   void
   CPPBuilder::print_component_decl (std::ofstream &os, const std::string &name)
   {
-    os << "Process* " << name;
+    os << "auto* " << name;
   }
 
   void

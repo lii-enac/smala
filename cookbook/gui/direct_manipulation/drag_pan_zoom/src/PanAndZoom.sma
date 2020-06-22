@@ -22,9 +22,6 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
   // Store pointer position in localRef coordinates system
   // (used by both zoom and pan management)
   ScreenToLocal s2l (localRef)
-  ScreenToLocal s2l (localRef)
-  frame.move.x =:> s2l.inX
-  frame.move.y =:> s2l.inY
 
   // Zoom management
   s2l.outX ::> transforms.rightScaleBy.cx
@@ -44,9 +41,15 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
     }
 
     State panning {
+      Double init_x (0)
+      Double init_y (0)
+      s2l.outX =: init_x
+      s2l.outY =: init_y
+      frame.move.x =:> s2l.inX
+      frame.move.y =:> s2l.inY
       // Compute added translation
-      s2l.outX - s2l.inX =:> transforms.rightTranslateBy.dx
-      s2l.outY - s2l.inY =:> transforms.rightTranslateBy.dy
+      s2l.outX - init_x =:> transforms.rightTranslateBy.dx
+      s2l.outY - init_y =:> transforms.rightTranslateBy.dy
     }
 
     idle -> pressed (bg.press)

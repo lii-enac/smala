@@ -5,6 +5,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.11.0] - 2020-06-25
+### compliant with djnn-cpp [1.12.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW supopr for the new process from djnn-cpp : totally transparent for end-user
+    - NEW Generate .deb package for ubuntu/debian
+    - NEW potentionmeter widget component into smalalib
+    - NEW cookbook using Async NativeAction
+
+### Added
+    - Added cookbook using potentionmeter
+
+### Changed
+    - IvyAcess component is now special with special constructor
+    - Improved build_find
+    - Cleaned code and cookbook
+    - Improved button design into smalalib
+
+### Fixed
+    - Fixed Pan and zoom cookbook
+    - Fixed cookbook midi
+    - Fixed a bug in cookbook dock
+
+
 ## [1.10.0] - 2020-05-07
 ### compliant with djnn-cpp [1.11.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

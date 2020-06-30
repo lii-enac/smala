@@ -429,7 +429,7 @@ namespace Smala
 
       //print_component_constructor (os, constructor);
       indent (os);
-      os << "new SimpleBinding ";
+      os << "new Binding ";
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
       os << ", " << src << ", "; //\"\", ";
       os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" )<< ", " << dst //<< ", \"\""
@@ -487,7 +487,7 @@ namespace Smala
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
-      os << "auto *" << new_name << " = new SimpleAssignment ( " << p_name
+      os << "auto *" << new_name << " = new Assignment ( " << p_name
           << ", "//\"\", "
           << arg << ", "//\"\","
           << out_arg << ", "//\"\", "
@@ -501,7 +501,6 @@ namespace Smala
         indent (os);
         std::string out_arg = build_find (e, false);
         os << "new ";
-        os << "Simple";
         if (node->is_paused ())
           os << "Paused";
         if (node->is_connector ())

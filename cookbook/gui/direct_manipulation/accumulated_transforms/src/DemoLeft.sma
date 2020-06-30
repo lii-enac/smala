@@ -77,7 +77,7 @@ DemoLeft (Process frame) {
                 frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftRotateBy.cx
                 s2l.outY ::> transforms.leftRotateBy.cy
-                frame.wheel.dy =:> transforms.leftRotateBy.da
+                frame.wheel.dy => transforms.leftRotateBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -99,7 +99,7 @@ DemoLeft (Process frame) {
                 s2l.outX ::> transforms.leftScaleBy.cx
                 s2l.outY ::> transforms.leftScaleBy.cy
                 Pow p (1.01, 0)
-                frame.wheel.dy =:> p.exponent
+                frame.wheel.dy => p.exponent
                 p.result =:> transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
             }
             off -> on (rect.enter)
@@ -121,7 +121,7 @@ DemoLeft (Process frame) {
                 frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftSkewXBy.cx
                 s2l.outY ::> transforms.leftSkewXBy.cy
-                frame.wheel.dy =:> transforms.leftSkewXBy.da
+                frame.wheel.dy => transforms.leftSkewXBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -142,7 +142,7 @@ DemoLeft (Process frame) {
                 frame.move.y =:> s2l.inY
                 s2l.outX ::> transforms.leftSkewYBy.cx
                 s2l.outY ::> transforms.leftSkewYBy.cy
-                frame.wheel.dy =:> transforms.leftSkewYBy.da
+                frame.wheel.dy => transforms.leftSkewYBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -205,7 +205,7 @@ DemoLeft (Process frame) {
                         frame.move.y =:> s2l.inY
                         s2l.outX ::> transforms.leftRotateBy.cx
                         s2l.outY ::> transforms.leftRotateBy.cy
-                        frame.wheel.dy =:> transforms.leftRotateBy.da
+                        frame.wheel.dy => transforms.leftRotateBy.da
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)
@@ -222,7 +222,7 @@ DemoLeft (Process frame) {
                         s2l.outX ::> transforms.leftScaleBy.cx
                         s2l.outY ::> transforms.leftScaleBy.cy
                         Pow p (1.01, 0)
-                        frame.wheel.dy =:> p.exponent
+                        frame.wheel.dy => p.exponent
                         p.result =:> transforms.leftScaleBy.sx, transforms.leftScaleBy.sy
                     }
                     off -> on (rect.enter)

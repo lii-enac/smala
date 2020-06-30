@@ -52,7 +52,7 @@ DemoRight (Process frame) {
             State on {
                 rect.move.local_x ::> transforms.rightRotateBy.cx
                 rect.move.local_y ::> transforms.rightRotateBy.cy
-                frame.wheel.dy =:> transforms.rightRotateBy.da
+                frame.wheel.dy => transforms.rightRotateBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -70,7 +70,7 @@ DemoRight (Process frame) {
                 rect.move.local_x ::> transforms.rightScaleBy.cx
                 rect.move.local_y ::> transforms.rightScaleBy.cy
                 Pow p (1.01, 0)
-                frame.wheel.dy =:> p.exponent
+                frame.wheel.dy => p.exponent
                 p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
             }
             off -> on (rect.enter)
@@ -88,7 +88,7 @@ DemoRight (Process frame) {
             State on {
                 rect.move.local_x ::> transforms.rightSkewXBy.cx
                 rect.move.local_y ::> transforms.rightSkewXBy.cy
-                frame.wheel.dy =:> transforms.rightSkewXBy.da
+                frame.wheel.dy => transforms.rightSkewXBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -105,7 +105,7 @@ DemoRight (Process frame) {
             State on {
                 rect.move.local_x ::> transforms.rightSkewYBy.cx
                 rect.move.local_y ::> transforms.rightSkewYBy.cy
-                frame.wheel.dy =:> transforms.rightSkewYBy.da
+                frame.wheel.dy => transforms.rightSkewYBy.da
             }
             off -> on (rect.enter)
             on -> off (rect.leave)
@@ -144,7 +144,7 @@ DemoRight (Process frame) {
                     State on {
                         rect.move.local_x ::> transforms.rightRotateBy.cx
                         rect.move.local_y ::> transforms.rightRotateBy.cy
-                        frame.wheel.dy =:> transforms.rightRotateBy.da
+                        frame.wheel.dy => transforms.rightRotateBy.da
                     }
                     off -> on (rect.enter)
                     on -> off (rect.leave)
@@ -158,7 +158,7 @@ DemoRight (Process frame) {
                         rect.move.local_x ::> transforms.rightScaleBy.cx
                         rect.move.local_y ::> transforms.rightScaleBy.cy
                         Pow p (1.01, 0)
-                        frame.wheel.dy =:> p.exponent
+                        frame.wheel.dy => p.exponent
                         p.result =:> transforms.rightScaleBy.sx, transforms.rightScaleBy.sy
                     }
                     off -> on (rect.enter)

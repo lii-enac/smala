@@ -302,6 +302,9 @@ ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
 $$($1_app_objs): $$(smala_lib)
+
+$$(notdir $1)_toto:
+	echo $$(smala_lib)
 endif
 endif
 

@@ -347,7 +347,6 @@ endef
 #find * -type d -mindepth 1 -maxdepth 2 | xargs echo
 cookbook_apps := core/bindings \
 	core/debug \
-	core/fsm_guards \
 	core/paused_control \
 	core/refproperty \
 	core/switch \

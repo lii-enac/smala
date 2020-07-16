@@ -33,10 +33,10 @@ Component root {
   Translation translation (0, 0)
 
   // Simple zoom around frame center
-  SimpleZoom zoom (frame, scaling)
+  //SimpleZoom zoom (frame, scaling)
 
   // Mouse-centered zoom
-  //MouseCenteredZoom zoom (frame, scaling, translation)
+  MouseCenteredZoom zoom (frame, scaling, translation)
 
   // Graphics
   FillColor _ (70, 70, 70)

@@ -51,7 +51,8 @@ Component root {
 
     IvyAccess ivybus ("224.1.2.3:2010", "smala", "READY")
     {
-        // define your regexs
+        // define your regexs 
+        // better to use (\\S*) than (.*) eq: "pos=(\\S*) alt=(\\S*)"
         String regex ("smala (.*)")
         //...
     }

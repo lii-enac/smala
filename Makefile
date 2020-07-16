@@ -88,6 +88,9 @@ CXX_CK := g++
 RANLIB_CK := ranlib
 SIZE_CK ?=
 endif
+else
+CC_CK := $(CC)
+CXX_CK := $(CXX)
 endif
 
 # # cross-compile support
@@ -523,7 +526,7 @@ $(foreach a,$(test_apps),$(eval $(call testapp_makerule,$a)))
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma | $(smalac)
 	@mkdir -p $(dir $@)
 	@echo smalac $<
-	$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
+	@$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 

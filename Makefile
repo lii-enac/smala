@@ -45,37 +45,82 @@ os := MinGW
 endif
 endif
 
+# ---------------------------------------
 # cross-compile support
-ifndef cross_prefix
-ifeq ($(os),Darwin)
-cross_prefix := llvm-g
+
+ifdef cross_prefix
+#cross_prefix := c
+#options: c g llvm-g i686-w64-mingw32- arm-none-eabi- em
+#/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-c
+#/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
+ifneq ($(cross_prefix),g)
+CC := $(cross_prefix)$(CC)
+CXX := $(cross_prefix)$(CXX)
+AR := $(cross_prefix)$(AR)
+RANLIB := $(cross_prefix)$(RANLIB)
+SIZE := $(cross_prefix)$(SIZE)
+else
+#temporary covid hack
+CC := gcc
+CXX := g++
+#AR := $(cross_prefix)$(AR)
+RANLIB := ranlib
+SIZE ?=
 endif
-#ifeq ($(os),Linux)
-cross_prefix := g
-#endif
-#cross_prefix := arm-none-eabi-
-#cross_prefix := em
-#cross_prefix := i686-w64-mingw32-
 endif
 
-ifndef cookbook_cross_prefix
-ifeq ($(os),Darwin)
-cookbook_cross_prefix := llvm-g
+ifdef cookbook_cross_prefix
+#cross_prefix := c
+#options: c g llvm-g i686-w64-mingw32- arm-none-eabi- em
+#/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-c
+#/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
+ifneq ($(cookbook_cross_prefix),g)
+CC_CK := $(cookbook_cross_prefix)$(CC)
+CXX_CK := $(cookbook_cross_prefix)$(CXX)
+AR_CK := $(cookbook_cross_prefix)$(AR)
+RANLIB_CK := $(cookbook_cross_prefix)$(RANLIB)
+SIZE_CK := $(cookbook_cross_prefix)$(SIZE)
+else
+#temporary covid hack
+CC_CK := gcc
+CXX_CK := g++
+#AR := $(cross_prefix)$(AR)
+RANLIB_CK := ranlib
+SIZE_CK ?=
 endif
-#ifeq ($(os),Linux)
-cookbook_cross_prefix := g
-#endif
-#cross_prefix := arm-none-eabi-
-#cross_prefix := em
-#cross_prefix := i686-w64-mingw32-
 endif
+
+# # cross-compile support
+# ifndef cross_prefix
+# ifeq ($(os),Darwin)
+# cross_prefix := llvm-g
+# endif
+# #ifeq ($(os),Linux)
+# cross_prefix := g
+# #endif
+# #cross_prefix := arm-none-eabi-
+# #cross_prefix := em
+# #cross_prefix := i686-w64-mingw32-
+# endif
+
+# ifndef cookbook_cross_prefix
+# ifeq ($(os),Darwin)
+# cookbook_cross_prefix := llvm-g
+# endif
+# #ifeq ($(os),Linux)
+# cookbook_cross_prefix := g
+# #endif
+# #cross_prefix := arm-none-eabi-
+# #cross_prefix := em
+# #cross_prefix := i686-w64-mingw32-
+# endif
 
 lib_smala_name = libsmala
 
-CC := $(cross_prefix)cc
-CXX := $(cross_prefix)++
-CC_CK := $(cookbook_cross_prefix)cc
-CXX_CK := $(cookbook_cross_prefix)++
+#CC := $(cross_prefix)cc
+#CXX := $(cross_prefix)++
+#CC_CK := $(cookbook_cross_prefix)cc
+#CXX_CK := $(cookbook_cross_prefix)++
 CFLAGS += -g -MMD
 CXXFLAGS += $(CFLAGS) -std=c++14
 #LIBS ?=
@@ -190,7 +235,7 @@ $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(smalac): CFLAGS = $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
-$(smalac): CXX = $(cross_prefix)++
+#$(smalac): CXX = $(cross_prefix)++
 $(smalac): LDFLAGS = $(SC_LDFLAGS)
 
 # ------------
@@ -319,6 +364,8 @@ $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
+
+$$(notdir $1)_objs: $$($1_app_objs)
 
 $$(notdir $1): $$($1_app_exe)
 

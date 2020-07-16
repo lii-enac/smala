@@ -1,5 +1,17 @@
 # usage :
 #
+# add this to config.mk in djnn-cpp/:
+# crazyflie_firmware_dir := ../../apps/crazyflie-push-demo/crazyflie-firmware
+# #include src/exec_env/crazyflie/not-a-djnn-lib.mk
+# djnn_libs := core base exec_env
+# os := crazyflie
+# cross_prefix := arm-none-eabi-
+# display :=
+# graphics :=
+#
+# then in djnn-cpp/:
+# make -j static
+#
 # add this to config.mk in smala/:
 # cookbook_apps_extra := extra/crazyflie_drone_app
 # cookbook_app_for_make_test := crazyflie_drone_app
@@ -9,7 +21,13 @@
 # then in smala/:
 # make -j crazyflie_drone_app_objs
 #
+# clone https://github.com/ataffanel/crazyflie-push-demo
+# apply the diff in crazyflie-push-demo.diff
+# then:
+# make -j && make cload
 #
+# git diff fabc98587e82a0408057247758899afe5902275f > diff
+# git diff fabc98587e82a0408057247758899afe5902275f > ../../djnn/smala/cookbook/extra/crazyflie_drone_app/crazyflie-push-demo.diff
 
 objs_cookbook_app := crazyflie_drone_app.o #fake_main.o
 djnn_libs_cookbook_app := crazyflie

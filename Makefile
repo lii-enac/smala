@@ -325,6 +325,7 @@ define cookbookapp_makerule
 djnn_libs_cookbook_app :=
 smala_libs_cookbook_app :=
 libs_cookbook_app :=
+cflags_cookbook_app :=
 cppflags_cookbook_app :=
 res_dir :=
 
@@ -339,6 +340,7 @@ $1_app_objs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_objs))
 $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_res_dir := $$(res_dir)
 $1_app_cppflags := $$(cppflags_cookbook_app)
+$1_app_cflags := $$(cflags_cookbook_app)
 
 ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
@@ -361,7 +363,7 @@ $1_app_link := $$(CXX_CK)
 $$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags)
+$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
 $$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
@@ -458,7 +460,7 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 
 
 # -----------
-# cookbook apps
+# test apps
 
 define testapp_makerule
 libs_test_app :=

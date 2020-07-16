@@ -38,7 +38,7 @@ freertos_dir := $(crazyflie_firmware_dir)/vendor/FreeRTOS
 freertos_config_dir := $(crazyflie_firmware_dir)/src/config
 freertos_layers_dir := $(crazyflie_firmware_dir)/src
 
-CFLAGS += -I$(freertos_dir)/include \
+cflags_cookbook_app += -I$(freertos_dir)/include \
 	-I$(freertos_dir)/portable/GCC/ARM_CM4F \
 	-I$(freertos_config_dir) \
 	-I$(freertos_layers_dir)/drivers/interface \
@@ -47,32 +47,32 @@ CFLAGS += -I$(freertos_dir)/include \
 	-I$(freertos_layers_dir)/modules/interface
 
 #freetos-cxx11
-CXXFLAGS += -include $(djnn_path)/src/exec_env/freertos/ext/freertos-cxx11/freertos-cxx11-macros.h
-CXXFLAGS += -I$(djnn_path)/src/exec_env/freertos/ext/freertos-cxx11
+cppflags_cookbook_app += -include $(djnn_path)/src/exec_env/freertos/ext/freertos-cxx11/freertos-cxx11-macros.h
+cppflags_cookbook_app += -I$(djnn_path)/src/exec_env/freertos/ext/freertos-cxx11
 
 # crazyflie
-CFLAGS += -DSTM32F40_41xxx
-CFLAGS += -I$(crazyflie_firmware_dir)/src/lib/CMSIS/STM32F4xx/Include
-CFLAGS += -I$(crazyflie_firmware_dir)/vendor/CMSIS/CMSIS/Include/
-CFLAGS += -mfp16-format=ieee -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
-#CFLAGS += -pie
-CFLAGS += -fexceptions
-CFLAGS += -ffunction-sections -fdata-sections
-CFLAGS += -fno-math-errno -fno-strict-aliasing -Wdouble-promotion
+cflags_cookbook_app += -DSTM32F40_41xxx
+cflags_cookbook_app += -I$(crazyflie_firmware_dir)/src/lib/CMSIS/STM32F4xx/Include
+cflags_cookbook_app += -I$(crazyflie_firmware_dir)/vendor/CMSIS/CMSIS/Include/
+cflags_cookbook_app += -mfp16-format=ieee -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+#cflags_cookbook_app += -pie
+cflags_cookbook_app += -fexceptions
+cflags_cookbook_app += -ffunction-sections -fdata-sections
+cflags_cookbook_app += -fno-math-errno -fno-strict-aliasing -Wdouble-promotion
 #CFLAGS += -fpic
 
 #boost
-CXXFLAGS += -I/usr/local/include
+cppflags_cookbook_app += -I/usr/local/include
 
 # djnn
-CFLAGS += -DDJNN_CRAZYFLIE
-CFLAGS += -DDJNN_NO_DEBUG
-CFLAGS += -DDJNN_NO_SERIALIZE
-CFLAGS += -DRMT_ENABLED=0
+cflags_cookbook_app += -DDJNN_CRAZYFLIE
+cflags_cookbook_app += -DDJNN_NO_DEBUG
+cflags_cookbook_app += -DDJNN_NO_SERIALIZE
+cflags_cookbook_app += -DRMT_ENABLED=0
 #CXXFLAGS += $(CFLAGS)
 #CXXFLAGS += -DDJNN_NO_DYNAMIC_CAST
-CXXFLAGS += -DDJNN_USE_FREERTOS
+cppflags_cookbook_app += -DDJNN_USE_FREERTOS
 #CXXFLAGS += -DDJNN_USE_FREERTOS_MAINLOOP
-CXXFLAGS += -DDJNN_USE_STD_THREAD=1
-CXXFLAGS += --rtti #--rtti_data
-CXXFLAGS += -Wno-psabi #https://stackoverflow.com/a/48149400
+cppflags_cookbook_app += -DDJNN_USE_STD_THREAD=1
+cppflags_cookbook_app += --rtti #--rtti_data
+cppflags_cookbook_app += -Wno-psabi #https://stackoverflow.com/a/48149400

@@ -30,7 +30,7 @@ setpoint_t setpoint;
 void
 hover(CoreProcess* p)
 {
-    float velFront=0, velSide=0, height=0.2;
+    float velFront=0, velSide=0, height=0.5;
     setHoverSetpoint(&setpoint, velFront, velSide, height, 0);
     commanderSetSetpoint(&setpoint, 3);
     //DEBUG_PRINT("hover\n");
@@ -51,7 +51,7 @@ _define_
 crazyflie_drone_app()
 {
     NativeAction hover_na (hover, this, 1)
-    NativeAction stop_hover_na (hover, this, 1)
+    NativeAction stop_hover_na (stop_hover, this, 1)
     FSM truc {
         State idle {
             Timer t(3000)

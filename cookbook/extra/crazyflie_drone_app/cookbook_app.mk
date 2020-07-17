@@ -27,7 +27,6 @@
 # then:
 # make -j && make cload
 #
-# git diff fabc98587e82a0408057247758899afe5902275f > diff
 # git diff fabc98587e82a0408057247758899afe5902275f > ../../djnn/smala/cookbook/extra/crazyflie_drone_app/crazyflie-push-demo.diff
 
 objs_cookbook_app := crazyflie_drone_app.o #fake_main.o

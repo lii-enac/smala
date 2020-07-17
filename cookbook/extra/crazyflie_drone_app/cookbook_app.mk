@@ -19,6 +19,7 @@
 # crazyflie_firmware_dir := ../../apps/crazyflie-push-demo/crazyflie-firmware
 #
 # then in smala/:
+# make -j
 # make -j crazyflie_drone_app_objs
 #
 # clone https://github.com/ataffanel/crazyflie-push-demo
@@ -32,6 +33,8 @@
 objs_cookbook_app := crazyflie_drone_app.o #fake_main.o
 djnn_libs_cookbook_app := crazyflie
 #smala_libs_cookbook_app := smala
+
+cppflags_cookbook_app += -Wno-psabi #https://stackoverflow.com/a/48149400
 
 # freertos
 freertos_dir := $(crazyflie_firmware_dir)/vendor/FreeRTOS

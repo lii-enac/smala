@@ -177,6 +177,11 @@ lib_suffix =.dll
 DYNLIB = -shared
 endif
 
+
+ifeq ($(cookbook_cross_prefix),arm-none-eabi-)
+CXXFLAGS_CK += -Wno-psabi #https://stackoverflow.com/a/48149400
+endif
+
 ifeq ($(cookbook_cross_prefix),em)
 #os := em
 EXE := .html

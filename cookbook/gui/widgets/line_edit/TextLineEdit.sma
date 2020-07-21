@@ -162,13 +162,13 @@
     State idle
     State edit {
       FSM fsm_leave {
-        State in
+        State st_in
         State out {
           Spike end_edit
           f.press->end_edit
         }
-        in->out (bkg.leave)
-        out->in (bkg.enter)
+        st_in->out (bkg.leave)
+        out->st_in (bkg.enter)
       }
     }
     State leave

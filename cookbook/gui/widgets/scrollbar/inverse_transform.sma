@@ -17,9 +17,9 @@ use base
 
 
 _define_
-forward_transform(Process transform, Process in, Process x, Process y) { // WARNING: not tested
-	( (in * transform.s) + transform.tx ) * transform.cosa =:> x
-	( (in * transform.s) + transform.ty ) * transform.sina =:> y
+forward_transform(Process transform, Process _in, Process x, Process y) { // WARNING: not tested
+	( (_in * transform.s) + transform.tx ) * transform.cosa =:> x
+	( (_in * transform.s) + transform.ty ) * transform.sina =:> y
 }
 
 _define_

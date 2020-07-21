@@ -16,6 +16,6 @@ use core
 use base
 
 _define_
-clamp(Process in, Process min, Process max, Process out) {
-	(in < min) ? min : ( in > max ? max : in) =:> out
+clamp(Process _in, Process min, Process max, Process out) {
+	(_in < min) ? min : ( _in > max ? max : _in) =:> out
 }

@@ -49,12 +49,12 @@ Component root
       State out {
         dark =: fc_trash.value
       }
-      State in {
+      State st_in {
         light =: fc_trash.value
         icon.release->s_delete
       }
-      out->in (icon.enter)
-      in->out (icon.leave)
+      out->st_in (icon.enter)
+      st_in->out (icon.leave)
     }
   }
   Mobile mob (selected, f, 100, 100) 

@@ -25,7 +25,7 @@ list_action (list l, Process c)
   Process *data = (Process*) get_native_user_data (c);
   for (auto e: l) {
     double w = ((AbstractProperty*)e->find_child("width"))->get_double_value ();
-    ((DoubleProperty*)e->find_child("width"))->set_value (w - 5, true);
+    ((DoubleProperty*)e->find_child("width"))->set_value (w + 5, true);
   }
 %}
 
@@ -43,7 +43,7 @@ Component root {
     f.height =:> bkg.height
 	FillColor fcc (#FFFFFF)
     Text explanation1 (10, 20, "Select rectangles by clicking on them")
-    Text explanation2 (10, 40, "Click on the Action button to resize them")
+    Text explanation2 (10, 40, "Click on the Increase/Decrease buttons to increase/decrease their size")
     Text explanation3 (10, 60, "Unselect them by clicking on the Clear button")
 
 	FillColor _ (#FF0000)
@@ -54,8 +54,9 @@ Component root {
 	Rectangle blue (350, 400, 100, 100, 0, 0)
     FillColor _ (#000000)
    
-    Button act (f, "Action", 200, 150)
-    Button clear (f, "Clear", 300, 150)
+    Button inc (f, "Increase", 50, 150)
+    Button dec (f, "Decrease", 150, 150)
+    Button clear (f, "Clear", 250, 150)
 
     ProcessCollector collection
     red.press->{red =: collection.add}
@@ -64,6 +65,11 @@ Component root {
     clear.click->collection.rm_all
 
     NativeCollectionAction coll_act (list_action, collection, 1)
-    act.click->coll_act
+    inc.click->coll_act
+    dec.click->(collection) {
+      forevery r in collection {
+        r.width = r.width - 5
+      }
+    }
 }
 

@@ -23,8 +23,8 @@ namespace Smala {
   CPPTypeManager::CPPTypeManager () : TypeManager ()
   {
     type_entry coreGS[] = {
-      {"syshook", "mainloop"},
-      {"mainloop", "mainloop"},
+      {"syshook", "(&MainLoop::instance ())"},
+      {"mainloop", "(&MainLoop::instance ())"},
       {"0", "0"}
     };
     coreGlobalSymbols = coreGS;

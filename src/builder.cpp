@@ -181,28 +181,29 @@ namespace Smala
     switch (node->node_type ())
       {
       case START_MAIN:
-        {
-          build_main_node (os);
-          break;
-        }
+      {
+        build_main_node (os);
+        break;
+      }
       case START_DEFINE:
-        {
-          build_define_node (os, node);
-          break;
-        }
+      {
+        build_define_node (os, node);
+        break;
+      }
       case START_ELSE:
-        {
-          indent  (os);
-          os << "else {\n";
-          m_indent++;
-          break;
-        }
+      {
+        push_ctxt ();
+        indent  (os);
+        os << "else {\n";
+        m_indent++;
+        break;
+      }
       case START_ELSEIF:
-        {
-           indent  (os);
-           os << "else ";
-           break;
-        }
+      {
+        indent  (os);
+        os << "else ";
+        break;
+      }
       case START_IF:
       {
         push_ctxt ();
@@ -256,12 +257,12 @@ namespace Smala
         break;
       }
       case END_CONTAINER:
-        {
-          BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-          m_parent_list.pop_back ();
-          if (n) delete n;
-          break;
-        }
+      {
+        BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+        m_parent_list.pop_back ();
+        if (n) delete n;
+        break;
+      }
       case END_MAIN:
       {
         build_end_main (os, node);
@@ -288,181 +289,180 @@ namespace Smala
         break;
       }
       case SMALA_NATIVE:
-        {
-          m_in_native_action = true;
-          build_smala_native (os, node);
-          break;
-        }
+      {
+        m_in_native_action = true;
+        build_smala_native (os, node);
+        break;
+      }
       case END_NATIVE:
-        {
-          os << "}\n\n";
-          BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-          m_parent_list.pop_back ();
-          if (n) delete n;
-          m_in_native_action = false;
-          break;
-        }
+      {
+        os << "}\n\n";
+        BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+        m_parent_list.pop_back ();
+        if (n) delete n;
+        m_in_native_action = false;
+        break;
+      }
       case NATIVE_EXPRESSION:
       {
         build_native_expression_node (os, node);
         break;
       }
       case INSTRUCTION:
-        {
-          build_instruction (os, node);
-          break;
-        }
+      {
+        build_instruction (os, node);
+        break;
+      }
       case SET_PROPERTY:
-        {
-          set_property (os, node);
-          break;
-        }
+      {
+        set_property (os, node);
+        break;
+      }
       case END_SET_PROPERTY:
-        {
-          end_set_property (os, node);
-          break;
-        }
+      {
+        end_set_property (os, node);
+        break;
+      }
       case END_PROPERTY:
-        {
-          end_property (os, node);
-          break;
-        }
+      {
+        end_property (os, node);
+        break;
+      }
       case GET_PROPERTY:
-        {
-          get_property (os, node);
-          break;
-        }
+      {
+        get_property (os, node);
+         break;
+      }
       case ALIAS:
-        {
-          alias (os, node);
-          break;
-        }
+      {
+        alias (os, node);
+        break;
+      }
       case MERGE:
-        {
-          merge (os, node);
-          break;
-        }
+      {
+        merge (os, node);
+        break;
+      }
       case REMOVE:
-        {
-          remove (os, node);
-          break;
-        }
+      {
+        remove (os, node);
+        break;
+      }
       case MOVE_FIRST:
-        {
-          move (os, node, "FIRST");
-          break;
-        }
+      {
+        move (os, node, "FIRST");
+        break;
+      }
       case MOVE_BEFORE:
-        {
-          move (os, node, "BEFORE");
-          break;
-        }
+      {
+        move (os, node, "BEFORE");
+        break;
+      }
       case MOVE_AFTER:
-        {
-          move (os, node, "AFTER");
-          break;
-        }
-
+      {
+        move (os, node, "AFTER");
+        break;
+      }
       case MOVE_END:
-        {
-          move (os, node, "LAST");
-          break;
-        }
+      {
+        move (os, node, "LAST");
+        break;
+      }
       case END_ASSIGNMENT:
       {
         os << ";\n";
         break;
       }
       case ADD_CHILD:
-        {
-          add_child (os, node);
-          break;
-        }
+      {
+        add_child (os, node);
+        break;
+      }
       case END_ADD_CHILD:
-        {
-          os << ";\n";
-          indent (os);
-          os << m_parent_list.back ()->name () << "->add_child (" << m_cur_building_name << ", \""
-             <<  m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
-          break;
-        }
+      {
+        os << ";\n";
+        indent (os);
+        os << m_parent_list.back ()->name () << "->add_child (" << m_cur_building_name << ", \""
+           <<  m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
+        break;
+      }
       case ADD_CHILDREN_TO:
-        {
-          add_children_to (os, node);
-          break;
-        }
+      {
+        add_children_to (os, node);
+        break;
+      }
       case FSM:
-        {
-          std::string new_name = build_simple_node (os, node);
-          m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
-          break;
-        }
+      {
+        std::string new_name = build_simple_node (os, node);
+        m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        break;
+      }
       case SET_PARENT:
-        {
-          //BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-          //m_parent_list.pop_back ();
-          //if (n) delete n;
-          SetParentNode* spn = static_cast<SetParentNode*> (node);
-          std::string parent;
-          parent = m_parent_list.back()->name ();
-          std::string name = spn->to_attach()->name();
-          if (name == "_")
-            name = "";
-          fetch_add_child (os, parent, spn->to_attach()->build_name(), name);
-          break;
-        }
+      {
+        //BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+        //m_parent_list.pop_back ();
+        //if (n) delete n;
+        SetParentNode* spn = static_cast<SetParentNode*> (node);
+        std::string parent;
+        parent = m_parent_list.back()->name ();
+        std::string name = spn->to_attach()->name();
+        if (name == "_")
+          name = "";
+        fetch_add_child (os, parent, spn->to_attach()->build_name(), name);
+        break;
+      }
       case CONTROL:
-        {
-          build_control_node (os, node);
-          break;
-        }
+      {
+        build_control_node (os, node);
+        break;
+      }
       case SIMPLE:
-        {
-          build_simple_node (os, node);
-          break;
-        }
+      {
+        build_simple_node (os, node);
+        break;
+      }
       case THIS:
-        {
-          build_this_node (os, node);
-          break;
-        }
+      {
+        build_this_node (os, node);
+        break;
+      }
       case TRANSITION:
-        {
-          build_transition_node (os, node);
-          break;
-        }
+      {
+        build_transition_node (os, node);
+        break;
+      }
       case CONTAINER:
-        {
-          std::string new_name = build_simple_node (os, node);
-          m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
-          break;
-        }
+      {
+        std::string new_name = build_simple_node (os, node);
+        m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        break;
+      }
       case LAMBDA:
-        {
-          build_native_action_component (os, node);
-          break;
-        }
+      {
+        build_native_action_component (os, node);
+        break;
+      }
       case NATIVE_ACTION_CPNT:
       {
         build_native_action_component (os, node);
         break;
       }
       case TERM_NODE:
-        {
-          build_term_node (os, node);
-          break;
-        }
+      {
+        build_term_node (os, node);
+        break;
+      }
       case NATIVE_CODE:
-        {
-          NativeCodeNode *n = static_cast<NativeCodeNode*> (node);
-          os << n->code () << std::endl;
-          break;
-        }
+      {
+        NativeCodeNode *n = static_cast<NativeCodeNode*> (node);
+        os << n->code () << std::endl;
+        break;
+      }
       case NEW_LINE:
-        {
-          build_new_line (os, static_cast<NewLineNode*> (node));
-          break;
-        }
+      {
+        build_new_line (os, static_cast<NewLineNode*> (node));
+        break;
+      }
       case NEW_VAR:
       {
         NewVarNode *n = static_cast<NewVarNode*> (node);
@@ -496,10 +496,10 @@ namespace Smala
         break;
       }
       case DASH_ARRAY:
-        {
-          build_dash_array (os, static_cast<DashArrayNode*> (node));
-          break;
-        }
+      {
+        build_dash_array (os, static_cast<DashArrayNode*> (node));
+        break;
+      }
       case RANGE:
       {
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));

@@ -49,7 +49,7 @@ Component root
     t = getRef (&root.f.touches.$removed)
     setRef (&root.d_touch.key, &t)
     p = getRef (&root.d_touch.value)
-    run root.d_touch.delete
+    run root.d_touch.del
     delete p
   }
 }

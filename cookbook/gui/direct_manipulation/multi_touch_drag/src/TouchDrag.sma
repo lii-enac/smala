@@ -58,7 +58,7 @@ TouchDrag (Process _frame, Process _shape, Process transforms) {
     if (t.id == this.activeTouchData.touchId) {
       setRef (&this.d_touch.key, &t)
       p = getRef (&this.d_touch.value)
-      run this.d_touch.delete
+      run this.d_touch.del
       delete p
       this.activeTouchData.touchId = 0
       run this.activeTouchData.released

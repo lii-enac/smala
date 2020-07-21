@@ -1,39 +1,39 @@
 /*
- *	djnn Smala compiler
+ *  djnn Smala compiler
  *
- *	The copyright holders for the contents of this file are:
- *		Ecole Nationale de l'Aviation Civile, France (2020)
- *	See file "license.terms" for the rights and conditions
- *	defined by copyright holders.
+ *  The copyright holders for the contents of this file are:
+ *    Ecole Nationale de l'Aviation Civile, France (2020)
+ *  See file "license.terms" for the rights and conditions
+ *  defined by copyright holders.
  *
  *
- *	Contributors:
- *		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+ *  Contributors:
+ *    Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
  *
  */
 
-use core
-use base
-use display
-use gui
+ use core
+ use base
+ use display
+ use gui
 
-import gui.widgets.Button
+ import gui.widgets.Button
 
-_action_
-list_action (list l, Process c)
-%{
+ _action_
+ list_action (list l, Process c)
+ %{
   Process *data = (Process*) get_native_user_data (c);
   for (auto e: l) {
     double w = ((AbstractProperty*)e->find_child("width"))->get_double_value ();
     ((DoubleProperty*)e->find_child("width"))->set_value (w + 5, true);
   }
-%}
+  %}
 
 
-_main_
-Component root {
+  _main_
+  Component root {
 
-	Frame f ("f", 0, 0, 500, 600)
+    Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
     NoOutline _
@@ -41,28 +41,58 @@ Component root {
     Rectangle bkg (0, 0, 0, 0, 0, 0)
     f.width =:> bkg.width
     f.height =:> bkg.height
-	FillColor fcc (#FFFFFF)
-    Text explanation1 (10, 20, "Select rectangles by clicking on them")
+    FillColor fcc (#FFFFFF)
+    Text explanation1 (10, 20, "Select/unselect rectangles by clicking on them")
     Text explanation2 (10, 40, "Click on the Increase/Decrease buttons to increase/decrease their size")
-    Text explanation3 (10, 60, "Unselect them by clicking on the Clear button")
+    Text explanation3 (10, 60, "Unselect all by clicking on the Clear button")
 
-	FillColor _ (#FF0000)
-	Rectangle red (50, 400, 100, 100, 0, 0)
-	FillColor _ (#00FF00)
-	Rectangle green (200, 400, 100, 100, 0, 0)
-	FillColor _ (#0000FF)
-	Rectangle blue (350, 400, 100, 100, 0, 0)
-    FillColor _ (#000000)
-   
+    Int select (##28F0FA)
+    Int unselect (#0A0A0A)
+
+    OutlineWidth _ (4)
+    List rectangles {
+      Component _ {
+        FillColor _ (#FF0000)
+        OutlineColor oc ($unselect)
+        Rectangle rec (50, 400, 100, 100, 0, 0)
+      }
+      Component _ {
+        FillColor _ (#00FF00)
+        OutlineColor oc ($unselect)
+        Rectangle rec (200, 400, 100, 100, 0, 0)
+      }
+      Component _ {
+        FillColor _ (#0000FF)
+        OutlineColor oc ($unselect)
+        Rectangle rec (350, 400, 100, 100, 0, 0)
+        
+      }
+    }
     Button inc (f, "Increase", 50, 150)
     Button dec (f, "Decrease", 150, 150)
     Button clear (f, "Clear", 250, 150)
 
+    Spike rm_all
     ProcessCollector collection
-    red.press->{red =: collection.add}
-    green.press->{green =: collection.add}
-    blue.press->{blue =: collection.add}
-    clear.click->collection.rm_all
+    forevery r in rectangles {
+      addChildrenTo r {
+        FSM fsm {
+          State unselected {
+            unselect =: r.oc.value
+            r.rec =: collection.rm
+          }
+          State selected {
+            select =: r.oc.value
+            r.rec =: collection.add
+          }
+          unselected->selected (r.rec.press)
+          selected->unselected (r.rec.press)
+          selected->unselected (rm_all)
+        }
+      }
+    }
+
+    clear.click->collection.rm_all, rm_all
 
     NativeCollectionAction coll_act (list_action, collection, 1)
     inc.click->coll_act
@@ -71,5 +101,5 @@ Component root {
         r.width = r.width - 5
       }
     }
-}
+  }
 

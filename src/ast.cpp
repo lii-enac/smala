@@ -91,7 +91,17 @@ void
 Ast::add_native_action (const std::string &action_name, const std::string &param_name, const std::string &code)
 {
   NativeActionNode *node = new NativeActionNode (action_name, param_name, code);
-  m_native_list.push_back (node);
+  //m_native_list.push_back (node);
+  if (m_in_preamble)
+    m_preamble.add_node (node);
+  else
+    add_node (node);
+}
+
+void
+Ast::add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
+{
+  NativeCollectionActionNode *node = new NativeCollectionActionNode (action_name, list_name, param_name, code);
   if (m_in_preamble)
     m_preamble.add_node (node);
   else
@@ -112,19 +122,12 @@ void
 Ast::add_native_expression (NativeExpressionNode *node)
 {
   m_native_expression_list.push_back (node);
-  //m_preamble.add_node (node);
 }
 
 const std::vector<Node*>&
 Ast::node_list () const
 {
   return m_node_list;
-}
-
-const std::vector<NativeActionNode*>
-Ast::native_list () const
-{
-  return m_native_list;
 }
 
 const std::vector<Node*>

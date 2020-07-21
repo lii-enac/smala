@@ -21,6 +21,7 @@
 #include "cpp_type_manager.h"
 #include "for_node.h"
 #include "transition_node.h"
+#include "native_collection_action_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -736,6 +737,23 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_native_collection_action (std::ofstream &os, Node *n)
+  {
+    NativeCollectionActionNode *node = static_cast<NativeCollectionActionNode*> (n);
+    os << "static void\n";
+    os << node->action_name () << "(CoreProcess *" << node->param_name () << ", std::vector<CoreProcess*> " << node->list_name() << ")\n";
+    const std::string code = node->code ();
+    if (code[0] != '{') {
+      os << "{\n";
+    }
+    os << code;
+    if (code[code.length () - 1] != '}') {
+      os << "}";
+    }
+    os << std::endl;
+  }
+
+  void
   CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
   {
     NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
@@ -1289,7 +1307,18 @@ namespace Smala
   CPPBuilder::build_native_action_component (std::ofstream &os, Node *n)
   {
     NativeComponentNode* node = static_cast<NativeComponentNode*> (n);
-    std::string constructor = node->is_async() ? "NativeAsyncAction" : "NativeAction";
+    native_type type = node->get_native_type();
+    std::string constructor;
+    switch (type) {
+      case SIMPLE_ACTION:
+        constructor = "NativeAction";
+        break;
+      case ASYNC_ACTION:
+        constructor = "NativeAsyncAction";
+        break;
+      case COLLECTION_ACTION:
+        constructor = "NativeCollectionAction";
+    }
     std::string name =
         node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1304,6 +1333,10 @@ namespace Smala
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     os << "auto* " << new_name << " = new " << constructor << " (" << p_name
         << ", " << name << ", " << node->function_name () << ", ";
+    if (type == COLLECTION_ACTION) {
+      std::string list = build_find (node->path_list(), false);
+      os << list << ", ";
+    }
     std::string data;
     if (node->path_data() == nullptr)
       data = m_null_symbol;

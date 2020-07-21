@@ -409,6 +409,7 @@ cookbook_apps := core/bindings \
 	core/switch \
 	core/text_cat \
 	core/nativeactions \
+	core/native_collection_action \
 	core/async_native \
 	gui/direct_manipulation/dnd \
 	gui/direct_manipulation/simplest \

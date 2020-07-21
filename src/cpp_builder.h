@@ -52,6 +52,7 @@ namespace Smala {
     void build_control_node (std::ofstream &os, Node *n) override;
     void build_native_action_component (std::ofstream &os, Node *n) override;
     void build_native_action (std::ofstream &os, Node *n) override;
+    void build_native_collection_action (std::ofstream &os, Node *n) override;
     void build_native_expression (std::ofstream &os, Node *n) override;
     void build_native_expression_node (std::ofstream &os, Node *n) override;
     void build_main_node (std::ofstream &os) override;

@@ -157,6 +157,11 @@ namespace Smala
             build_native_action (os, cur_node);
             break;
           }
+        case NATIVE_COLLECTION_ACTION:
+          {
+            build_native_collection_action (os, cur_node);
+            break;
+          }
         case NATIVE_CODE:
           {
             NativeCodeNode *n = static_cast<NativeCodeNode*> (cur_node);

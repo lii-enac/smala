@@ -108,6 +108,12 @@ Driver::add_native_action (const std::string &action_name, const std::string &pa
 }
 
 void
+Driver::add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
+{
+  m_ast.add_native_collection_action (action_name, list_name, param_name, code);
+}
+
+void
 Driver::add_native_code (const std::string &code)
 {
   m_ast.add_native_code (code);

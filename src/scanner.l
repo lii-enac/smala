@@ -113,6 +113,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "int"                 { return Smala::Parser::make_INT_T (Smala::location ()); }
 "double"              { return Smala::Parser::make_DOUBLE_T (Smala::location ()); }
 "string"              { return Smala::Parser::make_STRING_T (Smala::location ()); }
+"list"                { return Smala::Parser::make_LIST_T (Smala::location ()); }
 "TRUE"                { return Smala::Parser::make_TRUE (yytext, Smala::location ()); }
 "FALSE"               { return Smala::Parser::make_FALSE (yytext, Smala::location ()); }
 "null"                { return Smala::Parser::make_NULL (Smala::location ());}
@@ -123,6 +124,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
 "&"                   { return Smala::Parser::make_PROCESS_CAST (Smala::location()); }
 "NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
+"NativeCollectionAction" { return Smala::Parser::make_NATIVE_COLLECTION (Smala::location()); }
 "NativeAsyncAction"   { return Smala::Parser::make_NATIVE_ASYNC (Smala::location()); }
 "_main_"              { return Smala::Parser::make_MAIN (Smala::location ()); }
 "_define_"            { return Smala::Parser::make_DEFINE (Smala::location ()); }

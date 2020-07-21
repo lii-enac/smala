@@ -23,6 +23,7 @@
 #include "parser.hpp"
 #include "preamble.h"
 #include "native_action_node.h"
+#include "native_collection_action_node.h"
 #include "native_expression_node.h"
 #include "native_code_node.h"
 
@@ -41,6 +42,7 @@ public:
     void add_use (const std::string &val);
     void add_import (PathNode *path);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
+    void add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
     void add_native_expression (NativeExpressionNode *node);
     void add_define_node (Node *defineNode);
@@ -51,7 +53,6 @@ public:
     void end_preamble ();
 
     const std::vector<Node*> define_node_list () const;
-    const std::vector<NativeActionNode*> native_list () const;
     const std::vector<NativeExpressionNode*> native_expression_list () const { return m_native_expression_list; }
     const std::vector<Node*>& node_list () const;
     const Preamble& preamble () const;
@@ -60,6 +61,7 @@ public:
 private:
     Preamble m_preamble;
     std::vector<NativeActionNode*> m_native_list;
+    std::vector<NativeCollectionActionNode*> m_native_collection_list;
     std::vector<NativeExpressionNode*> m_native_expression_list;
     std::vector<SmalaNative*> m_smala_native;
     std::vector<Node*> m_node_list;

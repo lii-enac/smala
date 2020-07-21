@@ -96,6 +96,7 @@ namespace Smala {
     virtual void build_step (std::ofstream &os, Node *node, bool is_incr) {}
     virtual void build_native_action_component (std::ofstream &os, Node *n) = 0;
     virtual void build_native_action (std::ofstream &os, Node *n) = 0;
+    virtual void build_native_collection_action (std::ofstream &os, Node *n) = 0;
     virtual void build_native_expression (std::ofstream &os, Node *n) {}
     virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;

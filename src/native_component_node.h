@@ -19,23 +19,28 @@
 namespace Smala
 {
 
+  typedef enum native_type {
+    SIMPLE_ACTION,ASYNC_ACTION,COLLECTION_ACTION
+  } native_type;
+
   class NativeComponentNode : public Node
   {
   public:
     NativeComponentNode ();
-    NativeComponentNode (const std::string &action_name, PathNode *path_data, const std::string &is_model, bool is_async);
+    NativeComponentNode (const std::string &action_name, PathNode *path_list, PathNode *path_data, const std::string &is_model, native_type is_async);
     virtual ~NativeComponentNode ();
 
     const std::string& function_name () const;
     PathNode* path_data () const;
+    PathNode* path_list () const;
     const std::string& is_model () const;
-    bool is_async () { return m_is_async; }
+    native_type get_native_type () { return m_type; }
 
   private:
     std::string m_function_name;
-    PathNode* m_path_data;
+    PathNode *m_path_list, *m_path_data;
     std::string m_is_model;
-    bool m_is_async;
+    native_type m_type;
   };
 
 } /* namespace Smala */

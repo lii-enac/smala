@@ -41,6 +41,7 @@ public:
     void add_use (const std::string &val);
     void add_import (PathNode *path);
     void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
+    void add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &parm_name, const std::string &code);
     void add_native_code (const std::string &code);
     void add_native_expression (NativeExpressionNode *node);
     void add_define_node (Node *node);

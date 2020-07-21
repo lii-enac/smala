@@ -203,6 +203,7 @@
 %token INT_T "int"
 %token DOUBLE_T "double"
 %token STRING_T "string"
+%token LIST_T "list"
 %token USE "use"
 %token NULL "null"
 %token ADD_CHILDREN_TO "addChildrenTo"
@@ -216,6 +217,7 @@
 %token DEFINE "_define_"
 %token NATIVE "NativeAction"
 %token NATIVE_ASYNC "NativeAsyncAction"
+%token NATIVE_COLLECTION "NativeCollectionAction"
 %token NATIVE_ACTION "_action_"
 %token NATIVE_CODE "_native_code_"
 %token <string> CODE "<native code>"
@@ -231,7 +233,7 @@
 %token END 0 "end of file"
 %token <string> NAME "name"
 
-%type <bool> start_native
+%type <native_type> start_native
 %type <bool> keep
 %type <cast_type> cast
 %type <bool> bracket
@@ -317,6 +319,11 @@ native_action
     {
       string str = $7.substr (2, $7.length () - 4);
       driver.add_native_action ($2, $5, str);
+    }
+  | NATIVE_ACTION NAME LP LIST_T NAME COMMA PROCESS NAME RP CODE
+    {
+      string str = $10.substr (2, $10.length () - 4);
+      driver.add_native_collection_action ($2, $5, $8, str);
     }
 
 smala_action
@@ -765,14 +772,30 @@ remove
 native
   : start_native NAME LP NAME COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, $6, $1);
+      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, nullptr, $6, $1);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
   | start_native NAME LP NAME COMMA name_or_path COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), $8, $1);
+      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, new PathNode ($6), $8, $1);
+      n->set_name ($2);
+      driver.add_node (n);
+      n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      name_context_list.pop_back ();
+    }
+  | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA name_or_path COMMA INT RP
+    {
+      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), new PathNode ($8), $10, COLLECTION_ACTION);
+      n->set_name ($2);
+      driver.add_node (n);
+      n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      name_context_list.pop_back ();
+    }
+  | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA INT RP
+    {
+      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), nullptr, $8, COLLECTION_ACTION);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -780,8 +803,8 @@ native
     }
 
 start_native
-  : NATIVE { $$ = false; }
-  | NATIVE_ASYNC { $$ = true; }
+  : NATIVE { $$ = SIMPLE_ACTION; }
+  | NATIVE_ASYNC { $$ = ASYNC_ACTION; }
 
 add_child
   : start_add assignment_expression eol
@@ -1491,7 +1514,7 @@ start_lambda
       string new_name ("func_" + std::to_string (func_num++));
       SmalaNative *native = new SmalaNative (new_name, "_src_", new PathNode ($2));
       driver.add_node (native);
-      $$ = new NativeComponentNode (new_name, new PathNode ($2), "1", 0);
+      $$ = new NativeComponentNode (new_name, nullptr, new PathNode ($2), "1", SIMPLE_ACTION);
     }
 
 assignment

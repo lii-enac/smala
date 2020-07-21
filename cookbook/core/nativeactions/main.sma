@@ -89,10 +89,6 @@ Component root {
     Rectangle line1 (380, 400, 1, 100, 0, 0)
     Rectangle line2 (420, 400, 1, 100, 0, 0)
    
-
-    FillColor _(50, 50, 50)
-    Rectangle act (100, 550, 50, 50, 0, 0)
-    Rectangle clear (200, 550, 50, 50, 0, 0)
     // Bind a C++ native action
 	NativeAction cpp_na (cpp_action, root, 1)
 	red.press -> cpp_na
@@ -134,12 +130,5 @@ Component root {
         //     dump root.fc
         // }
 	}
-    ProcessCollector collection
-    red.press->{red =: collection.add}
-    green.press->{green =: collection.add}
-    clear.press->collection.rm_all
-
-    NativeCollectionAction coll_act (list_action, collection, 1)
-    act.press->coll_act
 }
 

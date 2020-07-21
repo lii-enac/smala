@@ -602,7 +602,7 @@ name_or_path
     }
 
 subname
-: ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; }
+: ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; } | IN { $$ = "in"; }
 
 cast
 : PROCESS_CAST { $$ = BY_PROCESS; }

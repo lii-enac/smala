@@ -25,12 +25,15 @@ namespace Smala {
     virtual ~CPPBuilder ();
     int build (const Ast &ast, const std::string &builddir, const std::string &prefix) override;
   private:
+    void pop_ctxt () override;
+    void push_ctxt () override;
     void build_define (const std::string &prefix);
     void build_use (std::ofstream &os, std::string use) override;
     void build_import (std::ofstream &os, Node* n) override;
     void build_instruction (std::ofstream &os, Node *node) override;
     void build_term_node (std::ofstream &os, Node *node) override;
     void build_for (std::ofstream &os, Node *node) override;
+    void build_for_every (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
     void build_print (std::ofstream &os, Node *node) override;
     void build_step (std::ofstream &os, Node *node, bool is_incr) override;

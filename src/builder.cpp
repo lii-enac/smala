@@ -205,6 +205,7 @@ namespace Smala
         }
       case START_IF:
       {
+        push_ctxt ();
         indent  (os);
         os << "if (";
         m_in_static_expr = true;
@@ -241,6 +242,7 @@ namespace Smala
         m_indent--;
         indent (os);
         os << "}\n";
+        pop_ctxt ();
         break;
       }
       case END_LOOP:
@@ -268,6 +270,11 @@ namespace Smala
       case FOR:
       {
         build_for (os, node);
+        break;
+      }
+      case FOR_EVERY:
+      {
+        build_for_every (os, node);
         break;
       }
       case WHILE:

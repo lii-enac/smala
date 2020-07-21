@@ -22,6 +22,7 @@
 #include "for_node.h"
 #include "transition_node.h"
 #include "native_collection_action_node.h"
+#include "forevery_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -366,16 +367,72 @@ namespace Smala
     }
     m_in_static_expr = false;
     os << ") {\n";
+    push_ctxt ();
     m_indent++;
   }
 
   void
   CPPBuilder::build_for (std::ofstream &os, Node *node)
   {
-    ForNode* n = (ForNode*) node;
     indent (os);
     os << "for ";
+    push_ctxt ();
     m_in_for = true;
+  }
+
+  void
+  CPPBuilder::build_for_every (std::ofstream &os, Node *node)
+  {
+    ForEveryNode* n = (ForEveryNode*) node;
+    indent (os);
+    std::string list_name = "list_" + std::to_string (m_cpnt_num++);
+    std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
+    os << "std::vector<CoreProcess*> " << list_name << ";\n";
+    indent (os);
+    std::string path = build_find (n->get_path (), true);
+    os << "auto *" << loc_name << " = " << path << ";\n";
+    indent (os);
+    os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
+    m_indent++;
+    indent (os);
+    os << list_name << " = " <<  "((ProcessCollector*) "<< loc_name << ")->get_list();\n";
+    m_indent--;
+    indent (os);
+    os << "} else if (dynamic_cast<Container*> (" << loc_name << ") != nullptr) {\n";
+    m_indent++;
+    indent (os);
+    os << list_name << " = " <<  "((Container*) "<< loc_name << ")->children();\n";
+    m_indent--;
+    indent (os);
+    os << "} else {\n";
+    m_indent++;
+    indent (os);
+    os << "std::cerr << \"Error: only Container and ProcessCollector can be used in forevery instruction\\n\";\n";
+    indent (os);
+    os << "exit (0);\n";
+    m_indent--;
+    indent (os);
+    os << "}\n";
+    indent (os);
+    std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
+    os << "for (auto " << var_name << " : " << list_name << ") {\n";
+    m_indent++;
+    push_ctxt ();
+    m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
+  }
+
+  void
+  CPPBuilder::pop_ctxt ()
+  {
+    BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+    m_parent_list.pop_back ();
+    if (n) delete n;
+  }
+
+  void
+  CPPBuilder::push_ctxt ()
+  {
+    m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
   }
 
   void

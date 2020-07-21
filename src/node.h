@@ -53,6 +53,7 @@ namespace Smala {
     END_REPEAT,
     END_SET_PROPERTY,
     FOR,
+    FOR_EVERY,
     FSM,
     GET_PROPERTY,
     IMPORT,

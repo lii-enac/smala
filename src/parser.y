@@ -48,6 +48,7 @@
   #include "range_node.h"
   #include "transition_node.h"
   #include "name_context.h"
+  #include "forevery_node.h"
 
   using namespace std;
 
@@ -197,6 +198,8 @@
 %token IF "if"
 %token ELSE "else"
 %token FOR "for"
+%token FOREVERY "forevery"
+%token IN "in"
 %token WHILE "while"
 %token PRINT "print"
 %token INSERT "insert"
@@ -645,7 +648,23 @@ start_while
     }
 
 for
-  : for_loop lcb statement_list rcb
+  : for_loop lcb statement_list RCB
+  {
+    Node *n = new Node (END_BLOCK);
+    driver.add_node (n);
+  }
+  | forevery_loop LCB statement_list RCB
+  {
+    Node *n = new Node (END_BLOCK);
+    driver.add_node (n);
+  }
+
+forevery_loop
+  : FOREVERY NAME IN name_or_path
+  {
+    ForEveryNode *n = new ForEveryNode ($2, new PathNode ($4));
+    driver.add_node (n);
+  }
 
 for_loop
   : start_for lp for_imperative_assignment semicolon assignment_expression semicolon for_imperative_assignment rp
@@ -1319,12 +1338,6 @@ lcb
   : LCB
     {
       TermNode *n = new TermNode (START_LCB_BLOCK, std::string ("{"));
-      driver.add_node (n);
-    }
-rcb
-  : RCB
-    {
-      TermNode *n = new TermNode (END_LCB_BLOCK, std::string ("}"));
       driver.add_node (n);
     }
 comma

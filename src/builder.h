@@ -72,6 +72,8 @@ namespace Smala {
     std::string m_cur_building_name;
     std::vector<BuildNode*> m_parent_list;
     std::map<std::string, std::string> m_types;
+    virtual void pop_ctxt () {}
+    virtual void push_ctxt () {}
     void indent (std::ofstream &os);
     std::string get_constructor (const std::string &type);
     void print_error_message (error_level::level_t level, const std::string& message, int error);
@@ -91,6 +93,7 @@ namespace Smala {
     virtual void build_end_main (std::ofstream &os, Node *node) = 0;
     virtual void build_smala_native (std::ofstream &os, Node *n) = 0;
     virtual void build_for (std::ofstream &os, Node *node) {}
+    virtual void build_for_every (std::ofstream &os, Node *node) {}
     virtual void build_while (std::ofstream &os, Node *node) {}
     virtual void build_print (std::ofstream &os, Node *node) {}
     virtual void build_step (std::ofstream &os, Node *node, bool is_incr) {}

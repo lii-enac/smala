@@ -3,8 +3,8 @@ use base
 use display
 use gui
 
-import Menu
-
+//import Menu
+import gui.widgets.DropDownMenu
 _main_
 Component root
 {
@@ -19,14 +19,15 @@ Component root
   f.width =:> bkg.width
   f.height =:> bkg.height
   
-  List items {
+
+
+  DropDownMenu menu (100, 10)
+  addChildrenTo menu.choices {
     String _ ("Choice 1")
     String _ ("Second choice")
     String _ ("Another choice")
     String _ ("Finally")
   }
-
-  Menu menu (f, items, 100, 10, 100)
   FillColor _ (210, 210, 210)
   FontSize _ (4, 20)
   Text choice (250, 26, "Choice 1")

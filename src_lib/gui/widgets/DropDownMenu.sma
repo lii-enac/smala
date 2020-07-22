@@ -45,17 +45,18 @@ fn_init(Process src, Process data)
         }
         Bool selected (0)
         select -> { "selected" =: sw.state
-        1 =: selected
+          1 =: selected
+        }
+        unselect -> { "idle" =: sw.state
+          0 =: selected
+        }
+        selected == 0 ? "idle" : "selected" =: sw.state
       }
-      unselect -> { "idle" =: sw.state
-      0 =: selected
     }
-    selected == 0 ? "idle" : "selected" =: sw.state
+    y = y + 18
   }
 }
-y = y + 18
-}
-}
+
 _define_
 DropDownMenu (double _x, double _y)
 {

@@ -15,18 +15,9 @@ fn_init(Process src, Process data)
         data.box.width - 3 =:> bkg.width
         Spike select
         Spike unselect
-        Spike press
-        Spike enter
-        Spike leave
         FillColor text_color (#000000)
         data.text_color.value =: text_color.value
         Text text (9, y, toString(t))
-        text.press->press
-        bkg.press->press
-        text.enter->enter
-        bkg.enter->enter
-        text.leave->leave
-        bkg.leave->leave
         width aka text.width
         FSM fsm {
           State idle {
@@ -35,19 +26,19 @@ fn_init(Process src, Process data)
           State hover {
             #FA9128 =: fc.value
           }
-          idle->hover (enter)
-          hover->idle (leave)
+          idle->hover (bkg.enter)
+          hover->idle (bkg.leave)
         }
         Switch sw (idle)  {
           Component idle {
-            press -> { c =: data.ask_selection }
+            bkg.press -> { c =: data.ask_selection }
           }
           Component selected {
             FillColor color (#000000)
             data.text_color.value =: color.value
             Circle c (5, y - 4, 2)
             t =: data.choice.text
-            press -> { data.unselect_all =: data.ask_selection 
+            bkg.press -> { data.unselect_all =: data.ask_selection
               "" =: data.choice.text
             }
           }

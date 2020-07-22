@@ -1,0 +1,146 @@
+use core
+use gui
+use base
+
+_action_
+fn_init(Process src, Process data)
+{
+  int y = 12
+  forevery t in data.choices {
+    addChildrenTo data.fsm.unfolded.items {
+      Component c {
+        NoOutline _
+        FillColor fc (#969696)
+        Rectangle bkg (0, y - 14, 0, 18, 0, 0)
+        data.box.width - 3 =:> bkg.width
+        Spike select
+        Spike unselect
+        Spike press
+        Spike enter
+        Spike leave
+        FillColor text_color (#000000)
+        data.text_color.value =: text_color.value
+        Text text (9, y, toString(t))
+        text.press->press
+        bkg.press->press
+        text.enter->enter
+        bkg.enter->enter
+        text.leave->leave
+        bkg.leave->leave
+        width aka text.width
+        FSM fsm {
+          State idle {
+            data.box_color.value =: fc.value
+          }
+          State hover {
+            #FA9128 =: fc.value
+          }
+          idle->hover (enter)
+          hover->idle (leave)
+        }
+        Switch sw (idle)  {
+          Component idle {
+            press -> { c =: data.ask_selection }
+          }
+          Component selected {
+            FillColor color (#000000)
+            data.text_color.value =: color.value
+            Circle c (5, y - 4, 2)
+            t =: data.choice.text
+            press -> { data.unselect_all =: data.ask_selection 
+              "" =: data.choice.text
+            }
+          }
+        }
+        Bool selected (0)
+        select -> { "selected" =: sw.state
+        1 =: selected
+      }
+      unselect -> { "idle" =: sw.state
+      0 =: selected
+    }
+    selected == 0 ? "idle" : "selected" =: sw.state
+  }
+}
+y = y + 18
+}
+}
+_define_
+DropDownMenu (double _x, double _y)
+{
+  mouseTracking = 1
+  Translation pos (_x, _y)
+  x aka pos.tx
+  y aka pos.ty
+
+  OutlineColor border_color (#000000)
+  FillColor box_color (50, 50, 50)
+
+  Rectangle box (0, 0, 100, 18, 2, 2)
+  FillColor text_color (#FFFFFF)
+  Text choice (3, 14, "")
+  selected aka choice.text
+
+  RefProperty ask_selection (null)
+  RefProperty unselect_all (null)
+
+  FillColor button_color (40, 200, 250)
+  Rectangle button (0, 0, 20, 18, 2, 2)
+  box.width - 2 =:> button.x
+  
+  List choices
+  
+  FSM fsm {
+    State idle {
+      Translation pos (0, 0)
+      OutlineColor _ (#FFFFFF)
+      OutlineWidth _ (2)
+      button.x =:> pos.tx
+      button.y =:> pos.ty
+      Polyline _ {
+        Point _ (5, 7)
+        Point _ (10, 13)
+        Point _ (15, 7)
+      }
+    }
+    State unfolded {
+      Component _ {
+        Translation pos (0, 0)
+        OutlineColor _ (#FFFFFF)
+        OutlineWidth _ (2)
+        button.x =:> pos.tx
+        button.y =:> pos.ty
+        Polyline _ {
+          Point _ (5, 12)
+          Point _ (10, 6)
+          Point _ (15, 12)
+        }
+      }
+      FillColor fc (#000000)
+      box_color.value =:> fc.value
+      OutlineColor _ (#000000)
+      Rectangle rec_list (0, -2, 100, 0, 0, 0)
+      choices.size * 18  + 4 =:> rec_list.height
+      box.width - 2 =:> rec_list.width
+      Translation _ (1, 2)
+      List items
+    }
+    idle->unfolded (button.press)
+    unfolded->idle (button.press)
+  }
+  NativeAction init (fn_init, this, 0)
+  MaxList sum (fsm.unfolded.items, "width")
+  sum.output + 20 =:> box.width
+
+  ask_selection->(this) {
+    p = getRef (&this.ask_selection)
+    forevery c in this.fsm.unfolded.items {
+      if (&c != &p) {
+        run c.unselect
+      }
+      if (&p != 0) {
+        run p.select
+      }
+    }
+  }
+}

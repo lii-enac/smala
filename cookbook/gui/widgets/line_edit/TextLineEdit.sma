@@ -104,23 +104,6 @@
       is_suppr || is_del || f.key\-pressed < 16777216 || f.key\-pressed > 16908289 => del_or_replace
 
       Double x_select (0)
-      Bool left_or_right (0)
-      is_left || is_right =:> left_or_right
-
-      /* Shift left/right management */
-      Spike select_request
-      FSM shift_select {
-        State idle
-        State about_to_select {
-          is_left.true->select_request
-          is_right.true->select_request
-          le.end_selection->le.start_selection
-        }
-        idle->about_to_select (is_shift_press.true)
-        about_to_select->idle (is_shift_release.true)
-      }
-
-      Bool has_selection (0)
 
       /* Graphic shape for selection */
       FSM rec_selection {
@@ -132,27 +115,31 @@
           le.x_start + text_field.x =:> rec.x
           le.x_cursor + text_field.x - rec.x =:> rec.width
         }
-        no_rec->rec (has_selection.true)
-        rec->no_rec (has_selection.false)
+        no_rec->rec (le.start_selection)
+        rec->no_rec (le.end_selection)
       }
-      le.x_start != le.x_cursor =:> has_selection
       
-      FSM select_fsm {
+      FSM select_all_fsm {
         State idle
-        State selecting {
+        State wait {
+          Timer t (500)
+          bkg.press->le.select_all
+        }
+        idle->wait (bkg.press)
+        wait->idle (wait.t.end)
+      }
+      FSM select_fsm {
+        State idle {
+          is_right || is_left -> le.end_selection
+        }
+        State kbd_select
+        State mouse_select {
           bkg.move->le.pointer_move
         }
-        State selected {
-          Timer t (500)
-          Component while_wait {
-            bkg.press->le.select_all
-          }
-          t.end->!while_wait
-        }
-        selecting->selected (bkg.release)
-        idle->selecting (bkg.press, le.start_selection)
-        idle->selected (is_shift_press.true, le.start_selection)
-        selected->idle (del_or_replace.true, le.end_selection)
+        idle->mouse_select (bkg.press, le.start_selection)
+        idle->kbd_select (is_shift_press.true, le.start_selection)
+        kbd_select->idle (is_shift_release.true)
+        mouse_select->idle (bkg.release)
       }
     }
   }

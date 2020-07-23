@@ -8,7 +8,7 @@ import gui.widgets.DropDownMenu
 _main_
 Component root
 {
-  Frame f ("my frame", 0, 0, 500, 500)
+  Frame f ("my frame", 0, 0, 400, 400)
   Exit ex (0, 1)
   f.close -> ex
   mouseTracking = 1
@@ -21,15 +21,33 @@ Component root
   
 
 
-  DropDownMenu menu (100, 10)
+  DropDownMenu menu (30, 10)
   addChildrenTo menu.choices {
-    String _ ("Choice 1")
-    String _ ("Second choice")
-    String _ ("Another choice")
-    String _ ("Finally")
+    String _ ("circle")
+    String _ ("rectangle")
+    String _ ("polyline")
+    String _ ("polygon")
   }
+  Translation pos (100, 0)
   FillColor _ (210, 210, 210)
-  FontSize _ (4, 20)
-  Text choice (250, 26, "Choice 1")
-  menu.selected =:> choice.text
+  OutlineColor _ (50, 250, 0)
+  OutlineWidth _ (3)
+  Switch selected (idle) {
+    Component idle
+    Circle circle (100, 200, 30)
+    Rectangle rectangle (70, 170, 60, 60, 2, 2)
+    Polyline polyline {
+      Point _ (70, 230)
+      Point _ (100, 170)
+      Point _ (130, 230)
+    }
+    Polygon polygon {
+      Point _ (70, 230)
+      Point _ (100, 170)
+      Point _ (130, 230)
+    }
+  }
+  TextComparator comp ("", "")
+  menu.selected =:> comp.left
+  comp.output == 1 ? "idle" : toString(menu.selected) =:> selected.state
 }

@@ -54,16 +54,6 @@ smala_action (Process src, Process data)
     //dump data
 }
 
-_action_
-list_action (list l, Process c)
-%{
-  Process *data = (Process*) get_native_user_data (c);
-  for (auto e: l) {
-    std::cout << "Rectangle x = " << ((AbstractProperty*)e->find_child("x"))->get_double_value () << std::endl;
-  }
-%}
-
-
 _main_
 Component root {
 

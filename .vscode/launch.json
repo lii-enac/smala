@@ -5,6 +5,7 @@
 
     //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
     //"program": "${workspaceFolder}/build/cookbook/comms/midi/midi_app",
+    //"program": "${workspaceFolder}/build/cookbook/core/nativeactions/nativeactions_app",
 
     "version": "0.2.0",
     "configurations": [
@@ -13,14 +14,14 @@
             "name": "(lldb) Lancer",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/cookbook/core/nativeactions/nativeactions_app",
+            "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
             "args": ["test"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
                     "name": "DYLD_LIBRARY_PATH",
-                    "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp-diet/build/lib"
+                    "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp-master/build/lib"
                 }
             ],
             "externalConsole": false,

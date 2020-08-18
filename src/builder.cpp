@@ -512,6 +512,11 @@ namespace Smala
         m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
         break;
       }
+      case CAUSAL_DEP:
+      {
+        build_causal_dep (os, node);
+        break;
+      }
       default:
         return;
       }

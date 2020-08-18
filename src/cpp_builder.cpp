@@ -23,6 +23,7 @@
 #include "transition_node.h"
 #include "native_collection_action_node.h"
 #include "forevery_node.h"
+#include "causal_dep_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -1500,6 +1501,16 @@ namespace Smala
       os << ");\n";
     }
     os.close ();
+  }
+
+  void
+  CPPBuilder::build_causal_dep (std::ofstream &os, Node* node)
+  {
+    CausalDependencyNode* n = dynamic_cast<CausalDependencyNode*> (node);
+    std::string src = build_find (n->src (), true);
+    std::string dst = build_find (n->dst (), true);
+    indent (os);
+    os << "Graph::instance ().add_edge (" << src << ", " << dst << ");\n";
   }
 
   void

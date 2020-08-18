@@ -29,6 +29,7 @@ namespace Smala {
     void push_ctxt () override;
     void build_define (const std::string &prefix);
     void build_use (std::ofstream &os, std::string use) override;
+    void build_causal_dep (std::ofstream &os, Node* node) override;
     void build_import (std::ofstream &os, Node* n) override;
     void build_instruction (std::ofstream &os, Node *node) override;
     void build_term_node (std::ofstream &os, Node *node) override;

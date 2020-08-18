@@ -35,6 +35,7 @@ namespace Smala {
     ADD_CHILDREN_TO,
     ALIAS,
     BREAK,
+    CAUSAL_DEP,
     CONTAINER,
     CONTROL,
     DASH_ARRAY,

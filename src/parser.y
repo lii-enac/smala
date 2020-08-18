@@ -31,6 +31,7 @@
   #include <algorithm>
   #include <stdint.h>
   #include "node.h"
+  #include "causal_dep_node.h"
   #include "path_node.h"
   #include "set_parent_node.h"
   #include "dash_array_node.h"
@@ -158,6 +159,7 @@
 %token NOT_ARROW "!->"
 %token NOT_ARROW_NOT "!->!"
 %token ARROW_NOT "->!"
+%token CAUSAL_DEP "~>"
 %token CONNECTOR "=>"
 %token ASSGNT_CONN "=:>"
 %token PAUSED_CONNECTOR "::>"
@@ -449,6 +451,7 @@ expression
   : connector
   | assignment
   | binding
+  | causal_dep
 
 tree_action
   : add_children_to
@@ -1429,6 +1432,13 @@ binding
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
+
+causal_dep
+  : name_or_path CAUSAL_DEP name_or_path
+  {
+    CausalDependencyNode *node = new CausalDependencyNode (new PathNode ($1), new PathNode ($3));
+    driver.add_node (node);
+  }
 
 assignment_sequence
   : start_assignment_sequence assignment_list RCB

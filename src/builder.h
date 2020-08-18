@@ -85,6 +85,7 @@ namespace Smala {
     virtual void print_component_decl (std::ofstream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ofstream &os, const std::string &constructor) = 0;
     virtual void print_type (std::ofstream &os, ParamType type) = 0;
+    virtual void build_causal_dep (std::ofstream &os, Node* node) = 0;
     virtual void build_use (std::ofstream &os, std::string use) = 0;
     virtual void build_import (std::ofstream &os, Node* n) = 0;
     virtual void build_main_node (std::ofstream &os) = 0;

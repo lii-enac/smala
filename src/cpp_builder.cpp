@@ -320,7 +320,7 @@ namespace Smala
     os << "std::string " << name << " ( ";
     std::vector<TermNode*> expr = node->get_expr_data ();
     for (auto cur: expr) {
-      TermNode *n = static_cast<TermNode*> (cur);
+      TermNode *n = dynamic_cast<TermNode*> (cur);
       switch (n->arg_type ()) {
         case SYMBOL:
         case OPERATOR: {
@@ -439,7 +439,7 @@ namespace Smala
   void
   CPPBuilder::build_control_node (std::ofstream &os, Node *node)
   {
-    CtrlNode *ctrl = static_cast<CtrlNode*> (node);
+    CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
     bool is_binding = node->djnn_type ().compare ("Binding") == 0;
 
@@ -607,7 +607,7 @@ namespace Smala
   CPPBuilder::build_native_expression_node (std::ofstream &os, Node *n)
   {
     m_expr_in = m_expr_out = 0;
-    NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
+    NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ().size () == 1) {
       build_simple_control_node (os, node);
       return;
@@ -780,7 +780,7 @@ namespace Smala
   void
   CPPBuilder::build_native_action (std::ofstream &os, Node *n)
   {
-    NativeActionNode *node = static_cast<NativeActionNode*> (n);
+    NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
     os << "void\n";
     os << node->action_name () << "(CoreProcess *" << node->param_name () << ")\n";
     const std::string code = node->code ();
@@ -797,7 +797,7 @@ namespace Smala
   void
   CPPBuilder::build_native_collection_action (std::ofstream &os, Node *n)
   {
-    NativeCollectionActionNode *node = static_cast<NativeCollectionActionNode*> (n);
+    NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
     os << node->action_name () << "(CoreProcess *" << node->param_name () << ", std::vector<CoreProcess*> " << node->list_name() << ")\n";
     const std::string code = node->code ();
@@ -814,7 +814,7 @@ namespace Smala
   void
   CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
   {
-    NativeExpressionNode *node = static_cast<NativeExpressionNode*> (n);
+    NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ().size () == 1) {
       return;
     }
@@ -924,7 +924,7 @@ namespace Smala
   void
   CPPBuilder::build_instruction (std::ofstream &os, Node *node)
   {
-    InstructionNode *n = static_cast<InstructionNode*> (node);
+    InstructionNode *n = dynamic_cast<InstructionNode*> (node);
     for (int i = 0; i < n->path_list ().size (); i++) {
       std::string arg = build_find (n->path_list ().at (i), false);
       if (arg.empty ()) {
@@ -1062,7 +1062,7 @@ namespace Smala
   void
   CPPBuilder::build_term_node (std::ofstream &os, Node *node)
   {
-    TermNode *n = static_cast<TermNode*> (node);
+    TermNode *n = dynamic_cast<TermNode*> (node);
     switch (n->arg_type ()) {
       case SYMBOL:
       case OPERATOR: {
@@ -1154,7 +1154,7 @@ namespace Smala
   void
   CPPBuilder::alias (std::ofstream &os, Node *node)
   {
-    BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
+    BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
@@ -1173,7 +1173,7 @@ namespace Smala
   void
   CPPBuilder::merge (std::ofstream &os, Node *node)
   {
-    BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
+    BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
@@ -1184,7 +1184,7 @@ namespace Smala
   void
   CPPBuilder::remove (std::ofstream &os, Node *node)
   {
-    BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
+    BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
@@ -1194,7 +1194,7 @@ namespace Smala
   void
   CPPBuilder::move (std::ofstream &os, Node *node, const string &c)
   {
-    BinaryInstructionNode *n = static_cast<BinaryInstructionNode*> (node);
+    BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string last;
     std::string left = build_find (n->left_arg (), false);
@@ -1364,7 +1364,7 @@ namespace Smala
   void
   CPPBuilder::build_native_action_component (std::ofstream &os, Node *n)
   {
-    NativeComponentNode* node = static_cast<NativeComponentNode*> (n);
+    NativeComponentNode* node = dynamic_cast<NativeComponentNode*> (n);
     native_type type = node->get_native_type();
     std::string constructor;
     switch (type) {
@@ -1406,7 +1406,7 @@ namespace Smala
   void
   CPPBuilder::build_transition_node (std::ofstream &os, Node *n)
   {
-    TransitionNode* ctrl = static_cast<TransitionNode*> (n);
+    TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
     os << "new " << constructor << " (" << m_parent_list.back ()->get_symbol (ctrl->parent ()->name())
@@ -1461,7 +1461,7 @@ namespace Smala
   void
   CPPBuilder::build_smala_native (std::ofstream &os, Node *node)
   {
-    SmalaNative *n = static_cast<SmalaNative*> (node);
+    SmalaNative *n = dynamic_cast<SmalaNative*> (node);
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));

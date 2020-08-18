@@ -164,7 +164,7 @@ namespace Smala
           }
         case NATIVE_CODE:
           {
-            NativeCodeNode *n = static_cast<NativeCodeNode*> (cur_node);
+            NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
             os << n->code () << std::endl;
             break;
           }
@@ -402,7 +402,7 @@ namespace Smala
         //BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
         //m_parent_list.pop_back ();
         //if (n) delete n;
-        SetParentNode* spn = static_cast<SetParentNode*> (node);
+        SetParentNode* spn = dynamic_cast<SetParentNode*> (node);
         std::string parent;
         parent = m_parent_list.back()->name ();
         std::string name = spn->to_attach()->name();
@@ -454,18 +454,18 @@ namespace Smala
       }
       case NATIVE_CODE:
       {
-        NativeCodeNode *n = static_cast<NativeCodeNode*> (node);
+        NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (node);
         os << n->code () << std::endl;
         break;
       }
       case NEW_LINE:
       {
-        build_new_line (os, static_cast<NewLineNode*> (node));
+        build_new_line (os, dynamic_cast<NewLineNode*> (node));
         break;
       }
       case NEW_VAR:
       {
-        NewVarNode *n = static_cast<NewVarNode*> (node);
+        NewVarNode *n = dynamic_cast<NewVarNode*> (node);
         if (!m_in_for)
           indent (os);
         print_type (os, n->type ());
@@ -497,7 +497,7 @@ namespace Smala
       }
       case DASH_ARRAY:
       {
-        build_dash_array (os, static_cast<DashArrayNode*> (node));
+        build_dash_array (os, dynamic_cast<DashArrayNode*> (node));
         break;
       }
       case RANGE:
@@ -561,7 +561,7 @@ namespace Smala
   void
   Builder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
   {
-    RangeNode* n = static_cast<RangeNode*> (node);
+    RangeNode* n = dynamic_cast<RangeNode*> (node);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();

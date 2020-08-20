@@ -38,8 +38,36 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
   ScreenToLocal s2l (localRef)
 
   // Zoom management
-  s2l.outX => transforms.rightScaleBy.cx
-  s2l.outY => transforms.rightScaleBy.cy
+  // set scaling center according to zoom option
+  Switch mouseCenteredOption (off) {
+    // frame centered zoom option
+    Component off {
+      // set scaling center to the center of the frame (localRef coordinates system)
+      ScreenToLocal s2l (localRef)
+      AssignmentSequence seq (1) {
+        frame.width /2  =: s2l.inX
+        frame.height /2 =: s2l.inY
+      }
+      // the coordinates conversion must be activated by frame wheel because matrix 
+      // could have changed due to other transforms whereas frame dimensions rarely change,
+      // so simple connectors (like in the mouse-centered option below) won't do the job
+      frame.wheel -> seq
+      // no need to propagate the scaling center change for the moment,
+      // as the sx/sy scaling factors haven't been computed yet
+      s2l.outX =:> transforms.rightScaleBy.cx
+      s2l.outY =:> transforms.rightScaleBy.cy
+    }
+
+    // mouse centered zoom option
+    Component on {
+      // set scaling center to pointer position (localRef coordinates system)
+      ScreenToLocal s2l (localRef)
+      frame.move.x =:> s2l.inX
+      frame.move.y =:> s2l.inY
+      s2l.outX =:> transforms.rightScaleBy.cx
+      s2l.outY =:> transforms.rightScaleBy.cy
+    }
+  }
 
   Pow p (1.01, 0)
   frame.wheel.dy =:> p.exponent

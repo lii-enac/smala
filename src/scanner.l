@@ -142,11 +142,9 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "from"                { return Smala::Parser::make_FROM (Smala::location ()); }
 "addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (Smala::location ()); }
 "toString"            { return Smala::Parser::make_TO_STRING (Smala::location()); }
-"in"                  { return Smala::Parser::make_IN (Smala::location()); }
 "if"                  { return Smala::Parser::make_IF (Smala::location ()); }
 "else"                { return Smala::Parser::make_ELSE (Smala::location ()); }
 "for"                 { return Smala::Parser::make_FOR (Smala::location ()); }
-"forevery"            { return Smala::Parser::make_FOREVERY (Smala::location ()); }
 "while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
 "print"               { return Smala::Parser::make_PRINT (Smala::location ()); }
 {NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }

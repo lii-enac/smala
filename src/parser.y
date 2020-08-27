@@ -200,8 +200,6 @@
 %token IF "if"
 %token ELSE "else"
 %token FOR "for"
-%token FOREVERY "forevery"
-%token IN "in"
 %token WHILE "while"
 %token PRINT "print"
 %token INSERT "insert"
@@ -605,7 +603,7 @@ name_or_path
     }
 
 subname
-: ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; } | IN { $$ = "in"; }
+: ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; }
 
 cast
 : PROCESS_CAST { $$ = BY_PROCESS; }
@@ -663,7 +661,7 @@ for
   }
 
 forevery_loop
-  : FOREVERY NAME IN name_or_path
+  : FOR NAME COLON name_or_path
   {
     ForEveryNode *n = new ForEveryNode ($2, new PathNode ($4));
     driver.add_node (n);

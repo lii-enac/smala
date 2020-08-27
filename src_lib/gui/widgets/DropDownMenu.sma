@@ -6,7 +6,7 @@ _action_
 fn_init(Process src, Process data)
 {
   int y = 12
-  forevery t in data.choices {
+  for t : data.choices {
     addChildrenTo data.fsm.unfolded.items {
       Component c {
         NoOutline _
@@ -126,7 +126,7 @@ DropDownMenu (double _x, double _y)
 
   ask_selection->(this) {
     p = getRef (&this.ask_selection)
-    forevery c in this.fsm.unfolded.items {
+    for c : this.fsm.unfolded.items {
       if (&c != &p) {
         run c.unselect
       }

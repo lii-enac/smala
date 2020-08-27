@@ -74,7 +74,7 @@
 
     Spike rm_all
     ProcessCollector collection
-    forevery r in rectangles {
+    for r : rectangles {
       addChildrenTo r {
         FSM fsm {
           State unselected {
@@ -97,7 +97,7 @@
     NativeCollectionAction coll_act (list_action, collection, 1)
     inc.click->coll_act
     dec.click->(collection) {
-      forevery r in collection {
+      for r : collection {
         r.width = r.width - 5
       }
     }

@@ -17,18 +17,13 @@ use base
 use display
 use gui
 
-_native_code_
-%{
-extern char* buildPath (const char *file);
-%}
-
 _define_
 Dial (Process frame, double _x, double _y) {
   Translation t (_x, _y)
   x aka t.tx
   y aka t.ty
 
-  gdial = loadFromXML (buildPath ("img/dial.svg"))
+  gdial = loadFromXML ("img/dial.svg")
 
   /*---- interface -----*/
   Double input (0)

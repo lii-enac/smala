@@ -17,11 +17,6 @@ use base
 use display
 use gui
 
-_native_code_
-%{
-extern char* buildPath (const char *file);
-%}
-
 _define_
 ToggleButton (Process frame, string l, double _x, double _y) {
   Translation t (_x, _y)
@@ -36,7 +31,7 @@ ToggleButton (Process frame, string l, double _x, double _y) {
   String label (l)
  /*--- end interface ---*/
 
-  gbutton = loadFromXML (buildPath("img/button.svg"))
+  gbutton = loadFromXML ("img/button.svg")
   FSM fsm {
     State idle {
       r << gbutton.idle

@@ -17,11 +17,6 @@ use base
 use display
 use gui
 
-_native_code_
-%{
-extern char* buildPath (const char *file);
-%}
-
 _define_
 Button (Process frame, string l, double _x, double _y) {
   Translation t (_x, _y)
@@ -36,7 +31,7 @@ Button (Process frame, string l, double _x, double _y) {
   /*--- end interface ---*/
 
   /*----- graphics and behavior-----*/
-  gbutton = loadFromXML (buildPath ("img/button.svg"))
+  gbutton = loadFromXML ("img/button.svg")
 
   FSM fsm {
     State idle {

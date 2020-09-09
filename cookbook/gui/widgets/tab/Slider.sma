@@ -4,19 +4,13 @@ use display
 use gui
 
 
-_native_code_
-%{
-  extern char* buildPath (const char *file);
-%}
-
-
 _define_
 Slider (Process frame, double _x, double _y) {
   Translation t (_x, _y)
   x aka t.tx
   y aka t.ty
 
-  gslider = loadFromXML (buildPath ("img/slider.svg"))
+  gslider = loadFromXML ("img/slider.svg")
 
   Component gobj {
     bkg << gslider.layer1.bkg

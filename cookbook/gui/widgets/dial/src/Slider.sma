@@ -17,26 +17,6 @@ use base
 use display
 use gui
 
-_native_code_
-%{
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-char*
-buildPath (const char* file)
-{
-  char* prefix = getcwd (NULL, 0);
-  int sz = strlen (prefix) + strlen (file) + 9;
-  char* path = (char*) malloc (sz * sizeof (char));
-  sprintf (path, "file://%s/%s", prefix, file);
-  path[sz-1] = '\0';
-  free (prefix);
-  return path;
-}
-%}
-
 _define_
 Slider (Process frame, double _x, double _y) {
   Translation t (_x, _y)
@@ -44,7 +24,7 @@ Slider (Process frame, double _x, double _y) {
   x aka t.tx
   y aka t.ty
 
-  gslider = loadFromXML (buildPath ("img/slider.svg"))
+  gslider = loadFromXML ("img/slider.svg")
 
   /*----- interface -----*/
   Double input (0)

@@ -6,32 +6,11 @@ use gui
 import Slider
 
 
-_native_code_
-%{
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-char*
-buildPath (const char* file)
-{
-  char* prefix = getcwd (NULL, 0);
-  int sz = strlen (prefix) + strlen (file) + 9;
-  char* path =  (char*) malloc (sz * sizeof (char));
-  sprintf (path, "file://%s/%s", prefix, file);
-  path[sz-1] = '\0';
-  free (prefix);
-  return path;
-}
-%}
-
-
 _define_
 Tab (Process frame, Process tabManager, string _label, int _index) {
   /* -------- Graphic components --------- */
   FillColor foreground_color (250, 250, 250)
-  g_tab = loadFromXML (buildPath ("img/tab.svg"))
+  g_tab = loadFromXML ("img/tab.svg")
 
   Component label_box {
     Translation pos ((_index - 1) * 160, 0)

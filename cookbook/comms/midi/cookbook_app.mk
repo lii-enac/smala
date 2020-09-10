@@ -14,7 +14,7 @@ djnn_libs_cookbook_app := gui display base exec_env core comms
 smala_libs_cookbook_app := smala
 
 ifeq ($(os),Linux)
-cppflags_cookbook_app := -I/usr/include/RtMidi
+cppflags_cookbook_app := -I/usr/include/RtMidi -I/usr/include/rtmidi
 endif
 
 libs_cookbook_app := -lrtmidi

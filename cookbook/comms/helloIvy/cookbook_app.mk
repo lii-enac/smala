@@ -13,3 +13,8 @@
 
 objs_cookbook_app := src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core comms
+
+
+ifeq ($(os),Linux)
+other_runtime_lib_path := /usr/lib64/
+endif

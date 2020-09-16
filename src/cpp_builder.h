@@ -54,6 +54,7 @@ namespace Smala {
     void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) override;
     void add_children_to (std::ofstream &os, Node *node) override;
     void build_control_node (std::ofstream &os, Node *n) override;
+    void build_multi_control_node (std::ofstream &os, NativeExpressionNode *node);
     void build_native_action_component (std::ofstream &os, Node *n) override;
     void build_native_action (std::ofstream &os, Node *n) override;
     void build_native_collection_action (std::ofstream &os, Node *n) override;

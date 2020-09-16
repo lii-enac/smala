@@ -88,6 +88,7 @@
     UNKNOWN
   };
 
+  vector<PathNode*> name_list;
   vector<PathNode*> process_list;
   vector<Node*> parent_list;
   vector<SubPathNode*> subpath;
@@ -98,6 +99,7 @@
   vector<int> int_array;
   Node *cur_node, *root = nullptr;
   //bool m_in_add_children = false;
+  bool m_terminate = false;
   int m_in_add_children = 0;
   bool m_in_arguments = false;
   bool m_in_for = false;
@@ -565,6 +567,7 @@ break_loop
 name_or_path
   : NAME
     {
+      m_terminate = false;
       NameContext *ctxt = new NameContext ();
       name_context_list.push_back (ctxt);
       ctxt->add_subpath (new SubPathNode ($1, START, NO_CAST));
@@ -572,6 +575,7 @@ name_or_path
     }
   | cast NAME
     {
+      m_terminate = false;
       NameContext *ctxt = new NameContext ();
       name_context_list.push_back (ctxt);
       ctxt->add_subpath (new SubPathNode ($2, START, $1));
@@ -580,27 +584,65 @@ name_or_path
   | name_or_path DOT subname
     {
       NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
       ctxt->add_subpath (new SubPathNode ($3, ITEM));
       $$ = ctxt->path ();
     }
   | name_or_path DOT DOLLAR NAME
     {
       NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
       ctxt->add_subpath (new SubPathNode ("$" + $4, REF));
       $$ = ctxt->path ();
     }
   | name_or_path DOT start_name_expr assignment_expression end_name_expr
     {
       NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
       ctxt->build_and_add_expression ();
       $$ = ctxt->path ();
     }
   | name_or_path start_name_expr assignment_expression end_name_expr
     {
       NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
       ctxt->build_and_add_expression ();
       $$ = ctxt->path ();
     }
+  | name_or_path DOT LCB pname_list RCB
+    {
+      NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
+      ctxt->add_subpath (new SubPathNode (name_list));
+      m_terminate = true;
+      $$ = ctxt->path ();
+    }
+    | name_or_path DOT LCB TIMES RCB
+    {
+      NameContext *ctxt = name_context_list.back ();
+      if (m_terminate) {
+        driver.set_error ("Invalid path specification");
+      }
+      SubPathNode *n = new SubPathNode ();
+      n->set_path_type (WILD_CARD);
+      ctxt->add_subpath (n);
+      m_terminate = true;
+      $$ = ctxt->path ();
+    }
+
+pname_list
+  : name_or_path { name_list.clear (); name_list.push_back (new PathNode ($1)); name_context_list.pop_back (); }
+  | pname_list COMMA name_or_path { name_list.push_back (new PathNode ($3)); name_context_list.pop_back (); }
 
 subname
 : ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; }

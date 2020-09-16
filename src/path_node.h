@@ -22,7 +22,9 @@ namespace Smala
     START,
     ITEM,
     REF,
-    EXPR
+    EXPR,
+    WILD_CARD,
+    PATH_LIST
   };
 
  enum cast_type {
@@ -32,22 +34,27 @@ namespace Smala
   BY_REF
  };
 
+  class PathNode;
   class SubPathNode : public Node
   {
   public:
     SubPathNode (): Node (SUBPATH), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
     SubPathNode (const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (SUBPATH), m_path (path), m_type (type), m_cast (cast) {}
     SubPathNode (const std::vector<TermNode*> node_list): Node (SUBPATH), m_path (""), m_expr (node_list), m_type (EXPR), m_cast (NO_CAST) {}
+    SubPathNode (const std::vector<PathNode*> path_list): Node (SUBPATH), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
     virtual ~SubPathNode () {}
 
     const std::string& get_subpath () const { return m_path; }
     void set_subpath (const std::string &path) { m_path = path; }
     subpath_type get_path_type () { return m_type; }
+    void set_path_type (subpath_type type) { m_type = type; }
+    std::vector<PathNode*> get_path_list () { return m_path_list; }
     std::vector<TermNode*> get_expr () { return m_expr; }
     cast_type get_cast () { return m_cast; }
 
   private:
     std::vector<TermNode*> m_expr;
+    std::vector<PathNode*> m_path_list;
     std::string m_path;
     subpath_type m_type;
     cast_type m_cast;
@@ -64,6 +71,8 @@ namespace Smala
       void set_cast (cast_type cast) { m_cast = cast; }
       cast_type get_cast () { return m_cast; }
       std::vector<SubPathNode*> get_subpath_list () { return m_path; }
+      bool has_wild_card () { return m_path.back ()->get_path_type () == WILD_CARD; }
+      bool has_path_list () { return m_path.back ()->get_path_type () == PATH_LIST; }
 
     private:
       std::vector<SubPathNode*> m_path;

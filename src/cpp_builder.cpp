@@ -173,10 +173,14 @@ namespace Smala
     std::string str = m_parent_list.back ()->get_symbol (symbol);
     if (n_list.size () == 1)
       return str;
+    if (n_list.size () == 2 && (n_list.at (1)->get_path_type () == WILD_CARD || n_list.at (1)->get_path_type () == PATH_LIST))
+      return str;
     str += "->find_child (\"";
     std::string pref = "";
     for (int i = 1; i < n_list.size (); i++) {
       str += pref;
+      if (n_list.at (i)->get_path_type () == WILD_CARD || n_list.at (i)->get_path_type () == PATH_LIST)
+        break;
       if (n_list.at (i)->get_path_type () != EXPR)
         str += n->get_subpath_list ().at (i)->get_subpath ();
       else {
@@ -261,7 +265,9 @@ namespace Smala
     }
     if (complex_term) {
       for (auto it = n_list.begin() + 1; it != n_list.end(); ++it) {
-        if ((*it)->get_path_type () != EXPR)
+        if ((*it)->get_path_type () == WILD_CARD || (*it)->get_path_type () == PATH_LIST)
+          break;
+        else if ((*it)->get_path_type () != EXPR)
           str += "->find_child (\"" + (*it)->get_subpath () + "\")";
         else {
           str += "->find_child (";
@@ -522,6 +528,68 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_multi_control_node (std::ofstream &os,
+                                           NativeExpressionNode *node)
+  {
+    TermNode* arg_node = node->get_expression ().at (0);
+    std::string p_name =
+            node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
+    std::string arg = build_find (arg_node->path_arg_value (), false);
+    std::string control_name = node->is_connector () ? "MultiConnector" : "MultiAssignment";
+    int model = node->is_connector () ? !node->is_model () : node->is_model ();
+    if (arg_node->path_arg_value ()->has_wild_card ()) {
+      for (auto e : node->get_output_nodes ()) {
+        for (auto e : node->get_output_nodes ()) {
+          indent (os);
+          std::string out_arg = build_find (e, false);
+          os << control_name << " (" << p_name << ", " << arg << ", " << out_arg
+              << ", " << model << ");\n";
+        }
+      }
+      return;
+    }
+    indent (os);
+    os << "{ std::vector <std::string> in_names;\n";
+    std::vector<SubPathNode*> subpaths = arg_node->path_arg_value()->get_subpath_list();
+    std::string comma = "";
+    for (auto p:subpaths.back()->get_path_list ()) {
+      indent (os);
+      os << "in_names.push_back (\"";
+      std::string sep = "";
+      for (auto item: p->get_subpath_list()) {
+        os << sep << item->get_subpath ();
+        sep = "/";
+      }
+      os << "\");\n";
+    }
+    m_indent++;
+    for (auto e : node->get_output_nodes ()) {
+      indent (os);
+      std::string out_arg = build_find (e, false);
+      comma = "";
+      os << "{ std::vector <std::string> out_names;\n";
+      for (auto p: e->get_subpath_list().back()->get_path_list()) {
+        indent (os);
+        os << "out_names.push_back (\"";
+        std::string sep = "";
+        for (auto item: p->get_subpath_list()) {
+          os << sep << item->get_subpath ();
+          sep = "/";
+        }
+        os << "\");\n";
+      }
+      indent (os);
+      os << control_name << " (" << p_name << ", " <<   arg << ", in_names, "
+          << out_arg << ", out_names, " << model << ");\n";
+      indent (os);
+      os << "}\n";
+    }
+    m_indent--;
+    indent (os);
+    os << "}\n";
+  }
+
+  void
   CPPBuilder::build_simple_control_node (std::ofstream &os,
                                          NativeExpressionNode *node)
   {
@@ -541,6 +609,10 @@ namespace Smala
       }
       arg = new_name;
     } else {
+      if (arg_node->path_arg_value()->has_path_list() || arg_node->path_arg_value()->has_wild_card()) {
+        build_multi_control_node (os, node);
+        return;
+      }
       arg = build_find (arg_node->path_arg_value (), false);
     }
     if (!node->is_connector () && !node->name ().empty ()) {

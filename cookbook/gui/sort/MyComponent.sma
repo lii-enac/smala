@@ -25,7 +25,7 @@ MyComponent (double _x, double _y, double _width, double _height, int r)
 
       cl.tick->incr, incr_anim
       incr.state =:> pos.ty
-      incr_anim.state >= 20 =:> end_anim
+      incr_anim.state >= 21 =:> end_anim
     }
     st_idle->st_move (move_y_to)
     st_move->st_idle (st_move.end_anim.true)

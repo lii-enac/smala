@@ -58,10 +58,7 @@ Component root
   }
   fsm.state =:> order.text
   button_asc.press -> sorter.sort
-  Spike sort_request
-  sorter.spec->sort_request
-  button_asc.press->sort_request
-  sort_request->(root) {
+  sorter.sort->(root) {
     int y = 10
     for (int i = 1; i <= root.mylist.size; i++) {
       root.mylist.[i].move_y_to = y

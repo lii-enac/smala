@@ -333,6 +333,7 @@ libs_cookbook_app :=
 cflags_cookbook_app :=
 cppflags_cookbook_app :=
 res_dir :=
+other_runtime_lib_path :=
 
 include cookbook/$1/cookbook_app.mk
 
@@ -346,6 +347,7 @@ $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_res_dir := $$(res_dir)
 $1_app_cppflags := $$(cppflags_cookbook_app)
 $1_app_cflags := $$(cflags_cookbook_app)
+$1_other_runtime_lib_path := $$(other_runtime_lib_path)
 
 ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
@@ -380,9 +382,9 @@ $$(notdir $1)_objs: $$($1_app_objs)
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(other_runtime_lib_path)" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$($1_other_runtime_lib_path)" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$($1_other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
 	rm -f $$($1_app_exe) $$($1_app_objs) $$($1_app_gensrcs)

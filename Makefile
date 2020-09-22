@@ -138,7 +138,8 @@ djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 else
 djnn_cflags := -I$(djnn_path)/src
 djnn_ldflags := -L$(djnn_path)/build/lib
-djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+#djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
 djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
 endif
@@ -450,9 +451,9 @@ cookbook_apps := core/bindings \
 	gui/texture \
 	gui/ms_per_frame \
 	gui/regex \
-	comms/helloIvy \
-	comms/midi \
-	audio/simple_audio
+	comms/helloIvy
+#	comms/midi \
+#	audio/simple_audio
 
 #	extra/crazyflie
 

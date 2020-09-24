@@ -1,0 +1,41 @@
+use core
+use base
+use animation
+
+_define_
+Animator (int duration, double min, double max, int func)
+{
+  Spike start
+  Spike abort
+  Spike end
+  Spike pause
+  Spike resume
+  Spike reset
+  Double output (0)
+  EasingGenerator gen (func)
+  Incr inc (1)
+  
+  inc.state =:> gen.input
+  inc.state >= 1 -> end
+  gen.output * (max - min) + min =:> output
+ 
+  FSM fsm {
+    State stopped
+    State started {
+      Clock cl (60)
+      Int num_step (0)
+      duration/cl.period =:> num_step
+      1 / num_step =:> inc.delta
+      cl.tick->inc      
+    }
+    State paused
+    started->stopped (end)
+    {started, paused}->stopped (abort)
+    stopped->started (start, reset)
+    started->paused (pause)
+    paused->started (resume)
+  }
+  fps aka fsm.started.cl.period
+  reset -> { 0 =: inc.state 
+             0 =: gen.input }
+}

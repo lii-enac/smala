@@ -29,6 +29,9 @@ Button (Process frame, string label, double x_, double y_) {
   FillColor fc (50, 50, 50)
   Rectangle r (0, 0, 100, 40, 10, 10)
 
+  width aka r.width
+  height aka r.height
+
   FSM fsm {
     State idle {
       50 =: fc.r

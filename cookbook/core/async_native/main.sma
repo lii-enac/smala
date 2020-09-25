@@ -25,19 +25,22 @@ import gui.interactors.SimpleDrag
     #include <unistd.h>
 
     // to use exclusive_access in smala
-    //#include "exec_env/global_mutex.h"
+    #include "exec_env/global_mutex.h"
  %}
 
 _action_
 smala_action(Process src, Process root)
 {
     // blocking call
-    sleep (3)
+    sleep (2)
 
     // then if you have to modify smala/djnn tree
-    //get_exclusive_access ("")
-    //root.t2.text = "TEXT FROM ACTION"
-    //release_exclusive_access ("")
+    get_exclusive_access ("")
+    root.t2.text = "TEXT FROM ACTION"
+    release_exclusive_access ("")
+
+    // another blocking call
+    sleep (2)
 }
 
 _main_

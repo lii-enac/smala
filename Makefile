@@ -444,7 +444,8 @@ cookbook_apps := core/bindings \
 	gui/widgets/scrollbar \
 	gui/widgets/tab \
 	gui/widgets/menu \
-	gui/animation/easing \
+	gui/animation/simple_animation \
+	gui/animation/simple_animation_loop \
 	gui/animation/path_animation \
 	gui/animation/notification_animation \
 	gui/clone \

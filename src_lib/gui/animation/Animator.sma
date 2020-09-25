@@ -3,7 +3,7 @@ use base
 use animation
 
 _define_
-Animator (int duration, double min, double max, int func)
+Animator (int duration, double min, double max, int func, int loop)
 {
   Spike start
   Spike abort
@@ -16,7 +16,11 @@ Animator (int duration, double min, double max, int func)
   Incr inc (1)
   
   inc.state =:> gen.input
-  inc.state >= 1 -> end
+  if (loop) {
+    inc.state >= 1 -> reset
+  } else {
+    inc.state >= 1 -> end
+  }
   gen.output * (max - min) + min =:> output
  
   FSM fsm {

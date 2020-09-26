@@ -11,4 +11,4 @@
 #
 
 objs_cookbook_app := Chronometer.o FittsTask1D.o main.o
-djnn_libs_cookbook_app := gui display base exec_env core
+djnn_libs_cookbook_app := file gui display base exec_env core

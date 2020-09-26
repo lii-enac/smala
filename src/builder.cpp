@@ -142,7 +142,26 @@ namespace Smala
     os << "double smala_deref(double p)\n";
     os << "{ return p; }\n\n";
 
-    /* thenthe user defined native */
+    /* user-defined native code so native expression can use it */
+    for (int i = 0; i < size; ++i) {
+      cur_node = m_ast.preamble ().nodes ().at (i);
+      switch (cur_node->node_type ()) {
+        case NATIVE_CODE:
+          {
+            NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
+            os << n->code () << std::endl;
+            break;
+          }
+        default: break;
+        }
+    }
+
+    /* auto-generated native */
+    for (auto e: m_ast.native_expression_list ()) {
+      build_native_expression (os, e);
+    }
+
+    /* user-defined native */
     for (int i = 0; i < size; ++i) {
       cur_node = m_ast.preamble ().nodes ().at (i);
       switch (cur_node->node_type ()) {
@@ -156,21 +175,12 @@ namespace Smala
             build_native_collection_action (os, cur_node);
             break;
           }
-        case NATIVE_CODE:
-          {
-            NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
-            os << n->code () << std::endl;
-            break;
-          }
+        case NATIVE_CODE: break; // already handled above
         default:
           build_node (os, cur_node);
         }
     }
 
-    /* then the auto-generated native */
-    for (auto e: m_ast.native_expression_list ()) {
-      build_native_expression (os, e);
-    }
   }
 
   void

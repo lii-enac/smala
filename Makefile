@@ -415,6 +415,7 @@ cookbook_apps := core/bindings \
 	core/native_collection_action \
 	core/async_native \
 	display/screenshot \
+	gui/graphics/simultaneous_contrast \
 	gui/direct_manipulation/dnd \
 	gui/direct_manipulation/simplest \
 	gui/direct_manipulation/reusable_dnd \

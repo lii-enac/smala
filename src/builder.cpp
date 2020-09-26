@@ -142,13 +142,7 @@ namespace Smala
     os << "double smala_deref(double p)\n";
     os << "{ return p; }\n\n";
 
-
-    /* then the auto-generated native */
-    for (auto e: m_ast.native_expression_list ()) {
-      build_native_expression (os, e);
-    }
-
-    /* finally the user defined native */
+    /* thenthe user defined native */
     for (int i = 0; i < size; ++i) {
       cur_node = m_ast.preamble ().nodes ().at (i);
       switch (cur_node->node_type ()) {
@@ -171,6 +165,11 @@ namespace Smala
         default:
           build_node (os, cur_node);
         }
+    }
+
+    /* then the auto-generated native */
+    for (auto e: m_ast.native_expression_list ()) {
+      build_native_expression (os, e);
     }
   }
 

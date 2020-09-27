@@ -24,6 +24,8 @@ Component root
     Rectangle left (50,50, 100,100)
     Rectangle right (600,50, 100,100)
 
+    f.width - 150 =:> right.x
+
     Rectangle mobile (50,400, 100,100)
     f.move.x => mobile.x
     f.move.y => mobile.y

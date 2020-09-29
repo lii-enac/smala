@@ -1,4 +1,5 @@
 config.mk
 build/
 res/
+cookbook/display/screenshot/screenshot.png
 .scannerwork

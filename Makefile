@@ -446,6 +446,7 @@ cookbook_apps := core/bindings \
 	gui/direct_manipulation/rotate_resize \
 	gui/direct_manipulation/dynamic_rectangle \
 	gui/fitts_law \
+	gui/keyboard \
 	gui/layout/dock \
 	gui/layout/strip_board \
 	gui/mainloop \

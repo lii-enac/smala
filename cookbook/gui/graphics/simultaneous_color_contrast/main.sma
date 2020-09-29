@@ -11,12 +11,12 @@ Component root
     f.close -> ex
     //mouseTracking = 1
 
-    FillColor _ (60,249,1)
+    FillColor bg_left_col (60,249,1)
     Rectangle bg_left (0,0, 0,100)
     f.width / 2 =:> bg_left.width
     f.height =:> bg_left.height
 
-    FillColor _ (255,58,219)
+    FillColor bg_right_col (255,58,219)
     Rectangle bg_right (0,0, 0,100)
     f.width / 2 =:> bg_right.x, bg_right.width
     f.height =:> bg_right.height
@@ -29,4 +29,30 @@ Component root
     FillColor _ (146,55,255)
     Rectangle right (600,200, 100,100)
     f.width - 150 =:> right.x
+
+    FSM fsm {
+        State saturated {
+            60 =: bg_left_col.r
+            249 =: bg_left_col.g
+            1 =: bg_left_col.b
+
+            255 =: bg_right_col.r
+            58 =: bg_right_col.g
+            219 =: bg_right_col.b
+        }
+        State pastel {
+            172 =: bg_left_col.r
+            251 =: bg_left_col.g
+            150 =: bg_left_col.b
+
+            255 =: bg_right_col.r
+            153 =: bg_right_col.g
+            237 =: bg_right_col.b
+        }
+        saturated -> pastel (f.press)
+        pastel -> saturated (f.press)
+
+    }
+
+
 }

@@ -139,7 +139,7 @@ else
 djnn_cflags := -I$(djnn_path)/src
 djnn_ldflags := -L$(djnn_path)/build/lib
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
-djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
+djnn_ldlibs := -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core 
 djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
 endif
@@ -358,7 +358,7 @@ else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
-$1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+$1_app_libs := -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app)) $$($1_app_libs)
 $$($1_app_objs): $$(smala_lib)
 
 $$(notdir $1)_toto:

@@ -37,6 +37,19 @@ MINOR2 = 0
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
+# ---------------------------------------
+# utils
+
+# https://stackoverflow.com/a/16151140
+uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
+
+# recursive wildcard https://stackoverflow.com/a/12959694
+rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+rwildcardmul = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
+
+# ---------------------------------------
+# os
+
 ifndef os
 os := $(shell uname -s)
 
@@ -358,7 +371,7 @@ else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
-$1_app_libs := -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app)) $$($1_app_libs)
+$1_app_libs := -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app)) $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux's ld
 $$($1_app_objs): $$(smala_lib)
 
 $$(notdir $1)_toto:

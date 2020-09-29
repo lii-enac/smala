@@ -23,7 +23,8 @@ _native_code_
 
     double myrandom()
     {
-        return random()/(double)RAND_MAX;
+        //return random()/(double)RAND_MAX; // does not work on win32
+        return rand()/(double)RAND_MAX;
     }
 
 %}

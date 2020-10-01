@@ -4,7 +4,7 @@ Section: libs
 Priority: optional
 Architecture: amd64
 Homepage: <http://smala.io/>
-Depends:  bison, flex,  m4, djnn-cpp (>= 1.12.0)
+Depends:  bison, flex,  m4, djnn-cpp (>= 1.13.0)
 Maintainer: Mathieu Poirier <mathieu.poirier@enac.fr>
 Description: interactive programming language
  Compiler for interactive programming language

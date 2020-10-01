@@ -5,6 +5,56 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.13.0] - 2020-10-01
+### compliant with djnn-cpp [1.13.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW native collection component + cookbook 
+    - New DropDownMenu recipe in gui widget libsmala
+    - NEW "for : "  loop operator (ex: "for r : rectangles")
+    - NEW opérator : " ~>  " allowingg user to add edges in the casual graph 
+    - NEW support for multi Connector
+    - NEW support for multi assignment
+    - NEW - libsmala - animation manager component +  easing cookbook recipe
+    - NEW support for screenshot service throug Frame/window + screenshot cookbook recipe
+    - NEW blinking cookbook recipe
+    - NEW simultaneous_contrast cookbook recipe
+    - NEW simultaneous_color_contrast cookbook recipe
+    - NEW - libsmala - Control key manager 
+    - NEW Keyboard cookbook 
+    - NEW curl native async cookbook recipe
+
+### Added
+    - Added cookbook crazyflie recipe
+
+### Changed
+    - Added - libsmala - Button interface
+    - Simplified async_native recipe
+    - Move PanAndZoom into libsmala
+    - Updated cookbook recipes from djnn-cpp 1.13.0 api
+    - Changed zoom recipe : mouseCentered by default
+    - Improved and cleaned up code
+    - Improved Makefile : cross_prefix, install-pkgdeps
+    - Changed Static_cast for dynamic_cast in 
+
+### Removed
+    - Removed all buildpath reference
+    - Removed : mainloop is no more an existing global variable
+    - Removed fsm_guard 
+    - Commented midi component recipe (not working on Windows)
+
+### Fixed
+    - Fixed few bugs in TextLineEdit
+    - Fixed the use of wheel->dx, dy
+    - Fixed some Linux compilation
+    - Fixed Sorter recipe
+    - Fixed the use of other_runtime_lib_path in Makefile
+
+
+## [1.12.0] - skipped
+
+
 ## [1.11.0] - 2020-06-25
 ### compliant with djnn-cpp [1.12.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

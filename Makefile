@@ -343,6 +343,7 @@ $(build_dir)/src/parser.cpp: src/errors.h
 define cookbookapp_makerule
 djnn_libs_cookbook_app :=
 smala_libs_cookbook_app :=
+pkg_cookbook_app :=
 libs_cookbook_app :=
 cflags_cookbook_app :=
 cppflags_cookbook_app :=
@@ -361,6 +362,7 @@ $1_app_exe := $$(build_dir)/cookbook/$1/$$(ckappname)_app$$(EXE)
 $1_res_dir := $$(res_dir)
 $1_app_cppflags := $$(cppflags_cookbook_app)
 $1_app_cflags := $$(cflags_cookbook_app)
+$1_app_pkg := $$(pkg_cookbook_app)
 $1_other_runtime_lib_path := $$(other_runtime_lib_path)
 
 ifeq ($$(cookbook_cross_prefix),em)
@@ -377,6 +379,13 @@ $$($1_app_objs): $$(smala_lib)
 $$(notdir $1)_toto:
 	echo $$(smala_lib)
 endif
+
+ifneq ($$($1_app_pkg),)
+#$1_lib_pkgpath = $$(subst $$() $$(),:,$$(lib_pkgpath))
+$1_app_cppflags += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pkgpath) pkg-config --cflags $$($1_app_pkg))
+$1_app_libs += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pkgpath) pkg-config --libs $$($1_app_pkg))
+endif
+
 endif
 
 $1_app_link := $$(CXX_CK)
@@ -426,7 +435,8 @@ cookbook_apps := core/bindings \
 	core/text_cat \
 	core/nativeactions \
 	core/native_collection_action \
-	core/async_native \
+	core/async_native/simple_async_native \
+	core/async_native/curl_async_native \
 	display/screenshot \
 	gui/graphics/simultaneous_contrast \
 	gui/graphics/simultaneous_color_contrast \

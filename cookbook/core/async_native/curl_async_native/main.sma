@@ -24,10 +24,10 @@ _native_code_
 %{
 #include "exec_env/global_mutex.h"
 
+namespace curl { // fix 'Rectangle' clash name for windowss
 #include <curl/curl.h>
 #include <curl/easy.h>
-
-
+}
 
 size_t
 mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -42,6 +42,7 @@ mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 void
 cpp_action (Process* c)
 {
+    using namespace curl;
     CURL *curl = curl_easy_init ();
     if (!curl) {
         std::cerr << "error setting curl" << std::endl;

@@ -17,6 +17,9 @@ use base
 use display
 use gui
 
+import gui.widgets.Button
+import gui.interactors.SimpleDrag
+
 _native_code_
 %{
 #include "exec_env/global_mutex.h"
@@ -24,25 +27,21 @@ _native_code_
 #include <curl/curl.h>
 #include <curl/easy.h>
 
+
+
 size_t
 mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
-    std::cerr << "curl received " << size * nmemb << " bytes." << std::endl;
-    std::cerr << ptr << std::endl;
+    //std::cerr << "curl received " << size * nmemb << " bytes." << std::endl;
+    //std::cerr << ptr << std::endl;
+    std::string * content = reinterpret_cast<std::string*>(userdata);
+    *content += ptr;
     return size * nmemb;
 }
 
 void
 cpp_action (Process* c)
 {
-	// To get the source that triggered the native action:
-	//Process *source = c->get_activation_source ();
-	
-	// To get the user_data:
- 	//Process *data = (Process*) get_native_user_data (c);
- 	//Process *fc = data->find_child ("fc");
-    //((IntProperty*) fc->find_child ("value"))->set_value (0xFF0000, 1)  ;
-
     CURL *curl = curl_easy_init ();
     if (!curl) {
         std::cerr << "error setting curl" << std::endl;
@@ -50,13 +49,15 @@ cpp_action (Process* c)
     }
 
     //std::string uri = "http://smala.io";
-    std::string uri = "https://www.lemonde.fr";
+    //std::string uri = "https://www.lemonde.fr";
+    std::string uri = "https://www.lemonde.fr/rss/une.xml";
     //std::string uri = "https://djnn.net/wp-content/uploads/2016/07/EICS_demo_2014.mp4";
 
     curl_easy_setopt(curl, CURLOPT_URL, uri.c_str ());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mycurl_write_callback);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, &d);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+    std::string content;
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
 
     std::cerr << "curl getting " << uri << std::endl;
     auto res = curl_easy_perform (curl);
@@ -67,11 +68,26 @@ cpp_action (Process* c)
 
     curl_easy_cleanup (curl);
 
-    // to print the component tree:
- 	//fc->dump(0);
-
+    //std::cerr << content << std::endl;
+    auto beg = content.find("<item>");
+    beg = content.find("<title>", beg);
+    auto end = content.find("</title>", beg+7);
+    string news = content.substr(beg+7,end-(beg+7));
+    std::cerr << news << std::endl;
+    
+    
+    // update djnn tree
     get_exclusive_access(DBG_GET);
-    // TODO: update djnn tree
+    
+    // To get the source that triggered the native action:
+	//Process *source = c->get_activation_source ();
+	
+	// To get the user_data
+ 	Process *data = (Process*) get_native_async_user_data (c);
+    
+ 	Process *t = data->find_child ("t");
+    ((Text*) t)->text()->set_value (news, 1) ;
+
     release_exclusive_access(DBG_REL);
 }
 
@@ -83,13 +99,24 @@ Component root {
 	Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
+    FillColor fcc (#000000)
+    Text explanation1 (10, 20, "Click the button to launch the async action")
+    Text explanation2 (10, 40, "then, drag the rectangle to check that the application is not freezed")
+    Text explanation3 (10, 60, "When the action is terminated, the title of the online ressource should appear")
+    Text t (10, 120, "  ")
+    Text t2 (10, 140, "")
+    Button btn (f, "launch", 50, 150)
+    FillColor fc (#FF00FF)
+    Rectangle r (200, 200, 100, 100, 0, 0)
+    Ref toDrag (r)
+    SimpleDrag _ (toDrag, f)
 
     // Bind a C++ native action
-	NativeAction cpp_na (cpp_action, root, 1)
+	NativeAsyncAction cpp_na (cpp_action, root, 1)
 
-    FillColor fc(255,0,0)
-    Rectangle r(0,0,50,50)
+    cpp_na ~> t
 
-	r.press -> cpp_na
+    btn.click -> cpp_na
+    btn.click -> {"STARTED" =: t.text}
 }
 

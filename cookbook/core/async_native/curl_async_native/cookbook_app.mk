@@ -14,5 +14,5 @@
 objs_cookbook_app := main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 lang_cookbook_app := cpp
-#smala_libs_cookbook_app := smala
+smala_libs_cookbook_app := smala
 pkg_cookbook_app := libcurl

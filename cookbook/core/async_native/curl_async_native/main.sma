@@ -83,7 +83,7 @@ cpp_action (Process* c)
 	//Process *source = c->get_activation_source ();
 	
 	// To get the user_data
- 	Process *data = (Process*) get_native_async_user_data (c);
+ 	Process *data = (Process*) get_native_user_data (c);
     
  	Process *t = data->find_child ("t");
     ((Text*) t)->text()->set_value (news, 1) ;

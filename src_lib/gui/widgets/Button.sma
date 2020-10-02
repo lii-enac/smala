@@ -17,7 +17,7 @@ use display
 use gui
 
 _define_
-Button (Process frame, string label, double x_, double y_) {
+Button (Process frame, string _label, double x_, double y_) {
   Translation t (x_, y_)
 
   /*----- interface -----*/
@@ -46,8 +46,8 @@ Button (Process frame, string label, double x_, double y_) {
 
   FillColor w (255, 255, 255)
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
-  Text thisLabel (10, 10, label)
-
+  Text thisLabel (10, 10, _label)
+  label aka thisLabel.text
   r.height / 2 + 3 =: thisLabel.y
   thisLabel.width + 20 =:> r.width
   r.width / 2 =:> thisLabel.x

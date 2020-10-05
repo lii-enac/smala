@@ -41,6 +41,7 @@ fn_init(Process src, Process data)
             bkg.press -> { data.unselect_all =: data.ask_selection
               "" =: data.choice.text
             }
+            |->data.fold
           }
         }
         Bool selected (0)
@@ -76,11 +77,13 @@ DropDownMenu (double _x, double _y)
   RefProperty ask_selection (null)
   RefProperty unselect_all (null)
 
-  FillColor button_color (40, 200, 250)
+  FillColor button_color (40, 00, 250)
   Rectangle button (0, 0, 20, 18, 2, 2)
   box.width - 2 =:> button.x
   
   List choices
+
+  Spike fold
   
   FSM fsm {
     State idle {
@@ -119,6 +122,7 @@ DropDownMenu (double _x, double _y)
     }
     idle->unfolded (button.press)
     unfolded->idle (button.press)
+    unfolded->idle (fold)
   }
   NativeAction init (fn_init, this, 0)
   MaxList sum (fsm.unfolded.items, "width")

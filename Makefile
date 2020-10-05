@@ -256,9 +256,9 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-$(smalac): CFLAGS = $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
+$(smalac): CFLAGS += $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 #$(smalac): CXX = $(cross_prefix)++
-$(smalac): LDFLAGS = $(SC_LDFLAGS)
+$(smalac): LDFLAGS += $(SC_LDFLAGS)
 
 # ------------
 # smala lib

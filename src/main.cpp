@@ -51,7 +51,10 @@ int main (int argc, const char **argv) {
 		ifstream is (filename) ;
 		if (is.is_open ()) {
 			filesystem::path path = filesystem::current_path() / filesystem::path(filename);
-			std::string str_path (path);
+			// on some system (Windows, Linux) path as to convert into string ()
+			std::string str_path (path.string ());
+			// on some system (Windows) str_path need to be converted : C:\foo\bar -> C:/foo/bar
+			std::replace (str_path.begin (), str_path.end (), '\\', '/');
 			driver.set_stream (&is, str_path);
 			error |= driver.parse ();
 			is.close ();

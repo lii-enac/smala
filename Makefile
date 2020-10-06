@@ -138,7 +138,7 @@ lib_smala_name = libsmala
 #CC_CK := $(cookbook_cross_prefix)cc
 #CXX_CK := $(cookbook_cross_prefix)++
 CFLAGS += -g -MMD
-CXXFLAGS += $(CFLAGS) -std=c++17
+CXXFLAGS += $(CFLAGS) -std=c++14
 #LIBS ?=
 
 ifeq ($(djnn_path),) 

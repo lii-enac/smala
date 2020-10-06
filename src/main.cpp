@@ -24,21 +24,6 @@
 using namespace Smala;
 using namespace std;
 
-#ifndef __has_include
-static_assert(false, "__has_include not supported");
-#else
-#  if __has_include(<filesystem>)
-#    include <filesystem>
-namespace filesystem = filesystem;
-#  elif __has_include(<experimental/filesystem>)
-#    include <experimental/filesystem>
-namespace filesystem = experimental::filesystem;
-#  elif __has_include(<boost/filesystem.hpp>)
-#    include <boost/filesystem.hpp>
-namespace filesystem = boost::filesystem;
-#  endif
-#endif
-
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
 	Driver driver (arg.debug());
@@ -50,9 +35,7 @@ int main (int argc, const char **argv) {
 	for (auto filename: arg.files()) {
 		ifstream is (filename) ;
 		if (is.is_open ()) {
-			filesystem::path path = filesystem::current_path() / filesystem::path(filename);
-			std::string str_path (path);
-			driver.set_stream (&is, str_path);
+			driver.set_stream (&is, filename);
 			error |= driver.parse ();
 			is.close ();
 

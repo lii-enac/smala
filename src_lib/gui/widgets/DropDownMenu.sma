@@ -61,7 +61,6 @@ fn_init(Process src, Process data)
 _define_
 DropDownMenu (double _x, double _y)
 {
-  mouseTracking = 1
   Translation pos (_x, _y)
   x aka pos.tx
   y aka pos.ty

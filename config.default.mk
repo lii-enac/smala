@@ -1,9 +1,14 @@
 build_dir := build
 
+
 #devel
 #djnn-pkgconf = djnn-cpp-dev
 #install (github)
 djnn-pkgconf = djnn-cpp
+
+#or use on local
+#djnn_path = ../djnn-cpp
+
 
 cookbook_app_for_make_test := button
 cookbook_apps_extra :=

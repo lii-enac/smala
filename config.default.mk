@@ -7,7 +7,7 @@ build_dir := build
 djnn-pkgconf = djnn-cpp
 
 #or use on local
-#djnn_path = ../djnn-cpp
+djnn_path = ../djnn-cpp
 
 
 cookbook_app_for_make_test := button

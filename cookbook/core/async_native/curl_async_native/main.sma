@@ -49,8 +49,6 @@ cpp_action (Process* c)
         return;
     }
 
-    //std::string uri = "http://smala.io";
-    //std::string uri = "https://www.lemonde.fr";
     std::string uri = "https://www.lemonde.fr/rss/une.xml";
     //std::string uri = "https://djnn.net/wp-content/uploads/2016/07/EICS_demo_2014.mp4";
 
@@ -61,6 +59,8 @@ cpp_action (Process* c)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
 
     std::cerr << "curl getting " << uri << std::endl;
+
+    // blocking call, only once here since the URI is finished (and there is no curl 'mainloop')
     auto res = curl_easy_perform (curl);
     if (res != CURLE_OK) {
         std::cerr << "error performing curl" << std::endl;
@@ -78,6 +78,7 @@ cpp_action (Process* c)
     
     
     // update djnn tree
+
     get_exclusive_access(DBG_GET);
     
     // To get the source that triggered the native action:
@@ -90,6 +91,8 @@ cpp_action (Process* c)
     ((Text*) t)->text()->set_value (news, 1) ;
 
     release_exclusive_access(DBG_REL);
+
+    // exiting, _end will be activated and graph will be executed
 }
 
 %}
@@ -115,6 +118,8 @@ Component root {
     // Bind a C++ native action
 	NativeAsyncAction cpp_na (cpp_action, root, 1)
 
+    // since we apply set_value to t in the native,
+    // we specify a causality relation between the native and the text it uses
     cpp_na ~> t
 
     btn.click -> cpp_na

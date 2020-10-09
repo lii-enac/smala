@@ -62,6 +62,7 @@ Driver::set_stream (std::istream *is, const std::string& filename)
   m_file = filename;
   m_scanner.switch_streams (is, 0);
   m_ast = Ast ();
+  m_loc.initialize (&filename);
 }
 
 void
@@ -79,7 +80,7 @@ Driver::add_define_node (Node *node)
 void
 Driver::add_node (Node *node)
 {
-  node->set_location (location ());
+  node->set_error_location (location ());
   m_ast.add_node (node);
 }
 
@@ -90,33 +91,33 @@ Driver::remove_node (Node *node)
 }
 
 void
-Driver::add_use (const std::string &val)
+Driver::add_use (const class location& loc, const std::string &val)
 {
-  m_ast.add_use (val);
+  m_ast.add_use (loc, val);
 }
 
 void
-Driver::add_import (PathNode *path)
+Driver::add_import (const class location& loc, PathNode *path)
 {
-  m_ast.add_import (path);
+  m_ast.add_import (loc, path);
 }
 
 void
-Driver::add_native_action (const std::string &action_name, const std::string &param_name, const std::string &code)
+Driver::add_native_action (const class location& loc, const std::string &action_name, const std::string &param_name, const std::string &code)
 {
-  m_ast.add_native_action (action_name, param_name, code);
+  m_ast.add_native_action (loc, action_name, param_name, code);
 }
 
 void
-Driver::add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
+Driver::add_native_collection_action (const class location& loc, const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
 {
-  m_ast.add_native_collection_action (action_name, list_name, param_name, code);
+  m_ast.add_native_collection_action (loc, action_name, list_name, param_name, code);
 }
 
 void
-Driver::add_native_code (const std::string &code)
+Driver::add_native_code (const class location& loc, const std::string &code)
 {
-  m_ast.add_native_code (code);
+  m_ast.add_native_code (loc, code);
 }
 
 void
@@ -133,10 +134,10 @@ Driver::end_preamble ()
 
 
 void
-Driver::new_line ()
+Driver::new_line (const class location& loc)
 {
   if (m_debug_mode)
-    m_ast.add_node(new NewLineNode(m_file, m_line));
+    m_ast.add_node(new NewLineNode(loc, m_file, m_line));
 }
 
 
@@ -163,6 +164,5 @@ Driver::increaseLocation (const char* s, int len)
 smala::ErrorLocation*
 Driver::location () const
 {
-
   return new smala::ErrorLocation (m_file, m_line, m_pos);
 }

@@ -17,19 +17,21 @@
 namespace Smala
 {
 
-  CtrlNode::CtrlNode () :
-      Node (CONTROL), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
+  CtrlNode::CtrlNode (const location& loc) :
+      Node (loc, CONTROL), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
   {
   }
 
-  CtrlNode::CtrlNode (
+  CtrlNode::CtrlNode (const location& loc,
       const std::string &type, const std::string &name,
       const std::vector<std::pair<ParamType, std::string> > &arguments) :
-      Node (CONTROL, type, name, arguments), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
+      Node (loc, CONTROL, type, name, arguments), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
   {
   }
 
-  CtrlNode::CtrlNode (const std::string &type, const std::string &name, std::string in_act, std::string out_act) : Node (CONTROL, type, name), m_in (nullptr), m_out (nullptr), m_in_act (in_act), m_out_act (out_act)
+  CtrlNode::CtrlNode (const location& loc,
+  const std::string &type, const std::string &name, std::string in_act, std::string out_act) :
+  Node (loc, CONTROL, type, name), m_in (nullptr), m_out (nullptr), m_in_act (in_act), m_out_act (out_act)
   {
   }
 

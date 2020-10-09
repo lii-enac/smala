@@ -25,8 +25,8 @@ namespace Smala
   class InstructionNode : public Node
   {
   public:
-    InstructionNode ();
-    InstructionNode (const std::string& name);
+    InstructionNode (const location& loc);
+    InstructionNode (const location& loc, const std::string& name);
     virtual ~InstructionNode ();
 
     void add_path (PathNode *n);

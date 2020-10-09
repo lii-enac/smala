@@ -22,8 +22,8 @@ namespace Smala
   class SetParentNode : public Node
   {
   public:
-    SetParentNode ();
-    SetParentNode (Node *to_attach);
+    SetParentNode (const location& loc);
+    SetParentNode (const location& loc, Node *to_attach);
     virtual ~SetParentNode ();
 
     Node* to_attach ();

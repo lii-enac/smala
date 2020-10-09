@@ -26,8 +26,8 @@ namespace Smala
   class NativeComponentNode : public Node
   {
   public:
-    NativeComponentNode ();
-    NativeComponentNode (const std::string &action_name, PathNode *path_list, PathNode *path_data, const std::string &is_model, native_type is_async);
+    NativeComponentNode (const location& loc);
+    NativeComponentNode (const location& loc, const std::string &action_name, PathNode *path_list, PathNode *path_data, const std::string &is_model, native_type is_async);
     virtual ~NativeComponentNode ();
 
     const std::string& function_name () const;

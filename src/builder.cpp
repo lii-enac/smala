@@ -186,7 +186,7 @@ namespace Smala
   void
   Builder::build_node (std::ofstream &os, Node *node)
   {
-    m_curloc = node->location ();
+    m_curloc = node->error_location ();
     switch (node->node_type ())
       {
       case START_MAIN:

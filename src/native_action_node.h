@@ -22,8 +22,8 @@ namespace Smala
   class NativeActionNode : public Node
   {
   public:
-    NativeActionNode () : Node (NATIVE_ACTION), m_action_name (""), m_param_name (""), m_code ("") {}
-    NativeActionNode (const std::string &action_name, const std::string & param_name, const std::string &code) : Node (NATIVE_ACTION), m_action_name (action_name), m_param_name (param_name), m_code (code) {}
+    NativeActionNode (const location& loc) : Node (loc, NATIVE_ACTION), m_action_name (""), m_param_name (""), m_code ("") {}
+    NativeActionNode (const location& loc, const std::string &action_name, const std::string & param_name, const std::string &code) : Node (loc, NATIVE_ACTION), m_action_name (action_name), m_param_name (param_name), m_code (code) {}
     virtual ~NativeActionNode () {}
 
     const std::string& action_name () const { return m_action_name;}

@@ -22,8 +22,8 @@ namespace Smala
   class DashArrayNode : public Node
   {
   public:
-    DashArrayNode () : Node (DASH_ARRAY) {}
-    DashArrayNode (const std::string &name, std::vector<int> pattern) : Node (DASH_ARRAY), _pattern (pattern) {
+    DashArrayNode (const location& loc) : Node (loc, DASH_ARRAY) {}
+    DashArrayNode (const location& loc, const std::string &name, std::vector<int> pattern) : Node (loc, DASH_ARRAY), _pattern (pattern) {
       set_name (name);
     }
     virtual ~DashArrayNode () {}

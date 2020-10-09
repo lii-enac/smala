@@ -30,7 +30,7 @@ Preamble::~Preamble()
 }
 
 void
-Preamble::add_import (PathNode *path) {
+Preamble::add_import (const location& loc, PathNode *path) {
   std::string ns, name;
   int sz = path->get_subpath_list ().size ();
   if (path->get_subpath_list ().size () == 1) {
@@ -40,7 +40,7 @@ Preamble::add_import (PathNode *path) {
     //ns = import.substr (0, pos);
     name = path->get_subpath_list ().at (sz - 1)->get_subpath();
   }
-  Node *n = new Node (IMPORT, "", path);
+  Node *n = new Node (loc, IMPORT, "", path);
   add_node (n);
   if (!name.empty ())
     m_import_list.push_back (name);
@@ -49,9 +49,9 @@ Preamble::add_import (PathNode *path) {
 }
 
 void
-Preamble::add_use (const std::string &use)
+Preamble::add_use (const location& loc, const std::string &use)
 {
-  Node *n = new Node (USE, "", use);
+  Node *n = new Node (loc, USE, "", use);
   m_use_list.push_back (use);
   add_node (n);
 }

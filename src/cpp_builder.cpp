@@ -80,7 +80,10 @@ namespace Smala
 
     size = m_ast.node_list ().size ();
     for (int i = 0; i < size; ++i) {
-      build_node (os, m_ast.node_list ().at (i));
+      Node * node = m_ast.node_list ().at (i);
+      os << "#line " << node->get_location().begin.line << " " << node->get_location().begin.filename << std::endl;
+      os << "Context::instance()->new_line(" << node->get_location().begin.line << ", \"" << node->get_location().begin.filename << "\");" << std::endl;
+      build_node (os, node);
     }
     if (m_ast.is_main ())
       os << "}\n";

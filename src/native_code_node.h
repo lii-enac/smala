@@ -22,8 +22,8 @@ namespace Smala
   class NativeCodeNode : public Node
   {
   public:
-    NativeCodeNode () : Node (NATIVE_CODE), m_code () {}
-    NativeCodeNode (const std::string &code) : Node (NATIVE_CODE), m_code (code) {}
+    NativeCodeNode (const location& loc) : Node (loc, NATIVE_CODE), m_code () {}
+    NativeCodeNode (const location& loc, const std::string &code) : Node (loc, NATIVE_CODE), m_code (code) {}
     virtual ~NativeCodeNode () {}
 
     const std::string& code () const { return m_code; }

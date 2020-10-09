@@ -17,14 +17,14 @@
 namespace Smala
 {
 
-  SetParentNode::SetParentNode () :
-      Node (SET_PARENT), m_to_attach (nullptr)
+  SetParentNode::SetParentNode (const location& loc) :
+      Node (loc, SET_PARENT), m_to_attach (nullptr)
   {
   }
 
-  SetParentNode::SetParentNode (
+  SetParentNode::SetParentNode (const location& loc, 
       Node* to_attach) :
-      Node (SET_PARENT), m_to_attach (to_attach)
+      Node (loc, SET_PARENT), m_to_attach (to_attach)
   {
   }
 

@@ -23,8 +23,8 @@ namespace Smala
   class BinaryInstructionNode : public Node
   {
   public:
-    BinaryInstructionNode (NodeType type);
-    BinaryInstructionNode (NodeType type, PathNode* left_arg, PathNode* right_arg);
+    BinaryInstructionNode (const location& loc, NodeType type);
+    BinaryInstructionNode (const location& loc, NodeType type, PathNode* left_arg, PathNode* right_arg);
     virtual ~BinaryInstructionNode ();
 
     PathNode* left_arg ();

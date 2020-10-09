@@ -18,13 +18,13 @@ namespace Smala
 {
 
   NewVarNode::NewVarNode (
-      ParamType type, const std::string &name, bool keep_name) :
-      Node (NEW_VAR), m_type (type), m_var_name (name), m_keep_name (keep_name)
+      const location& loc, ParamType type, const std::string &name, bool keep_name) :
+      Node (loc, NEW_VAR), m_type (type), m_var_name (name), m_keep_name (keep_name)
   {
   }
 
-  NewVarNode::NewVarNode () :
-      Node (NEW_VAR), m_type (VOID), m_var_name ("")
+  NewVarNode::NewVarNode (const location& loc) :
+      Node (loc, NEW_VAR), m_type (VOID), m_var_name ("")
   {
   }
 

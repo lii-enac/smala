@@ -17,13 +17,13 @@
 namespace Smala
 {
 
-  NativeExpressionNode::NativeExpressionNode () :
-      Node (NATIVE_EXPRESSION), _paused (false), _is_connector (false), _is_model (true)
+  NativeExpressionNode::NativeExpressionNode (const location& loc) :
+      Node (loc, NATIVE_EXPRESSION), _paused (false), _is_connector (false), _is_model (true)
   {
   }
 
-  NativeExpressionNode::NativeExpressionNode (std::vector<TermNode*> expression, bool paused, bool is_connector, bool is_model) :
-      Node (NATIVE_EXPRESSION), _expression (expression), _paused (paused), _is_connector (is_connector), _is_model (is_model)
+  NativeExpressionNode::NativeExpressionNode (const location& loc, std::vector<TermNode*> expression, bool paused, bool is_connector, bool is_model) :
+      Node (loc, NATIVE_EXPRESSION), _expression (expression), _paused (paused), _is_connector (is_connector), _is_model (is_model)
   {
   }
 

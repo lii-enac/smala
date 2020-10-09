@@ -17,13 +17,13 @@
 namespace Smala
 {
 
-  TransitionNode::TransitionNode () :
-      Node (TRANSITION), m_src (""), m_dst (""), m_trigger (nullptr), m_action (nullptr)
+  TransitionNode::TransitionNode (const location& loc) :
+      Node (loc, TRANSITION), m_src (""), m_dst (""), m_trigger (nullptr), m_action (nullptr)
   {
   }
 
-  TransitionNode::TransitionNode (const std::string &type, const std::string &name, const std::string &src_name, const std::string &dst_name, PathNode* trigger, PathNode* action) :
-      Node (TRANSITION, type, name), m_src (src_name), m_dst (dst_name), m_trigger (trigger), m_action (action)
+  TransitionNode::TransitionNode (const location& loc, const std::string &type, const std::string &name, const std::string &src_name, const std::string &dst_name, PathNode* trigger, PathNode* action) :
+      Node (loc, TRANSITION, type, name), m_src (src_name), m_dst (dst_name), m_trigger (trigger), m_action (action)
   {
   }
 

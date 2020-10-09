@@ -18,13 +18,13 @@
 
 using namespace Smala;
 
-SmalaNative::SmalaNative () :
-    Node (SMALA_NATIVE), m_fct (""), m_src (""), m_data (nullptr)
+SmalaNative::SmalaNative (const location& loc) :
+    Node (loc, SMALA_NATIVE), m_fct (""), m_src (""), m_data (nullptr)
 {
 }
 
-SmalaNative::SmalaNative (const std::string &fct, const std::string &src, PathNode* data) :
-    Node (SMALA_NATIVE), m_fct (fct), m_src (src), m_data (data)
+SmalaNative::SmalaNative (const location& loc, const std::string &fct, const std::string &src, PathNode* data) :
+    Node (loc, SMALA_NATIVE), m_fct (fct), m_src (src), m_data (data)
 {
 }
 

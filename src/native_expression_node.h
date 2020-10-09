@@ -22,8 +22,8 @@ namespace Smala
   class NativeExpressionNode : public Node
   {
   public:
-    NativeExpressionNode ();
-    NativeExpressionNode (std::vector<TermNode*> expression, bool paused, bool is_connector, bool is_model = true);
+    NativeExpressionNode (const location& loc);
+    NativeExpressionNode (const location& loc, std::vector<TermNode*> expression, bool paused, bool is_connector, bool is_model = true);
     virtual ~NativeExpressionNode ();
     void add_output_node (PathNode* output_node);
     std::vector<TermNode*>& get_expression ();

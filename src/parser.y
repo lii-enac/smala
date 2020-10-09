@@ -23,6 +23,7 @@
 %define api.value.type variant
 %define parse.assert
 %define api.namespace { Smala }
+
 %code requires
 {
   #include <iostream>
@@ -300,13 +301,13 @@ preamble
 use
   : USE NAME
     {
-      driver.add_use ($2);
+      driver.add_use (@$, $2);
     }
 
 import
   : IMPORT name_or_path
     {
-      driver.add_import (new PathNode ($2));
+      driver.add_import (@$, new PathNode (@$, $2));
     }
 
 native_code
@@ -318,23 +319,23 @@ native_action
   : NATIVE_ACTION NAME LP "Component" NAME RP CODE
     {
       string str = $7.substr (2, $7.length () - 4);
-      driver.add_native_action ($2, $5, str);
+      driver.add_native_action (@$, $2, $5, str);
     }
   | NATIVE_ACTION NAME LP PROCESS NAME RP CODE
     {
       string str = $7.substr (2, $7.length () - 4);
-      driver.add_native_action ($2, $5, str);
+      driver.add_native_action (@$, $2, $5, str);
     }
   | NATIVE_ACTION NAME LP LIST_T NAME COMMA PROCESS NAME RP CODE
     {
       string str = $10.substr (2, $10.length () - 4);
-      driver.add_native_collection_action ($2, $5, $8, str);
+      driver.add_native_collection_action (@$, $2, $5, $8, str);
     }
 
 smala_action
   : smala_native_start LCB statement_list RCB 
     {
-      Node *node = new Node (END_NATIVE);
+      Node *node = new Node (@$, END_NATIVE);
       driver.add_node (node);
     }
 
@@ -343,13 +344,13 @@ smala_native_start
     {
       driver.start_debug ();
       driver.in_preamble ();
-      SmalaNative *native = new SmalaNative ($2, $5, new PathNode ($8));
+      SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
     }
   | NATIVE_ACTION NAME LP PROCESS NAME COMMA PROCESS name_or_path RP
     {
       driver.start_debug ();
-      SmalaNative *native = new SmalaNative ($2, $5, new PathNode ($8));
+      SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
     }
 
@@ -357,13 +358,13 @@ rough_code
   : NATIVE_CODE CODE
     {
       string str = $2.substr (2, $2.length () - 4);
-      driver.add_native_code (str);
+      driver.add_native_code (@$, str);
     }
 
 body
   : start_main statement_list
   {
-    Node *end_main = new Node (END_MAIN);
+    Node *end_main = new Node (@$, END_MAIN);
     end_main->set_user_data (root);
     driver.add_node (end_main);
     driver.end_debug ();
@@ -378,7 +379,7 @@ define
   : start_define LCB statement_list RCB
     {
       driver.end_debug ();
-      Node *end = new Node (END_DEFINE);
+      Node *end = new Node (@$, END_DEFINE);
       driver.add_node (end);
       parent_list.pop_back ();
     }
@@ -390,7 +391,7 @@ start_main
     {
       driver.end_preamble ();
       driver.start_debug ();
-      Node *start = new Node (START_MAIN);
+      Node *start = new Node (@$, START_MAIN);
       driver.add_node (start);
       driver.set_is_main (true);
       root = nullptr;
@@ -402,12 +403,12 @@ start_define
       driver.end_preamble ();
       driver.start_debug ();
       driver.set_is_main (false);
-      Node *node = new Node  (START_DEFINE, "", $2);
+      Node *node = new Node  (@$, START_DEFINE, "", $2);
       node->set_args_data ($4);
       driver.add_define_node (node);
       driver.add_node (node);
 
-      Node *e_node = new Node (THIS);
+      Node *e_node = new Node (@$, THIS);
       parent_list.push_back (e_node);
       driver.add_node (e_node);
     }
@@ -436,9 +437,9 @@ statement_list
 
 statement
   : new_component
-  | expression { if (driver.debug()) driver.new_line(); }
+  | expression { if (driver.debug()) driver.new_line(@$); }
   | tree_action
-  | imperative_statement { if (driver.debug()) driver.new_line(); }
+  | imperative_statement { if (driver.debug()) driver.new_line(@$); }
   | break_loop
 
 new_component
@@ -455,12 +456,12 @@ expression
 
 tree_action
   : add_children_to
-  | add_child { if (driver.debug()) driver.new_line(); }
-  | alias { if (driver.debug()) driver.new_line(); }
-  | action { if (driver.debug()) driver.new_line(); }
-  | merge { if (driver.debug()) driver.new_line(); }
-  | remove { if (driver.debug()) driver.new_line(); }
-  | move { if (driver.debug()) driver.new_line(); }
+  | add_child { if (driver.debug()) driver.new_line(@$); }
+  | alias { if (driver.debug()) driver.new_line(@$); }
+  | action { if (driver.debug()) driver.new_line(@$); }
+  | merge { if (driver.debug()) driver.new_line(@$); }
+  | remove { if (driver.debug()) driver.new_line(@$); }
+  | move { if (driver.debug()) driver.new_line(@$); }
 
 imperative_statement
   : if_statement
@@ -469,7 +470,7 @@ imperative_statement
   | print
   | imperative_assignment 
     {
-      Node *n = new Node (END_ASSIGNMENT);
+      Node *n = new Node (@$, END_ASSIGNMENT);
       driver.add_node (n);
     }
 
@@ -486,7 +487,7 @@ imperative_assignment
     }
   | start_eq assignment_expression eol
     {
-      Node *n = new Node (END_SET_PROPERTY);
+      Node *n = new Node (@$, END_SET_PROPERTY);
       driver.add_node (n);
       bool has_op = false;
       for (auto n: arg_expression) {
@@ -515,7 +516,7 @@ for_imperative_assignment
     }
   | start_eq assignment_expression
     {
-      Node *n = new Node (END_SET_PROPERTY);
+      Node *n = new Node (@$, END_SET_PROPERTY);
       driver.add_node (n);
       bool has_op = false;
       for (auto n: arg_expression) {
@@ -536,7 +537,7 @@ start_eq
     { 
       if (!m_in_for)
         lexer_expression_mode_on ();
-      NewVarNode *n = new NewVarNode ($1, $3, $2);
+      NewVarNode *n = new NewVarNode (@$, $1, $3, $2);
       driver.add_node (n);
       m_in_imperative = true;
       $$ = n;
@@ -546,7 +547,7 @@ start_eq
     {
       if (!m_in_for)
         lexer_expression_mode_on ();
-      Node *n = new Node (SET_PROPERTY, "set", new PathNode ($1));
+      Node *n = new Node (@$, SET_PROPERTY, "set", new PathNode (@1, $1));
       driver.add_node (n);
       m_in_imperative = true;
       name_context_list.pop_back ();
@@ -560,7 +561,7 @@ keep
 break_loop
   : BREAK
     {
-      Node *n = new Node (BREAK, $1, "");
+      Node *n = new Node (@$, BREAK, $1, "");
       driver.add_node (n);
     }
 
@@ -570,7 +571,7 @@ name_or_path
       m_terminate = false;
       NameContext *ctxt = new NameContext ();
       name_context_list.push_back (ctxt);
-      ctxt->add_subpath (new SubPathNode ($1, START, NO_CAST));
+      ctxt->add_subpath (new SubPathNode (@$, $1, START, NO_CAST));
       $$ = ctxt->path ();
     }
   | cast NAME
@@ -578,7 +579,7 @@ name_or_path
       m_terminate = false;
       NameContext *ctxt = new NameContext ();
       name_context_list.push_back (ctxt);
-      ctxt->add_subpath (new SubPathNode ($2, START, $1));
+      ctxt->add_subpath (new SubPathNode (@$, $2, START, $1));
       $$ = ctxt->path ();
     }
   | name_or_path DOT subname
@@ -587,7 +588,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->add_subpath (new SubPathNode ($3, ITEM));
+      ctxt->add_subpath (new SubPathNode (@$, $3, ITEM));
       $$ = ctxt->path ();
     }
   | name_or_path DOT DOLLAR NAME
@@ -596,7 +597,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->add_subpath (new SubPathNode ("$" + $4, REF));
+      ctxt->add_subpath (new SubPathNode (@$, "$" + $4, REF));
       $$ = ctxt->path ();
     }
   | name_or_path DOT start_name_expr assignment_expression end_name_expr
@@ -605,7 +606,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->build_and_add_expression ();
+      ctxt->build_and_add_expression (@$);
       $$ = ctxt->path ();
     }
   | name_or_path start_name_expr assignment_expression end_name_expr
@@ -614,7 +615,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->build_and_add_expression ();
+      ctxt->build_and_add_expression (@$);
       $$ = ctxt->path ();
     }
   | name_or_path DOT LCB pname_list RCB
@@ -623,7 +624,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->add_subpath (new SubPathNode (name_list));
+      ctxt->add_subpath (new SubPathNode (@$, name_list));
       m_terminate = true;
       $$ = ctxt->path ();
     }
@@ -633,7 +634,7 @@ name_or_path
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      SubPathNode *n = new SubPathNode ();
+      SubPathNode *n = new SubPathNode (@$);
       n->set_path_type (WILD_CARD);
       ctxt->add_subpath (n);
       m_terminate = true;
@@ -641,8 +642,8 @@ name_or_path
     }
 
 pname_list
-  : name_or_path { name_list.clear (); name_list.push_back (new PathNode ($1)); name_context_list.pop_back (); }
-  | pname_list COMMA name_or_path { name_list.push_back (new PathNode ($3)); name_context_list.pop_back (); }
+  : name_or_path { name_list.clear (); name_list.push_back (new PathNode (@$, $1)); name_context_list.pop_back (); }
+  | pname_list COMMA name_or_path { name_list.push_back (new PathNode (@$, $3)); name_context_list.pop_back (); }
 
 subname
 : ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; }
@@ -665,7 +666,7 @@ type
 print
   : PRINT LP assignment_expression RP
     {
-      Node *n = new Node (PRINT);
+      Node *n = new Node (@$, PRINT);
       n->set_expr_data (comp_expression);
       comp_expression.clear ();
       arg_expression.clear ();
@@ -675,14 +676,14 @@ print
 while_loop
   : start_while LCB statement_list RCB
     {
-      Node *n = new Node (END_BLOCK);
+      Node *n = new Node (@$, END_BLOCK);
       driver.add_node (n);
     }
 
 start_while
   : WHILE LP assignment_expression RP
     {
-      Node *n = new Node (WHILE);
+      Node *n = new Node (@$, WHILE);
       n->set_expr_data (comp_expression);
       comp_expression.clear ();
       arg_expression.clear ();
@@ -693,33 +694,33 @@ start_while
 for
   : for_loop lcb statement_list RCB
   {
-    Node *n = new Node (END_BLOCK);
+    Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
   }
   | forevery_loop LCB statement_list RCB
   {
-    Node *n = new Node (END_BLOCK);
+    Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
   }
 
 forevery_loop
   : FOR NAME COLON name_or_path
   {
-    ForEveryNode *n = new ForEveryNode ($2, new PathNode ($4));
+    ForEveryNode *n = new ForEveryNode (@$, $2, new PathNode (@4, $4));
     driver.add_node (n);
   }
 
 for_loop
   : start_for lp for_imperative_assignment semicolon assignment_expression semicolon for_imperative_assignment rp
     {
-      Node* n = new Node (END_LOOP);
+      Node* n = new Node (@$, END_LOOP);
       m_in_for = false;
     }
 
 start_for
   : FOR
     {
-      ForNode *n = new ForNode ();
+      ForNode *n = new ForNode (@$);
       driver.add_node (n);
       $$ = n;
       m_in_for = true;
@@ -742,7 +743,7 @@ if_exp
 start_if
   : IF LP
     {
-      Node *n = new Node (START_IF);
+      Node *n = new Node (@$, START_IF);
       driver.add_node (n);
       $$ = n;
     }
@@ -750,25 +751,25 @@ start_if
 start_else
   : ELSE LCB
     {
-      driver.add_node (new Node (START_ELSE));
+      driver.add_node (new Node (@$, START_ELSE));
     }
 
 else
   : ELSE
     {
-      driver.add_node (new Node (START_ELSEIF));
+      driver.add_node (new Node (@$, START_ELSEIF));
     }
 
 end_if_exp
   : RP LCB
     {
-      driver.add_node (new Node (END_IF_EXPRESSION));
+      driver.add_node (new Node (@$, END_IF_EXPRESSION));
     }
 
 end_if_statement
   : RCB
     {
-      driver.add_node (new Node (END_BLOCK));
+      driver.add_node (new Node (@$, END_BLOCK));
     }
 
 move
@@ -776,23 +777,23 @@ move
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (MOVE_BEFORE, new PathNode ($2), new PathNode ($4)));
+      driver.add_node (new BinaryInstructionNode (@$, MOVE_BEFORE, new PathNode (@2, $2), new PathNode (@4, $4)));
     }
   | MOVE name_or_path GT name_or_path
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (MOVE_AFTER, new PathNode ($2), new PathNode ($4)));
+      driver.add_node (new BinaryInstructionNode (@$, MOVE_AFTER, new PathNode (@2, $2), new PathNode (@4, $4)));
     }
   | MOVE name_or_path GGT
     {
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (MOVE_END, new PathNode ($2), nullptr));
+      driver.add_node (new BinaryInstructionNode (@$, MOVE_END, new PathNode (@2, $2), nullptr));
     }
   | MOVE name_or_path INSERT
     {
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (MOVE_FIRST, new PathNode ($2), nullptr));
+      driver.add_node (new BinaryInstructionNode (@$, MOVE_FIRST, new PathNode (@2, $2), nullptr));
     }
 
 
@@ -800,7 +801,7 @@ action
   : ACTION process_list
     {
       $1[0] = std::toupper ($1[0]);
-      InstructionNode *node = new InstructionNode ($1);
+      InstructionNode *node = new InstructionNode (@$, $1);
       for (int i = 0; i < $2.size (); ++i) {
         node->add_path ($2.at (i));
       }
@@ -812,7 +813,7 @@ alias
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (ALIAS, new PathNode ($1), new PathNode ($3)));
+      driver.add_node (new BinaryInstructionNode (@$, ALIAS, new PathNode (@1, $1), new PathNode (@3, $3)));
     }
 
 merge
@@ -820,7 +821,7 @@ merge
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (MERGE, new PathNode ($2), new PathNode ($4)));
+      driver.add_node (new BinaryInstructionNode (@$, MERGE, new PathNode (@2, $2), new PathNode (@4, $4)));
     }
 
 remove
@@ -828,20 +829,20 @@ remove
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (REMOVE, new PathNode ($2), new PathNode ($4)));
+      driver.add_node (new BinaryInstructionNode (@$, REMOVE, new PathNode (@2, $2), new PathNode (@4, $4)));
     }
 
 native
   : start_native NAME LP NAME COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, nullptr, $6, $1);
+      NativeComponentNode *n = new NativeComponentNode (@$, $4, nullptr, nullptr, $6, $1);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
   | start_native NAME LP NAME COMMA name_or_path COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, nullptr, new PathNode ($6), $8, $1);
+      NativeComponentNode *n = new NativeComponentNode (@$, $4, nullptr, new PathNode (@6, $6), $8, $1);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -849,7 +850,7 @@ native
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA name_or_path COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), new PathNode ($8), $10, COLLECTION_ACTION);
+      NativeComponentNode *n = new NativeComponentNode (@$, $4, new PathNode (@6, $6), new PathNode (@8, $8), $10, COLLECTION_ACTION);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -857,7 +858,7 @@ native
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA INT RP
     {
-      NativeComponentNode *n = new NativeComponentNode ($4, new PathNode ($6), nullptr, $8, COLLECTION_ACTION);
+      NativeComponentNode *n = new NativeComponentNode (@$, $4, new PathNode (@6, $6), nullptr, $8, COLLECTION_ACTION);
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -871,7 +872,7 @@ start_native
 add_child
   : start_add assignment_expression eol
     {
-      Node *n = new Node (END_ADD_CHILD);
+      Node *n = new Node (@$, END_ADD_CHILD);
       driver.add_node (n);
       arg_expression.clear ();
       m_in_arguments = false;
@@ -881,7 +882,7 @@ start_add
   : NAME INSERT
     {
       lexer_expression_mode_on ();
-      Node* n = new Node (ADD_CHILD, "addChild", $1);
+      Node* n = new Node (@$, ADD_CHILD, "addChild", $1);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       m_in_arguments = true;
@@ -893,7 +894,7 @@ start_add
 dash_array
   : dash_array_decl LP int_array_decl RP
     {
-      DashArrayNode *node = new DashArrayNode ($1, int_array);
+      DashArrayNode *node = new DashArrayNode (@$, $1, int_array);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
@@ -922,11 +923,11 @@ range
 range_decl
   : NAME bracket first_bound COMMA second_bound bracket
   {
-    RangeNode *node = new RangeNode ($1, $3, $2, $5, !$6);
+    RangeNode *node = new RangeNode (@$, $1, $3, $2, $5, !$6);
     driver.add_node (node);
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     cur_node = node;
-    if (driver.debug()) driver.new_line();
+    if (driver.debug()) driver.new_line(@$);
   }
 
 first_bound
@@ -951,68 +952,69 @@ simple_process
   : simple_process_decl arguments opt_eol start_statement_list statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-      driver.add_node (new SetParentNode ($1));
+      driver.add_node (new SetParentNode (@$, $1));
     }
   }
   | simple_process_decl arguments opt_eol start_statement_list range_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-      driver.add_node (new SetParentNode ($1));
+      driver.add_node (new SetParentNode (@$, $1));
     }
   }
   | simple_process_decl arguments opt_eol start_statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-      driver.add_node (new SetParentNode ($1));
+      driver.add_node (new SetParentNode (@$, $1));
     }
   }
   | simple_process_decl opt_eol start_statement_list statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-      driver.add_node (new SetParentNode ($1));
+      driver.add_node (new SetParentNode (@$, $1));
     }
   }
   | simple_process_decl opt_eol start_statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-      driver.add_node (new SetParentNode ($1));
+      driver.add_node (new SetParentNode (@$, $1));
     }
   }
   | simple_process_decl arguments opt_eol
     {
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-        driver.add_node (new SetParentNode ($1));
+        driver.add_node (new SetParentNode (@$, $1));
       }
       if ($2) {
         $1->set_has_arguments (true);
         has_argument = false;
       }
-      if (driver.debug()) driver.new_line();
+      if (driver.debug()) driver.new_line(@$);
     }
   | simple_process_decl eol
     {
       lexer_expression_mode_off ();
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
-        driver.add_node (new SetParentNode ($1));
+        driver.add_node (new SetParentNode (@$, $1));
       }
       m_in_arguments = false;
-      if (driver.debug()) driver.new_line(); 
+      if (driver.debug()) driver.new_line(@$); 
     }
   | ACTIVATOR process_list
   {
     for (int i = 0; i < $2.size (); ++i) {
-      Node *node = new Node (SIMPLE, "Activator", "_");
+      auto &loc = $2.at(i)->get_location ();
+      Node *node = new Node (loc, SIMPLE, "Activator", "_");
       node->set_has_arguments (true);
       driver.add_node (node);
       if (m_in_add_children)
         node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      TermNode *n = new TermNode (VAR, $2.at(i));
+      TermNode *n = new TermNode (loc, VAR, $2.at(i));
       driver.add_node (n);
-      n = new TermNode (END, string (""));
+      n = new TermNode (loc, END, string (""));
       driver.add_node (n);
       if (m_in_add_children) {
-        SetParentNode *sp = new SetParentNode (node);
+        SetParentNode *sp = new SetParentNode (loc, node);
         driver.add_node (sp);
       }
     }
@@ -1041,7 +1043,7 @@ start_statement_list
 end_statement_list
   : RCB 
     { 
-      driver.add_node (new Node (END_CONTAINER));
+      driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
     }
 
@@ -1049,7 +1051,7 @@ simple_process_decl
   : NAME keep NAME
     {
       lexer_expression_mode_on ();
-      Node *node = new Node (SIMPLE, $1, $3);
+      Node *node = new Node (@$, SIMPLE, $1, $3);
       node->set_keep_name ($2);
       if (root == nullptr)
         root = node;
@@ -1068,7 +1070,7 @@ arguments
     { 
       if ($2) {
         has_argument = true;
-        TermNode *n = new TermNode (END, "");
+        TermNode *n = new TermNode (@$, END, "");
         driver.add_node (n);
       } else {
         has_argument = false;
@@ -1126,7 +1128,7 @@ conditional_expression
   : logical_or_expression
   | logical_or_expression question_mark assignment_expression colon conditional_expression
   {
-    add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+    add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
   }
 
 logical_or_expression
@@ -1174,14 +1176,14 @@ step
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      driver.add_node (new Node (INCREMENT, "incr", new PathNode ($1)));
+      driver.add_node (new Node (@$, INCREMENT, "incr", new PathNode (@1, $1)));
     }
   | name_or_path DECR
     {
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      driver.add_node (new Node (DECREMENT, "incr", new PathNode ($1)));
+      driver.add_node (new Node (@$, DECREMENT, "incr", new PathNode (@1, $1)));
     }
   
 function_call
@@ -1189,19 +1191,19 @@ function_call
     {
       $1->set_has_arguments ($2);
       $$ = $1->str_arg_value ();
-      add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
       m_in_func--;
     }
   | start_to_string name_or_path RP
   {
 
-    TermNode* n = new TermNode (FUNCTION_CALL, "toString");
+    TermNode* n = new TermNode (@$, FUNCTION_CALL, "toString");
     add_term_node (driver, n, false);
-    add_term_node (driver, new TermNode (SYMBOL, std::string ("(")), false);
-    n = new TermNode (VAR, new PathNode ($2));
+    add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("(")), false);
+    n = new TermNode (@$, VAR, new PathNode (@2, $2));
     n->path_arg_value()->set_cast (BY_REF);
     add_term_node (driver, n, false);
-    add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+    add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
     arg_expression.clear ();
     $$ = "toString";
   }
@@ -1219,8 +1221,8 @@ start_function
       if (!m_in_for && !m_in_arguments) {
         lexer_expression_mode_on ();
       } 
-      TermNode* n = new TermNode (FUNCTION_CALL, $1);
-      TermNode *lp = new TermNode (SYMBOL, std::string ("("));
+      TermNode* n = new TermNode (@$, FUNCTION_CALL, $1);
+      TermNode *lp = new TermNode (@$, SYMBOL, std::string ("("));
       if (is_in_expr ()) {
         NameContext* name_context = name_context_list.back ();
         name_context->add_term (n);
@@ -1244,31 +1246,31 @@ postfix_expression
 primary_expression
   : INT
     {
-      TermNode *n = new TermNode (VALUE, std::string ($1));
+      TermNode *n = new TermNode (@$, VALUE, std::string ($1));
       add_term_node (driver, n, true);
       $$ = n; 
     }
   | TRUE
     {
-      TermNode *n = new TermNode (VALUE, std::string ("1"));
+      TermNode *n = new TermNode (@$, VALUE, std::string ("1"));
       add_term_node (driver, n, true);
       $$ = n; 
     }
   | FALSE
     {
-      TermNode *n = new TermNode (VALUE, std::string ("0"));
+      TermNode *n = new TermNode (@$, VALUE, std::string ("0"));
       add_term_node (driver, n, true);
       $$ = n; 
     }
   | DOUBLE
     {
-      TermNode *n = new TermNode (VALUE, std::string ($1));
+      TermNode *n = new TermNode (@$, VALUE, std::string ($1));
       add_term_node (driver, n, true);
       $$ = n; 
     }
   | STRING
     {
-      TermNode *n = new TermNode (STRING_VALUE, std::string ($1));
+      TermNode *n = new TermNode (@$, STRING_VALUE, std::string ($1));
       add_term_node (driver, n, true);
       $$ = n; 
     }
@@ -1277,10 +1279,10 @@ primary_expression
     name_context_list.pop_back ();
     TermNode *n;
     if (!$1.empty () && $1.at (0)->get_subpath ().substr(0,3) == "DJN") {
-      n = new TermNode (VALUE, $1.at (0)->get_subpath ());
+      n = new TermNode (@$, VALUE, $1.at (0)->get_subpath ());
     }
     else {
-      n = new TermNode (VAR, new PathNode ($1));
+      n = new TermNode (@$, VAR, new PathNode (@1, $1));
     }
     if (is_in_expr ()) {
       if (n->arg_type() <= 3)
@@ -1296,7 +1298,7 @@ primary_expression
   }
   | NULL
     {
-      TermNode *n = new TermNode (SMALA_NULL, std::string (""));
+      TermNode *n = new TermNode (@$, SMALA_NULL, std::string (""));
       add_term_node (driver, n, true);
       $$ = n; 
     }
@@ -1305,106 +1307,106 @@ primary_expression
 plus
   : PLUS
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("+")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("+")), true);
     }
 minus
   : MINUS
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("-")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("-")), true);
     }
 times
   : TIMES
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("*")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("*")), true);
     }
 divide
   : DIVIDE
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("/")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("/")), true);
     }
 or
   : OR
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("||")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("||")), true);
     }
 and
   : AND
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("&&")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("&&")), true);
     }
 gt
   : GT
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string (">")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string (">")), true);
     }
 ge
   : GE
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string (">=")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string (">=")), true);
     }
 lt
   : LT
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("<")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("<")), true);
     }
 le
   : LE
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("<=")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("<=")), true);
     }
 eq
   : EQ
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("==")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("==")), true);
     }
 neq
   : NEQ
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("!=")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("!=")), true);
     }
 not
   : NOT
     {
-      add_term_node (driver, new TermNode (OPERATOR, std::string ("!")), true);
+      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("!")), true);
     }
 lp
   : LP
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string ("(")), false);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("(")), false);
     }
 rp
   : RP
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string (")")), false);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
     }
 lcb
   : LCB
     {
-      TermNode *n = new TermNode (START_LCB_BLOCK, std::string ("{"));
+      TermNode *n = new TermNode (@$, START_LCB_BLOCK, std::string ("{"));
       driver.add_node (n);
     }
 comma
   : COMMA
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string (", ")), false);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (", ")), false);
     }
 semicolon
   : SEMICOLON
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string ("; ")), false);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("; ")), false);
     }
 question_mark
   : QUESTION_MARK
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string ("?")), true);
-      add_term_node (driver, new TermNode (FUNCTION_CALL, std::string ("smala_deref (")), true);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("?")), true);
+      add_term_node (driver, new TermNode (@$, FUNCTION_CALL, std::string ("smala_deref (")), true);
     }
 colon
   : COLON
     {
-      add_term_node (driver, new TermNode (SYMBOL, std::string (")")), true);
-      add_term_node (driver, new TermNode (SYMBOL, std::string (":")), true);
-      add_term_node (driver, new TermNode (FUNCTION_CALL, std::string ("smala_deref (")), true);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), true);
+      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (":")), true);
+      add_term_node (driver, new TermNode (@$, FUNCTION_CALL, std::string ("smala_deref (")), true);
     }
 
 //------------------------------------------------
@@ -1412,7 +1414,7 @@ colon
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1432,10 +1434,10 @@ binding
   : binding_src binding_type process_list
     {
       for (int i = 0; i < $3.size (); ++i) {
-        CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
-        Node *in = new Node (PATH, "Name", $1);
+        CtrlNode *node = new CtrlNode (@$, "Binding", "", $2.first, $2.second);
+        Node *in = new Node (@$, PATH, "Name", $1);
         node->set_in (in);
-        Node *out = new Node (PATH, "Name", $3.at (i));
+        Node *out = new Node (@$, PATH, "Name", $3.at (i));
         node->set_out (out);
         driver.add_node (node);
         node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -1454,20 +1456,20 @@ binding
       $3->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
       /* then the binding */
-      CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
-      Node *in = new Node (PATH, "Name", $1);
+      CtrlNode *node = new CtrlNode (@$, "Binding", "", $2.first, $2.second);
+      Node *in = new Node (@$, PATH, "Name", $1);
       node->set_in (in);
       node->set_out ($3);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
     | binding_src binding_type assignment_sequence {
-      CtrlNode *node = new CtrlNode ("Binding", "", $2.first, $2.second);
-      Node *in = new Node (PATH, "Name", $1);
+      CtrlNode *node = new CtrlNode (@$, "Binding", "", $2.first, $2.second);
+      Node *in = new Node (@$, PATH, "Name", $1);
       node->set_in (in);
-      PathNode *path = new PathNode();
-      path->add_subpath (new SubPathNode ($3->name(), START));
-      Node *out = new Node (PATH, "Name", path);
+      PathNode *path = new PathNode(@$);
+      path->add_subpath (new SubPathNode (@$, $3->name(), START));
+      Node *out = new Node (@$, PATH, "Name", path);
       node->set_out (out);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
@@ -1476,14 +1478,14 @@ binding
 causal_dep
   : name_or_path CAUSAL_DEP name_or_path
   {
-    CausalDependencyNode *node = new CausalDependencyNode (new PathNode ($1), new PathNode ($3));
+    CausalDependencyNode *node = new CausalDependencyNode (@$, new PathNode (@1, $1), new PathNode (@1, $3));
     driver.add_node (node);
   }
 
 assignment_sequence
   : start_assignment_sequence assignment_list RCB
     { 
-      driver.add_node (new Node (END_CONTAINER));
+      driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
       $$ = $1;
     }
@@ -1492,14 +1494,14 @@ start_assignment_sequence
   : LCB
     {
       std::string loc_name ("loc_ass_seq_" + std::to_string(loc_node_num++));
-      Node *node = new Node (SIMPLE, "AssignmentSequence", loc_name);
+      Node *node = new Node (@$, SIMPLE, "AssignmentSequence", loc_name);
       driver.add_node (node);
 
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       node->set_has_arguments (true);
 
-      driver.add_node (new TermNode (VALUE, "1"));
-      driver.add_node (new TermNode (END, ""));
+      driver.add_node (new TermNode (@$, VALUE, "1"));
+      driver.add_node (new TermNode (@$, END, ""));
 
       node->set_node_type (CONTAINER);
       parent_list.push_back (node);
@@ -1523,7 +1525,7 @@ binding_src
         driver.set_error ("Wrong source specification in binding expression");
       }
     } else {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, false, true, false);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, false, true, false);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
       // build a local bool that will serve as an output for a connector
@@ -1531,24 +1533,24 @@ binding_src
       std::string loc_name ("loc_bool");
       loc_name.append (to_string(loc_node_num++));
       std::vector<SubPathNode*> path;
-      path.push_back (new SubPathNode (loc_name, START));
-      Node *node = new Node (SIMPLE, "Bool", loc_name);
+      path.push_back (new SubPathNode (@$, loc_name, START));
+      Node *node = new Node (@$, SIMPLE, "Bool", loc_name);
       node->set_has_arguments (true);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      TermNode *n = new TermNode (VALUE, "0");
+      TermNode *n = new TermNode (@$, VALUE, "0");
       driver.add_node (n);
-      n = new TermNode (END, "");
+      n = new TermNode (@$, END, "");
       driver.add_node (n);
 
-      expr_node->add_output_node (new PathNode (path));
+      expr_node->add_output_node (new PathNode (@$, path));
       driver.add_native_expression (expr_node);
       driver.add_node (expr_node);
       comp_expression.clear ();
       arg_expression.clear ();
-      path.push_back (new SubPathNode ("true", ITEM));
+      path.push_back (new SubPathNode (@$, "true", ITEM));
       loc_name.append(".true");
-      $$ = new PathNode (path);
+      $$ = new PathNode (@$, path);
     }
     comp_expression.clear ();
     arg_expression.clear ();
@@ -1563,7 +1565,7 @@ binding_type
 lambda
   : start_lambda LCB statement_list RCB
     {
-      driver.add_node (new Node (END_NATIVE));
+      driver.add_node (new Node (@$, END_NATIVE));
       driver.end_preamble ();
       $$ = $1;
     }
@@ -1575,18 +1577,18 @@ start_lambda
       driver.start_debug ();
       driver.in_preamble ();
       string new_name ("func_" + std::to_string (func_num++));
-      SmalaNative *native = new SmalaNative (new_name, "_src_", new PathNode ($2));
+      SmalaNative *native = new SmalaNative (@$, new_name, "_src_", new PathNode (@2, $2));
       driver.add_node (native);
-      $$ = new NativeComponentNode (new_name, nullptr, new PathNode ($2), "1", SIMPLE_ACTION);
+      $$ = new NativeComponentNode (@$, new_name, nullptr, new PathNode (@2, $2), "1", SIMPLE_ACTION);
     }
 
 assignment
   : assignment_expression assignment_symbol process_list is_model
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (comp_expression, $2, false, $4);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, $2, false, $4);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
-        Node *out = new Node (PATH, "Name", $3.at (i));
+        Node *out = new Node (@$, PATH, "Name", $3.at (i));
         expr_node->add_output_node ($3.at (i));
       }
       driver.add_native_expression (expr_node);
@@ -1605,11 +1607,11 @@ is_model
   | COLON INT { if ($2.compare ("0") == 0) $$ = false; else $$ = true; }
 
 process_list
-  : name_or_path { name_context_list.pop_back (); process_list.clear (); process_list.push_back (new PathNode ($1)); $$ = process_list;}
+  : name_or_path { name_context_list.pop_back (); process_list.clear (); process_list.push_back (new PathNode (@$, $1)); $$ = process_list;}
   | process_list COMMA name_or_path
     {
       name_context_list.pop_back ();
-      process_list.push_back (new PathNode ($3));
+      process_list.push_back (new PathNode (@$, $3));
       $$ = process_list;
     }
 
@@ -1620,7 +1622,7 @@ process_list
 add_children_to
   : start_add_children_to LCB statement_list RCB
     {
-      driver.add_node (new Node (END_CONTAINER));
+      driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
       //m_in_add_children = false;
       --m_in_add_children;
@@ -1630,7 +1632,7 @@ start_add_children_to
   : ADD_CHILDREN_TO name_or_path
     {
       name_context_list.pop_back ();
-      Node *n = new Node (ADD_CHILDREN_TO, "addChildrenTo", new PathNode ($2));
+      Node *n = new Node (@$, ADD_CHILDREN_TO, "addChildrenTo", new PathNode (@2, $2));
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (n);
       driver.add_node (n);
@@ -1641,8 +1643,8 @@ start_add_children_to
 fsm
   : fsm_decl fsm_items
     {      
-      driver.add_node (new Node (END_CONTAINER));
-      SetParentNode *p_node = new SetParentNode ($1);
+      driver.add_node (new Node (@$, END_CONTAINER));
+      SetParentNode *p_node = new SetParentNode (@$, $1);
       driver.add_node (p_node);
       parent_list.pop_back ();
     }
@@ -1650,12 +1652,12 @@ fsm
 fsm_decl
   : FSM NAME
     {
-      Node *node = new Node  (FSM, "FSM", $2);
+      Node *node = new Node  (@$, FSM, "FSM", $2);
       node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (node);
       driver.add_node (node);
-      if (driver.debug()) driver.new_line();
+      if (driver.debug()) driver.new_line(@$);
       $$ = node;
     }
 
@@ -1667,14 +1669,14 @@ fsm_state_list
   | fsm_state_list state
 
 state
-  : state_decl { if (driver.debug()) driver.new_line(); }
+  : state_decl { if (driver.debug()) driver.new_line(@$); }
   | state_decl start_fsm_state statement_list end_fsm_state
   | state_decl start_fsm_state end_fsm_state
 
 state_decl
   : STATE NAME
     {
-      Node *node = new Node  (SIMPLE, "FSMState", $2);
+      Node *node = new Node (@$, SIMPLE, "FSMState", $2);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       driver.add_node (node);
       cur_node = node;
@@ -1690,7 +1692,7 @@ start_fsm_state
 end_fsm_state
   : RCB 
     {
-      driver.add_node (new Node (END_CONTAINER));
+      driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
     }
 
@@ -1702,29 +1704,29 @@ transition
   : NAME ARROW NAME LP name_or_path RP
     {
       name_context_list.pop_back ();
-      TransitionNode *node = new TransitionNode ("FSMTransition", "", $1, $3, new PathNode ($5), nullptr);
+      TransitionNode *node = new TransitionNode (@$, "FSMTransition", "", $1, $3, new PathNode (@5, $5), nullptr);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      if (driver.debug()) driver.new_line();
+      if (driver.debug()) driver.new_line(@$);
     }
   | NAME ARROW NAME LP name_or_path COMMA name_or_path RP
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      TransitionNode *node = new TransitionNode ("FSMTransition", "", $1, $3, new PathNode ($5), new PathNode ($7));
+      TransitionNode *node = new TransitionNode (@$, "FSMTransition", "", $1, $3, new PathNode (@5, $5), new PathNode (@7, $7));
 
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      if (driver.debug()) driver.new_line();
+      if (driver.debug()) driver.new_line(@$);
     }
   | LCB state_list RCB ARROW NAME LP name_or_path RP
     {
       name_context_list.pop_back ();
       for (auto s: $2) {
-        TransitionNode *node = new TransitionNode ("FSMTransition", "", s, $5, new PathNode ($7), nullptr);
+        TransitionNode *node = new TransitionNode (@$, "FSMTransition", "", s, $5, new PathNode (@7, $7), nullptr);
         driver.add_node (node);
         node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-        if (driver.debug()) driver.new_line();
+        if (driver.debug()) driver.new_line(@$);
       }
     }
   | LCB state_list RCB ARROW NAME LP name_or_path COMMA name_or_path RP
@@ -1732,12 +1734,12 @@ transition
       name_context_list.pop_back ();
       name_context_list.pop_back ();
       for (auto s: $2) {
-        TransitionNode *node = new TransitionNode ("FSMTransition", "", s, $5, new PathNode ($7), new PathNode ($9));
+        TransitionNode *node = new TransitionNode (@$, "FSMTransition", "", s, $5, new PathNode (@7, $7), new PathNode (@9, $9));
         driver.add_node (node);;
 
         driver.add_node (node);
         node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-        if (driver.debug()) driver.new_line();
+        if (driver.debug()) driver.new_line(@$);
       }
     }
 

@@ -39,11 +39,11 @@ public:
     void clear();
     void add_node (Node *node);
     void remove_node (Node *node);
-    void add_use (const std::string &val);
-    void add_import (PathNode *path);
-    void add_native_action (const std::string &action_name, const std::string &parm_name, const std::string &code);
-    void add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &parm_name, const std::string &code);
-    void add_native_code (const std::string &code);
+    void add_use (const location& loc, const std::string &val);
+    void add_import (const location& loc, PathNode *path);
+    void add_native_action (const location& loc, const std::string &action_name, const std::string &parm_name, const std::string &code);
+    void add_native_collection_action (const location& loc, const std::string &action_name, const std::string &list_name, const std::string &parm_name, const std::string &code);
+    void add_native_code (const location& loc, const std::string &code);
     void add_native_expression (NativeExpressionNode *node);
     void add_define_node (Node *defineNode);
     void set_root_node (Node* root) { m_root = root; }

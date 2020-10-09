@@ -22,8 +22,8 @@ namespace Smala
   class TransitionNode : public Node
   {
   public:
-    TransitionNode ();
-    TransitionNode (const std::string &type, const std::string &name, const std::string &src_name, const std::string &dst_name, PathNode* trigger, PathNode* action);
+    TransitionNode (const location& loc);
+    TransitionNode (const location& loc, const std::string &type, const std::string &name, const std::string &src_name, const std::string &dst_name, PathNode* trigger, PathNode* action);
     virtual ~TransitionNode () {}
 
     std::string& get_src () { return m_src; }

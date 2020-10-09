@@ -76,21 +76,21 @@ Ast::remove_node (Node *node)
 }
 
 void
-Ast::add_use (const std::string &val)
+Ast::add_use (const location& loc, const std::string &val)
 {
-  m_preamble.add_use (val);
+  m_preamble.add_use (loc, val);
 }
 
 void
-Ast::add_import (PathNode *path)
+Ast::add_import (const location& loc, PathNode *path)
 {
-  m_preamble.add_import (path);
+  m_preamble.add_import (loc, path);
 }
 
 void
-Ast::add_native_action (const std::string &action_name, const std::string &param_name, const std::string &code)
+Ast::add_native_action (const location& loc, const std::string &action_name, const std::string &param_name, const std::string &code)
 {
-  NativeActionNode *node = new NativeActionNode (action_name, param_name, code);
+  NativeActionNode *node = new NativeActionNode (loc, action_name, param_name, code);
   //m_native_list.push_back (node);
   if (m_in_preamble)
     m_preamble.add_node (node);
@@ -99,9 +99,9 @@ Ast::add_native_action (const std::string &action_name, const std::string &param
 }
 
 void
-Ast::add_native_collection_action (const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
+Ast::add_native_collection_action (const location& loc, const std::string &action_name, const std::string &list_name, const std::string &param_name, const std::string &code)
 {
-  NativeCollectionActionNode *node = new NativeCollectionActionNode (action_name, list_name, param_name, code);
+  NativeCollectionActionNode *node = new NativeCollectionActionNode (loc, action_name, list_name, param_name, code);
   if (m_in_preamble)
     m_preamble.add_node (node);
   else
@@ -109,9 +109,9 @@ Ast::add_native_collection_action (const std::string &action_name, const std::st
 }
 
 void
-Ast::add_native_code (const std::string &code)
+Ast::add_native_code (const location& loc, const std::string &code)
 {
-  NativeCodeNode *node = new NativeCodeNode (code);
+  NativeCodeNode *node = new NativeCodeNode (loc, code);
   if (m_in_preamble)
     m_preamble.add_node (node);
   else

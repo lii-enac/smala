@@ -22,8 +22,8 @@ namespace Smala
 class NewLineNode : public Node {
 public:
 
-  NewLineNode (const std::string& filename, int line_number)
-  : Node(NEW_LINE), _filename (filename), _line_number (line_number) {}
+  NewLineNode (const location& loc, const std::string& filename, int line_number)
+  : Node(loc, NEW_LINE), _filename (filename), _line_number (line_number) {}
 
 //private:
   std::string _filename;

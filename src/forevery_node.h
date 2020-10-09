@@ -23,7 +23,7 @@ namespace Smala
   class ForEveryNode : public Node
   {
   public:
-    ForEveryNode (const std::string& new_name, PathNode* path) : Node (FOR_EVERY), m_new_name (new_name), m_path (path) {};
+    ForEveryNode (const location& loc, const std::string& new_name, PathNode* path) : Node (loc, FOR_EVERY), m_new_name (new_name), m_path (path) {};
     virtual ~ForEveryNode () {}
 
     std::string& get_new_name () { return m_new_name; }

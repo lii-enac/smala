@@ -23,8 +23,8 @@ namespace Smala {
 class SmalaNative : public Node
 {
 public:
-    SmalaNative ();
-    SmalaNative (const std::string &fct, const std::string &src, PathNode *data);
+    SmalaNative (const location& loc);
+    SmalaNative (const location& loc, const std::string &fct, const std::string &src, PathNode *data);
     ~SmalaNative ();
     
     const std::string& fct () const;

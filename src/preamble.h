@@ -34,8 +34,8 @@ public:
     std::vector<std::string> use () const;
     void add_node (Node *node);
     void remove_node (Node *node);
-    void add_import (PathNode *path);
-    void add_use (const std::string &use);
+    void add_import (const location& loc, PathNode *path);
+    void add_use (const location& loc, const std::string &use);
 
     void clear ();
     

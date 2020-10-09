@@ -22,7 +22,7 @@ namespace Smala
   class ForNode : public Node
   {
   public:
-    ForNode () : Node (FOR), m_first (nullptr), m_third (nullptr) {};
+    ForNode (const location& loc) : Node (loc, FOR), m_first (nullptr), m_third (nullptr) {};
     virtual ~ForNode () {}
 
     Node* first_st () const { return m_first; }

@@ -39,8 +39,8 @@ public:
     }
     void set_in_expr (bool v) { m_in_expr = v; }
     bool in_expr () { return m_in_expr; }
-    void build_and_add_expression () {
-      add_subpath (new SubPathNode (m_term));
+    void build_and_add_expression (const location& loc) {
+      add_subpath (new SubPathNode (loc, m_term));
       m_term.clear ();
     }
 

@@ -22,8 +22,8 @@ namespace Smala
   class CausalDependencyNode : public Node
   {
   public:
-    CausalDependencyNode ();
-    CausalDependencyNode (PathNode* src, PathNode* dst) : Node (CAUSAL_DEP), m_src (src), m_dst (dst) {}
+    //CausalDependencyNode (location& loc);
+    CausalDependencyNode (const location& loc, PathNode* src, PathNode* dst) : Node (loc, CAUSAL_DEP), m_src (src), m_dst (dst) {}
     virtual ~CausalDependencyNode () {}
 
     PathNode* src () const { return m_src; }

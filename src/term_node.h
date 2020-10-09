@@ -17,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "error_location.h"
 #include "node.h"
 #include "path_node.h"
 
@@ -41,9 +40,9 @@ namespace Smala {
 class TermNode : public Node
 {
 public:
-    TermNode () : Node (TERM_NODE), m_arg_type (NONE), m_path_value (nullptr), m_str_value (""), m_in_func (false) { }
-    TermNode (ArgType type, PathNode* value) : Node (TERM_NODE), m_arg_type (type), m_path_value (value), m_str_value (""), m_in_func (false) { }
-    TermNode (ArgType type, std::string value) : Node (TERM_NODE), m_arg_type (type), m_path_value (nullptr), m_str_value (value), m_in_func (false) { }
+    TermNode (const location& loc) : Node (loc, TERM_NODE), m_arg_type (NONE), m_path_value (nullptr), m_str_value (""), m_in_func (false) { }
+    TermNode (const location& loc, ArgType type, PathNode* value) : Node (loc, TERM_NODE), m_arg_type (type), m_path_value (value), m_str_value (""), m_in_func (false) { }
+    TermNode (const location& loc, ArgType type, std::string value) : Node (loc, TERM_NODE), m_arg_type (type), m_path_value (nullptr), m_str_value (value), m_in_func (false) { }
     void set_arg_type (ArgType type) { m_arg_type = type; }
     ArgType arg_type () const { return m_arg_type; };
     PathNode*  path_arg_value () { return m_path_value; };

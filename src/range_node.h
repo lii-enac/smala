@@ -23,8 +23,8 @@ namespace Smala
   class RangeNode : public Node
   {
   public:
-    RangeNode ();
-    RangeNode (const std::string& name, std::vector <TermNode*> left, bool left_open, std::vector <TermNode*> right, bool right_open);
+    RangeNode (const location& loc);
+    RangeNode (const location& loc, const std::string& name, std::vector <TermNode*> left, bool left_open, std::vector <TermNode*> right, bool right_open);
     virtual ~RangeNode ();
 
     std::vector <TermNode*> lower_arg () { return m_lower_arg; }

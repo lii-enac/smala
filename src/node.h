@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include "error_location.h"
+#include "location.hh"
 
 namespace Smala {
 
@@ -107,10 +108,11 @@ typedef void* user_data_t;
 class Node
 {
 public:
-    Node (NodeType type);
-    Node (NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
-    Node (NodeType type, const std::string &value, const std::string &name);
-    Node (NodeType type, const std::string &value, PathNode* path);
+    Node (const location& loc, NodeType type);
+    Node (const location& loc, NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
+    Node (const location& loc, NodeType type, const std::string &value, const std::string &name);
+    Node (const location& loc, NodeType type, const std::string &value, PathNode* path);
+
     void set_node_type (NodeType type);
     void set_build_name (const std::string& build_name);
     void set_parent (Node *p);
@@ -125,8 +127,8 @@ public:
     void set_name (const std::string &name);
     std::vector< std::pair<ParamType, std::string> > args () const;
     void add_args (std::vector< std::pair<ParamType, std::string> > &args);
-    void set_location (smala::ErrorLocation *loc);
-    smala::ErrorLocation* location ();
+    void set_error_location (smala::ErrorLocation *loc);
+    smala::ErrorLocation* error_location ();
     bool ignore_parent () { return m_ignore_parent; }
     void set_ignore_parent (bool ignore) { m_ignore_parent = ignore; }
     bool has_arguments ();
@@ -146,6 +148,7 @@ public:
     user_data_t get_user_data () { return m_data; }
     void set_keep_name (bool keep) { m_keep_name = keep; }
     bool keep_name () { return m_keep_name; }
+    const location& get_location () { return m_loc; }
  private:
     bool m_ignore_parent, m_has_path;
     Node *m_parent;
@@ -159,6 +162,7 @@ public:
     NodeType m_node_type;
     std::vector<TermNode*> m_expression;
     user_data_t m_data;
+    class location m_loc;
 };
 
 }

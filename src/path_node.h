@@ -38,10 +38,10 @@ namespace Smala
   class SubPathNode : public Node
   {
   public:
-    SubPathNode (): Node (SUBPATH), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
-    SubPathNode (const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (SUBPATH), m_path (path), m_type (type), m_cast (cast) {}
-    SubPathNode (const std::vector<TermNode*> node_list): Node (SUBPATH), m_path (""), m_expr (node_list), m_type (EXPR), m_cast (NO_CAST) {}
-    SubPathNode (const std::vector<PathNode*> path_list): Node (SUBPATH), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc): Node (loc, SUBPATH), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (loc, SUBPATH), m_path (path), m_type (type), m_cast (cast) {}
+    SubPathNode (const location& loc, const std::vector<TermNode*> node_list): Node (loc, SUBPATH), m_path (""), m_expr (node_list), m_type (EXPR), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, const std::vector<PathNode*> path_list): Node (loc, SUBPATH), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
     virtual ~SubPathNode () {}
 
     const std::string& get_subpath () const { return m_path; }
@@ -63,8 +63,8 @@ namespace Smala
   class PathNode : public Node
     {
     public:
-      PathNode () : Node (PATH), m_cast (NO_CAST) {}
-      PathNode (const std::vector<SubPathNode*> node_list) : Node (PATH), m_path (node_list) { if (!node_list.empty()) m_cast = node_list.at(0)->get_cast ();}
+      PathNode (const location& loc) : Node (loc, PATH), m_cast (NO_CAST) {}
+      PathNode (const location& loc, const std::vector<SubPathNode*> node_list) : Node (loc, PATH), m_path (node_list) { if (!node_list.empty()) m_cast = node_list.at(0)->get_cast ();}
       virtual ~PathNode () {}
 
       void add_subpath (SubPathNode* n) { if (m_path.empty ()) m_cast = n->get_cast(); m_path.push_back (n); };

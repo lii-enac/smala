@@ -17,8 +17,8 @@
 namespace Smala
 {
 
-  InstructionNode::InstructionNode (const std::string& name) :
-      Node (INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
+  InstructionNode::InstructionNode (const location& loc, const std::string& name) :
+      Node (loc, INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
   {
     set_name (name);
 
@@ -37,8 +37,8 @@ namespace Smala
       set_type (XMLSERIALIZE);
   }
 
-  InstructionNode::InstructionNode () :
-      Node (INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
+  InstructionNode::InstructionNode (const location& loc) :
+      Node (loc, INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
   {
   }
 

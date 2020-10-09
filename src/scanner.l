@@ -16,13 +16,14 @@
 %{
   #include <iostream>
   #include <cstdlib>
+  #include <algorithm>
   #include "scanner.h"
   #include "driver.h"
   #include "parser.hpp"
   #include "location.hh"
 
   #define yyterminate() Smala::Parser::make_END (Smala::location());
-  #define YY_USER_ACTION m_driver.increaseLocation (yytext, yyleng);
+  //#define YY_USER_ACTION m_driver.increaseLocation (yytext, yyleng);
 
   using namespace std;
   
@@ -54,7 +55,7 @@
 %}
 
 %option yylineno
-%option noyywrap
+%option noyywrap nounput noinput batch debug
 %option c++
 %option yyclass="Scanner"
 %option prefix="Smala_"
@@ -64,61 +65,78 @@ INT [0-9]+
 ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
 BREAK ("break"|"continue"|"return")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
+
+
+
+%{
+  // for *new*: see "A Complete C++ Example": https://www.gnu.org/software/bison/manual/html_node/A-Complete-C_002b_002b-Example.html
+  // Code run each time a pattern is matched.
+  # define YY_USER_ACTION  { loc.columns (yyleng) /*new*/;  m_driver.increaseLocation (yytext, yyleng) /*old*/; }
+%}
+
 %%
 
+%{
+  // A handy shortcut to the location held by the driver.
+  Smala::location& loc = m_driver.m_loc;
+  // Code run each time yylex is called.
+  loc.step ();
+%}
 
-"/*"([^*]|\*+[^*/])*\*+"/" {}
+
+
+"/*"([^*]|\*+[^*/])*\*+"/" { loc.lines (std::count(yytext, yytext+yyleng, '\n')); }
 "//"[^\n]*            {}
-"$"                   { return Smala::Parser::make_DOLLAR (Smala::location ());}
-";"                   { return Smala::Parser::make_SEMICOLON (Smala::location ()); }
-"{"                   { return Smala::Parser::make_LCB (Smala::location ()); }
-"}"                   { return Smala::Parser::make_RCB (Smala::location ()); }
-"["                   { return Smala::Parser::make_LB (Smala::location ()); }
-"]"                   { return Smala::Parser::make_RB (Smala::location ()); }
-"("                   { return Smala::Parser::make_LP (Smala::location ()); }
-")"                   { return Smala::Parser::make_RP (Smala::location ()); }
-"."                   { return Smala::Parser::make_DOT (Smala::location ()); }
-","                   { return Smala::Parser::make_COMMA (Smala::location ()); }
-"|->"                 { return Smala::Parser::make_ACTIVATOR (Smala::location ()); }
-"->"                  { return Smala::Parser::make_ARROW (Smala::location ()); }
-"!->"                 { return Smala::Parser::make_NOT_ARROW (Smala::location ()); }
-"!->!"                { return Smala::Parser::make_NOT_ARROW_NOT (Smala::location ()); }
-"->!"                 { return Smala::Parser::make_ARROW_NOT (Smala::location ()); }
-"~>"                  { return Smala::Parser::make_CAUSAL_DEP (Smala::location ()); }
-"+"                   { return Smala::Parser::make_PLUS (Smala::location ()); }
-"++"                  { return Smala::Parser::make_INCR (Smala::location ()); }
-"--"                  { return Smala::Parser::make_DECR (Smala::location ()); }
-"-"                   { return Smala::Parser::make_MINUS (Smala::location ()); }
-"*"                   { return Smala::Parser::make_TIMES (Smala::location ()); }
-"/"                   { return Smala::Parser::make_DIVIDE (Smala::location ()); }
-"?"                   { return Smala::Parser::make_QUESTION_MARK (Smala::location ()); }
-"!"                   { return Smala::Parser::make_NOT (Smala::location ()); }
-":"                   { return Smala::Parser::make_COLON (Smala::location ()); }
-"=>"                  { return Smala::Parser::make_CONNECTOR (Smala::location ()); }
-"=:>"                 { return Smala::Parser::make_ASSGNT_CONN (Smala::location ()); }
-"::>"                 { return Smala::Parser::make_PAUSED_CONNECTOR (Smala::location ()); }
-"=:"                  { return Smala::Parser::make_ASSIGNMENT (Smala::location ()); }
-"::"                  { return Smala::Parser::make_PAUSED_ASSIGNMENT (Smala::location ()); }
-"&&"                  { return Smala::Parser::make_AND (Smala::location ()); }
-"||"                  { return Smala::Parser::make_OR (Smala::location ()); }
-"<"                   { return Smala::Parser::make_LT (Smala::location ()); }
-"<="                  { return Smala::Parser::make_LE (Smala::location ()); }
-">"                   { return Smala::Parser::make_GT (Smala::location ()); }
-">="                  { return Smala::Parser::make_GE (Smala::location ()); }
-"=="                  { return Smala::Parser::make_EQ (Smala::location ()); }
-"="                   { return Smala::Parser::make_SIMPLE_EQ (Smala::location ()); }
-"!="                  { return Smala::Parser::make_NEQ (Smala::location ()); }
-"<<"                  { return Smala::Parser::make_INSERT (Smala::location ()); }
-">>"                  { return Smala::Parser::make_GGT (Smala::location ()); }
-"_keep_"              { return Smala::Parser::make_KEEP (Smala::location ()); }
-"int"                 { return Smala::Parser::make_INT_T (Smala::location ()); }
-"double"              { return Smala::Parser::make_DOUBLE_T (Smala::location ()); }
-"string"              { return Smala::Parser::make_STRING_T (Smala::location ()); }
-"list"                { return Smala::Parser::make_LIST_T (Smala::location ()); }
-"TRUE"                { return Smala::Parser::make_TRUE (yytext, Smala::location ()); }
-"FALSE"               { return Smala::Parser::make_FALSE (yytext, Smala::location ()); }
-"null"                { return Smala::Parser::make_NULL (Smala::location ());}
-"aka"                 { return Smala::Parser::make_AKA (Smala::location ()); }
+"$"                   { return Smala::Parser::make_DOLLAR (loc);}
+";"                   { return Smala::Parser::make_SEMICOLON (loc); }
+"{"                   { return Smala::Parser::make_LCB (loc); }
+"}"                   { return Smala::Parser::make_RCB (loc); }
+"["                   { return Smala::Parser::make_LB (loc); }
+"]"                   { return Smala::Parser::make_RB (loc); }
+"("                   { return Smala::Parser::make_LP (loc); }
+")"                   { return Smala::Parser::make_RP (loc); }
+"."                   { return Smala::Parser::make_DOT (loc); }
+","                   { return Smala::Parser::make_COMMA (loc); }
+"|->"                 { return Smala::Parser::make_ACTIVATOR (loc); }
+"->"                  { return Smala::Parser::make_ARROW (loc); }
+"!->"                 { return Smala::Parser::make_NOT_ARROW (loc); }
+"!->!"                { return Smala::Parser::make_NOT_ARROW_NOT (loc); }
+"->!"                 { return Smala::Parser::make_ARROW_NOT (loc); }
+"~>"                  { return Smala::Parser::make_CAUSAL_DEP (loc); }
+"+"                   { return Smala::Parser::make_PLUS (loc); }
+"++"                  { return Smala::Parser::make_INCR (loc); }
+"--"                  { return Smala::Parser::make_DECR (loc); }
+"-"                   { return Smala::Parser::make_MINUS (loc); }
+"*"                   { return Smala::Parser::make_TIMES (loc); }
+"/"                   { return Smala::Parser::make_DIVIDE (loc); }
+"?"                   { return Smala::Parser::make_QUESTION_MARK (loc); }
+"!"                   { return Smala::Parser::make_NOT (loc); }
+":"                   { return Smala::Parser::make_COLON (loc); }
+"=>"                  { return Smala::Parser::make_CONNECTOR (loc); }
+"=:>"                 { return Smala::Parser::make_ASSGNT_CONN (loc); }
+"::>"                 { return Smala::Parser::make_PAUSED_CONNECTOR (loc); }
+"=:"                  { return Smala::Parser::make_ASSIGNMENT (loc); }
+"::"                  { return Smala::Parser::make_PAUSED_ASSIGNMENT (loc); }
+"&&"                  { return Smala::Parser::make_AND (loc); }
+"||"                  { return Smala::Parser::make_OR (loc); }
+"<"                   { return Smala::Parser::make_LT (loc); }
+"<="                  { return Smala::Parser::make_LE (loc); }
+">"                   { return Smala::Parser::make_GT (loc); }
+">="                  { return Smala::Parser::make_GE (loc); }
+"=="                  { return Smala::Parser::make_EQ (loc); }
+"="                   { return Smala::Parser::make_SIMPLE_EQ (loc); }
+"!="                  { return Smala::Parser::make_NEQ (loc); }
+"<<"                  { return Smala::Parser::make_INSERT (loc); }
+">>"                  { return Smala::Parser::make_GGT (loc); }
+"_keep_"              { return Smala::Parser::make_KEEP (loc); }
+"int"                 { return Smala::Parser::make_INT_T (loc); }
+"double"              { return Smala::Parser::make_DOUBLE_T (loc); }
+"string"              { return Smala::Parser::make_STRING_T (loc); }
+"list"                { return Smala::Parser::make_LIST_T (loc); }
+"TRUE"                { return Smala::Parser::make_TRUE (yytext, loc); }
+"FALSE"               { return Smala::Parser::make_FALSE (yytext, loc); }
+"null"                { return Smala::Parser::make_NULL (loc);}
+"aka"                 { return Smala::Parser::make_AKA (loc); }
 "DashArray"           { return Smala::Parser::make_DASHARRAY (Smala::location()); }
 "FSM"                 { return Smala::Parser::make_FSM (Smala::location()); }
 "State"               { return Smala::Parser::make_STATE (Smala::location()); }
@@ -127,36 +145,36 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
 "NativeCollectionAction" { return Smala::Parser::make_NATIVE_COLLECTION (Smala::location()); }
 "NativeAsyncAction"   { return Smala::Parser::make_NATIVE_ASYNC (Smala::location()); }
-"_main_"              { return Smala::Parser::make_MAIN (Smala::location ()); }
-"_define_"            { return Smala::Parser::make_DEFINE (Smala::location ()); }
-"_action_"            { return Smala::Parser::make_NATIVE_ACTION (Smala::location ()); }
-"_native_code_"       { return Smala::Parser::make_NATIVE_CODE (Smala::location ()); }
-{ACTION}              { return Smala::Parser::make_ACTION (yytext, Smala::location ()); }
-{BREAK}               { return Smala::Parser::make_BREAK (yytext, Smala::location ()); }
-"use"                 { return Smala::Parser::make_USE (Smala::location ()); }
-"import"              { return Smala::Parser::make_IMPORT (Smala::location ()); }
-"merge"               { return Smala::Parser::make_MERGE (Smala::location ()); }
-"remove"              { return Smala::Parser::make_REMOVE (Smala::location ()); }
-"moveChild"           { return Smala::Parser::make_MOVE (Smala::location ()); }
-"with"                { return Smala::Parser::make_WITH (Smala::location ()); }
-"from"                { return Smala::Parser::make_FROM (Smala::location ()); }
-"addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (Smala::location ()); }
+"_main_"              { return Smala::Parser::make_MAIN (loc); }
+"_define_"            { return Smala::Parser::make_DEFINE (loc); }
+"_action_"            { return Smala::Parser::make_NATIVE_ACTION (loc); }
+"_native_code_"       { return Smala::Parser::make_NATIVE_CODE (loc); }
+{ACTION}              { return Smala::Parser::make_ACTION (yytext, loc); }
+{BREAK}               { return Smala::Parser::make_BREAK (yytext, loc); }
+"use"                 { return Smala::Parser::make_USE (loc); }
+"import"              { return Smala::Parser::make_IMPORT (loc); }
+"merge"               { return Smala::Parser::make_MERGE (loc); }
+"remove"              { return Smala::Parser::make_REMOVE (loc); }
+"moveChild"           { return Smala::Parser::make_MOVE (loc); }
+"with"                { return Smala::Parser::make_WITH (loc); }
+"from"                { return Smala::Parser::make_FROM (loc); }
+"addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (loc); }
 "toString"            { return Smala::Parser::make_TO_STRING (Smala::location()); }
-"if"                  { return Smala::Parser::make_IF (Smala::location ()); }
-"else"                { return Smala::Parser::make_ELSE (Smala::location ()); }
-"for"                 { return Smala::Parser::make_FOR (Smala::location ()); }
-"while"               { return Smala::Parser::make_WHILE (Smala::location ()); }
-"print"               { return Smala::Parser::make_PRINT (Smala::location ()); }
-{NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, Smala::location ()); }
-{INT}                 { return Smala::Parser::make_INT (yytext, Smala::location ()); }
-"#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), Smala::location ()); }
-"0x"[0-9A-Fa-f]+      { return Smala::Parser::make_INT (hexa_filter(&yytext[1]), Smala::location ()); }
-{INT}"."{INT}         { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
-{INT}"."              { return Smala::Parser::make_DOUBLE (yytext, Smala::location ()); }
-{NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), Smala::location ()); }
-\"(\\.|[^\"])*\"      { return Smala::Parser::make_STRING (yytext, Smala::location ()); }
-[\t \.]+              {}
+"if"                  { return Smala::Parser::make_IF (loc); }
+"else"                { return Smala::Parser::make_ELSE (loc); }
+"for"                 { return Smala::Parser::make_FOR (loc); }
+"while"               { return Smala::Parser::make_WHILE (loc); }
+"print"               { return Smala::Parser::make_PRINT (loc); }
+{NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, loc); }
+{INT}                 { return Smala::Parser::make_INT (yytext, loc); }
+"#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), loc); }
+"0x"[0-9A-Fa-f]+      { return Smala::Parser::make_INT (hexa_filter(&yytext[1]), loc); }
+{INT}"."{INT}         { return Smala::Parser::make_DOUBLE (yytext, loc); }
+{INT}"."              { return Smala::Parser::make_DOUBLE (yytext, loc); }
+{NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), loc); }
+\"(\\.|[^\"])*\"      { return Smala::Parser::make_STRING (yytext, loc); }
+[\t \.]+              { loc.step (); }
 "\\\n"                {}
-"\n"                  { if(_exp_mode) return Smala::Parser::make_EOL (Smala::location ()); }
+"\n"+                 { loc.lines (yyleng); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
 <<EOF>>               { return yyterminate (); }
 %%

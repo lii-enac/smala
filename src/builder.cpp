@@ -469,7 +469,7 @@ namespace Smala
       }
       case NEW_LINE:
       {
-        build_new_line (os, dynamic_cast<NewLineNode*> (node));
+        //build_new_line (os, dynamic_cast<NewLineNode*> (node));
         break;
       }
       case NEW_VAR:

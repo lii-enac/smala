@@ -45,7 +45,7 @@ namespace Smala
 
   int
   CPPBuilder::build (const Ast &ast, const std::string &builddir,
-                     const std::string &prefix)
+                     const std::string &prefix, bool debug)
   {
     m_indent = 0;
     m_cpnt_num = 0;
@@ -84,24 +84,28 @@ namespace Smala
     for (int i = 0; i < size; ++i) {
       Node * node = m_ast.node_list ().at (i);
       
-      const location & loc = node->get_location();
-      if(loc.begin.line != last_loc.begin.line) {
-        auto * f = node->get_location().begin.filename;
-        os << "\n#line " << node->get_location().begin.line << " \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
-        if (in_code) {
-          auto * tn = dynamic_cast<TermNode*>(node);
-          if ( !(tn && tn->arg_type()==START_LCB_BLOCK) )
-            os << "Context::instance()->new_line(" << node->get_location().begin.line << ", \"" << (f?*f:std::string("")) << "\");" << std::endl;
+      if(debug) {
+        const location & loc = node->get_location();
+        if(loc.begin.line != last_loc.begin.line) {
+          auto * f = node->get_location().begin.filename;
+          os << "\n#line " << node->get_location().begin.line << " \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
+          if (in_code) {
+            auto * tn = dynamic_cast<TermNode*>(node);
+            if ( !(tn && tn->arg_type()==START_LCB_BLOCK) )
+              os << "Context::instance()->new_line(" << node->get_location().begin.line << ", \"" << (f?*f:std::string("")) << "\");" << std::endl;
+          }
+          last_loc = loc;
         }
-        last_loc = loc;
       }
 
       build_node (os, node);
 
-      if (node->node_type()==START_MAIN || node->node_type()==START_DEFINE)
-        in_code = true;
-      if (node->node_type()==END_MAIN || node->node_type()==END_DEFINE)
-        in_code = false;
+      if(debug) {
+        if (node->node_type()==START_MAIN || node->node_type()==START_DEFINE)
+          in_code = true;
+        if (node->node_type()==END_MAIN || node->node_type()==END_DEFINE)
+          in_code = false;
+      }
 
     }
     if (m_ast.is_main ())

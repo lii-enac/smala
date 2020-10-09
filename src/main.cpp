@@ -71,7 +71,7 @@ int main (int argc, const char **argv) {
 			else {
 				prefix = filename.substr(0, filename.size() - 4);	
 			}
-			error |= b->build (driver.ast (), arg.get_option("builddir"), prefix);
+			error |= b->build (driver.ast (), arg.get_option("builddir"), prefix, arg.debug());
 			if (error) {
 			  remove (b->filename ().c_str());
 			}

@@ -60,7 +60,7 @@ namespace Smala {
     {
     }
     virtual ~Builder () {};
-    virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix) = 0;
+    virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) = 0;
     string filename () { return m_filename; }
   protected:
     smala::ErrorLocation *m_curloc;
@@ -119,9 +119,9 @@ namespace Smala {
     std::string build_simple_node (std::ofstream &os, Node *n);
     void build_range_node (std::ofstream &os, Node *n, const string& new_name);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
-    virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
-        os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
-    }
+    // virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
+    //     os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
+    // }
     virtual void build_dash_array (std::ofstream &os, DashArrayNode *n) {}
   };
 

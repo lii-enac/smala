@@ -23,7 +23,7 @@ namespace Smala {
   public:
     CPPBuilder ();
     virtual ~CPPBuilder ();
-    int build (const Ast &ast, const std::string &builddir, const std::string &prefix) override;
+    int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
   private:
     void pop_ctxt () override;
     void push_ctxt () override;
@@ -67,10 +67,10 @@ namespace Smala {
     void build_end_define (std::ofstream &os, Node *node) override;
     void build_transition_node (std::ofstream &os, Node *ctrl) override;
     void build_smala_native (std::ofstream &os, Node *node) override;
-    void build_new_line (std::ofstream &os, NewLineNode *n) override {
-        //Builder::build_new_line (os, n);
-        //os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
-    }
+    // void build_new_line (std::ofstream &os, NewLineNode *n) override {
+    //     //Builder::build_new_line (os, n);
+    //     //os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
+    // }
     void build_simple_control_node (std::ofstream &os, NativeExpressionNode *n);
     void build_dash_array (std::ofstream &os, DashArrayNode *n) override;
     void print_native_code (std::ofstream &os);

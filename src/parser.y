@@ -437,9 +437,9 @@ statement_list
 
 statement
   : new_component
-  | expression { if (driver.debug()) driver.new_line(@$); }
+  | expression
   | tree_action
-  | imperative_statement { if (driver.debug()) driver.new_line(@$); }
+  | imperative_statement
   | break_loop
 
 new_component
@@ -456,12 +456,12 @@ expression
 
 tree_action
   : add_children_to
-  | add_child { if (driver.debug()) driver.new_line(@$); }
-  | alias { if (driver.debug()) driver.new_line(@$); }
-  | action { if (driver.debug()) driver.new_line(@$); }
-  | merge { if (driver.debug()) driver.new_line(@$); }
-  | remove { if (driver.debug()) driver.new_line(@$); }
-  | move { if (driver.debug()) driver.new_line(@$); }
+  | add_child
+  | alias
+  | action
+  | merge
+  | remove
+  | move
 
 imperative_statement
   : if_statement
@@ -927,7 +927,6 @@ range_decl
     driver.add_node (node);
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     cur_node = node;
-    if (driver.debug()) driver.new_line(@$);
   }
 
 first_bound
@@ -988,7 +987,6 @@ simple_process
         $1->set_has_arguments (true);
         has_argument = false;
       }
-      if (driver.debug()) driver.new_line(@$);
     }
   | simple_process_decl eol
     {
@@ -997,7 +995,6 @@ simple_process
         driver.add_node (new SetParentNode (@$, $1));
       }
       m_in_arguments = false;
-      if (driver.debug()) driver.new_line(@$); 
     }
   | ACTIVATOR process_list
   {
@@ -1669,7 +1666,7 @@ fsm_state_list
   | fsm_state_list state
 
 state
-  : state_decl { if (driver.debug()) driver.new_line(@$); }
+  : state_decl
   | state_decl start_fsm_state statement_list end_fsm_state
   | state_decl start_fsm_state end_fsm_state
 

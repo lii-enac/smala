@@ -136,8 +136,8 @@ Driver::end_preamble ()
 void
 Driver::new_line (const class location& loc)
 {
-  if (m_debug_mode)
-    m_ast.add_node(new NewLineNode(loc, m_file, m_line));
+  //if (m_debug_mode)
+  //  m_ast.add_node(new NewLineNode(loc, m_file, m_line));
 }
 
 

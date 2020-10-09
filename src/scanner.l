@@ -22,7 +22,7 @@
   #include "parser.hpp"
   #include "location.hh"
 
-  #define yyterminate() Smala::Parser::make_END (Smala::location());
+  #define yyterminate() Smala::Parser::make_END (loc);
   //#define YY_USER_ACTION m_driver.increaseLocation (yytext, yyleng);
 
   using namespace std;
@@ -137,14 +137,14 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "FALSE"               { return Smala::Parser::make_FALSE (yytext, loc); }
 "null"                { return Smala::Parser::make_NULL (loc);}
 "aka"                 { return Smala::Parser::make_AKA (loc); }
-"DashArray"           { return Smala::Parser::make_DASHARRAY (Smala::location()); }
-"FSM"                 { return Smala::Parser::make_FSM (Smala::location()); }
-"State"               { return Smala::Parser::make_STATE (Smala::location()); }
-"Process"             { return Smala::Parser::make_PROCESS (Smala::location()); }
-"&"                   { return Smala::Parser::make_PROCESS_CAST (Smala::location()); }
-"NativeAction"        { return Smala::Parser::make_NATIVE (Smala::location()); }
-"NativeCollectionAction" { return Smala::Parser::make_NATIVE_COLLECTION (Smala::location()); }
-"NativeAsyncAction"   { return Smala::Parser::make_NATIVE_ASYNC (Smala::location()); }
+"DashArray"           { return Smala::Parser::make_DASHARRAY (loc); }
+"FSM"                 { return Smala::Parser::make_FSM (loc); }
+"State"               { return Smala::Parser::make_STATE (loc); }
+"Process"             { return Smala::Parser::make_PROCESS (loc); }
+"&"                   { return Smala::Parser::make_PROCESS_CAST (loc); }
+"NativeAction"        { return Smala::Parser::make_NATIVE (loc); }
+"NativeCollectionAction" { return Smala::Parser::make_NATIVE_COLLECTION (loc); }
+"NativeAsyncAction"   { return Smala::Parser::make_NATIVE_ASYNC (loc); }
 "_main_"              { return Smala::Parser::make_MAIN (loc); }
 "_define_"            { return Smala::Parser::make_DEFINE (loc); }
 "_action_"            { return Smala::Parser::make_NATIVE_ACTION (loc); }
@@ -159,7 +159,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "with"                { return Smala::Parser::make_WITH (loc); }
 "from"                { return Smala::Parser::make_FROM (loc); }
 "addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (loc); }
-"toString"            { return Smala::Parser::make_TO_STRING (Smala::location()); }
+"toString"            { return Smala::Parser::make_TO_STRING (loc); }
 "if"                  { return Smala::Parser::make_IF (loc); }
 "else"                { return Smala::Parser::make_ELSE (loc); }
 "for"                 { return Smala::Parser::make_FOR (loc); }

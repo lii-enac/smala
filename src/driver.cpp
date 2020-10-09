@@ -62,7 +62,7 @@ Driver::set_stream (std::istream *is, const std::string& filename)
   m_file = filename;
   m_scanner.switch_streams (is, 0);
   m_ast = Ast ();
-  m_loc.initialize (&filename);
+  m_loc.initialize (&const_cast<std::string&>(filename));
 }
 
 void

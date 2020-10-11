@@ -74,7 +74,7 @@ FittsTask1D(Process f) {
       255 =: display.target.fc.r
       Clock t(50) // 0.05ms
     }
-    State success {
+    State hit {
       chronometer.elapsed =: target_time_acquisition
       255 =: display.target.fc.g
       Clock t(50) // 0.05ms
@@ -85,9 +85,9 @@ FittsTask1D(Process f) {
     on_starting_area -> init (display.starting.area.leave)    
     on_starting_area -> started (on_starting_area.start_task.tick)
     started -> miss (bg.press)
-    started -> success (display.target.area.press)
+    started -> hit (display.target.area.press)
     miss -> init (miss.t.tick)
-    success -> init (success.t.tick)
+    hit -> init (hit.t.tick)
   }
 
 }

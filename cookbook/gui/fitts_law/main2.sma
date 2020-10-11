@@ -2,7 +2,7 @@ use core
 use base
 use display
 use gui
-use file
+use files
 
 import FittsTask1D
 
@@ -14,13 +14,24 @@ Component root
   	f.close -> ex
   	mouseTracking = 1
 
-  	// Typical CHIesque Fitts experiment (not the genuine, reciprocal from the 50's)
   	FittsTask1D fitts(f)
+	
+    Int target_width(0)
+    Int target_distance(64)
 
-    Int target_width(16)
-    Int target_distance(512)
+    target_distance =:> fitts.target_distance
 
-    target_distance =: fitts.target_distance
+	SwitchList tries {
+		Component t1 {
+			8 =: target_width
+			128 =: target_distance
+		}
+		Component t2 {
+			64 =: target_width
+			512 =: target_distance
+		}
+	}
+	fitts.control.init -> tries.next
 
     // classic
     target_width =:> fitts.target_width
@@ -47,8 +58,19 @@ Component root
   	=:> fitts.target_width
   	*/
 
-    // debug result
+    // display result
+
+	String hit_or_miss ("")
+	AssignmentSequence hm_as(1) {
+		fitts.control.state =: hit_or_miss
+	}
+	fitts.control.hit -> hm_as
+	fitts.control.miss -> hm_as
+
     TextPrinter tp
-    fitts.target_time_acquisition => tp.input
+	AssignmentSequence out_as(1) {
+    	tries.index + " " + hit_or_miss + " " + target_width + " " + target_distance + " " + fitts.target_time_acquisition =: tp.input
+	}
+	fitts.control.init -> out_as
 }
 

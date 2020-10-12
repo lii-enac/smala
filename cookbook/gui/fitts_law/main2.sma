@@ -15,9 +15,7 @@ _native_code_
 void
 cpp_action (Process* root)
 {
- 	//Process *root = reinterpret_cast<Process*> (get_native_user_data (c));
-
-	// traditional, confounded AxW
+	// traditional (confounded) AxW
 	struct condition {
 		int A, W;
 	};
@@ -26,8 +24,8 @@ cpp_action (Process* root)
 	std::vector<int> Ws = {8, 16, 32, 64};
 
 	std::vector<condition> conditions;
-	for(auto a: As) {
-		for(auto w: Ws) {
+	for (auto a: As) {
+		for (auto w: Ws) {
 			conditions.push_back(condition{a,w});
 		}
 	}
@@ -35,28 +33,29 @@ cpp_action (Process* root)
 	int num_repeat = 2;
 	std::vector<condition> repeats;
 	for (int i=0; i< num_repeat; ++i) repeats.insert(repeats.end(), conditions.begin(), conditions.end());
-
+	
 	std::random_device rng;
 	std::mt19937 urng(rng());
 	std::shuffle (repeats.begin(), repeats.end(), urng);
 
-	// guiard's FxS (Form x Scale) or ID x W with fixed A.
 	// TODO
+	// guiard's FxS (Form x Scale) or ID x W with fixed A.
 	/*struct condition {
 		int F, S;
 	};*/
 	
+	#define GET_PROC(type, varname, parent) auto *varname = dynamic_cast<type*>(parent->find_child (#varname)); assert(varname);
 
-	auto *measures = dynamic_cast<SwitchList*>(root->find_child ("measures")); assert(measures);
+	GET_PROC(SwitchList, measures, root);
 	int i=0;
 	for (auto * p: measures->children ()) {
 		auto *measure = dynamic_cast<Component*>(p); assert(measure);
-		auto *tw = dynamic_cast<AbstractIntProperty*>(measure->find_child ("tw")); assert(tw);
-		auto *td = dynamic_cast<AbstractIntProperty*>(measure->find_child ("td")); assert(td);
+		GET_PROC(AbstractIntProperty, tw, measure);
+		GET_PROC(AbstractIntProperty, td, measure);
 		tw->set_value (repeats[i].W, true);
 		td->set_value (repeats[i].A, true);
 		++i;
-		if(i==32) break;
+		if(i==32) break; // +1 to be notified when end is reached 
 	}
 }
 %}
@@ -64,7 +63,7 @@ cpp_action (Process* root)
 _main_
 Component root
 {
-	Frame f ("my frame", 0, 0, 800, 800)
+	Frame f ("my frame", 0, 0, 1200, 800)
   	Exit ex (0, 1)
   	f.close -> ex
   	mouseTracking = 1
@@ -77,7 +76,8 @@ Component root
     target_distance =:> fitts.target_distance
 
 	SwitchList measures {
-		for (int i=0; i<33; i++) {
+		// 32+1, +1 to be notified when end is reached
+		for (int i=0; i<32+1; i++) {
 			Component measure {
 				Int tw(0)
 				Int td(0)
@@ -89,17 +89,18 @@ Component root
 	cpp_action (&root) // populate list
 
 	fitts.control.init -> measures.next
-	(measures.index == 33) -> ex
+	(measures.index == 32+1) -> ex
 
     // classic
-    //target_width =:> fitts.target_width
+    target_width =:> fitts.target_width
 
   	// MacGuffin & Balakrishnan, 2002
-    /* 	
-    f.move.x > 0.9*fitts.target_distance
-  		? target_width*2
+    /*
+	Double scale(2)
+    f.move.x > 0.9 * fitts.target_distance
+  		? target_width * scale
   		: target_width
-  	=:> fitts.target_width
+  		  =:> fitts.target_width
   	*/
   	
   	// Zhai, Conversy, Guiard & Beaudouin-Lafon, 2003
@@ -107,15 +108,15 @@ Component root
   	Double scale(0.5) // FIXME .5 does not work!!
   	//scale(1)
   	//scale(2)
-  	// should be random
+  	// should be in the experimental plan
 
-	  f.move.x > 0.9*fitts.target_distance
-  		? target_width*scale
+	f.move.x > 0.9*fitts.target_distance
+  		? target_width * scale
   		: target_width
-  	=:> fitts.target_width
+  	      =:> fitts.target_width
   	*/
 
-    // display result
+    // log
 
 	String hit_or_miss ("")
 	AssignmentSequence hm_as(1) {
@@ -125,8 +126,9 @@ Component root
 	fitts.control.miss -> hm_as
 
 	TextPrinter tp
+	"measure\thitmiss\tW\tA\tt" =: tp.input // header
 	fitts.control.init -> {
-    	measures.index + " " + hit_or_miss + " " + target_width + " " + target_distance + " " + fitts.target_time_acquisition =: tp.input
+    	measures.index + "\t" + hit_or_miss + "\t" + target_width + "\t" + target_distance + "\t" + fitts.target_time_acquisition =: tp.input
 	}
 }
 

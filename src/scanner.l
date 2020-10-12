@@ -165,7 +165,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "for"                 { return Smala::Parser::make_FOR (loc); }
 "while"               { return Smala::Parser::make_WHILE (loc); }
 "print"               { return Smala::Parser::make_PRINT (loc); }
-{NATIVE_CODE}         { return Smala::Parser::make_CODE (yytext, loc); }
+{NATIVE_CODE}         { loc.lines (std::count(yytext, yytext+yyleng, '\n')); return Smala::Parser::make_CODE (yytext, loc); }
 {INT}                 { return Smala::Parser::make_INT (yytext, loc); }
 "#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), loc); }
 "0x"[0-9A-Fa-f]+      { return Smala::Parser::make_INT (hexa_filter(&yytext[1]), loc); }

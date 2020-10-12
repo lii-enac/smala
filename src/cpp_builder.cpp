@@ -76,6 +76,7 @@ namespace Smala
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
 
+    os << "\n#line 1" << " \"" << m_filename << "\"" << std::endl;
     build_preamble (os);
 
     size = m_ast.node_list ().size ();
@@ -88,7 +89,7 @@ namespace Smala
         const location & loc = node->get_location();
         if(loc.begin.line != last_loc.begin.line) {
           auto * f = node->get_location().begin.filename;
-          os << "\n#line " << node->get_location().begin.line << " \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
+          os << "\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
           if (in_code) {
             auto * tn = dynamic_cast<TermNode*>(node);
             if (     (!tn || (tn->arg_type() != START_LCB_BLOCK))

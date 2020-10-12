@@ -111,6 +111,7 @@ namespace Smala
         {
         case USE:
           {
+            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
             std::string str = cur_node->name ();
             std::locale loc;
             str[0] = std::toupper (str[0], loc);
@@ -122,6 +123,7 @@ namespace Smala
           }
         case IMPORT:
           {
+            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
             //std::string name = cur_node->name ();
             build_import (os, cur_node);
             break;
@@ -142,12 +144,13 @@ namespace Smala
     os << "double smala_deref(double p)\n";
     os << "{ return p; }\n\n";
 
-    /* user-defined native code so native expression can use it */
+    /* user-defined native code here so native expression can use it */
     for (int i = 0; i < size; ++i) {
       cur_node = m_ast.preamble ().nodes ().at (i);
       switch (cur_node->node_type ()) {
         case NATIVE_CODE:
           {
+            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
             NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
             os << n->code () << std::endl;
             break;
@@ -167,11 +170,13 @@ namespace Smala
       switch (cur_node->node_type ()) {
         case NATIVE_ACTION:
           {
+            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
             build_native_action (os, cur_node);
             break;
           }
         case NATIVE_COLLECTION_ACTION:
           {
+            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
             build_native_collection_action (os, cur_node);
             break;
           }

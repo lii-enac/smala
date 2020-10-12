@@ -91,7 +91,10 @@ namespace Smala
           os << "\n#line " << node->get_location().begin.line << " \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
           if (in_code) {
             auto * tn = dynamic_cast<TermNode*>(node);
-            if ( !(tn && tn->arg_type()==START_LCB_BLOCK) )
+            if (     (!tn || (tn->arg_type() != START_LCB_BLOCK))
+                  && (node->node_type() != START_ELSE)
+                  && (node->node_type() != START_ELSEIF)
+                )
               os << "Context::instance()->new_line(" << node->get_location().begin.line << ", \"" << (f?*f:std::string("")) << "\");" << std::endl;
           }
           last_loc = loc;

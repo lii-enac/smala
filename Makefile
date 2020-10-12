@@ -657,13 +657,13 @@ install: default smala_lib install_pkgconf install_headers install_libs install_
 
 
 
-# as to redifine all those variable already compute from config.mk
-install_brew: djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
-install_brew: djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-install_brew: djnn_ldlibs := $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
-install_brew: djnn_libs := $(shell pkg-config $(djnn-pkgconf) --libs)
-install_brew: djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-install_brew: djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+# as to redefine all those variable already compute from config.mk
+install_brew: djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
+install_brew: djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+install_brew: djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
+install_brew: djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
+install_brew: djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+install_brew: djnn_lib_path = $(subst -L, , $(djnn_lib_path))
 install_brew: install
 
 #----------------------------------------

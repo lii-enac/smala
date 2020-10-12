@@ -10,6 +10,7 @@ _native_code_
 %{
 #include <algorithm>
 #include <random>
+#include <cassert>
 
 void
 cpp_action (Process* root)

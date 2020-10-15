@@ -305,6 +305,7 @@ $(build_dir)/%.cpp: %.l
 	$(LEX) -o $@ $<
 
 $(build_dir)/src/scanner.o: CXXFLAGS += -Dregister=""
+$(build_dir)/src/location.hh: $(build_dir)/src/parser.cpp
 
 # for initial make -j
 # find build -name "*.d" | xargs grep -s "parser.hpp" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo

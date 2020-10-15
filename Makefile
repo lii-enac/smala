@@ -304,6 +304,10 @@ $(build_dir)/%.cpp: %.l
 	@mkdir -p $(dir $@)
 	$(LEX) -o $@ $<
 
+
+# ------------
+# specific dependencies and peculiarities
+
 $(build_dir)/src/scanner.o: CXXFLAGS += -Dregister=""
 $(build_dir)/src/location.hh: $(build_dir)/src/parser.cpp
 

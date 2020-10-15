@@ -311,6 +311,12 @@ $(build_dir)/src/scanner.o: CXXFLAGS += -Dregister=""
 $(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/j_builder.o $(build_dir)/src/builder.o \
 $(build_dir)/src/main.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/c_builder.o $(build_dir)/src/parser.o $(build_dir)/src/driver.o: $(build_dir)/src/parser.hpp
 
+$(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/newvar_node.o $(build_dir)/src/range_node.o\
+$(build_dir)/src/native_expression_node.o $(build_dir)/src/native_component_node.o $(build_dir)/src/builder.o \
+$(build_dir)/src/smala_native.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/preamble.o $(build_dir)/src/instruction_node.o \
+$(build_dir)/src/set_parent_node.o $(build_dir)/src/main.o $(build_dir)/src/binary_instruction_node.o \
+$(build_dir)/src/parser.o $(build_dir)/src/driver.o $(build_dir)/src/node.o $(build_dir)/src/ctrl_node.o $(build_dir)/src/transition_node.o: $(build_dir)/src/location.hh
+
 
 # ------------
 # merr error reporting tool for smalac

@@ -428,8 +428,6 @@ $$(notdir $1)_clean:
 $$(notdir $1)_clear:
 	rm -rf $(build_dir)/cookbook/$1
 
-
-
 .PHONY: $1 $1_test $1_dbg
 
 $$(notdir $1)_dbg_print:
@@ -459,70 +457,8 @@ cookbook_apps: $(notdir $(cookbook_apps))
 cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 
 
-# -----------
-# test apps
-
-define testapp_makerule
-libs_test_app :=
-djnn_libs_test_app :=
-res_dir :=
-
-include test/$1/test_app.mk
-
-ckappname := $$(notdir $1)
-$1_app_srcs_dir := test/$1
-$1_app_objs := $$(objs_test_app)
-$1_app_gensrcs := $$($1_app_objs:.o=.cpp)
-$1_app_gensrcs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_gensrcs))
-$1_app_objs := $$(addprefix $(build_dir)/test/$1/, $$($1_app_objs))
-$1_app_exe := $$(build_dir)/test/$1/$$(ckappname)_app$$(EXE)
-
-ifeq ($$(cookbook_cross_prefix),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_test_app))) $$(libs_test_app)
-$1_app_libs += ../ext-libs/libexpat/expat/lib/.libs/libexpat.dylib ../ext-libs/curl/lib/.libs/libcurl.dylib --emrun
-$1_app_libs += --preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
-else
-$1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_test_app)) $$(libs_test_app)
-endif
-
-
-$1_app_link := $$(CXX)
-
-$$($1_app_objs): $$($1_app_gensrcs)
-$$($1_app_exe): $$($1_app_objs)
-	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
-$$($1_app_objs): CFLAGS += $$(djnn_cflags)
-$$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
-$$($1_app_exe): LIBS += $$($1_app_libs)
-
-$$(notdir $1): $$($1_app_exe)
-
-$$(notdir $1)_test: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path) $$(launch_cmd) $$(shell pwd)/$$($1_app_exe))
-$$(notdir $1)_dbg: $$(notdir $1)
-	(cd $$($1_app_srcs_dir); env $$(LD_LIBRARY_PATH)=$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(other_runtime_lib_path) $(debugger) $$(shell pwd)/$$($1_app_exe))
-
-$$(notdir $1)_clean:
-	rm -f $$($1_app_exe) $$($1_app_objs)
-
-
-.PHONY: $1 $1_test $1_dbg
-
-$$(notdir $1)_dbg_print:
-	@echo $1_dbg
-	@echo $$($1_app_objs)
-	@echo $$($1_app_gensrcs)
-
-deps += $$($1_app_objs:.o=.d)
-endef
-
-test_apps := test_1 test_2 test_3 test_4 test_action
-
-test_apps: $(notdir $(test_apps))
-.PHONY: test_apps $(notdir $(test_apps))
-
-
-$(foreach a,$(test_apps),$(eval $(call testapp_makerule,$a)))
+# ---------------------------------------
+# rules
 
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma | $(smalac)
@@ -531,7 +467,6 @@ $(build_dir)/%.cpp $(build_dir)/%.h: %.sma | $(smalac)
 	@$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
-
 
 # from .c user sources
 $(build_dir)/%.o: %.c
@@ -552,6 +487,7 @@ $(build_dir)/%.o: $(build_dir)/%.c
 $(build_dir)/%.o: $(build_dir)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 
 # ---------------------------------------
 # package config
@@ -615,7 +551,7 @@ install: default smala_lib install_pkgconf install_headers install_libs install_
 
 
 
-# as to redefine all those variable already compute from config.mk
+# we have to redefine all variables already computed in config.mk
 install_brew: djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
 install_brew: djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
@@ -623,6 +559,7 @@ install_brew: djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 install_brew: djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_lib_path = $(subst -L, , $(djnn_lib_path))
 install_brew: install
+
 
 #----------------------------------------
 # package builder

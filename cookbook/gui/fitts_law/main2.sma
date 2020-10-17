@@ -79,7 +79,7 @@ Component root
 	
     Int target_width(0)
     Int target_distance(64)
-	//Double scale(1.0)
+	Double scale(2.0)
 
     target_distance =:> fitts.target_distance
 

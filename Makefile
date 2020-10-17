@@ -440,76 +440,23 @@ $$(notdir $1)_dbg_print:
 deps += $$($1_app_objs:.o=.d)
 endef
 
-#find * -type d -mindepth 1 -maxdepth 2 | xargs echo
-cookbook_apps := core/bindings \
-	core/debug \
-	core/paused_control \
-	core/refproperty \
-	core/switch \
-	core/text_cat \
-	core/nativeactions \
-	core/native_collection_action \
-	core/async_native/simple_async_native \
-	core/async_native/curl_async_native \
-	display/screenshot \
-	gui/graphics/simultaneous_contrast \
-	gui/graphics/simultaneous_color_contrast \
-	gui/direct_manipulation/dnd \
-	gui/direct_manipulation/simplest \
-	gui/direct_manipulation/reusable_dnd \
-	gui/direct_manipulation/simple_touch \
-	gui/direct_manipulation/multi_touch \
-	gui/direct_manipulation/multi_touch_drag \
-	gui/direct_manipulation/multi_touch_rrr \
-	gui/direct_manipulation/multi_touch_rrr_dyn \
-	gui/direct_manipulation/hysteresis \
-	gui/direct_manipulation/drag_pan_zoom \
-	gui/direct_manipulation/sketching_simple \
-	gui/direct_manipulation/sketching_advanced \
-	gui/direct_manipulation/zoom \
-	gui/direct_manipulation/accumulated_transforms \
-	gui/direct_manipulation/rotate_resize \
-	gui/direct_manipulation/dynamic_rectangle \
-	gui/fitts_law \
-	gui/keyboard \
-	gui/layout/dock \
-	gui/layout/strip_board \
-	gui/mainloop \
-	gui/redisplay \
-	gui/widgets/line_edit \
-	gui/widgets/potentiometer \
-	gui/widgets/switch_range \
-	gui/widgets/button \
-	gui/widgets/checkbox \
-	gui/widgets/dial \
-	gui/widgets/scrollbar \
-	gui/widgets/tab \
-	gui/widgets/menu \
-	gui/animation/blinking \
-	gui/animation/simple_animation \
-	gui/animation/simple_animation_loop \
-	gui/animation/path_animation \
-	gui/animation/notification_animation \
-	gui/clone \
-	gui/sort \
-	gui/texture \
-	gui/ms_per_frame \
-	gui/regex \
-	comms/helloIvy
-#	comms/midi \
-#	audio/simple_audio
 
-#	extra/crazyflie
+cookbook_apps := $(shell cd cookbook && find * -name cookbook_app.mk | xargs -I{} dirname {})
+disable_cookbook_apps := \
+	comms/midi \
+	audio/simple_audio \
+	extra/crazyflie \
+	extra/crazyflie_drone_app \
+	gui/physics
+
+cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))
 
 cookbook_apps += $(cookbook_apps_extra)
-
 
 $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 
 cookbook_apps: $(notdir $(cookbook_apps))
 cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
-
-.PHONY: cookbook_apps cookbook_apps_test $(notdir $(cookbook_apps))
 
 
 # -----------

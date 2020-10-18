@@ -67,7 +67,9 @@ Component root {
 
       //animation SwitchRange
       int step = 20
-      SwitchRange animationSteps ($radius_inc){
+
+      //SwitchRange animationSteps ($radius_inc) {
+      SwitchRange animationSteps (1) {
         //circle appears
         _ [0, 20[{
             radius_inc.state => source.rx, source.ry 
@@ -76,7 +78,7 @@ Component root {
         //circle disappear and ellipses arrive
         _ [20, 30[{
 
-              radius_inc.state => anim1.rx, anim1.ry
+                        radius_inc.state => anim1.rx, anim1.ry
           (1-(radius_inc.state-20) / 10) => ellipseOp.a
         }
           //circle disappear and ellipses arrive
@@ -90,7 +92,7 @@ Component root {
         _ [40, 50[{
 
               fmod((radius_inc.state - 20) , 5) => anim1.rx, anim1.ry
-          (1-(radius_inc.state-40) / 30) => ellipseOp.a
+                 (1-(radius_inc.state-40) / 30) => ellipseOp.a
         }
         //decrease source
         _ [50, 60]{
@@ -102,10 +104,11 @@ Component root {
         _ [60, 70]{
         }
       }
-      radius_inc.state => animationSteps.input
+      radius_inc.state =:> animationSteps.input
     }
     stopped -> running (start_r.press)
     running -> stopped (res.true)
   }
+
 }
 

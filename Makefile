@@ -442,7 +442,6 @@ endef
 cookbook_apps := $(shell cd cookbook && find * -name cookbook_app.mk | xargs -I{} dirname {})
 disable_cookbook_apps := \
 	comms/midi \
-	audio/simple_audio \
 	extra/crazyflie \
 	extra/crazyflie_drone_app \
 	gui/physics

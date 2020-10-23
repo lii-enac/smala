@@ -3,6 +3,9 @@ use base
 use audio
 use display
 use gui
+use animation
+
+import gui.animation.Animator
 
 _main_
 Component root
@@ -12,17 +15,24 @@ Component root
   	Exit ex (0, 1)
   	f.close -> ex
 	
-	//Volume v(0.9) // does not work anymore FUTUREWORK
-
+	//Volume v(0.9)
 	//0.2 =: DefaultAudioListener.gain
-
-	Sample s("res/shutter.wav")
+	Sample s("../simple_audio/res/shutter.wav")
 	0.2 =: s.gain
 	1 =: s.x
 	1 =: s.z
 	//1.5 =: s.pitch_mul
-	0.5 =: s.lowpass_freq // works with openal efx support
+	0.5 =: s.lowpass_freq
 
+	Animator an (300, 2, 1, DJN_OUT_ELASTIC, 0)
+	an.output =:> s.x
+	20 =: an.fps
+	|-> an.start
+
+	TextPrinter tp
+	//an.output => tp.input
+	
 	Clock cl(2000)
 	cl.tick -> s
+	cl.tick -> an.reset
 }

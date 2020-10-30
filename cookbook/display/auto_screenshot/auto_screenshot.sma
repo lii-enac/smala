@@ -30,13 +30,10 @@ Component root {
   r =: toDrag
   SimpleDrag _ (toDrag, f)
 
-  Incr num_frame (1)
-
-  f.refreshed -> num_frame
+  WallClock wc
   f.refreshed -> {
-    "screenshot-" + toString(num_frame.state) + ".png" =: f.screenshot_path
+    "screenshot-" + wc.state_text + ".png" =: f.screenshot_path
   }
   f.refreshed -> f.screenshot
-
   
 }

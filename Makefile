@@ -160,6 +160,8 @@ djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
 endif
 
+# for filesystem.h
+SC_CXXFLAGS += $(djnn_cflags)
 
 ifeq ($(os),Linux)
 #CXXFLAGS +=

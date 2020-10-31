@@ -21,23 +21,10 @@
 #include "driver.h"
 #include "cpp_builder.h"
 
+#include "core/utils/filesystem.h"
+
 using namespace Smala;
 using namespace std;
-
-#ifndef __has_include
-static_assert(false, "__has_include not supported");
-#else
-#  if __has_include(<filesystem>)
-#    include <filesystem>
-namespace filesystem = filesystem;
-#  elif __has_include(<experimental/filesystem>)
-#    include <experimental/filesystem>
-namespace filesystem = experimental::filesystem;
-#  elif __has_include(<boost/filesystem.hpp>)
-#    include <boost/filesystem.hpp>
-namespace filesystem = boost::filesystem;
-#  endif
-#endif
 
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);

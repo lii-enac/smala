@@ -23,7 +23,8 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  FillColor g(0,255,0)
   Rectangle r(10,10,50,50)
-  "screenshot.png" =: f.screenshot_path
+  "screenshot" =: f.screenshot_path // the implementation chooses the image file format
   r.press -> f.screenshot
 }

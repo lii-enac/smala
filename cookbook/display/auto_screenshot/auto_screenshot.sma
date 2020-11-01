@@ -25,6 +25,7 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  FillColor g(0,255,0)
   Rectangle r(10,10,50,50)
   Ref toDrag (null)
   r =: toDrag
@@ -32,7 +33,7 @@ Component root {
 
   WallClock wc
   f.refreshed -> {
-    "screenshot-" + wc.state_text + ".png" =: f.screenshot_path
+    "screenshot-" + wc.state_text =: f.screenshot_path
   }
   f.refreshed -> f.screenshot
   

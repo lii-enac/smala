@@ -1,5 +1,6 @@
 config.mk
 build/
 res/
-cookbook/display/screenshot/screenshot.png
+cookbook/display/screenshot/*.ppm
+cookbook/display/auto_screenshot/*.ppm
 .scannerwork

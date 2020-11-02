@@ -181,9 +181,6 @@ namespace Smala
       }
       case VAR: {
         std::string p = build_find (term->path_arg_value (), false);
-        // if the name contains "var_" then this is a simple variable not a djnn property
-        // so write it as is
-        std::size_t found = p.find ("var_");
         return p;
         break;
       }
@@ -570,12 +567,10 @@ namespace Smala
     int model = node->is_connector () ? !node->is_model () : node->is_model ();
     if (arg_node->path_arg_value ()->has_wild_card ()) {
       for (auto e : node->get_output_nodes ()) {
-        for (auto e : node->get_output_nodes ()) {
-          indent (os);
-          std::string out_arg = build_find (e, false);
-          os << control_name << " (" << p_name << ", " << arg << ", " << out_arg
-              << ", " << model << ");\n";
-        }
+        indent (os);
+        std::string out_arg = build_find (e, false);
+        os << control_name << " (" << p_name << ", " << arg << ", " << out_arg
+            << ", " << model << ");\n";
       }
       return;
     }

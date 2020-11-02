@@ -12,6 +12,8 @@ _main_
 Component root
 {
   Frame f ("my frame", 0, 0, 1000, 1000)
+  Exit ex (0, 1)
+  f.close -> ex
 
   World w (0, 0, -9.81)
   Sphere s (1.5, 0, 10, 0.2, 1)
@@ -43,6 +45,3 @@ Component root
   f.height - (s1.z*100) =:> cir2.cy
   s1.x * 100 =:> cir2.cx
 }
-
-run root
-run syshook

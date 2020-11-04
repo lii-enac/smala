@@ -31,10 +31,11 @@ Component root
 	Int anim_duration (10000) //ms
 	Int anim_step (10) //ms
 	Incr anim_inc (0)
-	AssignmentSequence restart_animation (1){
+
+	AssignmentSequence restart_animation (1) {
 		  0 =: anim_inc.state
 		0.5 =: s.gain
-		 20 =:c.r 
+		 20 =: c.r
 	}
 
 	anim_inc.state * anim_step =:> ms_time
@@ -49,15 +50,19 @@ Component root
 	Sine mod (0)
 	Abs abs (0)
 
-	($mod_freq*ms_time/1000 * 3.14) =:> mod.input
+	(($mod_freq*ms_time/1000) * 3.14) =:> mod.input
 	mod.output =:> abs.input
 
 	//Mapping
 	abs.output * 0.1 =:> s.lowpass_freq
 	abs.output*20 + 20 => c.r
 
-	s !-> s
+	TextPrinter tp
+	//abs.output => tp.input
+	//ms_time >= anim_duration => tp.input
 
+	//s !-> s
+	1 =: s.loop
 
 	Double range_x (0.5)
 	Double range_y (0.5)

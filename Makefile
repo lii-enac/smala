@@ -30,7 +30,7 @@ include config.default.mk
 -include config.mk
 
 MAJOR = 1
-MINOR = 13
+MINOR = 14
 MINOR2 = 0
 
 # remove builtin rules : speed up build process and help debug
@@ -493,14 +493,14 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 # ---------------------------------------
 # package config
 
-ifeq ($(prefix),)
+ifeq ($(PREFIX),)
 # dev install
 smala_install_prefix :=  $(abspath $(build_dir))
 pkg_config_install_prefix := /usr/local
 else
 # pkg install (brew, deb, arch)
-smala_install_prefix := $(abspath $(prefix))
-pkg_config_install_prefix := $(abspath $(prefix))
+smala_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
+pkg_config_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
 endif
 
 pkgconfig_targets = smala-dev.pc smala.pc
@@ -518,7 +518,7 @@ $(build_dir)/%.pc: distrib/%.pc.in
 
 install_pkgconf: pkgconf
 	test -d $(pkg_config_install_prefix)/lib/pkgconfig || mkdir -p $(pkg_config_install_prefix)/lib/pkgconfig	
-ifeq ($(prefix),)
+ifeq ($(PREFIX),)
 	install -m 644 $(build_dir)/smala-dev.pc	$(pkg_config_install_prefix)/lib/pkgconfig
 else
 	install -m 644 $(build_dir)/smala.pc	$(pkg_config_install_prefix)/lib/pkgconfig
@@ -540,7 +540,7 @@ $(smala_install_prefix)/include/smala/%.h: $(build_dir)/src_lib/%.h
 
 $(smala_install_prefix)/lib/%$(lib_suffix): $(build_dir)/lib/%$(lib_suffix)
 	@mkdir -p $(dir $@)
-ifneq ($(prefix),)
+ifneq ($(PREFIX),)
 	install -m 644 $< $@
 endif
 
@@ -578,7 +578,7 @@ install_brew: install
 deb_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2)
 deb_prefix = $(deb_prefix_version)/usr
 deb:	
-	make -j6  install prefix=$(deb_prefix)
+	make -j6  install PREFIX=$(deb_prefix)
 	test -d $(deb_prefix_version)/DEBIAN || mkdir -p $(deb_prefix_version)/DEBIAN
 	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' distrib/deb/control > $(deb_prefix_version)/DEBIAN/control
 # cp triggers file
@@ -593,6 +593,33 @@ deb:
 # check integrity of the build package. We still have error
 #	cd "build/deb" ; lintian smala_$(MAJOR).$(MINOR).$(MINOR2).deb
 .PHONY: deb
+
+#pkg
+
+#note: 
+#      	makepkg
+# install with:
+#		pacman -U smala.pkg 
+# remove with:
+#		pacman -Rs smala
+pkg_destdir_version = build/pkg/smala_$(MAJOR).$(MINOR).$(MINOR2)
+ifeq ($(PREFIX),)
+pkg_prefix = /usr
+else
+pkg_prefix = $(PREFIX)
+endif
+ifeq ($(DESTDIR),) 
+pkg_destdir= $(shell pwd)/$(pkg_destdir_version)
+else
+pkg_destdir = $(DESTDIR)
+endif
+pkg:
+#   for test only	
+#	make DESTDIR=$(pkg_destdir) PREFIX=$(pkg_prefix) install
+	test -d build || mkdir -p build
+	sed -e 's,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),;	 s,@MINOR2@,$(MINOR2),' distrib/PKGBUILD.proto > build/PKGBUILD
+	cd build ; makepkg -f --skipinteg 
+.PHONY: pkg
 
 # -----------
 

@@ -1,0 +1,55 @@
+# This is an example PKGBUILD file. Use this as a start to creating your own,
+# and remove these comments. For more information, see 'man PKGBUILD'.
+# NOTE: Please fill out the license field for your package! If it is unknown,
+# then please put 'unknown'.
+
+# Maintainer: Mathieu Poirier <mathieu.poirier@enac.fr>
+pkgname=smala
+pkgver=@MAJOR@.@MINOR@.@MINOR2@
+pkgrel=1
+epoch=
+pkgdesc="djnn language package"
+arch=('x86_64')
+url="https://github.com/lii-enac/smala"
+license=('SLEEPY CAT')
+groups=()
+depends=(djnn-cpp)
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog= 
+source=("https://github.com/lii-enac/$pkgname/archive/$pkgver.tar.gz")
+#source=("$pkgname-$pkgver.tar.gz")
+noextract=()
+#if needed use makepkg -g
+md5sums=("")
+validpgpkeys=()
+
+prepare() {
+	cd "$pkgname-$pkgver"
+#	cd "$pkgname"
+}
+
+build() {
+	cd "$pkgname-$pkgver"
+	make -j6 lib djnn_path=../../../../djnn-cpp
+}
+
+check() {
+# can't be empty
+	cd "$pkgname-$pkgver"
+#	make -k check
+}
+
+package() {
+	cd "$pkgname-$pkgver"
+	echo $pkgdir
+	echo make -j6 DESTDIR="$pkgdir/" PREFIX="/usr" install
+	make -j6 DESTDIR="$pkgdir/" PREFIX="/usr" install
+}	

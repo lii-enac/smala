@@ -1185,6 +1185,8 @@ namespace Smala
         break;
       case FUNCTION_CALL:
       case STRING_VALUE:
+        if (m_in_switch)
+          print_error_message (error_level::error, "Wrong type for switch argument", 1);
         os << n->str_arg_value ();
         break;
       case VAR: {

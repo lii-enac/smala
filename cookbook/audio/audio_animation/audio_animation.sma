@@ -15,21 +15,21 @@ Component root
   	Exit ex (0, 1)
   	f.close -> ex
 	
-	//Volume v(0.9)
-	//0.2 =: DefaultAudioListener.gain
+	//Sample s("../simple_audio/res/al2.wav")
 	Sample s("../simple_audio/res/shutter.wav")
 	0.2 =: s.gain
-	1 =: s.x
-	1 =: s.z
+	//1 =: s.x
+	//1 =: s.z
 	//1.5 =: s.pitch_mul
-	0.5 =: s.lowpass_freq
-
-	Animator an (300, 2, 1, DJN_OUT_ELASTIC, 0)
+	1 =: s.lowpass_gain
+	0.1 =: s.lowpass_freq
+	
+	Animator an (30000, 2, 1, DJN_OUT_ELASTIC, 0)
 	an.output =:> s.x
 	20 =: an.fps
 	|-> an.start
 
-	TextPrinter tp
+	//TextPrinter tp
 	//an.output => tp.input
 	
 	Clock cl(2000)

@@ -57,11 +57,7 @@ Component root
 	abs.output * 0.1 =:> s.lowpass_freq
 	abs.output*20 + 20 => c.r
 
-	TextPrinter tp
-	//abs.output => tp.input
-	//ms_time >= anim_duration => tp.input
-
-	//s !-> s
+	//s !-> s // may not work if multiplying pitch, as duration is changed...
 	1 =: s.loop
 
 	Double range_x (0.5)
@@ -72,4 +68,11 @@ Component root
 
 	range_x * 2 + 0.5 =:> s.pitch_mul
 	range_y * 5 =:> mod_freq
+
+	TextPrinter tp
+	//abs.output => tp.input
+	//ms_time >= anim_duration => tp.input
+	//restart_animation -> {
+	//	"restart animation" =: tp.input
+	//}
 }

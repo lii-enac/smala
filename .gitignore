@@ -4,3 +4,4 @@ res/
 cookbook/display/**/*.ppm
 cookbook/display/**/*.png
 .scannerwork
+cookbook/gui/teensy_test/screenshot-teensy_test-*.png

@@ -5,6 +5,11 @@ use gui
 import midi   // for self-contained midi message
 import midi_p // for property-based midi message
 
+_native_code_
+%{
+    extern void clear_midi ();
+%}
+
 import gui.widgets.Button
 
 // try with https://tytel.org/helm/ or https://asb2m10.github.io/dexed/
@@ -13,6 +18,12 @@ _main_
 Component root
 {
     Frame f ("midi", 0, 0, 500, 500)
+    Exit ex(0,1)
+    f.close -> (root) {
+        clear_midi ()
+    }
+    f.close -> ex
+
 
     Text _(10,20, "Press: note on - Release: note off - Drag X: pan - Drag Y: volume")
 
@@ -23,8 +34,7 @@ Component root
     f.close -> all_note_off.do_it_2
     f.close -> all_sound_off.do_it_2
 
-    Exit ex(0,1)
-    f.close -> ex
+
 
     Int _val1(0) // with 1 arg message
 

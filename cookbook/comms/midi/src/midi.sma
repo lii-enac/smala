@@ -7,6 +7,16 @@ _native_code_
 #include "RtMidi.h"
 
 RtMidiOut *midiout = nullptr;
+RtMidiIn *midiin = nullptr;
+
+void mycallback( double deltatime, std::vector< unsigned char > *message, void *userData )
+{
+  unsigned int nBytes = message->size();
+  for ( unsigned int i=0; i<nBytes; i++ )
+    std::cout << "Byte " << i << " = " << std::hex << (int)message->at(i) << std::dec << ", ";
+  if ( nBytes > 0 )
+    std::cout << "stamp = " << deltatime << std::endl;
+}
 
 void
 init_midi_if_not_inited ()
@@ -14,6 +24,7 @@ init_midi_if_not_inited ()
     if (midiout) return;
 
     midiout = new RtMidiOut();
+    midiin = new RtMidiIn();
 
     // Check available ports.
     unsigned int nPorts = midiout->getPortCount();
@@ -24,6 +35,19 @@ init_midi_if_not_inited ()
     std::cerr << midiout->getPortName () << std::endl;
     // Open first available port.
     midiout->openPort( 0 );
+
+    std::cerr << midiin->getPortName () << std::endl;
+    midiin->openPort( 0 );
+    // Don't ignore sysex, timing, or active sensing messages.
+    midiin->ignoreTypes( false, false, false );
+    midiin->setCallback( &mycallback );
+}
+
+void
+clear_midi ()
+{
+    delete midiout;
+    delete midiin;
 }
 
 void

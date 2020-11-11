@@ -406,7 +406,7 @@ endif
 
 $1_app_link := $$(CXX_CK)
 
-$$($1_app_objs): $$($1_app_gensrcs)
+#$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
 $$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
@@ -650,8 +650,10 @@ distclean clear clean:
 
 
 deps += $(smalac_objs:.o=.d)
--include $(deps)
 
+ifneq ($(dep),no)
+-include $(deps)
+endif
 
 pkgdeps := bison flex
 

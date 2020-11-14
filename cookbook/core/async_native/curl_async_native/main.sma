@@ -35,7 +35,7 @@ mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
     //std::cerr << "curl received " << size * nmemb << " bytes." << std::endl;
     //std::cerr << ptr << std::endl;
     std::string * content = reinterpret_cast<std::string*>(userdata);
-    *content += ptr;
+    content->append (ptr, size*nmemb);
     return size * nmemb;
 }
 

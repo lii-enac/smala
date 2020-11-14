@@ -83,7 +83,25 @@ cpp_action (Process* c)
         //} catch (nlohmann::detail::parse_error&e) {
         //}
         
-        // update djnn tree
+
+        // first create all djnn objects before updating the tree
+        // to minimize the time spent with exclusive access
+        //Process * tmp = new Process (nullptr, "");
+        Process * tmp = nullptr;
+        std::vector<Process*> processes;
+        int numpoly=0;
+        for (auto &poly: polys) {
+            auto * djnnpoly = new Polyline (tmp, std::to_string(numpoly++));
+            int i=0;
+            for (auto& coord: poly) {
+                //std::cerr << coord[0] << " " << coord[1] << " " ;
+                new PolyPoint (djnnpoly, std::to_string(i++), coord[0], coord[1]);
+            }
+            processes.push_back(djnnpoly);
+            //std::cerr << std::endl;
+        }
+
+        // then update the djnn tree
 
         get_exclusive_access(DBG_GET);
 
@@ -92,18 +110,11 @@ cpp_action (Process* c)
 
         // To get the user_data
         Process *data = (Process*) get_native_user_data (c);
-
         Process *meteo = data->find_child ("meteo");
         //std::cerr << meteo << std::endl;
-        int numpoly=0;
-        for (auto &poly: polys) {
-            auto * djnnpoly = new Polyline (meteo, std::to_string(numpoly++));
-            int i=0;
-            for (auto& coord: poly) {
-                //std::cerr << coord[0] << " " << coord[1] << " " ;
-                new PolyPoint (djnnpoly, std::to_string(i++), coord[0], coord[1]);
-            }
-            //std::cerr << std::endl;
+        numpoly = 0;
+        for (auto p:processes) {
+            meteo->add_child(p, std::to_string(numpoly++));
         }
 
         release_exclusive_access(DBG_REL);

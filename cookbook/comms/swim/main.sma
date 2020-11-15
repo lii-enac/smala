@@ -62,6 +62,7 @@ namespace curl { // fix 'Rectangle' clash name for windowss
 size_t
 mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
+    assert(ptr);
     //std::cerr << "curl received " << size * nmemb << " bytes." << std::endl;
     //std::cerr << size << " " << nmemb << " " << ptr << std::endl;
     std::string * content = reinterpret_cast<std::string*>(userdata);
@@ -73,6 +74,11 @@ mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 void
 cpp_action (Process* c)
 {
+    const char* token = getenv ("METSAFE_TOKEN");
+    if (!token) {
+        std::cerr << "no METSAFE_TOKEN env variable, please provide it" << std::endl;
+        return;
+    }
     std::string content;
 
     using namespace curl;
@@ -83,7 +89,7 @@ cpp_action (Process* c)
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
         std::string url = "https://apiv3.metsafecloud.com/core/wfs?service=WFS&token=";
-        url += getenv ("METSAFE_TOKEN");
+        url += token;
         url += "&version=2.0.0&request=GetFeature&typeName=metgate-replay:lightningcells_meteorage&outputFormat=json&count=50&bbox=41.57,-5.27,51.67,9.66&srsName=EPSG:4326&sortBy=startValidity+D";
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);

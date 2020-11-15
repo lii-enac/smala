@@ -8,8 +8,9 @@
 #
 #  	Contributors:
 #  		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
-#  		Jérémie Garcia <jeremie.garcia@enc.fr>
+#  		Jérémie Garcia <jeremie.garcia@enac.fr>
 #
 
 objs_cookbook_app := Segment.o main.o
+$(gen_srcs_dir)/main.o: $(gen_srcs_dir)/Segment.h
 djnn_libs_cookbook_app := gui display base exec_env core

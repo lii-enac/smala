@@ -11,5 +11,5 @@
 #  		Jérémie Garcia <jeremie.garcia@enc.fr>
 #
 
-objs_cookbook_app := main.o Segment.o
+objs_cookbook_app := Segment.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core

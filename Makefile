@@ -369,6 +369,7 @@ other_runtime_lib_path :=
 ckappname := $$(notdir $1)
 $1_app_srcs_dir := cookbook/$1
 app_srcs_dir := $$($1_app_srcs_dir)
+gen_srcs_dir := $(build_dir)/cookbook/$1
 
 include cookbook/$1/cookbook_app.mk
 
@@ -444,7 +445,7 @@ endef
 
 
 cookbook_apps := $(shell cd cookbook && find * -name cookbook_app.mk | xargs -I{} dirname {})
-disable_cookbook_apps := \
+disable_cookbook_apps ?= \
 	extra/crazyflie \
 	extra/crazyflie_drone_app \
 	comms/swim \

@@ -366,10 +366,12 @@ cppflags_cookbook_app :=
 res_dir :=
 other_runtime_lib_path :=
 
-include cookbook/$1/cookbook_app.mk
-
 ckappname := $$(notdir $1)
 $1_app_srcs_dir := cookbook/$1
+app_srcs_dir := $$($1_app_srcs_dir)
+
+include cookbook/$1/cookbook_app.mk
+
 $1_app_objs := $$(objs_cookbook_app)
 $1_app_gensrcs := $$($1_app_objs:.o=.cpp)
 $1_app_gensrcs := $$(addprefix $(build_dir)/cookbook/$1/, $$($1_app_gensrcs))
@@ -443,10 +445,12 @@ endef
 
 cookbook_apps := $(shell cd cookbook && find * -name cookbook_app.mk | xargs -I{} dirname {})
 disable_cookbook_apps := \
-	comms/midi \
 	extra/crazyflie \
 	extra/crazyflie_drone_app \
-	gui/physics
+	comms/swim
+
+	#gui/physics
+	#comms/midi \
 
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))
 
@@ -655,7 +659,7 @@ ifneq ($(dep),no)
 -include $(deps)
 endif
 
-pkgdeps := bison flex
+pkgdeps := bison flex rtmidi nlohmann-json
 
 ifeq ($(os),Linux)
 pkgcmd := apt install -y

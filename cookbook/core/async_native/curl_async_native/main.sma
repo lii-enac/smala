@@ -61,6 +61,7 @@ cpp_action (Process* c)
     std::cerr << "curl getting " << uri << std::endl;
 
     // blocking call, only once here since the URI is finished (and there is no curl 'mainloop')
+    // FIXME: hsould be cancellable with https://curl.se/libcurl/c/CURLOPT_XFERINFOFUNCTION.html
     auto res = curl_easy_perform (curl);
     if (res != CURLE_OK) {
         std::cerr << "error performing curl" << std::endl;

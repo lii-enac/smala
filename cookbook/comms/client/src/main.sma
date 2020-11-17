@@ -19,7 +19,7 @@ use comms
 
 _main_
 Component root {
-  Frame f ("RemoteProc - client", 100, 100, 400, 200)
+  Frame f ("RemoteProc - client", 100, 100, 400, 300)
   Exit ex (0, 1)
   f.close -> ex
   FillColor _ (#101010)
@@ -29,11 +29,13 @@ Component root {
 
   Component expl {
     FillColor _ (White)
-    Text t (10, 15, "If the circle is red, start the server then click on the circle")
-    Text t2 (10, 30, "to enable connection.")
-    Text t3 (10, 45, "Click on the rectangle to increment the server's counter.")
+    Text t (5, 15, "If the circle is red, start the server then click on the circle")
+    Text t2 (5, 30, "to enable connection.")
+    Text t3 (5, 45, "Click on the violet rectangle to increment the server's counter.")
+    Text t3 (5, 60, "Click on the yellow rectangle and move the cursor to move")
+    Text t4 (5, 75, "the server's circle.")
   }
-  Translation _ (0, 45)
+  Translation _ (0, 75)
 
   RemoteProc dp ("127.0.0.1", 8080)
 
@@ -54,10 +56,15 @@ Component root {
 
   Incr inc (1)
   FillColor _ (White)
-  Text tp (50, 100, "")
+  Text t_inc (50, 100, "")
 
   FillColor _ (100, 100, 250)
   Rectangle r (100, 30, 40, 40, 5, 5)
   r.press -> dp.inc
-  dp.inc.state =:> tp.text
+  dp.inc.state =:> t_inc.text
+
+  FillColor _ (254, 200, 50)
+  Rectangle r2 (250, 30, 100, 100, 5, 5)
+  r2.move.x - 250 => dp.c.cx
+  r2.move.y - 70 => dp.c.cy
 }

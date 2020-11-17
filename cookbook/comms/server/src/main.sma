@@ -37,4 +37,8 @@ Component root {
   FillColor _ (White)
   Text t (80, 100, "")
   inc.state =:> t.text
+
+  FillOpacity _ (0.5)
+  FillColor _ (200, 100, 100)
+  Circle c (50, 50, 20)
 }

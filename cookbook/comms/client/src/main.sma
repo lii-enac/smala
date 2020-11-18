@@ -29,11 +29,11 @@ Component root {
 
   Component expl {
     FillColor _ (White)
-    Text t (5, 15, "If the circle is red, start the server then click on the circle")
-    Text t2 (5, 30, "to enable connection.")
-    Text t3 (5, 45, "Click on the violet rectangle to increment the server's counter.")
-    Text t3 (5, 60, "Click on the yellow rectangle and move the cursor to move")
-    Text t4 (5, 75, "the server's circle.")
+    Text _ (5, 15, "If the circle is red, start the server then click on the circle")
+    Text _ (5, 30, "to enable connection.")
+    Text _ (5, 45, "Click on the violet rectangle to increment the server's counter.")
+    Text _ (5, 60, "Click on the yellow rectangle and move the cursor to move")
+    Text _ (5, 75, "the server's circle.")
   }
   Translation _ (0, 75)
 

@@ -97,7 +97,14 @@ namespace Smala
                   && (node->node_type() != START_ELSE)
                   && (node->node_type() != START_ELSEIF)
                 )
-              os << "Context::instance()->new_line(" << node->get_location().begin.line << ", \"" << (f?*f:std::string("")) << "\");" << std::endl;
+              os << "Context::instance()->parser_info(" 
+                 << node->get_location().begin.line << ", "
+                 << node->get_location().begin.column << ", "
+                 << node->get_location().end.line << ", "
+                 << node->get_location().end.column << ", "
+                 << "\"" << (f?*f:std::string("")) << "\""
+                 << ");"
+                 << std::endl;
           }
           last_loc = loc;
         }

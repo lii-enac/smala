@@ -157,10 +157,12 @@ else
 djnn_cflags := -I$(djnn_path)/src
 djnn_ldflags := -L$(djnn_path)/build/lib
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
-djnn_ldlibs := -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core 
+djnn_ldlibs := -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core
 djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
 endif
+
+djnn_libs_SL := $(djnn_libs)
 
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
@@ -209,6 +211,10 @@ ifeq ($(cookbook_cross_prefix),em)
 EXE := .html
 launch_cmd := emrun --serve_after_close
 
+#os := em
+DYNLIB=
+lib_suffix=.bc
+
 EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
 -DSDL_DISABLE_IMMINTRIN_H \
@@ -216,6 +222,9 @@ EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
 -s ASSERTIONS=2 \
 -s ERROR_ON_UNDEFINED_SYMBOLS=0
+
+djnn_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,animation comms gui display input files utils base exec_env core))
+djnn_libs_SL :=
 
 em_ext_libs_path ?= ../djnn-emscripten-ext-libs
 
@@ -282,7 +291,7 @@ $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
-	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs)
+	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL)
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)
@@ -393,9 +402,16 @@ $1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_
 	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
+endif
+
 ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
-$1_app_libs := -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app)) $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux's ld
+ifeq ($$(cookbook_cross_prefix),em)
+$1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
+else
+$1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+$1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux's ld
+endif
 $$($1_app_objs): $$(smala_lib)
 
 $$(notdir $1)_toto:
@@ -406,8 +422,6 @@ ifneq ($$($1_app_pkg),)
 #$1_lib_pkgpath = $$(subst $$() $$(),:,$$(lib_pkgpath))
 $1_app_cppflags += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pkgpath) pkg-config --cflags $$($1_app_pkg))
 $1_app_libs += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pkgpath) pkg-config --libs $$($1_app_pkg))
-endif
-
 endif
 
 $1_app_link := $$(CXX_CK)

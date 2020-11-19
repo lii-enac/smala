@@ -89,7 +89,7 @@ ifdef cookbook_cross_prefix
 #/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
 ifneq ($(cookbook_cross_prefix),g)
 CC_CK := $(cookbook_cross_prefix)$(CC)
-CXX_CK := $(cookbook_cross_prefix)$(CXX)
+CXX_CK ?= $(cookbook_cross_prefix)$(CXX)
 AR_CK := $(cookbook_cross_prefix)$(AR)
 RANLIB_CK := $(cookbook_cross_prefix)$(RANLIB)
 SIZE_CK := $(cookbook_cross_prefix)$(SIZE)
@@ -161,7 +161,7 @@ djnn_lib_path := $(djnn_path)/build/lib
 endif
 
 # for filesystem.h
-SC_CXXFLAGS += $(djnn_cflags)
+CXXFLAGS_SC += $(djnn_cflags)
 
 ifeq ($(os),Linux)
 #CXXFLAGS +=
@@ -171,6 +171,7 @@ LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 lib_suffix =.so
 DYNLIB = -shared
+LDFLAGS_SC += -lstdc++fs
 endif
 
 ifeq ($(os),Darwin)
@@ -181,8 +182,8 @@ LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-SC_CXXFLAGS += -I/usr/local/opt/flex/include
-SC_LDFLAGS += -L/usr/local/opt/flex/lib
+CXXFLAGS_SC += -I/usr/local/opt/flex/include
+LDFLAGS_SC += -L/usr/local/opt/flex/lib
 lib_suffix =.dylib
 DYNLIB = -dynamiclib
 endif
@@ -261,9 +262,9 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-$(smalac): CFLAGS += $(SC_CXXFLAGS) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
+$(smalac): CFLAGS += $(CXXFLAGS_SC) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 #$(smalac): CXX = $(cross_prefix)++
-$(smalac): LDFLAGS += $(SC_LDFLAGS)
+$(smalac): LDFLAGS += $(LDFLAGS_SC)
 
 # ------------
 # smala lib
@@ -413,11 +414,11 @@ $1_app_link := $$(CXX_CK)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
 $$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
-$$($1_app_exe): LDFLAGS += $$(djnn_ldflags)
+$$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)
-	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS) $$(LIBS)
+	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
 
 $$(notdir $1)_objs: $$($1_app_objs)
 

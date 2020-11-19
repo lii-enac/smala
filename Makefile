@@ -80,6 +80,8 @@ CXX := g++
 RANLIB := ranlib
 SIZE ?=
 endif
+else
+CXX_SC := $(CXX)
 endif
 
 ifdef cookbook_cross_prefix
@@ -205,7 +207,7 @@ endif
 ifeq ($(cookbook_cross_prefix),em)
 #os := em
 EXE := .html
-launch_cmd := emrun
+launch_cmd := emrun --serve_after_close
 
 EMFLAGS := -Wall -Wno-unused-variable -Oz \
 -s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
@@ -263,7 +265,7 @@ $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 $(smalac): CFLAGS += $(CXXFLAGS_SC) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
-#$(smalac): CXX = $(cross_prefix)++
+$(smalac): CXX = $(CXX_SC)
 $(smalac): LDFLAGS += $(LDFLAGS_SC)
 
 # ------------
@@ -280,7 +282,7 @@ $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
-	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS) $(djnn_libs)
+	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs)
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)

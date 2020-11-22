@@ -52,12 +52,17 @@ _native_code_
 %{
 #include "exec_env/global_mutex.h"
 
+#include <sstream>
+
 #include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace curl { // fix 'Rectangle' clash name for windowss
-#include <curl/curl.h>
-#include <curl/easy.h>
+    #include <curl/curl.h>
+    #include <curl/easy.h>
 }
+
+#include "JSONSaxParser.h"
 
 size_t
 mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
@@ -69,7 +74,6 @@ mycurl_write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
     content->append (ptr, size*nmemb);
     return size * nmemb;
 }
-
 
 void
 cpp_action (Process* c)
@@ -106,6 +110,23 @@ cpp_action (Process* c)
     }
     curl_easy_cleanup(curl);
     if (content.empty()) return;
+
+    //std::cout << content << std::endl;
+
+    #if 0
+    get_exclusive_access(DBG_GET);
+    // To get the source that triggered the native action:
+    //Process *source = c->get_activation_source ();
+    // To get the user_data
+    Process * root = (Process*) get_native_user_data (c);
+
+    auto * parser = dynamic_cast<JSONSaxParser*>(root->find_child ("parser"));
+    release_exclusive_access(DBG_REL);
+
+    assert(parser);
+    parser->parse(content);
+    
+    #else
 
     //std::cerr << content.size() << std::endl;
     //std::cerr << content << std::endl;
@@ -166,8 +187,10 @@ cpp_action (Process* c)
     for (auto p: processes) {
         meteo->add_child(p, std::to_string(numpoly++));
     }
+    GRAPH_EXEC;
 
     release_exclusive_access(DBG_REL);
+    #endif
     
 }
 
@@ -187,6 +210,41 @@ Component root {
     Text t (10, 120, "  ")
     Text t2 (10, 140, "")
     Button btn (f, "launch", 50, 150)
+
+    TextPrinter tp
+    JSONSaxParser parser("features/geometry/coordinates")
+
+    parser.geometry -> (root) {
+        addChildrenTo root.meteo {
+            Polygon poly
+        }
+    }
+    parser.coordinates -> (root) {
+        //root.tp.input = "truc"
+        addChildrenTo root.meteo.poly {
+            PolyPoint point(0,0)
+            point.x = 0
+        }
+        
+    }
+    parser.features -> {
+        "features yes" =: tp.input
+    }
+    parser.features !-> {
+        "!features yes" =: tp.input
+    }
+    parser.geometry -> {
+        "geometry yes" =: tp.input
+    }
+    parser.geometry !-> {
+        "!geometry yes" =: tp.input
+    }
+    parser.coordinates -> {
+        "coordinates yes" =: tp.input
+    }
+    parser.coordinates !-> {
+        "!coordinates yes" =: tp.input
+    }
     
     FillColor fc (#FF00FF)
     Rectangle r (200, 200, 100, 100, 0, 0)
@@ -214,5 +272,83 @@ Component root {
 
     btn.click -> cpp_na
     btn.click -> {"STARTED" =: t.text}
+    cpp_na.end -> (root) {
+        dump root.meteo
+        dump root.tp
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+json sax state-machine could be
+features[object]/geometry[object]/MultiPolygon[object]/coordinates[array];
+
+FSM json_sax {
+    FSM features {
+        FSM geometry {
+            FSM MultiPolygon {
+                coordinates {
+
+                }
+            }
+        }
+    }
+}
+
+List {
+    Component features {
+        Component geometry {
+            Component MultiPolygon {
+                Component coordinates {
+                    List _ {
+                        List _ {
+                            List pair {
+                                float f
+}   }   }   }   }   }   }   }
+
+Ref refp
+
+XPath xp("/features/geometry/MultiPolygon/coordinates")
+
+xp.MultiPolygon -> {
+    Polygon p ()
+    p =: refp
+}
+
+features.geometry.MultiPolygon -> (root) {
+    Polygon p ()
+    p =: refp
+}
+
+features.geometry.MultiPolygon.coordinates._._.pair -> (root) {
+    PolyPoint p($refp, [0],[1])
+    features.geometry.MultiPolygon.coordinates._._._.f 
+}
+
+
+FSM json_sax {
+    State features
+    State geometry
+    State MultiPolygon
+    State coordinates 
+    features -> geometry (sax.features.start)
+    geometry -> features (sax.features.end)
+}
+
+
+*/
+
+
 

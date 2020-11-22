@@ -11,9 +11,9 @@
 #     Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := main.o
+objs_cookbook_app := main.o JSONSaxParser.o
 djnn_libs_cookbook_app := gui display base exec_env core
 lang_cookbook_app := cpp
 smala_libs_cookbook_app := smala
 pkg_cookbook_app := libcurl nlohmann_json
-#cflags_cookbook_app += -I$(app_srcs_dir)
+cflags_cookbook_app += -I$(app_srcs_dir)

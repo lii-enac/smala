@@ -5,6 +5,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.14.0] - 2020-11-23
+### compliant with djnn-cpp [1.14.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - Package for windows (and Linux) are avaluable on : https://github.com/lii-enac/smala/releases
+    - Added SVG recipe, workflow and preferences to use in smala
+    - NEW Client/server (TCP/IP) cookbook recipes.
+    - NEW audio/animation cookbook recipe.
+    - NEW auddio/visual cookbook recipe.
+    - NEW Physics cookbook recipes.
+    - NEW screenshots using WallClock cookbook recipes.
+    - NEW window cookbook recipe.
+    - NEW SWIM connection cookbook recipe (aeronautical)
+
+### Added
+### Changed
+    - Better debug info - line number fixed - add more parser info to context.
+    - Improved Fitts Law recipe.
+    - Improved warning on Switch generation
+    - Improved and clean-up Makefile
+    - Improved audio/midi cookbook recipe.
+    - Improved async_native cookbook recipe.
+    - Improved emscripten support
+
+### Fixed
+    - Fixed context generation for ELSEIF
+    - Fixed notification animation
+
 ## [1.13.0] - 2020-10-07
 ### compliant with djnn-cpp [1.13.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

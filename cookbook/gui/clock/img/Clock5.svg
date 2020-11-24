@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="Calque_1" inkscape:version="0.91 r13725" sodipodi:docname="Clock4.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 600 700"
+	 enable-background="new 0 0 600 700" xml:space="preserve">
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview5806" inkscape:current-layer="Calque_1" inkscape:cx="158.93517" inkscape:cy="395.9687" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="1192" inkscape:window-maximized="0" inkscape:window-width="2098" inkscape:window-x="1680" inkscape:window-y="1" inkscape:zoom="1.0866113" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="horloge">
+	<rect id="back" y="0" fill="#EEEEEE" width="600" height="700"/>
+	<g id="dial" transform="translate(300,300)">
+		<g id="back_clock">
+			
+				<linearGradient id="iron_shape_1_" gradientUnits="userSpaceOnUse" x1="-450" y1="549.28" x2="-150" y2="249.28" gradientTransform="matrix(1 0 0 -1 300 399.28)">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#242424"/>
+			</linearGradient>
+			<circle id="iron_shape" fill="url(#iron_shape_1_)" stroke="#000000" stroke-miterlimit="10" cx="0" cy="0" r="245"/>
+			
+				<linearGradient id="inner_stroke_1_" gradientUnits="userSpaceOnUse" x1="-150" y1="249.28" x2="-450" y2="549.28" gradientTransform="matrix(1 0 0 -1 300 399.28)">
+				<stop  offset="0" style="stop-color:#E0E0E0"/>
+				<stop  offset="1" style="stop-color:#242424"/>
+			</linearGradient>
+			<circle id="inner_stroke" fill="url(#inner_stroke_1_)" stroke="#000000" stroke-miterlimit="10" cx="0" cy="0" r="226.8"/>
+			<circle id="dialback" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="0" cy="0" r="221"/>
+		</g>
+		<g id="Graduations" transform="translate(-300,-300)">
+			<g id="minutes_grads">
+				<line id="line5583" fill="none" stroke="#878787" stroke-miterlimit="10" x1="300" y1="84.4" x2="300" y2="95.8"/>
+				<line id="line5585" fill="none" stroke="#878787" stroke-miterlimit="10" x1="277.5" y1="85.6" x2="278.7" y2="96.9"/>
+				<line id="line5587" fill="none" stroke="#878787" stroke-miterlimit="10" x1="255.2" y1="89.1" x2="257.5" y2="100.2"/>
+				<line id="line5589" fill="none" stroke="#878787" stroke-miterlimit="10" x1="233.4" y1="95" x2="236.9" y2="105.8"/>
+				<line id="line5591" fill="none" stroke="#878787" stroke-miterlimit="10" x1="212.3" y1="103.1" x2="216.9" y2="113.4"/>
+				<line id="line5593" fill="none" stroke="#878787" stroke-miterlimit="10" x1="192.2" y1="113.3" x2="197.9" y2="123.1"/>
+				<line id="line5595" fill="none" stroke="#878787" stroke-miterlimit="10" x1="173.3" y1="125.6" x2="180" y2="134.8"/>
+				<line id="line5597" fill="none" stroke="#878787" stroke-miterlimit="10" x1="155.8" y1="139.8" x2="163.3" y2="148.2"/>
+				<line id="line5599" fill="none" stroke="#878787" stroke-miterlimit="10" x1="139.8" y1="155.8" x2="148.2" y2="163.3"/>
+				<line id="line5601" fill="none" stroke="#878787" stroke-miterlimit="10" x1="125.6" y1="173.3" x2="134.8" y2="180"/>
+				<line id="line5603" fill="none" stroke="#878787" stroke-miterlimit="10" x1="113.3" y1="192.2" x2="123.1" y2="197.9"/>
+				<line id="line5605" fill="none" stroke="#878787" stroke-miterlimit="10" x1="103.1" y1="212.3" x2="113.4" y2="216.9"/>
+				<line id="line5607" fill="none" stroke="#878787" stroke-miterlimit="10" x1="95" y1="233.4" x2="105.8" y2="236.9"/>
+				<line id="line5609" fill="none" stroke="#878787" stroke-miterlimit="10" x1="89.1" y1="255.2" x2="100.2" y2="257.5"/>
+				<line id="line5611" fill="none" stroke="#878787" stroke-miterlimit="10" x1="85.6" y1="277.5" x2="96.9" y2="278.7"/>
+				<line id="line5613" fill="none" stroke="#878787" stroke-miterlimit="10" x1="84.4" y1="300" x2="95.8" y2="300"/>
+				<line id="line5615" fill="none" stroke="#878787" stroke-miterlimit="10" x1="85.6" y1="322.5" x2="96.9" y2="321.3"/>
+				<line id="line5617" fill="none" stroke="#878787" stroke-miterlimit="10" x1="89.1" y1="344.8" x2="100.2" y2="342.5"/>
+				<line id="line5619" fill="none" stroke="#878787" stroke-miterlimit="10" x1="95" y1="366.6" x2="105.8" y2="363.1"/>
+				<line id="line5621" fill="none" stroke="#878787" stroke-miterlimit="10" x1="103.1" y1="387.7" x2="113.4" y2="383.1"/>
+				<line id="line5623" fill="none" stroke="#878787" stroke-miterlimit="10" x1="113.3" y1="407.8" x2="123.1" y2="402.1"/>
+				<line id="line5625" fill="none" stroke="#878787" stroke-miterlimit="10" x1="125.6" y1="426.7" x2="134.8" y2="420"/>
+				<line id="line5627" fill="none" stroke="#878787" stroke-miterlimit="10" x1="139.8" y1="444.2" x2="148.2" y2="436.7"/>
+				<line id="line5629" fill="none" stroke="#878787" stroke-miterlimit="10" x1="155.8" y1="460.2" x2="163.3" y2="451.8"/>
+				<line id="line5631" fill="none" stroke="#878787" stroke-miterlimit="10" x1="173.3" y1="474.4" x2="180" y2="465.2"/>
+				<line id="line5633" fill="none" stroke="#878787" stroke-miterlimit="10" x1="192.2" y1="486.7" x2="197.9" y2="476.9"/>
+				<line id="line5635" fill="none" stroke="#878787" stroke-miterlimit="10" x1="212.3" y1="496.9" x2="216.9" y2="486.6"/>
+				<line id="line5637" fill="none" stroke="#878787" stroke-miterlimit="10" x1="233.4" y1="505" x2="236.9" y2="494.2"/>
+				<line id="line5639" fill="none" stroke="#878787" stroke-miterlimit="10" x1="255.2" y1="510.9" x2="257.5" y2="499.8"/>
+				<line id="line5641" fill="none" stroke="#878787" stroke-miterlimit="10" x1="277.5" y1="514.4" x2="278.7" y2="503.1"/>
+				<line id="line5643" fill="none" stroke="#878787" stroke-miterlimit="10" x1="300" y1="515.6" x2="300" y2="504.2"/>
+				<line id="line5645" fill="none" stroke="#878787" stroke-miterlimit="10" x1="322.5" y1="514.4" x2="321.3" y2="503.1"/>
+				<line id="line5647" fill="none" stroke="#878787" stroke-miterlimit="10" x1="344.8" y1="510.9" x2="342.5" y2="499.8"/>
+				<line id="line5649" fill="none" stroke="#878787" stroke-miterlimit="10" x1="366.6" y1="505" x2="363.1" y2="494.2"/>
+				<line id="line5651" fill="none" stroke="#878787" stroke-miterlimit="10" x1="387.7" y1="496.9" x2="383.1" y2="486.6"/>
+				<line id="line5653" fill="none" stroke="#878787" stroke-miterlimit="10" x1="407.8" y1="486.7" x2="402.1" y2="476.9"/>
+				<line id="line5655" fill="none" stroke="#878787" stroke-miterlimit="10" x1="426.7" y1="474.4" x2="420" y2="465.2"/>
+				<line id="line5657" fill="none" stroke="#878787" stroke-miterlimit="10" x1="444.2" y1="460.2" x2="436.7" y2="451.8"/>
+				<line id="line5659" fill="none" stroke="#878787" stroke-miterlimit="10" x1="460.2" y1="444.2" x2="451.8" y2="436.7"/>
+				<line id="line5661" fill="none" stroke="#878787" stroke-miterlimit="10" x1="474.4" y1="426.7" x2="465.2" y2="420"/>
+				<line id="line5663" fill="none" stroke="#878787" stroke-miterlimit="10" x1="486.7" y1="407.8" x2="476.9" y2="402.1"/>
+				<line id="line5665" fill="none" stroke="#878787" stroke-miterlimit="10" x1="496.9" y1="387.7" x2="486.6" y2="383.1"/>
+				<line id="line5667" fill="none" stroke="#878787" stroke-miterlimit="10" x1="505" y1="366.6" x2="494.2" y2="363.1"/>
+				<line id="line5669" fill="none" stroke="#878787" stroke-miterlimit="10" x1="510.9" y1="344.8" x2="499.8" y2="342.5"/>
+				<line id="line5671" fill="none" stroke="#878787" stroke-miterlimit="10" x1="514.4" y1="322.5" x2="503.1" y2="321.3"/>
+				<line id="line5673" fill="none" stroke="#878787" stroke-miterlimit="10" x1="515.6" y1="300" x2="504.2" y2="300"/>
+				<line id="line5675" fill="none" stroke="#878787" stroke-miterlimit="10" x1="514.4" y1="277.5" x2="503.1" y2="278.7"/>
+				<line id="line5677" fill="none" stroke="#878787" stroke-miterlimit="10" x1="510.9" y1="255.2" x2="499.8" y2="257.5"/>
+				<line id="line5679" fill="none" stroke="#878787" stroke-miterlimit="10" x1="505" y1="233.4" x2="494.2" y2="236.9"/>
+				<line id="line5681" fill="none" stroke="#878787" stroke-miterlimit="10" x1="496.9" y1="212.3" x2="486.6" y2="216.9"/>
+				<line id="line5683" fill="none" stroke="#878787" stroke-miterlimit="10" x1="486.7" y1="192.2" x2="476.9" y2="197.9"/>
+				<line id="line5685" fill="none" stroke="#878787" stroke-miterlimit="10" x1="474.4" y1="173.3" x2="465.2" y2="180"/>
+				<line id="line5687" fill="none" stroke="#878787" stroke-miterlimit="10" x1="460.2" y1="155.8" x2="451.8" y2="163.3"/>
+				<line id="line5689" fill="none" stroke="#878787" stroke-miterlimit="10" x1="444.2" y1="139.8" x2="436.7" y2="148.2"/>
+				<line id="line5691" fill="none" stroke="#878787" stroke-miterlimit="10" x1="426.7" y1="125.6" x2="420" y2="134.8"/>
+				<line id="line5693" fill="none" stroke="#878787" stroke-miterlimit="10" x1="407.8" y1="113.3" x2="402.1" y2="123.1"/>
+				<line id="line5695" fill="none" stroke="#878787" stroke-miterlimit="10" x1="387.7" y1="103.1" x2="383.1" y2="113.4"/>
+				<line id="line5697" fill="none" stroke="#878787" stroke-miterlimit="10" x1="366.6" y1="95" x2="363.1" y2="105.8"/>
+				<line id="line5699" fill="none" stroke="#878787" stroke-miterlimit="10" x1="344.8" y1="89.1" x2="342.5" y2="100.2"/>
+				<line id="line5701" fill="none" stroke="#878787" stroke-miterlimit="10" x1="322.5" y1="85.6" x2="321.3" y2="96.9"/>
+			</g>
+			<g id="number_grads">
+				
+					<line id="line5704" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="300" y1="84.4" x2="300" y2="107.1"/>
+				
+					<line id="line5706" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="192.2" y1="113.3" x2="203.6" y2="133"/>
+				
+					<line id="line5708" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="113.3" y1="192.2" x2="133" y2="203.6"/>
+				
+					<line id="line5710" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="84.4" y1="300" x2="107.1" y2="300"/>
+				
+					<line id="line5712" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="113.3" y1="407.8" x2="133" y2="396.4"/>
+				
+					<line id="line5714" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="192.2" y1="486.7" x2="203.6" y2="467"/>
+				
+					<line id="line5716" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="300" y1="515.6" x2="300" y2="492.9"/>
+				
+					<line id="line5718" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="407.8" y1="486.7" x2="396.4" y2="467"/>
+				
+					<line id="line5720" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="486.7" y1="407.8" x2="467" y2="396.4"/>
+				
+					<line id="line5722" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="515.6" y1="300" x2="492.9" y2="300"/>
+				
+					<line id="line5724" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="486.7" y1="192.2" x2="467" y2="203.6"/>
+				
+					<line id="line5726" fill="none" stroke="#E30613" stroke-width="3" stroke-miterlimit="10" x1="407.8" y1="113.3" x2="396.4" y2="133"/>
+			</g>
+			<g id="quart_grads">
+				<polygon id="polygon5729" fill="#E30613" points="296.5,112.5 294.5,82.4 305.5,82.4 303.5,112.5 				"/>
+				<polygon id="polygon5731" fill="#E30613" points="112.5,303.5 82.4,305.5 82.4,294.5 112.5,296.5 				"/>
+				<polygon id="polygon5733" fill="#E30613" points="303.5,487.5 305.5,517.6 294.5,517.6 296.5,487.5 				"/>
+				<polygon id="polygon5735" fill="#E30613" points="487.5,296.5 517.6,294.5 517.6,305.5 487.5,303.5 				"/>
+			</g>
+		</g>
+		<g id="Chiffres" transform="translate(-300,-300)">
+			<text id="text5770" transform="matrix(1 0 0 1 284.2831 137.6393)" font-family="'Segoe-Light'" font-size="30px">12</text>
+			<text id="text5772" transform="matrix(1 0 0 1 198.4825 160.3085)" font-family="'Segoe-Light'" font-size="30px">11</text>
+			<text id="text5774" transform="matrix(1 0 0 1 137.3422 222.4752)" font-family="'Segoe-Light'" font-size="30px">10</text>
+			<text id="text5776" transform="matrix(1 0 0 1 120.5488 308.2856)" font-family="'Segoe-Light'" font-size="30px">9</text>
+			<text id="text5778" transform="matrix(1 0 0 1 143.7184 395.5858)" font-family="'Segoe-Light'" font-size="30px">8</text>
+			<text id="text5780" transform="matrix(1 0 0 1 205.3852 457.2262)" font-family="'Segoe-Light'" font-size="30px">7</text>
+			<text id="text5782" transform="matrix(1 0 0 1 292.1953 480.8599)" font-family="'Segoe-Light'" font-size="30px">6</text>
+			<text id="text5784" transform="matrix(1 0 0 1 378.9952 457.1903)" font-family="'Segoe-Light'" font-size="30px">5</text>
+			<text id="text5786" transform="matrix(1 0 0 1 441.1361 394.023)" font-family="'Segoe-Light'" font-size="30px">4</text>
+			<text id="text5788" transform="matrix(1 0 0 1 463 308.2856)" font-family="'Segoe-Light'" font-size="30px">3</text>
+			<text id="text5790" transform="matrix(1 0 0 1 440.1009 222.4131)" font-family="'Segoe-Light'" font-size="30px">2</text>
+			<text id="text5792" transform="matrix(1 0 0 1 376.9336 160.272)" font-family="'Segoe-Light'" font-size="30px">1</text>
+		</g>
+		<g id="needles">
+			<circle id="needle_center" fill="#CCCCCC" cx="0" cy="0" r="34"/>
+			<g id="hours_shadow_translation" transform="translate(2,2)">
+				<g id="hours_shadow" transform="rotate(0.1,0,0)">
+					<g id="hours_shadow_needle">
+						
+							<line id="hours_shadow_line" fill="none" stroke="#666666" stroke-width="12" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="17" x2="0" y2="-108"/>
+					</g>
+				</g>
+			</g>
+			<g id="hours" transform="rotate(0.1,0,0)">
+				<g id="g5743">
+					
+						<line id="hours_line" fill="none" stroke="#000000" stroke-width="11" stroke-miterlimit="10" x1="0" y1="17" x2="0" y2="-108"/>
+				</g>
+			</g>
+			<g id="minutes_shadow_translation" transform="translate(3,3)">
+				<g id="minutes_shadow" transform="rotate(0.1,0,0)">
+					<g id="minutes_shadow_needle">
+						
+							<line id="minutes_shadow_needle_line" fill="none" stroke="#666666" stroke-width="8" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="20" x2="0" y2="-156"/>
+					</g>
+				</g>
+			</g>
+			<g id="minutes" transform="rotate(0.1,0,0)">
+				<g id="minutes_needle">
+					
+						<line id="minutes_needle_line" fill="none" stroke="#444444" stroke-width="7" stroke-miterlimit="10" x1="0" y1="20" x2="0" y2="-156"/>
+				</g>
+			</g>
+			<g id="seconds_shadow_translation" transform="translate(5,5)">
+				<g id="seconds_shadow" transform="rotate(0.1,0,0)">
+					<g id="seconds_shadow_needle">
+						
+							<line id="seconds_shadow_needle_line" fill="none" stroke="#777777" stroke-width="4" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="24" x2="0" y2="-150"/>
+						
+							<ellipse id="seconds_shadow_needle_circle" transform="matrix(1.745326e-03 -1 1 1.745326e-03 170.0011 -169.7039)" fill="none" stroke="#777777" stroke-width="4" stroke-miterlimit="10" stroke-opacity="0.2" cx="0" cy="-170" rx="18.4" ry="18.4"/>
+					</g>
+				</g>
+			</g>
+			<g id="seconds" transform="rotate(0.1,0,0)">
+				<g id="seconde_needle">
+					
+						<line id="seconde_needle_line" fill="none" stroke="#E30613" stroke-width="4" stroke-miterlimit="10" x1="0" y1="24" x2="0" y2="-150"/>
+					
+						<ellipse id="aiguille_seconde_circle" transform="matrix(1.745326e-03 -1 1 1.745326e-03 170.0011 -169.7039)" fill="none" stroke="#E30613" stroke-width="4" stroke-miterlimit="10" cx="0" cy="-170" rx="19" ry="19"/>
+				</g>
+			</g>
+			
+				<linearGradient id="needle_axe_relief_1_" gradientUnits="userSpaceOnUse" x1="-311" y1="410.28" x2="-289" y2="388.28" gradientTransform="matrix(1 0 0 -1 300 399.28)">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#444444"/>
+			</linearGradient>
+			
+				<circle id="needle_axe_relief" fill="url(#needle_axe_relief_1_)" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="0" cy="0" r="11"/>
+			<circle id="needle_axe_fill" fill="#FFFFFF" cx="0" cy="0" r="8"/>
+		</g>
+		<g id="glass" transform="translate(-300,-300)">
+			
+				<radialGradient id="hublot_1_" cx="221.5" cy="485.2802" r="336.2518" gradientTransform="matrix(1 0 0 -1 2.273737e-13 699.28)" gradientUnits="userSpaceOnUse">
+				<stop  offset="0" style="stop-color:#FFFFFF;stop-opacity:0.7"/>
+				<stop  offset="0.2436" style="stop-color:#FAFAFA;stop-opacity:0.1"/>
+				<stop  offset="0.756" style="stop-color:#518FBE;stop-opacity:0.2"/>
+				<stop  offset="0.9114" style="stop-color:#247DA6;stop-opacity:0.3"/>
+				<stop  offset="1" style="stop-color:#978EC4;stop-opacity:0.3"/>
+			</radialGradient>
+			
+				<path id="hublot" inkscape:connector-curvature="0" opacity="0.75" fill="url(#hublot_1_)" stroke="#FFFFFF" stroke-miterlimit="10" enable-background="new    " d="
+				M300,521.1c-59.1,0-114.6-23-156.3-64.8S78.9,359.1,78.9,300s23-114.6,64.8-156.3C185.5,101.9,241,78.9,300,78.9
+				s114.6,23,156.3,64.8S521.1,241,521.1,300s-23,114.6-64.8,156.3S359.1,521.1,300,521.1z"/>
+		</g>
+	</g>
+	<g id="modeButtons">
+		<g id="realtime_mode" display="none">
+			<g id="realbtn_on" transform="translate(255,620)" display="inline">
+				<path id="rtbtn_on_back" fill="#FFFF77" stroke="#111111" stroke-width="3" d="M-34-25h68c3.3,0,6,2.7,6,6v38c0,3.3-2.7,6-6,6
+					h-68c-3.3,0-6-2.7-6-6v-38C-40-22.3-37.3-25-34-25z"/>
+				
+					<text id="realbtn_on_label" transform="matrix(1 0 0 1 -14.0405 10)" fill="#FF0000" font-family="'Segoe-Light'" font-size="30px">x1</text>
+			</g>
+			<g id="fastbtn_off" transform="translate(340,620)" display="inline">
+				<path id="fastbtn_off_back" fill="#BBBBBB" stroke="#444444" stroke-width="3" d="M-34-25h68c3.3,0,6,2.7,6,6v38
+					c0,3.3-2.7,6-6,6h-68c-3.3,0-6-2.7-6-6v-38C-40-22.3-37.3-25-34-25z"/>
+				<text id="fastbtn_off_label" transform="matrix(1 0 0 1 -21.7676 10)" font-family="'Segoe-Light'" font-size="30px">x20</text>
+				<path id="fastbtn_off_input" fill="#FFFF00" fill-opacity="0" d="M-34-26h68c3.3,0,6,2.7,6,6v40c0,3.3-2.7,6-6,6h-68
+					c-3.3,0-6-2.7-6-6v-40C-40-23.3-37.3-26-34-26z"/>
+			</g>
+		</g>
+		<g id="fasttime_mode" display="none">
+			<g id="realbtn_off" transform="translate(255,620)" display="inline">
+				<path id="realbtn_off__back" fill="#BBBBBB" stroke="#444444" stroke-width="3" d="M-34-25h68c3.3,0,6,2.7,6,6v38
+					c0,3.3-2.7,6-6,6h-68c-3.3,0-6-2.7-6-6v-38C-40-22.3-37.3-25-34-25z"/>
+				
+					<text id="realbtn_off__label" transform="matrix(1 0 0 1 -14.0405 10)" fill="#555555" font-family="'Segoe-Light'" font-size="30px">x1</text>
+				<path id="realbtn_off_input" fill="#FFFF00" fill-opacity="0" d="M-34-26h68c3.3,0,6,2.7,6,6v40c0,3.3-2.7,6-6,6h-68
+					c-3.3,0-6-2.7-6-6v-40C-40-23.3-37.3-26-34-26z"/>
+			</g>
+			<g id="fastbtn_on" transform="translate(340,620)" display="inline">
+				<path id="fastbtn_on_back" fill="#FFFF77" stroke="#111111" stroke-width="3" d="M-34-25h68c3.3,0,6,2.7,6,6v38c0,3.3-2.7,6-6,6
+					h-68c-3.3,0-6-2.7-6-6v-38C-40-22.3-37.3-25-34-25z"/>
+				
+					<text id="fsbtn_on_label" transform="matrix(1 0 0 1 -21.7676 10)" fill="#FF0000" font-family="'Segoe-Light'" font-size="30px">x20</text>
+			</g>
+		</g>
+	</g>
+      </g>
+      <g id="buttons" >
+	<linearGradient id="btn_edge_1_" gradientUnits="userSpaceOnUse" x1="300" y1="667.7498" x2="300" y2="591.7498">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="1" style="stop-color:#808080"/>
+	</linearGradient>
+	<linearGradient id="btn_form_1_" gradientUnits="userSpaceOnUse" x1="300" y1="595.75" x2="300" y2="663.75">
+	        <stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="1" style="stop-color:#808080"/>
+	</linearGradient>
+	<linearGradient id="btn_form_2_" gradientUnits="userSpaceOnUse" x1="300" y1="658.7498" x2="300" y2="600.7498">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.9987" style="stop-color:#808080"/>
+	</linearGradient>
+	<linearGradient id="btn_selected_1_" gradientUnits="userSpaceOnUse" x1="300" y1="594.75" x2="300" y2="664.75">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="1" style="stop-color:#808080"/>
+	</linearGradient>
+	<linearGradient id="btn_selected_2_" gradientUnits="userSpaceOnUse" x1="300" y1="659.6027" x2="300" y2="599.8968">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="1" style="stop-color:#A3717E"/>
+	</linearGradient>
+	<g id="play_btn" >
+	     <circle id="play_edge" fill="url(#btn_edge_1_)" stroke="none" stroke-width="1.5" cx="300" cy="629.8" r="38" />
+	     <g id="play_unselected">
+		  <g id="play_unselected_form">
+			<circle fill="url(#btn_form_1_)" stroke="#000000" stroke-width="1.5" cx="300" cy="629.8" r="34"/>
+			<circle fill="url(#btn_form_2_)" stroke="#FFFFFF" stroke-width="1.0" cx="300" cy="629.8" r="29"/>
+		  </g>
+		  <polygon id="play_unselected_ico" fill="#444444" points="311.5,629.7 292.5,617.2 292.5,642.2 		"/>
+	     </g>
+	     <g id="play_selected">
+	          <g id="play_selected_form">
+			<circle fill="url(#btn_selected_1_)" stroke="#B80028" stroke-width="2" stroke-miterlimit="10" cx="300" cy="629.8" r="35"/>
+			<circle fill="url(#btn_selected_2_)" stroke="#B80028" stroke-width="2" stroke-miterlimit="10" cx="300" cy="629.8" r="30"/>
+		  </g>
+		  <polygon id="play_x5F_selected_x5F_ico" fill="#EB0033" points="313.4,629.7 290.7,614.9 290.7,644.6 "/>
+	     </g>
+	     <circle id="play_input" opacity="0" fill="#EEEEEE" stroke="none" stroke-width="1.5" cx="300" cy="629.8" r="38" />
+	</g>
+	<g id="forward_btn">
+	     <path id="forward_edge" fill="url(#btn_edge_1_)" d="M369.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5
+		h8c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H369.8z"/>
+	     <g id="forward_unselected">
+		   <g id="forward_unselected_form">
+			<path fill="url(#btn_form_1_)" stroke="#000000" stroke-width="1.2574" stroke-miterlimit="10" d="M377.8,658.2h-8
+				c-15.7,0-28.5-12.8-28.5-28.5v0c0-15.7,12.8-28.5,28.5-28.5h8c15.7,0,28.5,12.8,28.5,28.5v0C406.3,645.4,393.5,658.2,377.8,658.2
+				z"/>
+			<path fill="url(#btn_form_2_)" stroke="#FFFFFF" stroke-width="0.9988" stroke-miterlimit="10" d="M369.8,653.2
+				c-13,0-23.5-10.5-23.5-23.5s10.5-23.5,23.5-23.5h8c13,0,23.5,10.5,23.5,23.5s-10.5,23.5-23.5,23.5H369.8z"/>
+		   </g>
+		   <g id="forward_unselected_ico">
+			<polygon id="icon_1_" fill="#444444" points="388.9,630 373.9,618.5 373.9,641.5 "/>
+				<rect x="365.9" y="618.5" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 735.7936 1259.9994)" fill="#444444" width="4" height="23"/>
+		   </g>
+	     </g>
+	     <g id="forward_selected" display="none">
+		  <g id="forward_selected_form">
+			<path fill="url(#btn_selected_1_)" stroke="#B80028" stroke-width="2" stroke-miterlimit="10" d="M378.8,659.1h-10
+				c-15.7,0-28.5-12.8-28.5-28.5v-1.8c0-15.7,12.8-28.5,28.5-28.5h10c15.7,0,28.5,12.8,28.5,28.5v1.8
+				C407.3,646.3,394.5,659.1,378.8,659.1z"/>
+			<path fill="url(#btn_selected_2_)" stroke="#FFFFFF" stroke-width="1.0281" stroke-miterlimit="10" d="M369.7,654
+				c-13.4,0-24.2-10.9-24.2-24.2c0-13.4,10.9-24.2,24.2-24.2h8.2c13.4,0,24.2,10.9,24.2,24.2c0,13.4-10.9,24.2-24.2,24.2H369.7z"/>
+		  </g>
+		  <g id="forward_selected_ico">
+			<polygon id="icon_3_" fill="#EB0033" points="389.3,630 373.9,618.2 373.9,641.9 			"/>
+			<rect x="365.7" y="618.2" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 735.4285 1260.0149)" fill="#EB0033" width="4.1" height="23.7"/>
+		</g>
+	     </g>
+	     <path id="forward_input" opacity="0" fill="#EEEEEE" d="M369.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H369.8z"/>
+	</g>
+	<g id="rewind_btn">
+	     <path id="rewind_edge" fill="url(#btn_edge_1_)" d="M149.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H149.8z"/>
+	     <g id="rewind_unselected">
+		<g id="rewind_unselected_form">
+			<path fill="url(#btn_form_1_)" stroke="#000000" stroke-width="1.2574" stroke-miterlimit="10" d="M157.8,658.2h-8
+				c-15.7,0-28.5-12.8-28.5-28.5v0c0-15.7,12.8-28.5,28.5-28.5h8c15.7,0,28.5,12.8,28.5,28.5v0C186.3,645.4,173.5,658.2,157.8,658.2
+				z"/>
+			<path fill="url(#btn_form_2_)" stroke="#FFFFFF" stroke-width="0.9988" stroke-miterlimit="10" d="M149.8,653.2
+				c-13,0-23.5-10.5-23.5-23.5s10.5-23.5,23.5-23.5h8c13,0,23.5,10.5,23.5,23.5s-10.5,23.5-23.5,23.5H149.8z"/>
+		</g>
+		<g id="rewind_unselected_ico">
+			<polygon id="icon_5_" fill="#444444" points="137.9,630 152.9,618.5 152.9,641.5 			"/>
+			<rect x="156.9" y="618.5" fill="#444444" width="4" height="23"/>
+		</g>
+	</g>
+	<g id="rewind_selected" display="none">
+		<g id="rewind_selected_form">
+			<path fill="url(#btn_selected_1_)" stroke="#EB0033" stroke-width="2" stroke-miterlimit="10" d="M158.8,659.1h-10
+				c-15.7,0-28.5-12.8-28.5-28.5v-1.8c0-15.7,12.8-28.5,28.5-28.5h10c15.7,0,28.5,12.8,28.5,28.5v1.8
+				C187.3,646.3,174.5,659.1,158.8,659.1z"/>
+			<path fill="url(#btn_selected_2_)" stroke="#FFFFFF" stroke-width="1.0295" stroke-miterlimit="10" d="M149.7,654
+				c-13.4,0-24.2-10.9-24.2-24.2c0-13.4,10.9-24.2,24.2-24.2h8.2c13.4,0,24.2,10.9,24.2,24.2c0,13.4-10.9,24.2-24.2,24.2H149.7z"/>
+		</g>
+		<g id="rewind_selected_ico">
+			<polygon id="icon_4_" fill="#EB0033" points="137.4,630 152.9,618.2 152.9,641.9 			"/>
+			<rect x="157" y="618.2" fill="#EB0033" width="4.1" height="23.7"/>
+		</g>
+	 </g>
+	 <path id="rewind_input" opacity="0" fill="#EEEEEE" d="M149.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H149.8z"/>
+	</g>
+	<g id="speedy_btn">
+	     <path id="speedy_x5F_edge" fill="url(#btn_edge_1_)" d="M442.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H442.8z"/>
+	     <g id="speedy_unselected">
+		  <g id="speedy_unselected_form">
+			<path fill="url(#btn_form_1_)" stroke="#000000" stroke-width="1.2574" stroke-miterlimit="10" d="M450.8,658.2h-8
+				c-15.7,0-28.5-12.8-28.5-28.5v0c0-15.7,12.8-28.5,28.5-28.5h8c15.7,0,28.5,12.8,28.5,28.5v0C479.3,645.4,466.5,658.2,450.8,658.2
+				z"/>
+			<path fill="url(#btn_form_2_)" stroke="#FFFFFF" stroke-width="0.9988" stroke-miterlimit="10" d="M442.8,653.2
+				c-13,0-23.5-10.5-23.5-23.5s10.5-23.5,23.5-23.5h8c13,0,23.5,10.5,23.5,23.5s-10.5,23.5-23.5,23.5H442.8z"/>
+		</g>
+		<g id="speedy_unselected_ico">
+			<polygon id="icon_2_" fill="#444444" points="463.9,630 448.9,618.5 448.9,641.5 			"/>
+			
+			<rect x="440.9" y="618.5" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 885.7947 1259.9994)" fill="#444444" width="4" height="23"/>
+			
+			<rect x="433.9" y="618.5" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 871.7953 1259.9994)" fill="#444444" width="4" height="23"/>
+		</g>
+	</g>
+	<g id="speedy_selected" display="none">
+		<g id="speedy_selected_form">
+			<path fill="url(#btn_selected_1_)" stroke="#EB0033" stroke-width="2.0615" stroke-miterlimit="10" d="M451.8,659.1h-10
+				c-15.7,0-28.5-12.8-28.5-28.5v-1.8c0-15.7,12.8-28.5,28.5-28.5h10c15.7,0,28.5,12.8,28.5,28.5v1.8
+				C480.3,646.3,467.5,659.1,451.8,659.1z"/>
+			<path fill="url(#btn_selected_2_)" stroke="#FFFFFF" stroke-width="1.0295" stroke-miterlimit="10" d="M442.7,654
+				c-13.4,0-24.2-10.9-24.2-24.2c0-13.4,10.9-24.2,24.2-24.2h8.2c13.4,0,24.2,10.9,24.2,24.2c0,13.4-10.9,24.2-24.2,24.2H442.7z"/>
+		</g>
+		<g id="speedy_selected_ico">
+			<polygon id="icon_6_" fill="#EB0033" points="464.4,630 448.9,618.2 448.9,641.9 			"/>
+			
+			<rect x="440.7" y="618.2" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 885.5526 1260.0149)" fill="#EB0033" width="4.1" height="23.7"/>
+			
+			<rect x="433.5" y="618.2" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 871.1224 1260.0149)" fill="#EB0033" width="4.1" height="23.7"/>
+		</g>
+	</g>
+	<path id="speedy-input" opacity="0" fill="#EEEEEE" d="M442.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H442.8z"/>
+	</g>
+	<g id="pause_btn">
+	     <path id="pause_edge" fill="url(#btn_edge_1_)" d="M222.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H222.8z"/>
+	     <g id="pause_unselected">
+		<g id="pause_unselected_form">
+			<path fill="url(#btn_form_1_)" stroke="#000000" stroke-width="1.2574" stroke-miterlimit="10" d="M230.8,658.2h-8
+				c-15.7,0-28.5-12.8-28.5-28.5v0c0-15.7,12.8-28.5,28.5-28.5h8c15.7,0,28.5,12.8,28.5,28.5v0C259.3,645.4,246.5,658.2,230.8,658.2
+				z"/>
+			<path fill="url(#btn_form_2_)" stroke="#FFFFFF" stroke-width="0.9988" stroke-miterlimit="10" d="M222.8,653.2
+				c-13,0-23.5-10.5-23.5-23.5s10.5-23.5,23.5-23.5h8c13,0,23.5,10.5,23.5,23.5s-10.5,23.5-23.5,23.5H222.8z"/>
+		</g>
+		<g id="pause_unselected_ico">
+			
+			<rect x="229.8" y="618.5" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 466.6623 1259.9994)" fill="#444444" width="7" height="23"/>
+			
+			<rect x="216.8" y="618.5" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 440.6617 1259.9994)" fill="#444444" width="7" height="23"/>
+		</g>
+	     </g>
+	     <g id="pause_selected" display="none">
+	           <g id="pause_form">
+			<path fill="url(#btn_selected_1_)" stroke="#EB0033" stroke-width="2.0615" stroke-miterlimit="10" d="M231.8,659.1h-10
+				c-15.7,0-28.5-12.8-28.5-28.5v-1.8c0-15.7,12.8-28.5,28.5-28.5h10c15.7,0,28.5,12.8,28.5,28.5v1.8
+				C260.3,646.3,247.5,659.1,231.8,659.1z"/>
+			<path fill="url(#btn_selected_2_)" stroke="#FFFFFF" stroke-width="1.0295" stroke-miterlimit="10" d="M222.7,654
+				c-13.4,0-24.2-10.9-24.2-24.2c0-13.4,10.9-24.2,24.2-24.2h8.2c13.4,0,24.2,10.9,24.2,24.2c0,13.4-10.9,24.2-24.2,24.2H222.7z"/>
+		</g>
+		<g id="pause_selected_ico">
+			
+			<rect x="229.9" y="618.2" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 467.0623 1260.0149)" fill="#EB0033" width="7.2" height="23.7"/>
+			
+			<rect x="216.5" y="618.2" transform="matrix(-1 -1.224647e-16 1.224647e-16 -1 440.2617 1260.0149)" fill="#EB0033" width="7.2" height="23.7"/>
+		</g>
+	</g>
+	<path id="pause_input" opacity="0" fill="#EEEEEE" d="M222.8,662.2c-17.9,0-32.5-14.6-32.5-32.5s14.6-32.5,32.5-32.5h8
+		c17.9,0,32.5,14.6,32.5,32.5s-14.6,32.5-32.5,32.5H222.8z"/>
+	</g>
+      </g>
+</svg>

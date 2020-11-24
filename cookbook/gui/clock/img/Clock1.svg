@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+    id="Calque_1" inkscape:version="0.91 r13725" sodipodi:docname="Clock4.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 600 700"
+    enable-background="new 0 0 600 700" xml:space="preserve">
+   <sodipodi:namedview  bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" id="namedview5806" inkscape:current-layer="Calque_1" inkscape:cx="158.93517" inkscape:cy="395.9687"  inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="1192" inkscape:window-maximized="0" inkscape:window-width="2098" inkscape:window-x="1680" inkscape:window-y="1" inkscape:zoom="1.0866113" objecttolerance="10" pagecolor="#ffffff" showgrid="false">
+   </sodipodi:namedview>
+<g id="horloge">
+   <rect id="back" y="0" fill="#EEEEEE" width="600" height="700"/>
+   <g id="dial" transform="translate(300,300)">
+      <g id="back_clock">
+         <circle id="dialback" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="0" cy="0" r="200"/>
+         <g id="Chiffres" transform="translate(-300,-300)">
+            <text id="text5770" transform="matrix(1 0 0 1 284.2831 137.6393)" fill="#777777" font-family="Roboto" font-size="28px">12</text>
+            <text id="text5772" transform="matrix(1 0 0 1 198.4825 160.3085)" fill="#777777" font-family="Roboto" font-size="28px">11</text>
+            <text id="text5774" transform="matrix(1 0 0 1 137.3422 222.4752)" fill="#777777" font-family="Roboto" font-size="28px">10</text>
+            <text id="text5776" transform="matrix(1 0 0 1 120.5488 308.2856)" fill="#777777" font-family="Roboto" font-size="28px">9</text>
+            <text id="text5778" transform="matrix(1 0 0 1 143.7184 395.5858)" fill="#777777" font-family="Roboto" font-size="28px">8</text>
+            <text id="text5780" transform="matrix(1 0 0 1 205.3852 457.2262)" fill="#777777" font-family="Roboto" font-size="28px">7</text>
+            <text id="text5782" transform="matrix(1 0 0 1 292.1953 480.8599)" fill="#777777" font-family="Roboto" font-size="28px">6</text>
+            <text id="text5784" transform="matrix(1 0 0 1 378.9952 457.1903)" fill="#777777" font-family="Roboto" font-size="28px">5</text>
+            <text id="text5786" transform="matrix(1 0 0 1 441.1361 394.0230)" fill="#777777" font-family="Roboto" font-size="28px">4</text>
+            <text id="text5788" transform="matrix(1 0 0 1 463.0000 308.2856)" fill="#777777" font-family="Roboto" font-size="28px">3</text>
+            <text id="text5790" transform="matrix(1 0 0 1 440.1009 222.4131)" fill="#777777" font-family="Roboto" font-size="28px">2</text>
+            <text id="text5792" transform="matrix(1 0 0 1 376.9336 160.2720)" fill="#777777" font-family="Roboto" font-size="28px">1</text>
+         </g>
+      </g>
+      <g id="needles">
+         <g id="hours_shadow_translation" transform="translate(2,2)">
+            <g id="hours_shadow" transform="rotate(0.1,0,0)">
+               <line id="hours_shadow_line" fill="none" stroke="#666666" stroke-width="12" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="17" x2="0" y2="-108"/>
+            </g>
+         </g>
+         <g id="hours" transform="rotate(0.1,0,0)">
+            <line id="hours_line" fill="none" stroke="#000000" stroke-width="11" stroke-miterlimit="10" x1="0" y1="17" x2="0" y2="-108"/>
+         </g>
+         <g id="minutes_shadow_translation" transform="translate(3,3)">
+            <g id="minutes_shadow" transform="rotate(0.1,0,0)">
+               <line id="minutes_shadow_needle_line" fill="none" stroke="#666666" stroke-width="8" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="20" x2="0" y2="-140"/>
+            </g>
+         </g>
+         <g id="minutes" transform="rotate(0.1,0,0)">
+            <line id="minutes_needle_line" fill="none" stroke="#666666" stroke-width="7" stroke-miterlimit="10" x1="0" y1="20" x2="0" y2="-140"/>
+         </g>
+         <g id="seconds_shadow_translation" transform="translate(5,5)">
+            <g id="seconds_shadow" transform="rotate(0.1,0,0)">
+               <line id="seconds_shadow_needle_line" fill="none" stroke="#777777" stroke-width="4" stroke-miterlimit="10" stroke-opacity="0.2" x1="0" y1="24" x2="0" y2="-160"/>
+            </g>
+         </g>
+         <g id="seconds" transform="rotate(0.1,0,0)">
+            <line id="seconde_needle_line" fill="none" stroke="#FF0000" stroke-width="4" stroke-miterlimit="10" x1="0" y1="24" x2="0" y2="-160"/>
+         </g>
+      </g>
+   </g>
+</g>
+</svg>

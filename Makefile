@@ -465,7 +465,6 @@ cookbook_apps := $(shell cd cookbook && find * -name cookbook_app.mk | xargs -I{
 disable_cookbook_apps ?= \
 	extra/crazyflie \
 	extra/crazyflie_drone_app \
-	comms/swim \
 	comms/midi \
 	gui/physics
 

@@ -306,7 +306,7 @@ Component root {
     Ref toDrag (r)
     SimpleDrag _ (toDrag, f)
 
-    Translation _(0,-5000)
+    Translation _(-300,-5800)
     Scaling _(140,140, 0,0)
 
     OutlineWidth _(0) // do not apply scale in Qt

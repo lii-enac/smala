@@ -111,25 +111,30 @@ cpp_action (Process* c)
     curl_easy_cleanup(curl);
     if (content.empty()) return;
 
+    //std::cerr << content.size() << std::endl;
     //std::cout << content << std::endl;
 
-    #if 1
+#if 1
+    // smala/djnn-based json parsing
+
     get_exclusive_access(DBG_GET);
     // To get the source that triggered the native action:
     //Process *source = c->get_activation_source ();
     // To get the user_data
-    Process * root = (Process*) get_native_user_data (c);
-
+    auto * root = reinterpret_cast<Process*>(get_native_user_data (c));
     auto * parser = dynamic_cast<JSONSaxParser*>(root->find_child ("parser"));
     release_exclusive_access(DBG_REL);
 
     assert(parser);
     parser->parse(content);
     
-    #else
+#else
+    // c++-based json parsing
 
-    //std::cerr << content.size() << std::endl;
-    //std::cerr << content << std::endl;
+    // fist find out relevant information in json content
+    // inappropriate for loading of large set of data:
+    // should be incremental
+
     vector<vector<vector<float>>> polys;
     using json = nlohmann::json;
     //try {
@@ -146,13 +151,8 @@ cpp_action (Process* c)
     //} catch (nlohmann::detail::parse_error&e) {
     //}
     
-
-    // first create all djnn objects before updating the tree
+    // second create all djnn objects before updating the tree
     // to minimize the time spent with exclusive access
-
-    // inappropriate for loading of large set of data:
-    // should be incremental, with SAX json parser TODO
-    // cf Darius way of doing that?
 
     //Process * tmp = new Process (nullptr, ""); // TODO when Process::move_children_from (Process*) is available
     Process * tmp = nullptr;
@@ -170,16 +170,17 @@ cpp_action (Process* c)
         //std::cerr << std::endl;
     }
 
-    // second update the djnn tree
+
+    // third update the djnn tree
 
     get_exclusive_access(DBG_GET);
 
     // To get the source that triggered the native action:
-    //Process *source = c->get_activation_source ();
+    // Process *source = c->get_activation_source ();
     // To get the user_data
-    Process *data = (Process*) get_native_user_data (c);
-
-    Process *meteo = data->find_child ("meteo");
+    Process *data = reinterpret_cast<Process*>(get_native_user_data (c));
+    Process * meteo = data->find_child ("meteo");
+    assert(meteo);
     //std::cerr << meteo << std::endl;
     // meteo->move_children_from (tmp); // TODO when Process::move_children_from (Process*) is available
     
@@ -190,7 +191,7 @@ cpp_action (Process* c)
     GRAPH_EXEC;
 
     release_exclusive_access(DBG_REL);
-    #endif
+#endif
     
 }
 
@@ -199,11 +200,10 @@ cpp_action (Process* c)
 
 _main_
 Component root {
-
 	Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
-    //FillColor fcc (#000000)
+    FillColor fcc (#000000)
     Text explanation1 (10, 20, "Click the button to launch the async action")
     Text explanation2 (10, 40, "then, drag the rectangle to check that the application is not freezed")
     Text explanation3 (10, 60, "When the action is terminated, the title of the online ressource should appear")
@@ -211,135 +211,98 @@ Component root {
     Text t2 (10, 140, "")
     Button btn (f, "launch", 50, 150)
 
+    Rectangle r (200, 200, 100, 100, 0, 0)
+    Ref toDrag (r)
+    SimpleDrag _ (toDrag, f)
+
     TextPrinter tp
-    //JSONSaxParser parser("features/geometry/coordinates")
-    //JSONSaxParser parser("geometry/coordinates")
-    //JSONSaxParser parser("geometry/coordinates//number")
+
+    // JSONSaxParser parser("array/array/number") // should be this but our implementation of xpath is not powerful enough
     JSONSaxParser parser("geometry/coordinates/array/array/array/array/number")
 
-    Component point1 {
-        DoubleProperty x(0)
-        DoubleProperty y(0)
-    }
-    Ref point (null)
+    //json_poly aka parser.geometry
+    json_poly aka parser.geometry.coordinates.array.array.array
+    json_point aka parser.geometry.coordinates.array.array.array.array
+    json_coord aka parser.geometry.coordinates.array.array.array.array.number
+
     Ref poly (null)
+    Ref point (null)
     DerefDouble xr (point, "x", DJNN_GET_ON_CHANGE)
     DerefDouble yr (point, "y", DJNN_GET_ON_CHANGE)
 
+    // FSM to read x,y coordinates when receiving unspecified numbers from an array of 2 elements
     Spike xys
     FSM xy {
         State a
         State x {
             //"set x" =: tp.input
-            parser.geometry.coordinates.array.array.array.array.number.value =: xr.value
+            json_coord.value =: xr.value
         }
         State y {
             //"set y" =: tp.input
-            parser.geometry.coordinates.array.array.array.array.number.value =: yr.value
+            json_coord.value =: yr.value
         }
         a->x(xys)
         x->y(xys)
         y->x(xys)
     }
 
-    Switch ttt(init) {
-        Component init
-        Component TempLayer {
-        }
+    // create polys in an invisible layer, to avoid displaying their construction
+    Switch deactivated (init) {
+        Component _
+        Component tmp_layer
     }
 
-    Incr nbpoly(1)
-    Incr nbpoints(1)
-
-    parser.geometry -> (root) {
-        //root.tp.input = "add poly"
-        addChildrenTo root.ttt.TempLayer {
+    json_poly -> (root) {
+        //root.tp.input = "create poly"
+        addChildrenTo root.deactivated.tmp_layer {
             Polyline poly
         }
     }
-    parser.geometry !-> (root) {
-        //root.tp.input = "add poly"
+    json_poly !-> (root) {
+        //root.tp.input = "move poly to meteo layer"
         addChildrenTo root.meteo {
-            poly << root.ttt.TempLayer.poly
+            poly << root.deactivated.tmp_layer.poly
         }
     }
-    parser.geometry -> nbpoly
-
-    //parser.array -> (root) {
-    parser.geometry.coordinates.array.array.array.array -> (root) {
+    json_point -> (root) {
         //root.tp.input = "add point"
-        addChildrenTo root.ttt.TempLayer.poly.points {
-        //addChildrenTo root.ttt.TempLayer.poly {
+        addChildrenTo root.deactivated.tmp_layer.poly.points {
             PolyPoint point(0,0)
-            //Circle point (0,0,5/70.0)
             root.point = &point
         }
     }
-    parser.geometry.coordinates.array.array.array.array.number -> xys, nbpoints
-
-    /*parser.features -> {
-        "features yes" =: tp.input
-    }
-    parser.features !-> {
-        "features no" =: tp.input
-    }*/
-    /*parser.geometry -> {
-        "geometry yes" =: tp.input
-    }
-    parser.geometry !-> {
-        "geometry no" =: tp.input
-    }
-    parser.geometry.coordinates.array.array.array.array -> {
-        "geometry.coordinates.array.array.array.array yes" =: tp.input
-    }
-    parser.geometry.coordinates.array.array.array.array !-> {
-        "geometry.coordinates.array.array.array.array no" =: tp.input
-    }*/
-    /*parser.number -> {
-        "float yes" =: tp.input
-        parser.number.value =: tp.input
-    }*/
+    json_coord -> xys
     
-    //FillColor fc (#FF00FF)
-    //FillColor fc (255,0,255)
-    Rectangle r (200, 200, 100, 100, 0, 0)
-    Ref toDrag (r)
-    SimpleDrag _ (toDrag, f)
-
+    
     Translation _(-300,-5800)
     Scaling _(140,140, 0,0)
 
-    OutlineWidth _(0) // do not apply scale in Qt
+    //OutlineWidth _(0) // 0 == do not apply scale to OutlineWidth in Qt
+    OutlineWidth _(1/140) // should work on other renderer since 1/140 is 0!
 
     NoFill _
     OutlineColor _(#FF00FF)
-    
-    
 
-    Component meteo {
-        
-    }
+    Component meteo
 
-    // Bind a C++ native action
+    // Bind to native action to get the data and parse them
 	NativeAsyncAction cpp_na (cpp_action, root, 1)
+    btn.click -> cpp_na
+    btn.click -> {"STARTED" =: t.text}
 
     // since we apply set_value to t in the native,
     // we specify a causality relation between the native and the text it uses
     cpp_na ~> t
+    // idem for json
+    cpp_na ~> json_poly // FIXME there should be a multi destination for ~>
+    cpp_na ~> json_point
+    cpp_na ~> json_coord
 
-    //Rectangle rr (10,10,10,10)
-    //rr.press -> (root) { dump root.meteo }
-
-    btn.click -> cpp_na
-    btn.click -> {"STARTED" =: t.text}
-    cpp_na.end -> (root) {
-        dump root.meteo
-        dump root.tp
-    }
-    cpp_na.end -> {
-        root.nbpoly.state =: tp.input
-        root.nbpoints.state =: tp.input
-    }
+    //cpp_na.end -> (root) {
+    //    dump root.meteo
+    //    dump root.tp
+    //}
 }
 
 

@@ -56,7 +56,7 @@ namespace djnn {
                 next_sep = deep_sep;
             }
         }
-        for (auto it: _xpath_vec) {std::cerr << it << " ";} std::cerr << std::endl;
+        //for (auto it: _xpath_vec) {std::cerr << it << " ";} std::cerr << std::endl;
         //for (auto it: _seps) {std::cerr << it << " ";} std::cerr << std::endl;
         
         finalize_construction (parent, name); // no, we are not regular processes

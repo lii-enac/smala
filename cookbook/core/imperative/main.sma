@@ -25,9 +25,10 @@ Component root {
     f.close -> ex
     mouseTracking = 1
 
-    IntProperty i(0)    
+    IntProperty i(0)
 
-    // FIXME smalac generates 2 process per assignment: two presses are required in the following to 'scitch' to an assignment 
+    // FIXME : smalac generates 2 process per assignment: two presses are required in the following to 'scitch' to an assignment 
+    // FIXME : possible solution: set null to parent of the generated DoubleProperty before the assignement in smalac
     SwitchList imperative_statements {
         1 =: i
         f.move.x =:> i
@@ -38,6 +39,7 @@ Component root {
     }
 
     PCincr aka imperative_statements.next
+    //PCincr aka imperative_statements.previous // more cryptic than befunge ;-)
     f.press -> PCincr
 
     TextPrinter tp

@@ -53,6 +53,7 @@ _native_code_
 #include "exec_env/global_mutex.h"
 
 #include <sstream>
+#include <fstream>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -79,37 +80,42 @@ void
 cpp_action (Process* c)
 {
     const char* token = getenv ("METSAFE_TOKEN");
-    if (!token) {
-        std::cerr << "no METSAFE_TOKEN env variable, please provide it" << std::endl;
-        return;
-    }
     std::string content;
 
-    using namespace curl;
-    // code pasted from postman
-    CURL *curl;
-    CURLcode res;
-    curl = curl_easy_init();
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-        std::string url = "https://apiv3.metsafecloud.com/core/wfs?service=WFS&token=";
-        url += token;
-        url += "&version=2.0.0&request=GetFeature&typeName=metgate-replay:lightningcells_meteorage&outputFormat=json&count=50&bbox=41.57,-5.27,51.67,9.66&srsName=EPSG:4326&sortBy=startValidity+D";
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, "https");
-        struct curl_slist *headers = NULL;
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    if (!token) {
+        std::cerr << "no METSAFE_TOKEN env variable, please provide it to download remote data" << std::endl;
+        std::cerr << "resorting to local file metsafe_result.json" << std::endl;
+        std::ifstream ifs("metsafe_result.json");
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        content = buffer.str();
+    } else {
+        using namespace curl;
+        // code pasted from postman
+        CURL *curl;
+        CURLcode res;
+        curl = curl_easy_init();
+        if(curl) {
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+            std::string url = "https://apiv3.metsafecloud.com/core/wfs?service=WFS&token=";
+            url += token;
+            url += "&version=2.0.0&request=GetFeature&typeName=metgate-replay:lightningcells_meteorage&outputFormat=json&count=50&bbox=41.57,-5.27,51.67,9.66&srsName=EPSG:4326&sortBy=startValidity+D";
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, "https");
+            struct curl_slist *headers = NULL;
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        // addition to postman code
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mycurl_write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
+            // addition to postman code
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mycurl_write_callback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
 
-        // blocking call
-        res = curl_easy_perform(curl);
+            // blocking call
+            res = curl_easy_perform(curl);
+        }
+        curl_easy_cleanup(curl);
+        if (content.empty()) return;
     }
-    curl_easy_cleanup(curl);
-    if (content.empty()) return;
 
     //std::cerr << content.size() << std::endl;
     //std::cout << content << std::endl;

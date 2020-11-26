@@ -7,6 +7,9 @@
 #include "core/execution/graph.h"
 #include "core/tree/blank.h"
 #include "core/tree/component.h"
+#include "core/tree/double_property.h"
+
+#include "core/utils/error.h"
 
 namespace djnn {
     JSONSaxParser::JSONSaxParser (ParentProcess * parent, const std::string& name, const std::string& xpath)
@@ -15,91 +18,143 @@ namespace djnn {
         assert(!xpath.empty());
 
         std::istringstream f(xpath);
-        std::string s;
+        std::string path_component;
+
+        auto next_sep = shallow_sep;
+        _xpath_vec.push_back ("__root");
+        _full_xpath_vec.push_back ("");
+        _seps.push_back (shallow_sep);
 
         if (xpath[0]=='/') {
-            getline(f, s, '/');
-            _xpath_vec.push_back ("__root");
-            _absolute = true;
-            _seps.push_back (shallow_sep);
+            getline(f, path_component, '/');
+            next_sep = shallow_sep;
         } else {
-            //_seps.push_back (deep_sep);
-            _xpath_vec.push_back ("__root"); // temporary
+            next_sep = deep_sep;
         }
         
-        auto next_sep = shallow_sep;
-        while (getline(f, s, '/')) {
+        std::string acc_path = "";
+
+        //auto next_sep = shallow_sep;
+        while (getline(f, path_component, '/')) {
             //cout << s << endl;
-            if (!s.empty()) {
+            if (!path_component.empty()) {
                 //new UndelayedSpike (this, s);
                 //new Blank (this, s);
                 //new Blank (this, s);
-                new Component (this, s);
-                _xpath_vec.push_back (s);
+                acc_path += path_component;
+                //std::cerr << acc_path << std::endl;
+                auto * c = new Component (this, acc_path);
+                if (path_component == "number") {
+                    new DoubleProperty(c, "value", 0);
+                }
+                _full_xpath_vec.push_back (acc_path);
+                acc_path += "/";
+                _xpath_vec.push_back (path_component);
                 _seps.push_back (next_sep);
                 next_sep = shallow_sep;
             } else {
                 next_sep = deep_sep;
             }
         }
-        //for (auto it: _xpath_vec) {std::cerr << it << " ";} std::cerr << std::endl;
+        for (auto it: _xpath_vec) {std::cerr << it << " ";} std::cerr << std::endl;
         //for (auto it: _seps) {std::cerr << it << " ";} std::cerr << std::endl;
         
         finalize_construction (parent, name); // no, we are not regular processes
     }
 
-    void
-    JSONSaxParser::activate (const std::string& name)
+    FatChildProcess*
+    JSONSaxParser::find_child_impl (const std::string& s)
     {
-        //std::cerr << "activating " << name << std::endl;
+        //std::cerr << "find " << s << std::endl;
+        const std::string value_string("value");
+        const size_t value_size = value_string.size();
+        if ( (s.size() > value_size) && (s.substr(s.size()-value_size, s.size()) == value_string)) {
+            const std::string t = s.substr(0, s.size()-value_size-1);
+            auto it = find_child_iterator(t);
+            assert(it!=children_end());
+            auto * n = it->second;
+            //auto * n = FatProcess::find_child_impl(t);
+            return n->find_child(value_string);
+        } else {
+            auto it = find_child_iterator(s);
+            assert(it!=children_end());
+            auto * n = it->second;
+            return n;
+        }
+    }
+
+    void
+    //JSONSaxParser::activate (const std::string& name)
+    JSONSaxParser::activate (size_t pos)
+    {
+        const std::string& name = _full_xpath_vec[pos];
+        //std::cerr << "activating " << name << " " << pos << std::endl;
         get_exclusive_access(DBG_GET);
         auto it = find_child_iterator(name);
         assert(it!=children_end());
         auto * current = it->second;
+        //std::cerr << "activate " << name << std::endl;
         current->activate (); // deactivate it
         GRAPH_EXEC;
         release_exclusive_access(DBG_REL);
     }
     void
-    JSONSaxParser::deactivate (const std::string& name)
+    //JSONSaxParser::deactivate (const std::string& name)
+    JSONSaxParser::deactivate (size_t pos)
     {
-        //std::cerr << "deactivating " << name << std::endl;
+        const std::string& name = _full_xpath_vec[pos];
+        //std::cerr << "deactivating " << name << " " << pos << std::endl;
         get_exclusive_access(DBG_GET);
         auto it = find_child_iterator(name);
         assert(it!=children_end());
         auto * current = it->second;
+        //std::cerr << "deactivate " << name << std::endl;
         current->deactivate (); // deactivate it
         GRAPH_EXEC;
         release_exclusive_access(DBG_REL);
     }
     void
+    //JSONSaxParser::activate_double (const std::string& name, double val)
+    JSONSaxParser::activate_double (size_t pos, double val)
+    {
+        const std::string& name = _full_xpath_vec[pos];
+        //std::cerr << "activating " << name << " " << pos << std::endl;
+        get_exclusive_access(DBG_GET);
+        auto it = find_child_iterator(name);
+        assert(it!=children_end());
+        auto * current = it->second;
+        auto * dit = current->find_child("value");
+        assert(dit);
+        DoubleProperty * d = dynamic_cast<DoubleProperty*>(dit);
+        assert(d);
+        d->set_value(val, true);
+        //std::cerr << "activate " << name << std::endl;
+        current->activate (); // deactivate it
+        GRAPH_EXEC;
+        release_exclusive_access(DBG_REL);
+    }
+    void
     JSONSaxParser::debug_json_stack () {
-        std::cerr << "json_stack: "; for (auto s: _json_stack) { std::cerr << s << " "; } std::cerr << std::endl;
+        //std::cerr << "json_stack: "; for (auto s: _json_stack) { std::cerr << s << " "; } std::cerr << std::endl;
+        std::cerr << "parse_stack: "; for (auto s: _parse_stack) { std::cerr << "(" << s.json << "," << s.xpath << "," << s.pos_xpath << "," << s.matching << ") "; } std::cerr << std::endl;
     }
     void
     JSONSaxParser::debug_expecting () {
-        std::cerr << "expecting: " << _xpath_vec[pos] << std::endl;
+        std::cerr << "expecting: " << _xpath_vec[_parse_stack.back().pos_xpath] << " " << _parse_stack.back().pos_xpath << std::endl;
     }
 
     void
     JSONSaxParser::parse (const std::string& input) {
-        pos = 0;
-        using json = nlohmann::json;
-        _json_stack.clear (); // should not be necessary
-        _json_stack.push_back ("__root");
-        _matching.clear ();
-        _matching.push_back (true);
-        json::sax_parse(input, this);
-        assert (_json_stack.back() == "__root");
+        _parse_stack.clear ();
+        _parse_stack.push_back (parse_stack_value_t{.json= "__root", .pos_xpath=1, .xpath= "", .matching=true});
+        nlohmann::json::sax_parse(input, this);
+        assert (_parse_stack.back().json == "__root");
     }
 
     bool
     JSONSaxParser::is_matching ()
     {
-        return _json_stack.back() == _xpath_vec[pos];
-        /*return _seps[pos]==shallow_sep
-            ? _json_stack.back() == _xpath_vec[pos]
-            : _matching.back();*/
+        return _parse_stack.back().json == _xpath_vec[_parse_stack.back().pos_xpath];
     }
 
     bool
@@ -108,34 +163,49 @@ namespace djnn {
         // debug_json_stack();
         // debug_expecting();
 
-        if (is_matching()) {
-            if (pos<_xpath_vec.size()) {
-                pos += 1;
-            }
-        }    
-        _json_stack.push_back("(none)"); // we don't know yet the name
-        _matching.push_back(false);
+        size_t pos = _parse_stack.back().pos_xpath;
+        _parse_stack.push_back (parse_stack_value_t{.json="(none)", .pos_xpath=pos, .xpath="", .matching=_parse_stack.back().matching});
         return true;
     }
 
     bool
     JSONSaxParser::key(json::string_t& val) {
-        // std::cerr << "-- key received: " << val << std::endl;
+        // std::cerr << "-- key received" << std::endl;
         // debug_json_stack();
         // debug_expecting();
+        // std::cerr << "key: " << val << std::endl;
+        // std::cerr << _parse_stack.back().json << " " << _xpath_vec[_parse_stack.back().pos_xpath] << " " << _parse_stack.back().pos_xpath << std::endl;
+        // std::cerr << is_matching () << std::endl;
 
-        if (is_matching()) {
-            //_matching.back()=false;
-            _matching.pop_back();
-            _matching.push_back(_matching.back());
-            deactivate(_json_stack.back());
+
+        //if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+        //if (_parse_stack[_parse_stack.size()-2].matching) {
+        if (_parse_stack.back().json==_xpath_vec[_parse_stack.back().pos_xpath-1] && _parse_stack[_parse_stack.size()-2].matching) {
+            deactivate(_parse_stack.back().pos_xpath-1);
+            _parse_stack.back().pos_xpath-=1;
         }
 
-        _json_stack.back() = val;
+        _parse_stack.back().json = val;
 
-        if (is_matching()) {
-            _matching.back()=true;
-            activate(_json_stack.back());
+        if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+            //std::cerr << " match" << std::endl;
+            auto pos = _parse_stack.back().pos_xpath;
+            _parse_stack.back().xpath = val;
+            _parse_stack.back().matching = true;
+            _parse_stack.back().pos_xpath += 1;
+            activate(pos);
+        } else {
+            if (_seps[_parse_stack.back().pos_xpath]==shallow_sep) {
+                //std::cerr << " unmatch" << std::endl;
+                //auto pos = _parse_stack.back().pos_xpath;
+                _parse_stack.back().xpath = "";
+                _parse_stack.back().matching = false;
+            } else {
+                //std::cerr << " waiting match" << std::endl;
+                //auto pos = _parse_stack.back().pos_xpath;
+                _parse_stack.back().xpath = "";
+                _parse_stack.back().matching = true;
+            }
         }
         
         return true;
@@ -146,59 +216,120 @@ namespace djnn {
         // std::cerr << "-- end_object" << std::endl;
         // debug_json_stack();
         // debug_expecting();
+        // std::cerr << _parse_stack.back().json << " " << _xpath_vec[_parse_stack.back().pos_xpath] << " " << _parse_stack.back().pos_xpath << std::endl;
+        // std::cerr << is_matching () << std::endl;
 
-        if (is_matching()) {
-            deactivate(_json_stack.back());
-            if (pos>0) {
-               pos -= 1;
-            }
+        //if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+        //if (_parse_stack[_parse_stack.size()-2].matching) {
+        if (_parse_stack.back().json==_xpath_vec[_parse_stack.back().pos_xpath-1] && _parse_stack[_parse_stack.size()-2].matching) {
+            deactivate(_parse_stack.back().pos_xpath-1);
         }
 
-        _json_stack.pop_back();
-        _matching.pop_back();
+        _parse_stack.pop_back();
+
+        
         return true;
     }
 
     bool
     JSONSaxParser::start_array(std::size_t elements) {
-        /*if(!_json_stack.empty() ) {
-            if (_json_stack.back() == _xpath_vec[pos]) { // if we were handling a segment of xpath...
-                if (pos<_xpath_vec.size() && (_xpath_vec[pos+1]=="list")) {
-                    get_exclusive_access(DBG_GET);
-                    auto it = find_child_iterator("list");
-                    assert(it!=children_end());
-                    auto * current = it->second;
-                    current->activate (); // activate it
-                    GRAPH_EXEC;
-                    release_exclusive_access(DBG_REL);
-                    pos += 1;
-                }
-            }    
+        // std::cerr << "-- start_array" << std::endl;
+        // debug_json_stack();
+        // debug_expecting();
+        
+        auto pos = _parse_stack.back().pos_xpath;
+        _parse_stack.push_back (parse_stack_value_t{.json="array", .pos_xpath=pos, .xpath="", .matching=_parse_stack.back().matching});
+
+        //_parse_stack.back().json = "array";
+        //size_t pos = _parse_stack.back().pos_xpath;
+        
+        if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+            activate(pos);
+            if (pos<_xpath_vec.size()+1) {
+                //std::cerr << "+1" <<  std::endl;
+                pos += 1;
+            }
+            _parse_stack.back().pos_xpath = pos;
+            _parse_stack.back().xpath = "array";
+            _parse_stack.back().matching = true;
+        } else {
+            if (_seps[_parse_stack.back().pos_xpath]==shallow_sep) {
+                //std::cerr << " unmatch" << std::endl;
+                //auto pos = _parse_stack.back().pos_xpath;
+                _parse_stack.back().xpath = "";
+                _parse_stack.back().matching = false;
+            } else {
+                //std::cerr << " waiting match" << std::endl;
+                //auto pos = _parse_stack.back().pos_xpath;
+                _parse_stack.back().xpath = "";
+                _parse_stack.back().matching = true;
+            }
         }
-        _json_stack.push_back("list");*/
+        //_parse_stack.push_back (parse_stack_value_t{.json="array", .pos_xpath=pos, .xpath="array", .matching=_parse_stack.back().matching});
+        
         return true;
     }
     bool
     JSONSaxParser::end_array() {
-        /*if(!_json_stack.empty() ) {
-            if (_json_stack.back() == _xpath_vec[pos]) { // if we were handling a segment of xpath...
-                get_exclusive_access(DBG_GET);
-                auto it = find_child_iterator("list");
-                assert(it!=children_end());
-                auto * current = it->second;
-                current->deactivate (); // deactivate it
-                GRAPH_EXEC;
-                release_exclusive_access(DBG_REL);
-                if (pos>0) {
-                    pos -= 1;
-                }
-            }
+        // std::cerr << "-- end_array" << std::endl;
+        // debug_json_stack();
+        // debug_expecting();
+
+        _parse_stack.pop_back();
+
+        if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+            deactivate(_parse_stack.back().pos_xpath);
+            //_parse_stack.back().pos_xpath-=1;
+
         }
-        _json_stack.pop_back();*/
+
+        
+        // auto json = _parse_stack.back().json;
+        //_parse_stack.back().json = "array";
+
+        // if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+        //     deactivate(_parse_stack.back().pos_xpath);
+        //     //_parse_stack.back().pos_xpath-=1;
+        // }
+
+        // _parse_stack.back().json = json;
+        
         return true;
     }
     bool
-    JSONSaxParser::number_float(json::number_float_t val, const json::string_t& s) { return true; }
+    JSONSaxParser::number_float(json::number_float_t val, const json::string_t& s) {
+        // std::cerr << "-- float received: " << val << std::endl;
+        // debug_json_stack();
+        // debug_expecting();
+
+        _parse_stack.back().json = "number";
+
+        if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+            //DBG;
+            _parse_stack.back().xpath = "number";
+            _parse_stack.back().matching = true;
+            deactivate (_parse_stack.back().pos_xpath);
+            activate_double(_parse_stack.back().pos_xpath, val);
+        }
+        return true;
+    }
+    bool
+    JSONSaxParser::string(json::string_t& val) {
+        // std::cerr << "-- string received: " << val << std::endl;
+        // debug_json_stack();
+        // debug_expecting();
+
+        _parse_stack.back().json = "string";
+
+        if (is_matching() && _parse_stack[_parse_stack.size()-2].matching) {
+            //DBG;
+            _parse_stack.back().xpath = "string";
+            _parse_stack.back().matching = true;
+            //deactivate (_parse_stack.back().pos_xpath);
+            //activate_double(_parse_stack.back().pos_xpath, val);
+        }
+        return true;
+    }
 }
 
 /*class UndelayedSpike : public FatProcess

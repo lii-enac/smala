@@ -36,22 +36,36 @@ namespace djnn {
         virtual bool start_array(std::size_t elements) override;
         virtual bool end_array() override;
         virtual bool number_float(json::number_float_t val, const json::string_t& s) override;
+        virtual bool string(json::string_t& val) override;
 
         void impl_activate () override {}
         void impl_deactivate () override {}
+        virtual FatChildProcess* find_child_impl (const std::string&) override;
     private:
-        void activate (const std::string&);
-        void deactivate (const std::string&);
+        // void activate (const std::string&);
+        // void activate_double (const std::string&, double val);
+        // void deactivate (const std::string&);
+        void activate (size_t pos);
+        void activate_double (size_t pos, double val);
+        void deactivate (size_t pos);
         void debug_json_stack ();
         void debug_expecting ();
         bool is_matching ();
         bool _absolute;
         enum sep_t { shallow_sep, deep_sep};
         std::vector<std::string> _xpath_vec;
+        std::vector<std::string> _full_xpath_vec;
         std::vector<sep_t> _seps;
-        size_t pos;
-        std::vector<std::string> _json_stack;
-        std::vector<bool> _matching;
+        //size_t pos;
+        struct parse_stack_value_t {
+            std::string json;
+            std::string xpath;
+            size_t pos_xpath;
+            bool matching;
+        };
+        std::vector<parse_stack_value_t> _parse_stack;
+        //std::vector<std::string> _json_stack;
+        //std::vector<bool> _matching;
         //std::vector<CoreProcess*> _process_stack;
     };
 }

@@ -113,7 +113,7 @@ cpp_action (Process* c)
 
     //std::cout << content << std::endl;
 
-    #if 0
+    #if 1
     get_exclusive_access(DBG_GET);
     // To get the source that triggered the native action:
     //Process *source = c->get_activation_source ();
@@ -203,7 +203,7 @@ Component root {
 	Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
-    FillColor fcc (#000000)
+    //FillColor fcc (#000000)
     Text explanation1 (10, 20, "Click the button to launch the async action")
     Text explanation2 (10, 40, "then, drag the rectangle to check that the application is not freezed")
     Text explanation3 (10, 60, "When the action is terminated, the title of the online ressource should appear")
@@ -212,52 +212,112 @@ Component root {
     Button btn (f, "launch", 50, 150)
 
     TextPrinter tp
-    JSONSaxParser parser("features/geometry/coordinates")
+    //JSONSaxParser parser("features/geometry/coordinates")
+    //JSONSaxParser parser("geometry/coordinates")
+    //JSONSaxParser parser("geometry/coordinates//number")
+    JSONSaxParser parser("geometry/coordinates/array/array/array/array/number")
+
+    Component point1 {
+        DoubleProperty x(0)
+        DoubleProperty y(0)
+    }
+    Ref point (null)
+    Ref poly (null)
+    DerefDouble xr (point, "x", DJNN_GET_ON_CHANGE)
+    DerefDouble yr (point, "y", DJNN_GET_ON_CHANGE)
+
+    Spike xys
+    FSM xy {
+        State a
+        State x {
+            //"set x" =: tp.input
+            parser.geometry.coordinates.array.array.array.array.number.value =: xr.value
+        }
+        State y {
+            //"set y" =: tp.input
+            parser.geometry.coordinates.array.array.array.array.number.value =: yr.value
+        }
+        a->x(xys)
+        x->y(xys)
+        y->x(xys)
+    }
+
+    Switch ttt(init) {
+        Component init
+        Component TempLayer {
+        }
+    }
+
+    Incr nbpoly(1)
+    Incr nbpoints(1)
 
     parser.geometry -> (root) {
+        //root.tp.input = "add poly"
+        addChildrenTo root.ttt.TempLayer {
+            Polyline poly
+        }
+    }
+    parser.geometry !-> (root) {
+        //root.tp.input = "add poly"
         addChildrenTo root.meteo {
-            Polygon poly
+            poly << root.ttt.TempLayer.poly
         }
     }
-    parser.coordinates -> (root) {
-        //root.tp.input = "truc"
-        addChildrenTo root.meteo.poly {
+    parser.geometry -> nbpoly
+
+    //parser.array -> (root) {
+    parser.geometry.coordinates.array.array.array.array -> (root) {
+        //root.tp.input = "add point"
+        addChildrenTo root.ttt.TempLayer.poly.points {
+        //addChildrenTo root.ttt.TempLayer.poly {
             PolyPoint point(0,0)
-            point.x = 0
+            //Circle point (0,0,5/70.0)
+            root.point = &point
         }
-        
     }
-    parser.features -> {
+    parser.geometry.coordinates.array.array.array.array.number -> xys, nbpoints
+
+    /*parser.features -> {
         "features yes" =: tp.input
     }
     parser.features !-> {
-        "!features yes" =: tp.input
-    }
-    parser.geometry -> {
+        "features no" =: tp.input
+    }*/
+    /*parser.geometry -> {
         "geometry yes" =: tp.input
     }
     parser.geometry !-> {
-        "!geometry yes" =: tp.input
+        "geometry no" =: tp.input
     }
-    parser.coordinates -> {
-        "coordinates yes" =: tp.input
+    parser.geometry.coordinates.array.array.array.array -> {
+        "geometry.coordinates.array.array.array.array yes" =: tp.input
     }
-    parser.coordinates !-> {
-        "!coordinates yes" =: tp.input
-    }
+    parser.geometry.coordinates.array.array.array.array !-> {
+        "geometry.coordinates.array.array.array.array no" =: tp.input
+    }*/
+    /*parser.number -> {
+        "float yes" =: tp.input
+        parser.number.value =: tp.input
+    }*/
     
-    FillColor fc (#FF00FF)
+    //FillColor fc (#FF00FF)
+    //FillColor fc (255,0,255)
     Rectangle r (200, 200, 100, 100, 0, 0)
     Ref toDrag (r)
     SimpleDrag _ (toDrag, f)
 
-    Translation _(0,-2500)
-    Scaling _(70,70, 0,0)
+    Translation _(0,-5000)
+    Scaling _(140,140, 0,0)
+
+    OutlineWidth _(0) // do not apply scale in Qt
 
     NoFill _
     OutlineColor _(#FF00FF)
+    
+    
 
     Component meteo {
+        
     }
 
     // Bind a C++ native action
@@ -275,6 +335,10 @@ Component root {
     cpp_na.end -> (root) {
         dump root.meteo
         dump root.tp
+    }
+    cpp_na.end -> {
+        root.nbpoly.state =: tp.input
+        root.nbpoints.state =: tp.input
     }
 }
 

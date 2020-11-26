@@ -27,8 +27,8 @@ Component root {
 
     IntProperty i(0)
 
-    // FIXME : smalac generates 2 process per assignment: two presses are required in the following to 'scitch' to an assignment 
-    // FIXME : possible solution: set null to parent of the generated DoubleProperty before the assignement in smalac
+    // FIXME : smalac generates 2 processes per assignment: two presses are required in the following to 'switch' to an assignment 
+    // FIXME : possible solution: in smalac, set to null the parent of the generated DoubleProperty before the assignement
     SwitchList imperative_statements {
         1 =: i
         f.move.x =:> i
@@ -39,7 +39,7 @@ Component root {
     }
 
     PCincr aka imperative_statements.next
-    //PCincr aka imperative_statements.previous // more cryptic than befunge ;-)
+    //PCincr aka imperative_statements.previous // upside PC, even more cryptic than befunge ;-)
     f.press -> PCincr
 
     TextPrinter tp

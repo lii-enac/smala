@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *		Stephane Conversy <stephane.conversy@enac.fr>
+ *		Mathieu Poirier <mathieu.poirier@enac.fr>
  *
  */
 
@@ -58,7 +59,8 @@ _native_code_
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-namespace curl { // fix 'Rectangle' clash name for windowss
+namespace curl { // fix 'Rectangle' clash name for windows
+    //#define NOGDI
     #include <curl/curl.h>
     #include <curl/easy.h>
 }
@@ -95,7 +97,7 @@ cpp_action (Process* c)
         CURL *curl;
         CURLcode res;
         curl = curl_easy_init();
-        if(curl) {
+        if (curl) {
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
             std::string url = "https://apiv3.metsafecloud.com/core/wfs?service=WFS&token=";
             url += token;
@@ -201,12 +203,11 @@ cpp_action (Process* c)
     
 }
 
-
 %}
 
 _main_
 Component root {
-	Frame f ("f", 0, 0, 500, 600)
+	Frame f ("f", 0, 0, 1100, 500)
     Exit ex (0, 1)
     f.close -> ex
     FillColor fcc (#000000)
@@ -231,32 +232,21 @@ Component root {
     json_point aka parser.geometry.coordinates.array.array.array.array
     json_coord aka parser.geometry.coordinates.array.array.array.array.number
 
-    Ref poly (null)
-    Ref point (null)
-    DerefDouble xr (point, "x", DJNN_GET_ON_CHANGE)
-    DerefDouble yr (point, "y", DJNN_GET_ON_CHANGE)
+    Translation _(-300,-5800)
+    Scaling _(140,140, 0,0)
 
-    // FSM to read x,y coordinates when receiving unspecified numbers from an array of 2 elements
-    Spike xys
-    FSM xy {
-        State a
-        State x {
-            //"set x" =: tp.input
-            json_coord.value =: xr.value
-        }
-        State y {
-            //"set y" =: tp.input
-            json_coord.value =: yr.value
-        }
-        a->x(xys)
-        x->y(xys)
-        y->x(xys)
-    }
+    //OutlineWidth _(0) // 0 == do not apply scale to OutlineWidth in Qt
+    OutlineWidth _(1/140) // should work on other renderers since 1/140 is 0!
+
+    NoFill _
+    OutlineColor _(#FF00FF)
+
+    Component meteo 
 
     // create polys in an invisible layer, to avoid displaying their construction
     Switch deactivated (init) {
-        Component _
-        Component tmp_layer
+        Component init
+        Component tmp_layer 
     }
 
     json_poly -> (root) {
@@ -265,32 +255,39 @@ Component root {
             Polyline poly
         }
     }
+    json_point -> (root) {
+        //root.tp.input = "add point"
+        addChildrenTo root.deactivated.tmp_layer.poly.points {
+            PolyPoint point(0,0)
+        }
+    }
+    // FSM to read x,y coordinates when receiving unspecified numbers from an array of 2 elements
+    Spike xys
+    FSM xy {
+        State a
+        State x
+        State y
+        a->x(xys)
+        x->y(xys)
+        y->x(xys)
+    }
+    xy.x -> (root) {
+        int i = root.deactivated.tmp_layer.poly.points.size 
+        root.deactivated.tmp_layer.poly.points[i].x = root.json_coord.value
+    }
+    xy.y -> (root) {
+        int i = root.deactivated.tmp_layer.poly.points.size 
+        root.deactivated.tmp_layer.poly.points[i].y = root.json_coord.value
+    }
+    json_coord -> xys
+
     json_poly !-> (root) {
         //root.tp.input = "move poly to meteo layer"
         addChildrenTo root.meteo {
             poly << root.deactivated.tmp_layer.poly
         }
     }
-    json_point -> (root) {
-        //root.tp.input = "add point"
-        addChildrenTo root.deactivated.tmp_layer.poly.points {
-            PolyPoint point(0,0)
-            root.point = &point
-        }
-    }
-    json_coord -> xys
-    
-    
-    Translation _(-300,-5800)
-    Scaling _(140,140, 0,0)
 
-    //OutlineWidth _(0) // 0 == do not apply scale to OutlineWidth in Qt
-    OutlineWidth _(1/140) // should work on other renderer since 1/140 is 0!
-
-    NoFill _
-    OutlineColor _(#FF00FF)
-
-    Component meteo
 
     // Bind to native action to get the data and parse them
 	NativeAsyncAction cpp_na (cpp_action, root, 1)

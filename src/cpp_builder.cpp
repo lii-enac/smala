@@ -1040,54 +1040,54 @@ namespace Smala
       indent (os);
       switch (n->type ()) {
         case DUMP:
-        os << "if (" << arg << ")" << endl ;
-        indent (os); indent (os);
-        os << arg << "->dump";
-        if (!n->has_argument ()) {
-          os << " (0);\n";
+          os << "if (" << arg << ")" << endl ;
+          indent (os); indent (os);
+          os << arg << "->dump";
+          if (!n->has_argument ()) {
+            os << " (0);\n";
+            indent (os);
+            os << "else" << endl ;
+            indent (os); indent (os);
+            os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
+          }
+          else {
+            os << " (";
+            for (auto arg : n->args ()) {
+              build_term_node (os, arg);
+            }
+            os << ";\n";
+          }
+          break;
+        case XMLSERIALIZE:
+          os << "if (" << arg << ")" << endl ;
+          indent (os); indent (os);
+          os << arg << "->serialize (\"XML\");\n";
           indent (os);
           os << "else" << endl ;
           indent (os); indent (os);
-          os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
-       }
-       else {
-        os << " (";
-        for (auto arg : n->args ()) {
-          build_term_node (os, arg);
-        }
-        os << ";\n";
-      }
-      break;
-      case XMLSERIALIZE:
-        os << "if (" << arg << ")" << endl ;
-        indent (os); indent (os);
-        os << arg << "->serialize (\"XML\");\n";
-        indent (os);
-        os << "else" << endl ;
-        indent (os); indent (os);
-        os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
-      break;
-      case NOTIFY:
-      os << arg << "->notify_activate ();\n";
-      break;
+          os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
+          break;
+        case NOTIFY:
+          os << arg << "->notify_activate ();\n";
+          break;
       case RUN:
-      if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
-        if (n->has_argument ()) {
-          os << "MainLoop::instance ().set_run_for (";
-          for (auto arg : n->args ()) {
-            build_term_node (os, arg);
+        if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
+          if (n->has_argument ()) {
+            os << "MainLoop::instance ().set_run_for (";
+            for (auto arg : n->args ()) {
+              build_term_node (os, arg);
+            }
           }
-        }
-        os << "MainLoop::instance ().activate ();\n";
-      } else
-      os << arg << "->activate ();\n";
-      break;
+          os << "MainLoop::instance ().activate ();\n";
+        } else
+        os << arg << "->activate ();\n";
+        break;
       case STOP:
-      if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
-        os << "MainLoop::instance ().deactivate ();\n";
-      } else
-      os << arg << "->deactivate ();\n";
-      break;
+        if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
+          os << "MainLoop::instance ().deactivate ();\n";
+        } else
+          os << arg << "->deactivate ();\n";
+        break;
       case DELETE: {
          /* delete first.second */
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1110,9 +1110,9 @@ namespace Smala
       }
       break;
       case UNKNOWN:
-      print_error_message (error_level::error,
-       "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
-      break;
+        print_error_message (error_level::error,
+        "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
+        break;
     }
   }
 }

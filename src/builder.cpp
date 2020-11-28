@@ -561,14 +561,14 @@ namespace Smala
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
         print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
     }
-      indent (os);
-      std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-      print_start_component (os, new_name, constructor);
-      os << " (" << p_name << ", " << name;
-      if (node->has_arguments ())
-        os << ", ";
-      else
-        os << ");\n";
+    indent (os);
+    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+    print_start_component (os, new_name, constructor);
+    os << " (" << p_name << ", " << name;
+    if (node->has_arguments ())
+      os << ", ";
+    else
+      os << ");\n";
     return new_name;
   }
 

@@ -19,7 +19,7 @@ using namespace Smala;
 Node::Node (const location& loc, NodeType t) :
     m_ignore_parent (false), m_djnn_type (""), m_name (""), m_build_name (""), m_args (), m_node_type (
         t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr),  m_has_arguments (
-        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc)
+        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
 {
 }
 
@@ -27,21 +27,21 @@ Node::Node (const location& loc, NodeType t, const std::string &value, const std
             const std::vector<std::pair<ParamType, std::string> > &arguments) :
     m_ignore_parent (false),m_djnn_type (value), m_name (name), m_build_name (""), m_args (arguments), m_node_type (
         t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_arguments ( // FIXME??
-        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc)
+        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
 {
 }
 
 Node::Node (const location& loc, NodeType t, const std::string &value, const std::string &name) :
     m_ignore_parent (false), m_djnn_type (value), m_name (name), m_build_name (""), m_args (), m_node_type (
         t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_arguments (
-        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc)
+        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
 {
 }
 
 Node::Node (const location& loc, NodeType t, const std::string &value, PathNode* path) :
     m_ignore_parent (false), m_djnn_type (value), m_name (""), m_build_name (""), m_args (), m_node_type (
         t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (path), m_has_arguments (
-        false), m_has_path (true), m_duplicate_warning (true), m_keep_name (false), m_loc(loc)
+        false), m_has_path (true), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
 {
 }
 

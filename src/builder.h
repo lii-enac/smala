@@ -56,7 +56,7 @@ namespace Smala {
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
             0), m_sym_num (0), m_native_num (0), m_in_for (false), m_in_set_text (false), m_in_set_property(false) , m_in_native_action (false), m_in_static_expr (false), m_in_switch (false),
-            m_type_manager (nullptr)
+            m_type_manager (nullptr), m_define_or_main_node (nullptr)
     {
     }
     virtual ~Builder () {};
@@ -72,6 +72,8 @@ namespace Smala {
     std::string m_cur_building_name;
     std::vector<BuildNode*> m_parent_list;
     std::map<std::string, std::string> m_types;
+    Node * m_define_or_main_node;
+
     virtual void pop_ctxt () {}
     virtual void push_ctxt () {}
     void indent (std::ofstream &os);

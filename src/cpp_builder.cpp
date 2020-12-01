@@ -83,6 +83,7 @@ namespace Smala
     size = m_ast.node_list ().size ();
     location last_loc;
     bool in_code = false;
+
     for (int i = 0; i < size; ++i) {
       Node * node = m_ast.node_list ().at (i);
       
@@ -111,6 +112,10 @@ namespace Smala
       }
 
       build_node (os, node);
+
+      if (node->is_define_or_main()) {
+        m_define_or_main_node = node;
+      }
 
       if(debug) {
         if (node->node_type()==START_MAIN || node->node_type()==START_DEFINE)
@@ -634,16 +639,13 @@ namespace Smala
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       indent (os);
       if (arg_node->str_arg_value ().at (0) == '\"') {
-        os << "TextProperty *" << new_name << " = new TextProperty (" << p_name
-            << ", \"\", " << arg_node->str_arg_value () << ");\n";
+        os << "TextProperty *" << new_name << " = new TextProperty (";
       } else {
         os << "DoubleProperty *" << new_name << " = new DoubleProperty (";
-        //if (node->parent () && node->parent ()->type () == SWITCH)
-        os << "nullptr";
-        //else
-        //os << p_name;  
-        os << ", \"\", " << arg_node->str_arg_value () << "); // parent is nullptr to make Switch* behave as expected\n";
       }
+      assert(m_define_or_main_node);
+      os << m_define_or_main_node->build_name ();
+      os << ", \"\", " << arg_node->str_arg_value () << "); // parent of constant is main or define component to make Switch* behave as expected\n";
       arg = new_name;
     } else {
       if (arg_node->path_arg_value()->has_path_list() || arg_node->path_arg_value()->has_wild_card()) {

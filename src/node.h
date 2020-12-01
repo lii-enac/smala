@@ -149,6 +149,8 @@ public:
     void set_keep_name (bool keep) { m_keep_name = keep; }
     bool keep_name () { return m_keep_name; }
     const location& get_location () { return m_loc; }
+    void set_is_define_or_main () { m_is_define_or_main = true; }
+    bool is_define_or_main () const { return m_is_define_or_main; }
  private:
     bool m_ignore_parent, m_has_path;
     Node *m_parent;
@@ -163,6 +165,7 @@ public:
     std::vector<TermNode*> m_expression;
     user_data_t m_data;
     class location m_loc;
+    bool m_is_define_or_main;
 };
 
 }

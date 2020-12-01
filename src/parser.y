@@ -380,6 +380,7 @@ define
     {
       driver.end_debug ();
       Node *end = new Node (@$, END_DEFINE);
+      end->set_is_define_or_main ();
       driver.add_node (end);
       parent_list.pop_back ();
     }
@@ -1050,8 +1051,10 @@ simple_process_decl
       lexer_expression_mode_on ();
       Node *node = new Node (@$, SIMPLE, $1, $3);
       node->set_keep_name ($2);
-      if (root == nullptr)
+      if (root == nullptr) {
         root = node;
+        node->set_is_define_or_main ();
+      }
       driver.add_node (node);
       if ((m_in_add_children && !exclude_from_no_parent ($1)) || is_switch ($1))
         node->set_ignore_parent (true);

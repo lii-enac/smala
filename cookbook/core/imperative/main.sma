@@ -26,22 +26,35 @@ Component root {
     mouseTracking = 1
 
     IntProperty i(0)
+    TextProperty t("t")
+    TextPrinter tp
+    i =:> tp.input
+    t =:> tp.input
 
-    // FIXME : smalac generates 2 processes per assignment: two presses are required in the following to 'switch' to an assignment 
-    // FIXME : possible solution: in smalac, set to null the parent of the generated DoubleProperty before the assignement
+    // WARNING : smalac may generates more than 1 process per "statement":
+    // two or more activations of SwitchList.next might be required in the following to 'switch' to an instruction 
+    // let the authors/maintainers know if you find such a case 
     SwitchList imperative_statements {
         1 =: i
         f.move.x =:> i
         3 =: i
+        2+4 =: i
+        "foo" =: t
         Circle _(20,20,10)
         Circle _(80,20,10)
-        4 =: i
+        5 =: i
     }
 
+    // PC = Program Counter
     PCincr aka imperative_statements.next
     //PCincr aka imperative_statements.previous // upside PC, even more cryptic than befunge ;-)
+    // seriously the above ^^ demonstrates how order is explicit (Y visual variable), but direction is not => cf LangViz paper
     f.press -> PCincr
 
-    TextPrinter tp
-    i =:> tp.input
+    // simulating a 1hz computer
+    //Clock cl(1000)
+    //cl.tick -> PCincr
+
+    // other conditions to incr the PC
+    //i>200 -> PCincr // try it when f.move.x =:> i is active
 }

@@ -43,6 +43,10 @@ Component root {
         Circle _(20,20,10)
         Circle _(80,20,10)
         5 =: i
+        Component _ {
+            8 =: i
+            "bar" =: t
+        }
     }
 
     // PC = Program Counter

@@ -255,31 +255,31 @@ Component root {
             Polyline poly
         }
     }
-    json_point -> (root) {
-        //root.tp.input = "add point"
-        addChildrenTo root.deactivated.tmp_layer.poly.points {
-            PolyPoint point(0,0)
+        json_point -> (root) {
+            //root.tp.input = "add point"
+            addChildrenTo root.deactivated.tmp_layer.poly.points {
+                PolyPoint point(0,0)
+            }
         }
-    }
-    // FSM to read x,y coordinates when receiving unspecified numbers from an array of 2 elements
-    Spike xys
-    FSM xy {
-        State a
-        State x
-        State y
-        a->x(xys)
-        x->y(xys)
-        y->x(xys)
-    }
-    xy.x -> (root) {
-        int i = root.deactivated.tmp_layer.poly.points.size 
-        root.deactivated.tmp_layer.poly.points[i].x = root.json_coord.value
-    }
-    xy.y -> (root) {
-        int i = root.deactivated.tmp_layer.poly.points.size 
-        root.deactivated.tmp_layer.poly.points[i].y = root.json_coord.value
-    }
-    json_coord -> xys
+            // FSM to read x,y coordinates when receiving unspecified numbers from an array of 2 elements
+            Spike xys
+            FSM xy {
+                State a
+                State x
+                State y
+                a->x(xys)
+                x->y(xys)
+                y->x(xys)
+            }
+            xy.x -> (root) {
+                int i = root.deactivated.tmp_layer.poly.points.size 
+                root.deactivated.tmp_layer.poly.points[i].x = root.json_coord.value
+            }
+            xy.y -> (root) {
+                int i = root.deactivated.tmp_layer.poly.points.size 
+                root.deactivated.tmp_layer.poly.points[i].y = root.json_coord.value
+            }
+            json_coord -> xys
 
     json_poly !-> (root) {
         //root.tp.input = "move poly to meteo layer"

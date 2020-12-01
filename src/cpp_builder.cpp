@@ -637,8 +637,12 @@ namespace Smala
         os << "TextProperty *" << new_name << " = new TextProperty (" << p_name
             << ", \"\", " << arg_node->str_arg_value () << ");\n";
       } else {
-        os << "DoubleProperty *" << new_name << " = new DoubleProperty ("
-            << p_name << ", \"\", " << arg_node->str_arg_value () << ");\n";
+        os << "DoubleProperty *" << new_name << " = new DoubleProperty (";
+        //if (node->parent () && node->parent ()->type () == SWITCH)
+        os << "nullptr";
+        //else
+        //os << p_name;  
+        os << ", \"\", " << arg_node->str_arg_value () << "); // parent is nullptr to make Switch* behave as expected\n";
       }
       arg = new_name;
     } else {
@@ -1442,16 +1446,17 @@ namespace Smala
       }
       if (str == "gui" && !has_display) {
         indent (os);
-        os << "init_display ();\n";
+        os << "init_display ();\n"; // do it before init_gui ()
         has_display = true;
       }
-      if (str == "core") {
-        indent (os);
-        os << "init_exec_env ();\n";
-      }
-      /* add cpp init_MODULE corresponding */
+      /* add corresponding init_MODULE */
       indent (os);
       os << "init_" << str << " ();\n";
+
+      if (str == "core") {
+        indent (os);
+        os << "init_exec_env ();\n"; // do it after init_core ()
+      }
 
     }
   }

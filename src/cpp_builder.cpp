@@ -636,6 +636,18 @@ namespace Smala
     TermNode* arg_node = node->get_expression ().at (0);
     std::string arg;
     if (arg_node->arg_type () != VAR) {
+      
+      std::string branch_name;
+      if (node->parent()) {
+        if (node->parent()->djnn_type().find("Switch")==0) {
+          // if it's inside a switch, we should surround it with a component, or find the nearest parent component and put it there
+          std::string branch_name = "cpnt_" + std::to_string (m_cpnt_num++);
+          indent (os);
+          os << "auto * " << branch_name << "= new Component (" << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
+          p_name = branch_name;
+        }
+      }
+      
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       indent (os);
       if (arg_node->str_arg_value ().at (0) == '\"') {
@@ -643,19 +655,16 @@ namespace Smala
       } else {
         os << "DoubleProperty *" << new_name << " = new DoubleProperty (";
       }
-      // std::cerr << arg_node->parent() << std::endl;
-      // if (arg_node->parent()) {
-      //   std::cerr << arg_node->parent()->djnn_type() << std::endl;
-      // }
-      // if it's inside a switch, we should surround it with a component, or find the nearest parent component and put it there
-      if (m_define_or_main_node) {
-        os << m_define_or_main_node->build_name ();
+
+      os << p_name;
+      os << ", \"\", " << arg_node->str_arg_value () << ");\n";
+
+      if (!branch_name.empty()) {
+        arg = branch_name;
       } else {
-        std::cerr << "warning link ahead" << std::endl;
-        os << "nullptr"; // FIXME!!!!
+        arg = new_name;
       }
-      os << ", \"\", " << arg_node->str_arg_value () << "); // parent of constant is main or define component to make Switch* behave as expected\n";
-      arg = new_name;
+
     } else {
       if (arg_node->path_arg_value()->has_path_list() || arg_node->path_arg_value()->has_wild_card()) {
         build_multi_control_node (os, node);

@@ -33,10 +33,10 @@ Mobile (Process ref, Process f, int x, int y)
       0 =: circ.pickable
       Int off_x (0)
       Int off_y (0)
-      f.move.x - t.tx =: off_x
-      f.move.y - t.ty =: off_y 
-      f.move.x - off_x =:> t.tx
-      f.move.y - off_y =:> t.ty
+      f.press.x - t.tx =: off_x
+      f.press.y - t.ty =: off_y 
+      f.move.x - off_x => t.tx
+      f.move.y - off_y => t.ty
     }
     idle -> dragging (circ.press)
     dragging -> idle (f.release)

@@ -643,8 +643,17 @@ namespace Smala
       } else {
         os << "DoubleProperty *" << new_name << " = new DoubleProperty (";
       }
-      assert(m_define_or_main_node);
-      os << m_define_or_main_node->build_name ();
+      // std::cerr << arg_node->parent() << std::endl;
+      // if (arg_node->parent()) {
+      //   std::cerr << arg_node->parent()->djnn_type() << std::endl;
+      // }
+      // if it's inside a switch, we should surround it with a component, or find the nearest parent component and put it there
+      if (m_define_or_main_node) {
+        os << m_define_or_main_node->build_name ();
+      } else {
+        std::cerr << "warning link ahead" << std::endl;
+        os << "nullptr"; // FIXME!!!!
+      }
       os << ", \"\", " << arg_node->str_arg_value () << "); // parent of constant is main or define component to make Switch* behave as expected\n";
       arg = new_name;
     } else {

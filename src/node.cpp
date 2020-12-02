@@ -30,7 +30,6 @@ Node::Node (const location& loc, NodeType t)
 {
 }
 
-
 Node::Node (const location& loc, NodeType t, const std::string &value, const std::string &name)
 : Node (loc, t, value, name, {})
 {

@@ -61,6 +61,7 @@ namespace Smala
     std::ofstream os (prefix + ".cpp");
     os << "#include <iostream>\n";
     os << "#include <string>\n";
+    os << "#include \"core/core.h\"\n";
     os << "#include \"core/core-dev.h\"\n";
     os << "#include \"exec_env/exec_env.h\"\n\n";
     os << "using namespace std;\nusing namespace djnn;\n\n";

@@ -29,6 +29,8 @@ namespace Smala
         m_filenames.push_back (str);
       } else if (str.compare ("-g") == 0) {
          _debug = true;
+      } else if (str.compare ("-lang=js") == 0) {
+          _lang = JS;
       }
     }
     if (m_filenames.empty ()) {
@@ -70,5 +72,6 @@ namespace Smala
     std::cout << "USAGE: smala " <<  "<filenames> [options]\n";
     std::cout << "Options:\n";
     std::cout << "  -g \t enable debug\n";
+    std::cout << "  -lang <cpp|js> \t change the target language\n";
   }
 } /* namespace Smala */

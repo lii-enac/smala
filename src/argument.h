@@ -21,7 +21,7 @@
 namespace Smala {
 
   enum Language {
-    C, JAVA, CPP
+    CPP, JS
   };
 
 class Argument {

@@ -20,6 +20,7 @@
 #include "parser.hpp"
 #include "driver.h"
 #include "cpp_builder.h"
+#include "js_builder.h"
 
 #include "core/utils/filesystem.h"
 
@@ -29,7 +30,11 @@ using namespace std;
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
 	Driver driver (arg.debug());
-	Builder *b = new CPPBuilder ();
+	Builder *b;
+	if (arg.lang () == JS )
+	  b = new JSBuilder ();
+	else
+	  b = new CPPBuilder ();
 	int error = 0;
 
 	int sz = arg.files().size();

@@ -111,7 +111,7 @@ namespace Smala
         {
         case USE:
           {
-            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
+            set_location (os, cur_node);
             std::string str = cur_node->name ();
             std::locale loc;
             str[0] = std::toupper (str[0], loc);
@@ -123,7 +123,7 @@ namespace Smala
           }
         case IMPORT:
           {
-            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
+            set_location (os, cur_node);
             //std::string name = cur_node->name ();
             build_import (os, cur_node);
             break;
@@ -132,17 +132,8 @@ namespace Smala
         }
     }
     /* inline function */
-    os << "inline\n";
-    os << "double smala_deref(djnn::AbstractProperty& p)\n";
-    os << "{ return p.get_double_value(); }\n\n";
+    build_post_import (os);
 
-    os << "inline\n";
-    os << "std::string smala_deref(std::string p)\n";
-    os << "{ return p; }\n\n";
-
-    os << "inline\n";
-    os << "double smala_deref(double p)\n";
-    os << "{ return p; }\n\n";
 
     /* user-defined native code here so native expression can use it */
     for (int i = 0; i < size; ++i) {
@@ -150,7 +141,7 @@ namespace Smala
       switch (cur_node->node_type ()) {
         case NATIVE_CODE:
           {
-            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
+            set_location (os, cur_node);
             NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
             os << n->code () << std::endl;
             break;
@@ -170,13 +161,13 @@ namespace Smala
       switch (cur_node->node_type ()) {
         case NATIVE_ACTION:
           {
-            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
+            set_location (os, cur_node);
             build_native_action (os, cur_node);
             break;
           }
         case NATIVE_COLLECTION_ACTION:
           {
-            os << "\n#line " << cur_node->get_location().begin.line << std::endl;
+            set_location (os, cur_node);
             build_native_collection_action (os, cur_node);
             break;
           }
@@ -208,21 +199,21 @@ namespace Smala
       {
         push_ctxt ();
         indent  (os);
-        os << "else {\n";
+        build_start_else (os);
         m_indent++;
         break;
       }
       case START_ELSEIF:
       {
         indent  (os);
-        os << "else ";
+        build_start_else_if (os);
         break;
       }
       case START_IF:
       {
         push_ctxt ();
         indent  (os);
-        os << "if (";
+        build_start_if (os);
         m_in_static_expr = true;
         for (Node *n : node->get_expr_data ()) {
           build_node (os, n);
@@ -230,10 +221,16 @@ namespace Smala
         m_in_static_expr = false;
         break;
       }
+      case END_IF_EXPRESSION:
+      {
+        build_end_if (os);
+        m_indent++;
+        break;
+      }
       case BREAK:
       {
         indent (os);
-        os << node->djnn_type() << ";\n";
+        build_break (os, node);
         break;
       }
       case INCREMENT:
@@ -246,17 +243,11 @@ namespace Smala
         build_step (os, node, false);
         break;
       }
-      case END_IF_EXPRESSION:
-      {
-        os << ") {\n";
-        m_indent++;
-        break;
-      }
       case END_BLOCK:
       {
         m_indent--;
         indent (os);
-        os << "}\n";
+        build_end_block (os);
         pop_ctxt ();
         break;
       }
@@ -310,7 +301,7 @@ namespace Smala
       }
       case END_NATIVE:
       {
-        os << "}\n\n";
+        build_end_native (os);
         BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
         m_parent_list.pop_back ();
         if (n) delete n;
@@ -394,10 +385,7 @@ namespace Smala
       }
       case END_ADD_CHILD:
       {
-        os << ";\n";
-        indent (os);
-        os << m_parent_list.back ()->name () << "->add_child (" << m_cur_building_name << ", \""
-           <<  m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
+        build_end_add_child (os);
         break;
       }
       case ADD_CHILDREN_TO:
@@ -564,31 +552,8 @@ namespace Smala
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     print_start_component (os, new_name, constructor);
-    os << " (" << p_name << ", " << name;
-    if (node->has_arguments ())
-      os << ", ";
-    else
-      os << ");\n";
+    build_component_arguments (os, p_name, name, node);
     return new_name;
-  }
-
-  void
-  Builder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
-  {
-    RangeNode* n = dynamic_cast<RangeNode*> (node);
-    std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
-    indent (os);
-    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-    print_start_component (os, new_name, "SwitchRangeBranch");
-    os << " (" << p_name << ", " << name << ", ";
-    for (auto term: n->lower_arg()) {
-      build_term_node (os, term);
-    }
-    os << ", " << n->left_open () << ", ";
-    for (auto term: n->upper_arg ()) {
-      build_term_node (os, term);
-    }
-    os << ", " << n->right_open () << ");\n";
   }
 
   void
@@ -596,14 +561,6 @@ namespace Smala
   {
     for (int i = 0; i < m_indent; i++)
       os << "\t";
-  }
-
-  void
-  Builder::print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor)
-  {
-    print_component_decl (os, name);
-    os << " = ";
-    print_component_constructor (os, constructor);
   }
 
   std::string

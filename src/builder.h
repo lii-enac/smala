@@ -83,18 +83,27 @@ namespace Smala {
     void build_preamble (std::ofstream &os);
     virtual void build_term_node (std::ofstream &os, Node *node) = 0;
     virtual void build_control_node (std::ofstream &os, Node *n) = 0;
-    void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor);
+    virtual void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor) = 0;
+    virtual void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) = 0;
     virtual void print_component_decl (std::ofstream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ofstream &os, const std::string &constructor) = 0;
     virtual void print_type (std::ofstream &os, ParamType type) = 0;
     virtual void build_causal_dep (std::ofstream &os, Node* node) = 0;
     virtual void build_use (std::ofstream &os, std::string use) = 0;
     virtual void build_import (std::ofstream &os, Node* n) = 0;
+    virtual void build_post_import (std::ofstream &os) {};
     virtual void build_main_node (std::ofstream &os) = 0;
     virtual void build_define_node (std::ofstream &os, Node *node) = 0;
     virtual void build_end_define (std::ofstream &os, Node *node) = 0;
     virtual void build_end_main (std::ofstream &os, Node *node) = 0;
     virtual void build_smala_native (std::ofstream &os, Node *n) = 0;
+    virtual void build_start_else (std::ofstream &os) { os << "else {\n"; }
+    virtual void build_start_else_if (std::ofstream &os) { os << "else "; }
+    virtual void build_start_if (std::ofstream &os) { os << "if ( "; }
+    virtual void build_end_if (std::ofstream &os) { os << ") {\n"; }
+    virtual void build_end_block (std::ofstream &os) { os << "}\n"; }
+    virtual void build_end_native (std::ofstream &os) { os << "}\n\n"; }
+    virtual void build_break (std::ostream &os, Node *n) { os << n->djnn_type() << ";\n"; }
     virtual void build_for (std::ofstream &os, Node *node) {}
     virtual void build_for_every (std::ofstream &os, Node *node) {}
     virtual void build_while (std::ofstream &os, Node *node) {}
@@ -106,6 +115,7 @@ namespace Smala {
     virtual void build_native_expression (std::ofstream &os, Node *n) {}
     virtual void build_native_expression_node (std::ofstream &os, Node *n) {};
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
+    virtual void build_range_node (std::ofstream &os, Node *node, const string& new_name) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
     virtual void end_set_property (std::ofstream &os, Node *node) {};
     virtual void end_property (std::ofstream &os, Node *n) {};
@@ -115,12 +125,13 @@ namespace Smala {
     virtual void remove (std::ofstream &os, Node *n) = 0;
     virtual void move (std::ofstream &os, Node *n, const string& c) {};
     virtual void add_child (std::ofstream &os, Node *n) = 0;
+    virtual void build_end_add_child (std::ofstream &os) = 0;
     virtual void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) {};
     virtual void add_children_to (std::ofstream &os, Node *n) = 0;
     virtual void build_transition_node (std::ofstream &os, Node *ctrl) = 0;
     std::string build_simple_node (std::ofstream &os, Node *n);
-    void build_range_node (std::ofstream &os, Node *n, const string& new_name);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
+    virtual void set_location (std::ofstream &os, Node *n) {}
     // virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
     //     os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
     // }

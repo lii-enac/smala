@@ -163,6 +163,59 @@ namespace Smala
     os << ".h\"\n";
   }
 
+  void
+  CPPBuilder::build_post_import (std::ofstream &os)
+  {
+    os << "inline\n";
+    os << "double smala_deref(djnn::AbstractProperty& p)\n";
+    os << "{ return p.get_double_value(); }\n\n";
+
+    os << "inline\n";
+    os << "std::string smala_deref(std::string p)\n";
+    os << "{ return p; }\n\n";
+
+    os << "inline\n";
+    os << "double smala_deref(double p)\n";
+    os << "{ return p; }\n\n";
+  }
+
+  void
+  CPPBuilder::build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n)
+  {
+    os << " (" << p_name << ", " << name;
+    if (n->has_arguments ())
+      os << ", ";
+    else
+      os << ");\n";
+  }
+
+  void
+  CPPBuilder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
+  {
+    RangeNode* n = dynamic_cast<RangeNode*> (node);
+    std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
+    indent (os);
+    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+    print_start_component (os, new_name, "SwitchRangeBranch");
+    os << " (" << p_name << ", " << name << ", ";
+    for (auto term: n->lower_arg()) {
+      build_term_node (os, term);
+    }
+    os << ", " << n->left_open () << ", ";
+    for (auto term: n->upper_arg ()) {
+      build_term_node (os, term);
+    }
+    os << ", " << n->right_open () << ");\n";
+  }
+
+  void
+  CPPBuilder::print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor)
+  {
+    print_component_decl (os, name);
+    os << " = ";
+    print_component_constructor (os, constructor);
+  }
+
   std::string
   CPPBuilder::build_fake_name (PathNode* n, bool out)
   {
@@ -1352,6 +1405,16 @@ namespace Smala
     }
     m_cur_building_name = new_name;
     os << "auto *" << new_name << " = ";
+  }
+
+  void
+  CPPBuilder::build_end_add_child (std::ofstream &os)
+  {
+    os << ";\n";
+    indent (os);
+    os << m_parent_list.back ()->name () << "->add_child ("
+        << m_cur_building_name << ", \""
+        << m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
   }
 
   void

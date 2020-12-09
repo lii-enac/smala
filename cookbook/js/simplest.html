@@ -4,11 +4,8 @@
 <body>
 
 <h2>djnn/smala in js</h2>
-
 <p id="demo"></p>
 <canvas id="canvas"></canvas>
-
-
 
 <script>
 document.getElementById("demo").innerHTML = "yep";
@@ -29,10 +26,10 @@ Module = {
         var cpnt_1 = Window (cpnt_0, "f", "simplest", 0, 0, 600, 600);
         var cpnt_3 = Translation (cpnt_0, "t", 0, 0);
         var cpnt_4 = OutlineWidth (cpnt_0, "ow", 10);
-        //var cpnt_5 = FillColor (cpnt_0, "fc", 255, 0, 0);
-        //var cpnt_6 = OutlineColor (cpnt_0, "_", 0, 0, 255);
+        var cpnt_5 = FillColor (cpnt_0, "fc", 255, 0, 0);
+        var cpnt_6 = OutlineColor (cpnt_0, "_", 0, 0, 255);
         var cpnt_7 = Circle (cpnt_0, "_", 0, 0, 50);
-        dump (cpnt_1);
+        //dump (cpnt_1);
         mouse_tracking = 1;
         Connector (cpnt_0, "", find_child (cpnt_1, "move/x"), find_child (cpnt_3, "tx"), 1);
     	Connector (cpnt_0, "", find_child (cpnt_1, "move/y"), find_child (cpnt_3, "ty"), 1);
@@ -43,60 +40,7 @@ Module = {
 
 </script>
 <script text="text/javascript" src="djnn.js"></script>
-<script text="text/javascript">
-function djnn_init_js_api () {
-    init_core = Module.cwrap('djnn_init_core', 'null', []);
-    clear_core = Module.cwrap('djnn_clear_core', 'null', []);
-    init_exec_env = Module.cwrap('djnn_init_exec_env', 'null', []);
-    clear_exec_env = Module.cwrap('djnn_clear_exec_env', 'null', []);
-    init_base = Module.cwrap('djnn_init_base', 'null', []);
-    clear_base = Module.cwrap('djnn_clear_base', 'null', []);
-    init_display = Module.cwrap('djnn_init_display', 'null', []);
-    clear_display = Module.cwrap('djnn_clear_display', 'null', []);
-    init_gui = Module.cwrap('djnn_init_gui', 'null', []);
-    clear_gui = Module.cwrap('djnn_clear_gui', 'null', []);
-    init_audio = Module.cwrap('djnn_init_audio', 'null', []);
-    clear_audio = Module.cwrap('djnn_clear_audio', 'null', []);
-    init_physics = Module.cwrap('djnn_init_physics', 'null', []);
-    clear_physics = Module.cwrap('djnn_clear_physics', 'null', []);
-    
-    Component = Module.cwrap('djnn_new_Component', 'number', ['number', 'string']);
-    Connector = Module.cwrap('djnn_new_Connector', 'number', ['number', 'string', 'number', 'number', 'number']);
-    Window = Module.cwrap('djnn_new_Window', 'number', ['number', 'string', 'string', 'number','number','number','number']);
-    activate = Module.cwrap('djnn_activate', 'null', ['number']);
-    find_child = Module.cwrap('djnn_find_child', 'number', ['number','string']);
-    dump = Module.cwrap('djnn_dump', 'null', ['number']);
-    mainloop_instance = Module.cwrap('djnn_mainloop_instance', 'number', []);
-    Rectangle = Module.cwrap('djnn_new_Rectangle', 'number', ['number', 'string', 'number', 'number', 'number', 'number', 'number', 'number']);
-    Circle = Module.cwrap('djnn_new_Circle', 'number', ['number', 'string', 'number', 'number', 'number']);
-    Ellipse = Module.cwrap('djnn_new_Ellipse', 'number', ['number', 'string', 'number', 'number', 'number', 'number']);
-    Line = Module.cwrap('djnn_new_Line', 'number', ['number', 'string', 'number', 'number', 'number', 'number']);
-    RectangleClip = Module.cwrap('djnn_new_RectangleClip', 'number', ['number', 'string', 'number', 'number', 'number', 'number']);
-    PathImage = Module.cwrap('djnn_new_PathImage', 'number', ['number', 'string', 'string', 'number', 'number', 'number', 'number']);
-    DataImage = Module.cwrap('djnn_new_DataImage', 'number', ['number', 'string', 'string', 'number', 'number', 'number', 'number']);
-    FillRule = Module.cwrap('djnn_new_FillRule', 'number', ['number', 'string', 'number']);
-    Texture = Module.cwrap('djnn_new_Texture', 'number', ['number', 'string', 'string']);
-    OutlineWidth = Module.cwrap('djnn_new_OutlineWidth', 'number', ['number', 'string', 'number']);
-    OutlineCapStyle = Module.cwrap('djnn_new_OutlineCapStyle', 'number', ['number', 'string', 'number']);
-    OutlineJoinStyle = Module.cwrap('djnn_new_OutlineJoinStyle', 'number', ['number', 'string', 'number']);
-    OutlineMiterLimit = Module.cwrap('djnn_new_OutlineMiterLimit', 'number', ['number', 'string', 'number']);
-    DashOffset = Module.cwrap('djnn_new_DashOffset', 'number', ['number', 'string', 'number']);
-    GradientStop = Module.cwrap('djnn_new_GradientStop', 'number', ['number', 'string', 'number', 'number', 'number', 'number', 'number']);
-    LinearGradient = Module.cwrap('djnn_new_LinearGradient', 'number', ['number', 'string', 'number', 'number', 'number', 'number', 'number', 'number']);
-    RadialGradient = Module.cwrap('djnn_new_RadialGradient', 'number', ['number', 'string', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
-    FontSize = Module.cwrap('djnn_new_FontSize', 'number', ['number', 'string', 'number', 'number']);
-    FontWeight = Module.cwrap('djnn_new_FontWeight', 'number', ['number', 'string', 'number']);
-    FontStyle = Module.cwrap('djnn_new_FontStyle', 'number', ['number', 'string', 'number']);
-    FontFamily = Module.cwrap('djnn_new_FontFamily', 'number', ['number', 'string', 'string']);
-    TextAnchor = Module.cwrap('djnn_new_TextAnchor', 'number', ['number', 'string', 'number']);
-    Translation = Module.cwrap('djnn_new_Translation', 'number', ['number', 'string', 'number', 'number']);
-    Rotation = Module.cwrap('djnn_new_Rotation', 'number', ['number', 'string', 'number', 'number', 'number']);
-    Scaling = Module.cwrap('djnn_new_Scaling', 'number', ['number', 'string', 'number', 'number', 'number', 'number']);
-    Homography = Module.cwrap('djnn_new_Homography', 'number', ['number', 'string', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
-    Volume = Module.cwrap('djnn_new_Volume', 'number', ['number', 'string', 'number']);
-    Plane = Module.cwrap('djnn_new_Plane', 'number', ['number', 'string', 'number', 'number', 'number', 'number']);
-}
-    </script>
+<script text="text/javascript" src="djnn_js_api.js"></script>
 
 </body>
 </html>

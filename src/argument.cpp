@@ -17,6 +17,11 @@
 
 namespace Smala
 {
+  inline bool ends_with(std::string const & value, std::string const & ending)
+  {
+      if (ending.size() > value.size()) return false;
+      return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+  }
 
   Argument::Argument (int argc, const char** argv) :
     _lang (CPP), _debug (false)
@@ -31,6 +36,16 @@ namespace Smala
          _debug = true;
       } else if (str.compare ("-lang=js") == 0) {
           _lang = JS;
+      } else if (str.compare ("-o") == 0) {
+          std::string fn (argv[i+1]);
+          if (ends_with(fn, ".html") || ends_with(fn, ".htm")) {
+              _build_html = true;
+              m_target_name = fn;
+          } else {
+              std::cerr << "unknown output file format: " << fn << std::endl;
+              exit (0);
+          }
+          i++;
       }
     }
     if (m_filenames.empty ()) {

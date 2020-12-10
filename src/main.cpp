@@ -21,6 +21,7 @@
 #include "driver.h"
 #include "cpp_builder.h"
 #include "js_builder.h"
+#include "html_builder.h"
 
 #include "core/utils/filesystem.h"
 
@@ -72,6 +73,11 @@ int main (int argc, const char **argv) {
 			error = 1;
 			break;
 		}
+	}
+	if (!error) {
+	  if (arg.lang () == JS && arg.build_html()) {
+	      build_html (arg.get_target(), arg.files ());
+	  }
 	}
 	return error;
 }

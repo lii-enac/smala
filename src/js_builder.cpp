@@ -29,8 +29,28 @@
 #include <locale>
 #include <algorithm>
 
+
 namespace Smala
 {
+
+  static std::string
+  transform_name(const std::string& input)
+  {
+    std::string new_param_name = input;
+    std::replace(new_param_name.begin(), new_param_name.end(), '.','_');
+    std::replace(new_param_name.begin(), new_param_name.end(), '/','_');
+    std::replace(new_param_name.begin(), new_param_name.end(), '-','_');
+    new_param_name.erase(std::remove(new_param_name.begin(), new_param_name.end(), '"'), new_param_name.end());
+    return new_param_name;
+  }
+
+  static std::string remove_deref (std::string name)
+  {
+    if (name.compare (0, 22, ("(*((AbstractProperty*)")) == 0) {
+      return name.substr(22, name.size() - 24);
+    }
+    return name;
+  }
 
   JSBuilder::JSBuilder () :
       Builder (), m_display_initialized (false), m_expr_in (0), m_expr_out (0)
@@ -59,12 +79,7 @@ namespace Smala
       build_define (prefix);
     m_filename = std::string (prefix) + ".js";
     std::ofstream os (prefix + ".js");
-    os << "Module = {\n";
-    m_indent++;
-    indent (os);
-    os << "canvas: document.getElementById ('canvas'),\n";
-    indent (os);
-    os << "onRuntimeInitialized: function() {\n";
+
 
 
     int size = m_ast.preamble ().import ().size ();
@@ -143,15 +158,14 @@ namespace Smala
   void
   JSBuilder::build_import (std::ofstream &os, Node *n)
   {
-    os << "//TODO import ";
-    auto sep = "/";
+    /*auto sep = "/";
     auto *sep_2 = "";
     for (auto sub : n->get_path ()->get_subpath_list ())
       {
         os << sep_2 << sub->get_subpath ();
         sep_2 = sep;
       }
-    os << ".js\"\n";
+    os << ".js\';\n";*/
   }
 
   void
@@ -754,14 +768,14 @@ namespace Smala
   void
   JSBuilder::build_native_expression_node (std::ofstream &os, Node *n)
   {
-    os << "//TODO build_native_expression_node\n";
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ().size () == 1) {
       build_simple_control_node (os, node);
       return;
     }
-    /*
+    os << "//TODO build_native_expression_node\n";
+
     std::map<std::string, std::string> sym;
     std::string sym_name ("sym_" + std::to_string (m_sym_num++));
     std::string p_name =
@@ -916,7 +930,6 @@ namespace Smala
       os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
       os << arg << ");\n";
     }
-    */
   }
 
   void
@@ -1432,7 +1445,7 @@ namespace Smala
     for (int j = 0; j < data.size (); j++) {
       std::pair<ParamType, std::string> arg = data.at (j);
       os << ", ";
-      print_type (os, arg.first);
+      //print_type (os, arg.first);
       std::string new_name;
       switch (arg.first) {
         case INT:
@@ -1468,6 +1481,12 @@ namespace Smala
     m_indent = 1;
     int size = m_ast.preamble ().use ().size ();
     bool has_display = false;
+    os << "Module = {\n";
+    indent (os);
+    os << "canvas: document.getElementById ('canvas'),\n";
+    indent (os);
+    os << "onRuntimeInitialized: function() {\n";
+    m_indent++;
     indent (os);
     os << "djnn_init_js_api ();\n";
     /* init modules from use */

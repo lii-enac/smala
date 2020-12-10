@@ -766,7 +766,7 @@ namespace Smala
   }
 
 
-  std::string
+  static std::string
   transform_name(const std::string& input)
   {
     std::string new_param_name = input;
@@ -777,8 +777,7 @@ namespace Smala
     return new_param_name;
   }
 
-  static
-  std::string remove_deref (std::string name)
+  static std::string remove_deref (std::string name)
   {
     if (name.compare (0, 22, ("(*((AbstractProperty*)")) == 0) {
       return name.substr(22, name.size() - 24);

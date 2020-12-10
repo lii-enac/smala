@@ -764,6 +764,18 @@ namespace Smala
     }
   }
 
+  void
+  JSBuilder::emit_not_a_property (std::ofstream &os, const std::string& arg, const std::string& e)
+  {
+    os << "if (get_process_type(" << arg << ") != process_type_e.PROPERTY_T) {\n";
+    indent (os);
+    os << "\tconsole.log (\"" << e << " is not a property\\n\");\n";
+    indent (os);
+    os << "\texit(0);\n";
+    indent (os);
+    os << "}\n";
+    indent (os);
+  }
 
   void
   JSBuilder::build_native_expression_node (std::ofstream &os, Node *n)
@@ -808,7 +820,7 @@ namespace Smala
               << p_name << ", \"\", " << arg << ");\n";
           indent (os);
           std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "->"<< new_param_name <<  "= " << new_name
+            os << native_name << "."<< new_param_name <<  "= " << new_name
                 << ";\n";
 
         } else if (arg.compare (0, 6, "s_var_") == 0) {
@@ -818,7 +830,7 @@ namespace Smala
               << p_name << ", \"\", " <<arg << ");\n";
           indent (os);
           std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "->"<< new_param_name <<  "= " << new_name
+            os << native_name << "."<< new_param_name <<  "= " << new_name
                 << ";\n";
 
         } else {
@@ -831,25 +843,27 @@ namespace Smala
                         indent (os);
             std::string fake_name = build_fake_name (e->path_arg_value (), false);
             std::string new_param_name = transform_name (fake_name);
-            os << native_name << "->"<< new_param_name <<  "= " << new_name
+            os << native_name << "."<< new_param_name <<  "= " << new_name
                 << ";\n";
             sym[fake_name] = new_name;
             triggers.push_back (new_name);
 
           } else {
-            os << "if (dynamic_cast<AbstractProperty*>(" << arg
-                << ") == nullptr) {\n";
-            indent (os);
-            os << "\tcerr << \"" << e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()
-                << "\" << \" is not a property\\n\";\n";
-            indent (os);
-            os << "\texit(0);\n";
-            indent (os);
-            os << "}\n";
-            indent (os);
+            //os << "if (dynamic_cast<AbstractProperty*>(" << arg
+            // os << "if (get_process_type(" << arg << ") != process_type_e.PROPERTY_T) {\n";
+            // indent (os);
+            // os << "\tcerr << \"" << e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()
+            //     << "\" << \" is not a property\\n\";\n";
+            // indent (os);
+            // os << "\texit(0);\n";
+            // indent (os);
+            // os << "}\n";
+            // indent (os);
+            emit_not_a_property (os, arg, e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() );
             std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg
-                << ");\n";
+            //os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg
+            //    << ");\n";
+            os << native_name << "."<< new_param_name <<  " = " << arg << ";\n";
             sym[e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()] = arg;
             triggers.push_back (arg);
             
@@ -864,36 +878,41 @@ namespace Smala
         if (arg.compare (0, 4, "var_") != 0) {
           indent (os);
           if (arg.find ("->") == std::string::npos) {
-            os << "if (dynamic_cast<AbstractProperty*>(" << arg
-                << ") == nullptr) {\n";
-            indent (os);
-            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
-            indent (os);
-            os << "\texit(0);\n";
-            indent (os);
-            os << "}\n";
-            indent (os);
+            //os << "if (dynamic_cast<AbstractProperty*>(" << arg << ") == nullptr) {\n";
+            // os << "if (get_process_type(" << arg << ") != process_type_e.PROPERTY_T) {\n";
+            // indent (os);
+            // os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            // indent (os);
+            // os << "\texit(0);\n";
+            // indent (os);
+            // os << "}\n";
+            // indent (os);
+            emit_not_a_property (os, arg, e->get_subpath_list().at (0)->get_subpath());
             std::string new_param_name = transform_name(e->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "->"<< new_param_name
-                << " = dynamic_cast<AbstractProperty*>(" << arg
-                << ");\n";
+            os << native_name << "."<< new_param_name
+                //<< " = dynamic_cast<AbstractProperty*>(" << arg
+                << " = " << arg
+                << ";\n";
             sym[e->get_subpath_list().at (0)->get_subpath()] = arg;
           } else {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-            os << "AbstractProperty* " << new_name
-                << " = dynamic_cast<AbstractProperty*> (" << arg << ");\n";
-            indent (os);
-            os << "if (" << new_name << " == nullptr) {\n";
-            indent (os);
-            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
-            indent (os);
-            os << "\texit(0);\n";
-            indent (os);
-            os << "}\n";
-            indent (os);
+            //os << "AbstractProperty* " << new_name
+            os << "var " << new_name
+                //<< " = dynamic_cast<AbstractProperty*> (" << arg << ");\n";
+                << " = " << arg << ";\n";
+            // indent (os);
+            // os << "if (" << new_name << " == nullptr) {\n";
+            // indent (os);
+            // os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            // indent (os);
+            // os << "\texit(0);\n";
+            // indent (os);
+            // os << "}\n";
+            // indent (os);
+            emit_not_a_property (os, new_name, e->name());
             std::string fake_name = build_fake_name (e, true);
             std::string new_param_name = transform_name (fake_name);
-            os << native_name << "->" << new_param_name << " = " << new_name << ";\n";
+            os << native_name << "." << new_param_name << " = " << new_name << ";\n";
             sym[fake_name] = new_name;
           }
         }
@@ -902,7 +921,7 @@ namespace Smala
 
     indent (os);
     // now that properties are built, call finalize_construction, which in turn will call impl_activate
-    os << native_name << "->finalize_construction (" << p_name << ", " << n_expr_name << ");\n";
+    os << native_name << ".finalize_construction (" << p_name << ", " << n_expr_name << ");\n";
 
     std::string& new_name = native_name;
 
@@ -916,18 +935,19 @@ namespace Smala
     if (node->is_connector ()) {
       indent (os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
-      os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
+      //os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
+      os << "var " << sync_name << " = djnn_new_Synchronizer (" << p_name
           << ", \"sync_"+sync_name+"\", " << new_name << ", \"\");\n";
       native_edge_name = sync_name;
       for (auto t : triggers) {
         indent (os);
-        os << sync_name << "->add_source (" << t << ", \"\");\n";
+        os << sync_name << ".add_source (" << t << ", \"\");\n";
       }
     }
     for (auto out : node->get_output_nodes ()) {
       std::string arg = build_find (out, false);
       indent (os);
-      os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
+      os << native_edge_name <<".add_native_edge (" << new_name << "," ;
       os << arg << ");\n";
     }
   }
@@ -970,7 +990,7 @@ namespace Smala
   JSBuilder::build_native_expression (std::ofstream &os, Node *n)
   {
     os << "//TODO build_native_expression\n";
-    /*
+    
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ().size () == 1) {
       return;
@@ -981,7 +1001,7 @@ namespace Smala
 
     std::string native_name ("nat_" + unique_name + "_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);
-
+/*
     // first pass: generate nat struct
     std::map<std::string,bool> already_handled;
     std::string native_name_struct = native_name + "_struct";
@@ -1059,8 +1079,7 @@ namespace Smala
     }
     indent (os);
     os << "};\n\n";
-    */
-
+*/
   }
 
   void
@@ -1315,7 +1334,7 @@ namespace Smala
     os << arg << ");\n";
     indent (os);
     os << "var" << new_name << " = "
-        << "find_child (" <<  m_parent_list.back ()->name () << " \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\");\n";
+        << "find_child (" <<  m_parent_list.back ()->name () << ", \"" << n->left_arg ()->get_subpath_list().at(0)->get_subpath() + "\");\n";
     if (m_parent_list.back ()->add_entry (n->left_arg ()->get_subpath_list().at(0)->get_subpath(), new_name) == 1
         && node->duplicate_warning ())
       print_error_message (error_level::warning,
@@ -1634,7 +1653,7 @@ namespace Smala
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
     m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));
     os << "\nfunction " << n->fct () << " (c) {\n";
-    os << "\var " << src_name << " = get_activation_source (c);\n";
+    os << "\tvar " << src_name << " = get_activation_source (c);\n";
     os << "\tvar " << data_name
         << " = get_native_user_data (c);\n";
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1)

@@ -482,6 +482,17 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 # ---------------------------------------
 # rules
 
+# .sma to .js
+$(build_dir)/%.js: %.sma | $(smalac)
+	@mkdir -p $(dir $@)
+	$(smalac) -lang=js $<
+	@mv $*.js $(build_dir)/$(*D)
+
+$(build_dir)/%.html: %.sma | $(smalac)
+	@mkdir -p $(dir $@)
+	$(smalac) -lang=js $<
+	@mv $*.js $(build_dir)/$(*D)
+
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma | $(smalac)
 	@mkdir -p $(dir $@)

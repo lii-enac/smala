@@ -315,7 +315,7 @@ namespace Smala
     else
       str = m_parent_list.back ()->get_symbol (symbol);
 
-
+    ignore_cast = true; // with js there is no dynamic_cast...
     if (!ignore_cast) {
       switch (n->get_cast ()) {
         case NO_CAST:

@@ -315,8 +315,7 @@ namespace Smala
     else
       str = m_parent_list.back ()->get_symbol (symbol);
 
-    ignore_cast = true; // with js there is no dynamic_cast...
-    if (!ignore_cast) {
+    //if (!ignore_cast) {
       switch (n->get_cast ()) {
         case NO_CAST:
         case BY_PROCESS:
@@ -329,7 +328,7 @@ namespace Smala
           prefix = "(*((AbstractProperty*)";
           break;
       }
-    }
+    //}
     if (str.empty ()) {
       // then check if it is a Djnn symbol that is a key prefixed by DJN
       if (symbol.substr (0, 3) == "DJN")
@@ -366,18 +365,18 @@ namespace Smala
         }
       }
     }
-    if (!ignore_cast) {
-      switch (n->get_cast ()) {
-        case BY_VALUE:
-          str += ")";
-          break;
-        case BY_REF:
-          str += "))";
-          break;
-        default:
-          break;
-      }
-    }
+    // if (!ignore_cast) {
+    //   switch (n->get_cast ()) {
+    //     case BY_VALUE:
+    //       str += ")";
+    //       break;
+    //     case BY_REF:
+    //       str += "))";
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // }
   return str;
 }
 
@@ -504,7 +503,7 @@ namespace Smala
     os << "} else {\n";
     m_indent++;
     indent (os);
-    os << "std::cerr << \"Error: only Container and ProcessCollector can be used in forevery instruction\\n\";\n";
+    os << "get_value << \"Error: only Container and ProcessCollector can be used in forevery instruction\\n\";\n";
     indent (os);
     os << "exit (0);\n";
     m_indent--;
@@ -1200,8 +1199,8 @@ namespace Smala
       os << "var " << var_name << " = ";
     } else {
       prop_name = build_find (node->get_path(), false);
-      if (prop_name.rfind ("cpnt_", 0) == 0) {
-        os << "set_value (" << prop_name;
+      if ( (prop_name.rfind ("cpnt_", 0) == 0) || (prop_name.rfind ("find_child (cpnt_", 0)==0) ) {
+        os << "set_value (" << prop_name << ",";
         m_in_set_property = true;
       } else {
         os << prop_name << " = ";
@@ -1577,7 +1576,11 @@ namespace Smala
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     os << "var " << new_name << " = " << constructor << " (" << p_name
-        << ", " << name << ", " << node->function_name () << ", ";
+        << ", " << name << ", "
+        << "\""
+        << node->function_name ()
+        << "\""
+        << ", ";
     if (type == COLLECTION_ACTION) {
       std::string list = build_find (node->path_list(), false);
       os << list << ", ";

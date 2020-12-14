@@ -15,6 +15,7 @@
 #pragma once
 
 #include "node.h"
+#include <iostream>
 
 namespace Smala
 {
@@ -70,9 +71,20 @@ namespace Smala
       void add_subpath (SubPathNode* n) { if (m_path.empty ()) m_cast = n->get_cast(); m_path.push_back (n); };
       void set_cast (cast_type cast) { m_cast = cast; }
       cast_type get_cast () { return m_cast; }
-      std::vector<SubPathNode*> get_subpath_list () { return m_path; }
+      std::vector<SubPathNode*>& get_subpath_list () { return m_path; }
+      const std::vector<SubPathNode*>& get_subpath_list () const { return m_path; }
       bool has_wild_card () { return m_path.back ()->get_path_type () == WILD_CARD; }
       bool has_path_list () { return m_path.back ()->get_path_type () == PATH_LIST; }
+
+      std::string build_string_repr () const {
+        std::string res;
+        auto sep = "";
+        for (auto & spn: get_subpath_list()) {
+          res += sep + spn->get_subpath ();
+          sep = ".";
+        }
+        return res;
+      }
 
     private:
       std::vector<SubPathNode*> m_path;

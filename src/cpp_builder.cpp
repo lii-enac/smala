@@ -849,7 +849,7 @@ namespace Smala
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()
+            os << "\tcerr << \"" << e->path_arg_value ()->build_string_repr () //e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() << "."
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
@@ -867,7 +867,7 @@ namespace Smala
             os << "if (dynamic_cast<AbstractProperty*>(" << arg
                 << ") == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()
+            os << "\tcerr << \"" << e->path_arg_value ()->build_string_repr () // e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()
                 << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
@@ -912,7 +912,8 @@ namespace Smala
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e->get_subpath_list().at (0)->get_subpath() << "\" << \" is not a property\\n\";\n";
+            os << "\tcerr << \"" << e->build_string_repr ()//e->get_subpath_list().at (0)->get_subpath()
+               << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
             indent (os);

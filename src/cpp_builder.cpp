@@ -912,7 +912,7 @@ namespace Smala
             indent (os);
             os << "if (" << new_name << " == nullptr) {\n";
             indent (os);
-            os << "\tcerr << \"" << e << "\" << \" is not a property\\n\";\n";
+            os << "\tcerr << \"" << e->get_subpath_list().at (0)->get_subpath() << "\" << \" is not a property\\n\";\n";
             indent (os);
             os << "\texit(0);\n";
             indent (os);

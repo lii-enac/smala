@@ -23,16 +23,16 @@ namespace Smala
   {
   public:
     NewVarNode (const location& loc);
-    NewVarNode (const location& loc, ParamType type, const std::string &name, bool keep_name);
+    NewVarNode (const location& loc, SmalaType type, const std::string &name, bool keep_name);
     virtual ~NewVarNode ();
 
     std::string& var_name ();
-    ParamType type ();
+    SmalaType type ();
     bool keep_name () { return m_keep_name; }
 
   private:
     std::string m_var_name;
-    ParamType m_type;
+    SmalaType m_type;
     bool m_keep_name;
   };
 

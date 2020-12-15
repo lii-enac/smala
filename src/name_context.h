@@ -16,40 +16,44 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "node.h"
 #include "path_node.h"
-#include "term_node.h"
 
 namespace Smala {
 
-class NameContext
+class BuildNameContext
 {
 public:
-    NameContext () : m_in_expr (false) { }
+    BuildNameContext () : m_in_expr (false) { }
     std::vector<SubPathNode*>  path () { return m_path; };
-    std::vector<TermNode*> terms () { return m_term; }
     void add_subpath (SubPathNode* n) { m_path.push_back (n); }
-    void add_term (TermNode* t) { m_term.push_back (t); }
-    void remove_term (TermNode* t) {
-      std::vector<TermNode*>::iterator it = find (m_term.begin(), m_term.end(), t);
-      if (it != m_term.end()) {
-        m_term.erase (it);
-      }
-    }
-    void set_in_expr (bool v) { m_in_expr = v; }
     bool in_expr () { return m_in_expr; }
-    void build_and_add_expression (const location& loc) {
-      add_subpath (new SubPathNode (loc, m_term));
-      m_term.clear ();
+    void build_and_add_expression (const location& loc, ExprNode *expr) {
+      add_subpath (new SubPathNode (loc, expr));
+      m_in_expr = true;
     }
 
-    ~NameContext () {}
+    ~BuildNameContext () {}
 
 private:
     std::vector<SubPathNode*> m_path;
-    std::vector<TermNode*> m_term;
     bool m_in_expr;
 };
 
+class SymTable
+{
+public:
+  SymTable ();
+  SymTable (SymTable* t): _prev (t) {}
+  ~SymTable () {}
+  void add_global_sym (const std::string& key, smala_t type);
+  int add_sym (const location& loc, const std::string& key, smala_t type);
+  bool exists (const std::string &key) const;
+  SmalaType get_type (const std::string &key) const;
+private:
+  std::map<std::string, SmalaType> _t;
+  SymTable *_prev;
+};
 }

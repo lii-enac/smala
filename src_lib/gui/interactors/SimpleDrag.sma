@@ -4,12 +4,12 @@ use base
 _define_
 SimpleDrag (Process ref_to_obj, Process frame)
 {
-  Deref press (ref_to_obj, "press")
-  DerefDouble press_x (ref_to_obj, "press/x", DJNN_GET_ON_CHANGE)
-  DerefDouble press_y (ref_to_obj, "press/y", DJNN_GET_ON_CHANGE)
+  Deref press (&ref_to_obj, "press")
+  DerefDouble press_x (&ref_to_obj, "press/x", DJNN_GET_ON_CHANGE)
+  DerefDouble press_y (&ref_to_obj, "press/y", DJNN_GET_ON_CHANGE)
 
-  DerefDouble x (ref_to_obj, "x", DJNN_GET_ON_CHANGE)
-  DerefDouble y (ref_to_obj, "y", DJNN_GET_ON_CHANGE)
+  DerefDouble x (&ref_to_obj, "x", DJNN_GET_ON_CHANGE)
+  DerefDouble y (&ref_to_obj, "y", DJNN_GET_ON_CHANGE)
 
   FSM fsm {
     State idle

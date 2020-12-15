@@ -18,10 +18,9 @@ using namespace Smala;
 
 
 Node::Node (const location& loc, NodeType t, const std::string &value, const std::string &name,
-            const std::vector<std::pair<ParamType, std::string> > &arguments) :
-    m_ignore_parent (false),m_djnn_type (value), m_name (name), m_build_name (""), m_args (arguments), m_node_type (
-        t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_arguments (
-        false), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
+            const std::vector<std::pair<SmalaType, std::string> > &arguments) :
+    m_ignore_parent (false),m_djnn_type (value), m_name (name), m_build_name (""), m_args_spec (arguments), m_node_type (
+        t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_path (false), m_duplicate_warning (true), m_keep_name (false), m_loc(loc), m_is_define_or_main (false)
 {
 }
 
@@ -105,28 +104,22 @@ Node::set_build_name(const std::string &build_name)
   m_build_name = build_name;
 }
 
-std::vector< std::pair<ParamType, std::string> >
+std::vector< std::pair<SmalaType, std::string> >
 Node::args () const
 {
-  return m_args;
+  return m_args_spec;
 }
 
 void
-Node::add_args (std::vector< std::pair<ParamType, std::string> > &args)
+Node::add_args (std::vector< std::pair<SmalaType, std::string> > &args)
 {
-  m_args.insert (m_args.end (), args.begin (), args.end ());
-}
-
-void
-Node::set_has_arguments (bool v)
-{
-  m_has_arguments = v;
+  m_args_spec.insert (m_args_spec.end (), args.begin (), args.end ());
 }
 
 bool
 Node::has_arguments ()
 {
-  return m_has_arguments;
+  return !m_expr_args.empty ();
 }
 
 void

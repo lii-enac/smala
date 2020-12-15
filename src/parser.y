@@ -40,7 +40,6 @@
   #include "binary_instruction_node.h"
   #include "smala_native.h"
   #include "ctrl_node.h"
-  #include "term_node.h"
   #include "newvar_node.h"
   #include "native_action_node.h"
   #include "native_code_node.h"
@@ -51,6 +50,7 @@
   #include "transition_node.h"
   #include "name_context.h"
   #include "forevery_node.h"
+  #include "expr_node.h"
 
   using namespace std;
 
@@ -59,9 +59,9 @@
     class Driver;
   }
 
-  typedef pair<Smala::ParamType, string> parameter_t;
+  typedef pair<Smala::smala_t, string> parameter_t;
   typedef vector<parameter_t> parameters_t;
-
+  typedef vector<Smala::ExprNode*> expression_t;
   extern void lexer_expression_mode_on();
   extern void lexer_expression_mode_off();
 
@@ -89,14 +89,15 @@
     UNKNOWN
   };
 
+
+
   vector<PathNode*> name_list;
   vector<PathNode*> process_list;
   vector<Node*> parent_list;
   vector<SubPathNode*> subpath;
   vector<Node*> expression;
-  vector<TermNode*> comp_expression;
-  vector<TermNode*> arg_expression;
-  vector<NameContext*> name_context_list;
+  vector<BuildNameContext*> name_context_list;
+  std::vector<SymTable*> sym_table_list;
   vector<int> int_array;
   Node *cur_node, *root = nullptr;
   //bool m_in_add_children = false;
@@ -128,17 +129,6 @@
     if (name_context_list.empty ())
       return false;
     return name_context_list.back ()->in_expr ();
-  }
-  void
-  add_term_node (Smala::Driver &driver, TermNode* n, bool add_to_arg){
-    if (is_in_expr ()) {
-      name_context_list.back ()->add_term (n);
-    } else if (m_in_arguments || m_in_for || m_in_imperative) {
-      driver.add_node (n);
-    } else
-      comp_expression.push_back (n);
-    if (add_to_arg)
-      arg_expression.push_back (n);
   }
 }
 
@@ -213,7 +203,6 @@
 %token USE "use"
 %token NULL "null"
 %token ADD_CHILDREN_TO "addChildrenTo"
-%token TO_STRING "toString"
 %token MERGE "merge"
 %token REMOVE "remove"
 %token MOVE "move"
@@ -241,17 +230,15 @@
 
 %type <native_type> start_native
 %type <bool> keep
-%type <cast_type> cast
 %type <bool> bracket
-%type <int> arguments
+%type < expression_t > arguments
 %type <int> connector_symbol
 %type <int> assignment_symbol
-%type <int> argument_list
-%type <string> function_call
+%type < expression_t > argument_list
 %type <PathNode*> binding_src
 %type < std::vector<SubPathNode*> > name_or_path
 %type <bool> is_model
-%type <ParamType> type
+%type <smala_t> type
 %type <Node*> fsm_decl
 %type <string> subname
 %type <string> dash_array_decl
@@ -259,10 +246,10 @@
 %type <Node*> simple_process_decl
 %type <Node*> assignment_sequence
 %type <Node*> start_assignment_sequence
+%type <Node*> start_add_child
 %type < vector<PathNode*> > process_list
 %type < vector<std::string> > state_list
-%type <TermNode*> start_function
-%type <Node*> imperative_assignment
+%type <ExprNode*> start_function
 %type <Node*> start_if
 %type <Node*> start_eq
 %type <ForNode*> start_for
@@ -271,9 +258,25 @@
 %type < parameters_t > parameters
 %type < parameter_t > parameter
 %type < pair <std::string, std::string> > binding_type
-%type <TermNode*> primary_expression
-%type < std::vector<TermNode*> >first_bound
-%type < std::vector<TermNode*> >second_bound
+%type < expression_t > non_empty_argument_list
+%type <string> unary_operator
+%type <ExprNode*> step
+%type <Node*> for_imperative_assignment
+%type <ExprNode*> first_bound
+%type <ExprNode*> second_bound
+%type <ExprNode*> argument
+%type <ExprNode*> assignment_expression
+%type <ExprNode*> conditional_expression
+%type <ExprNode*> logical_or_expression
+%type <ExprNode*> logical_and_expression
+%type <ExprNode*> equality_expression
+%type <ExprNode*> relational_expression
+%type <ExprNode*> additive_expression
+%type <ExprNode*> multiplicative_expression
+%type <ExprNode*> unary_expression
+%type <ExprNode*> postfix_expression
+%type <ExprNode*> function_call
+%type <ExprNode*> primary_expression
 
 /*
 %left QUESTION_MARK COLON
@@ -293,7 +296,7 @@ program
   : preamble body
 
 preamble
-  : %empty
+  : %empty { sym_table_list.push_back (new SymTable ()); }
   | preamble use
   | preamble import
   | preamble native_code { driver.end_debug (); }
@@ -337,6 +340,7 @@ smala_action
     {
       Node *node = new Node (@$, END_NATIVE);
       driver.add_node (node);
+      sym_table_list.pop_back ();
     }
 
 smala_native_start
@@ -344,6 +348,11 @@ smala_native_start
     {
       driver.start_debug ();
       driver.in_preamble ();
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      sym_table_list.back()->add_sym (@$, $5, PROCESS);
+      int sz = $8.size();
+      std::string user_data_name = sz >= 1 ? $8.at (sz - 1)->get_subpath () : "no_user_data";
+      sym_table_list.back()->add_sym (@$, user_data_name, PROCESS);
       SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
     }
@@ -352,6 +361,11 @@ smala_native_start
       driver.start_debug ();
       SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      sym_table_list.back()->add_sym (@$, $5, PROCESS);
+      int sz = $8.size();
+      std::string user_data_name = sz >= 1 ? $8.at (sz - 1)->get_subpath () : "no_user_data";
+      sym_table_list.back()->add_sym (@$, user_data_name, PROCESS);
     }
 
 rough_code
@@ -405,17 +419,18 @@ start_define
       driver.start_debug ();
       driver.set_is_main (false);
       Node *node = new Node  (@$, START_DEFINE, "", $2);
-      node->set_args_data ($4);
+      node->set_args_spec ($4);
       driver.add_define_node (node);
       driver.add_node (node);
 
       Node *e_node = new Node (@$, THIS);
       parent_list.push_back (e_node);
       driver.add_node (e_node);
+      sym_table_list.back()->add_sym (@$, "this", PROCESS);
     }
 
 parameters
-  : %empty { vector< pair<ParamType, string> > params; $$ = params; }
+  : %empty { vector< pair<SmalaType, string> > params; $$ = params; }
   | parameters parameter COMMA
     {
       $1.push_back ($2);
@@ -428,7 +443,7 @@ parameters
     }
 
 parameter
-  : type NAME { $$ = make_pair ($1, $2); }
+  : type NAME { sym_table_list.back()->add_sym (@$, $2, $1); $$ = make_pair ($1, $2); }
 
 //------------------------------------------------
 
@@ -470,67 +485,33 @@ imperative_statement
   | while_loop
   | print
   | imperative_assignment 
-    {
-      Node *n = new Node (@$, END_ASSIGNMENT);
-      driver.add_node (n);
-    }
 
 imperative_assignment
-  : step eol { lexer_expression_mode_off (); }
+  : step eol { driver.add_node ($1); lexer_expression_mode_off (); }
   | function_call eol
     { 
-      for (auto n: comp_expression) {
-        driver.add_node (n);
-      }
-      comp_expression.clear ();
+      driver.add_node ($1);
       lexer_expression_mode_off ();
-      $$ = nullptr; 
     }
   | start_eq assignment_expression eol
     {
-      Node *n = new Node (@$, END_SET_PROPERTY);
-      driver.add_node (n);
-      bool has_op = false;
-      for (auto n: arg_expression) {
-        if (n->arg_type() == OPERATOR)
-          has_op = true;
-      }
-      for (auto n: arg_expression) {
-        if (n->arg_type () == VAR && !has_op && n->path_arg_value()->get_cast () == NO_CAST) {
-          n->path_arg_value()->set_cast (BY_VALUE);
-        }
-      }
-      arg_expression.clear ();
+      $1->add_arg ($2);
+      driver.add_node ($1);
       m_in_imperative = false;
       lexer_expression_mode_off ();
-      $$ = n;
     }
 
 for_imperative_assignment
-  : step
+  : step { $$ = $1; }
   | function_call
     {
-      for (auto n: comp_expression) {
-        driver.add_node (n);
-      }
-      comp_expression.clear ();
+      $$ = $1;
     }
   | start_eq assignment_expression
     {
-      Node *n = new Node (@$, END_SET_PROPERTY);
-      driver.add_node (n);
-      bool has_op = false;
-      for (auto n: arg_expression) {
-        if (n->arg_type() == OPERATOR)
-          has_op = true;
-      }
-      for (auto n: arg_expression) {
-        if (n->arg_type () == VAR && !has_op && n->path_arg_value()->get_cast () == NO_CAST) {
-          n->path_arg_value()->set_cast (BY_VALUE);
-        }
-      }
-      arg_expression.clear ();
+      $1->add_arg ($2);
       m_in_imperative = false;
+      $$ = $1;
     }
 
 start_eq
@@ -539,8 +520,8 @@ start_eq
       if (!m_in_for)
         lexer_expression_mode_on ();
       NewVarNode *n = new NewVarNode (@$, $1, $3, $2);
-      driver.add_node (n);
       m_in_imperative = true;
+      sym_table_list.back ()->add_sym (@$, $3, $1);
       $$ = n;
     }
   | 
@@ -549,9 +530,13 @@ start_eq
       if (!m_in_for)
         lexer_expression_mode_on ();
       Node *n = new Node (@$, SET_PROPERTY, "set", new PathNode (@1, $1));
-      driver.add_node (n);
       m_in_imperative = true;
       name_context_list.pop_back ();
+      if ($1.size () == 1) {
+        if (!sym_table_list.back ()->exists ($1.at(0)->get_subpath ())) {
+          sym_table_list.back ()->add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
+        }
+      }
       $$ = n;
     }
 
@@ -570,22 +555,14 @@ name_or_path
   : NAME
     {
       m_terminate = false;
-      NameContext *ctxt = new NameContext ();
+      BuildNameContext *ctxt = new BuildNameContext ();
       name_context_list.push_back (ctxt);
       ctxt->add_subpath (new SubPathNode (@$, $1, START, NO_CAST));
       $$ = ctxt->path ();
     }
-  | cast NAME
-    {
-      m_terminate = false;
-      NameContext *ctxt = new NameContext ();
-      name_context_list.push_back (ctxt);
-      ctxt->add_subpath (new SubPathNode (@$, $2, START, $1));
-      $$ = ctxt->path ();
-    }
   | name_or_path DOT subname
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
@@ -594,7 +571,7 @@ name_or_path
     }
   | name_or_path DOT DOLLAR NAME
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
@@ -603,25 +580,25 @@ name_or_path
     }
   | name_or_path DOT start_name_expr assignment_expression end_name_expr
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->build_and_add_expression (@$);
+      ctxt->build_and_add_expression (@$, $4);
       $$ = ctxt->path ();
     }
   | name_or_path start_name_expr assignment_expression end_name_expr
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
-      ctxt->build_and_add_expression (@$);
+      ctxt->build_and_add_expression (@$, $3);
       $$ = ctxt->path ();
     }
   | name_or_path DOT LCB pname_list RCB
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
@@ -631,7 +608,7 @@ name_or_path
     }
     | name_or_path DOT LCB TIMES RCB
     {
-      NameContext *ctxt = name_context_list.back ();
+      BuildNameContext *ctxt = name_context_list.back ();
       if (m_terminate) {
         driver.set_error ("Invalid path specification");
       }
@@ -649,14 +626,10 @@ pname_list
 subname
 : ACTION { $$ = $1; }| NAME { $$ = $1; } | FROM { $$ = "from"; }
 
-cast
-: PROCESS_CAST { $$ = BY_PROCESS; }
-| DOLLAR { $$ = BY_VALUE; }
-
 start_name_expr
-  : LB { name_context_list.back ()->set_in_expr (true); }
+  : LB
 end_name_expr
-  : RB { name_context_list.back ()->set_in_expr (false); }
+  : RB
 
 type
   : INT_T { $$ = INT;}
@@ -668,9 +641,7 @@ print
   : PRINT LP assignment_expression RP
     {
       Node *n = new Node (@$, PRINT);
-      n->set_expr_data (comp_expression);
-      comp_expression.clear ();
-      arg_expression.clear ();
+      n->add_arg ($3);
       driver.add_node (n);
     }
 
@@ -679,29 +650,31 @@ while_loop
     {
       Node *n = new Node (@$, END_BLOCK);
       driver.add_node (n);
+      sym_table_list.pop_back ();
     }
 
 start_while
   : WHILE LP assignment_expression RP
     {
       Node *n = new Node (@$, WHILE);
-      n->set_expr_data (comp_expression);
-      comp_expression.clear ();
-      arg_expression.clear ();
+      n->add_arg ($3);
       driver.add_node (n);
       lexer_expression_mode_off ();
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
     }
 
 for
-  : for_loop lcb statement_list RCB
+  : for_loop LCB statement_list RCB
   {
     Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
+    sym_table_list.pop_back ();
   }
   | forevery_loop LCB statement_list RCB
   {
     Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
+    sym_table_list.pop_back ();
   }
 
 forevery_loop
@@ -709,13 +682,16 @@ forevery_loop
   {
     ForEveryNode *n = new ForEveryNode (@$, $2, new PathNode (@4, $4));
     driver.add_node (n);
+    sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+    sym_table_list.back()->add_sym (@$, $2, PROCESS);
   }
 
 for_loop
-  : start_for lp for_imperative_assignment semicolon assignment_expression semicolon for_imperative_assignment rp
+  : start_for LP for_imperative_assignment SEMICOLON assignment_expression SEMICOLON for_imperative_assignment RP
     {
-      Node* n = new Node (@$, END_LOOP);
+      $1->set_statements ($3, $5, $7);
       m_in_for = false;
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
     }
 
 start_for
@@ -735,9 +711,7 @@ if_statement
 if_exp
   : start_if assignment_expression end_if_exp
     {
-    $1->set_expr_data (comp_expression);
-    comp_expression.clear ();
-    arg_expression.clear ();
+    $1->add_arg ($2);
     lexer_expression_mode_off ();
     }
 
@@ -753,6 +727,7 @@ start_else
   : ELSE LCB
     {
       driver.add_node (new Node (@$, START_ELSE));
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
     }
 
 else
@@ -764,13 +739,14 @@ else
 end_if_exp
   : RP LCB
     {
-      driver.add_node (new Node (@$, END_IF_EXPRESSION));
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
     }
 
 end_if_statement
   : RCB
     {
       driver.add_node (new Node (@$, END_BLOCK));
+      sym_table_list.pop_back ();
     }
 
 move
@@ -815,6 +791,7 @@ alias
       name_context_list.pop_back ();
       name_context_list.pop_back ();
       driver.add_node (new BinaryInstructionNode (@$, ALIAS, new PathNode (@1, $1), new PathNode (@3, $3)));
+      sym_table_list.back ()->add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
     }
 
 merge
@@ -840,6 +817,8 @@ native
       n->set_name ($2);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      if ($2 != "_")
+        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
     }
   | start_native NAME LP NAME COMMA name_or_path COMMA INT RP
     {
@@ -848,6 +827,8 @@ native
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
+      if ($2 != "_")
+        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA name_or_path COMMA INT RP
     {
@@ -856,6 +837,8 @@ native
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
+      if ($2 != "_")
+        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA INT RP
     {
@@ -864,6 +847,8 @@ native
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
+      if ($2 != "_")
+        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
     }
 
 start_native
@@ -871,22 +856,23 @@ start_native
   | NATIVE_ASYNC { $$ = ASYNC_ACTION; }
 
 add_child
-  : start_add assignment_expression eol
+  : start_add_child argument eol
     {
       Node *n = new Node (@$, END_ADD_CHILD);
       driver.add_node (n);
-      arg_expression.clear ();
-      m_in_arguments = false;
       lexer_expression_mode_off ();
+      $1->add_arg ($2);
     }
-start_add
+
+start_add_child
   : NAME INSERT
     {
       lexer_expression_mode_on ();
       Node* n = new Node (@$, ADD_CHILD, "addChild", $1);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      m_in_arguments = true;
+      sym_table_list.back ()->add_sym (@$, $1, PROCESS);
+      $$ = n;
     }
 
 
@@ -905,6 +891,8 @@ dash_array_decl
     {
       int_array.clear ();
       $$ = $2;
+      if ($2 != "_")
+        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
     }
 
 int_array_decl
@@ -928,20 +916,18 @@ range_decl
     driver.add_node (node);
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     cur_node = node;
+    if ($1 != "_")
+      sym_table_list.back ()->add_sym (@$, $1, PROCESS);
   }
 
 first_bound
   : assignment_expression {
-    vector<TermNode*> first (comp_expression);
-    comp_expression.clear ();
-    $$ = first;
+    $$ = $1;
   }
 
 second_bound
   : assignment_expression {
-    vector<TermNode*> second (comp_expression);
-    comp_expression.clear ();
-    $$ = second;
+    $$ = $1;
   }
 
 bracket
@@ -954,18 +940,21 @@ simple_process
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode (@$, $1));
     }
+    $1->set_args ($2);
   }
   | simple_process_decl arguments opt_eol start_statement_list range_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode (@$, $1));
     }
+    $1->set_args ($2);
   }
   | simple_process_decl arguments opt_eol start_statement_list end_statement_list
   {
     if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
       driver.add_node (new SetParentNode (@$, $1));
     }
+    $1->set_args ($2);
   }
   | simple_process_decl opt_eol start_statement_list statement_list end_statement_list
   {
@@ -984,10 +973,7 @@ simple_process
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
         driver.add_node (new SetParentNode (@$, $1));
       }
-      if ($2) {
-        $1->set_has_arguments (true);
-        has_argument = false;
-      }
+      $1->set_args ($2);
     }
   | simple_process_decl eol
     {
@@ -1002,15 +988,13 @@ simple_process
     for (int i = 0; i < $2.size (); ++i) {
       auto &loc = $2.at(i)->get_location ();
       Node *node = new Node (loc, SIMPLE, "Activator", "_");
-      node->set_has_arguments (true);
+      PathExprNode *arg = new PathExprNode ($2.at(i)->get_location (), $2.at(i), PROCESS);
+      UnaryExprNode *un = new UnaryExprNode ($2.at(i)->get_location (), "&", arg);
+      node->add_arg (un);
       driver.add_node (node);
       if (m_in_add_children)
         node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      TermNode *n = new TermNode (loc, VAR, $2.at(i));
-      driver.add_node (n);
-      n = new TermNode (loc, END, string (""));
-      driver.add_node (n);
       if (m_in_add_children) {
         SetParentNode *sp = new SetParentNode (loc, node);
         driver.add_node (sp);
@@ -1029,20 +1013,17 @@ eol
 start_statement_list
   : LCB
     {
-      m_in_arguments = false;
-      if (has_argument) {
-        cur_node->set_has_arguments (true);
-        has_argument = false;
-      }
       if (cur_node->node_type () != RANGE)
         cur_node->set_node_type (CONTAINER);
       parent_list.push_back (cur_node);
+      sym_table_list.push_back (new SymTable (sym_table_list.empty () ? nullptr : sym_table_list.back()));
     }
 end_statement_list
   : RCB 
     { 
       driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
+      sym_table_list.pop_back ();
     }
 
 simple_process_decl
@@ -1059,116 +1040,152 @@ simple_process_decl
       if ((m_in_add_children && !exclude_from_no_parent ($1)) || is_switch ($1))
         node->set_ignore_parent (true);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      m_in_arguments = true;
-      arg_expression.clear ();
       cur_node = node;
+      if ($3.compare("_") != 0)
+        sym_table_list.back ()->add_sym (@$, $3, PROCESS);
       $$ = node;
     }
 
 arguments
   : LP argument_list RP 
     { 
-      if ($2) {
-        has_argument = true;
-        TermNode *n = new TermNode (@$, END, "");
-        driver.add_node (n);
-      } else {
-        has_argument = false;
-      }
-      m_in_arguments = false;
-      comp_expression.clear ();
-      arg_expression.clear ();
       $$ = $2; 
     }
 
 argument_list
-  : %empty { $$ = 0;}
-  | non_empty_argument_list { $$ = 1; }
+  : %empty { std::vector <ExprNode*> args; $$ = args; }
+  | non_empty_argument_list  { std::reverse($1.begin(), $1.end()); $$ = $1; }
 
 non_empty_argument_list
-  : argument comma non_empty_argument_list
-  | argument
+  : argument COMMA non_empty_argument_list
+  {
+    $3.push_back ($1);
+    $$ = $3;
+  }
+  | argument {
+    std::vector <ExprNode*> args;
+    args.push_back ($1);
+    $$ = args;
+  }
 
 
 argument
   : assignment_expression 
     {
-      arg_expression.clear (); 
+      if ($1->get_expr_type () == PROCESS) {
+        UnaryExprNode *n = new UnaryExprNode (@$, "&", $1);
+        $$ = n;
+      } else {
+        $$ = $1;
+      }
     }
 
 assignment_expression
   : 
   conditional_expression
   {
-    bool has_op = false;
-    for (auto n: arg_expression) {
-      if (n->arg_type() == OPERATOR)
-        has_op = true;
-    }
-    for (auto n: arg_expression) {
-      if (n->arg_type () == VAR && has_op && n->path_arg_value()->get_cast () == NO_CAST) {
-        n->path_arg_value()->set_cast (BY_REF);
-      } else if (m_in_func > 0 && n->arg_type () == VAR && !has_op && n->path_arg_value()->get_cast () == NO_CAST) {
-        n->path_arg_value()->set_cast (BY_VALUE);
-      }
-    }
-    has_op = false;
-    for (auto n: comp_expression) {
-      if (n->arg_type() == OPERATOR)
-        has_op = true;
-    }
-    for (auto n: comp_expression) {
-      if (n->arg_type () == VAR && has_op && n->path_arg_value()->get_cast () == NO_CAST) {
-        n->path_arg_value()->set_cast (BY_REF);
-      }
-    }
+    $$ = $1;
   }
 
 conditional_expression
-  : logical_or_expression
-  | logical_or_expression question_mark assignment_expression colon conditional_expression
+  : logical_or_expression { $$ = $1; }
+  | logical_or_expression QUESTION_MARK assignment_expression COLON conditional_expression
   {
-    add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
+    TernaryExprNode *n = new TernaryExprNode (@$, $1, $3, $5);
+    $$ = n;
   }
 
 logical_or_expression
-  : logical_and_expression
-  | logical_or_expression or logical_and_expression
+  : logical_and_expression { $$ = $1; }
+  | logical_or_expression OR logical_and_expression 
+  { 
+    BinaryExprNode* n = new BinaryExprNode (@$, "||", $1, $3);
+    $$ = n;
+  }
 
 logical_and_expression
-  : equality_expression
-  | logical_and_expression and equality_expression
+  : equality_expression { $$ = $1; }
+  | logical_and_expression AND equality_expression { 
+    BinaryExprNode* n = new BinaryExprNode (@$, "&&", $1, $3);
+    $$ = n;
+  }
 
 equality_expression
-  : relational_expression
-  | equality_expression eq relational_expression
-  | equality_expression neq relational_expression
+  : relational_expression { $$ = $1; }
+  | equality_expression EQ relational_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "==", $1, $3);
+    $$ = n;
+  }
+  | equality_expression NEQ relational_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "!=", $1, $3);
+    $$ = n;
+  }
 
 relational_expression
-  : additive_expression
-  | relational_expression lt additive_expression
-  | relational_expression gt additive_expression
-  | relational_expression le additive_expression
-  | relational_expression ge additive_expression
+  : additive_expression { $$ = $1; }
+  | relational_expression LT additive_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "<", $1, $3);
+    $$ = n;
+  }
+  | relational_expression GT additive_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, ">", $1, $3);
+    $$ = n;
+  }
+  | relational_expression LE additive_expression 
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "<=", $1, $3);
+    $$ = n;
+  }
+  | relational_expression GE  additive_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, ">=", $1, $3);
+    $$ = n;
+  }
 
 additive_expression
-  : multiplicative_expression
-  | additive_expression plus multiplicative_expression
-  | additive_expression minus multiplicative_expression
+  : multiplicative_expression { $$ = $1; }
+  | additive_expression PLUS multiplicative_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "+", $1, $3);
+    $$ = n;
+  }
+  | additive_expression MINUS multiplicative_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "-", $1, $3);
+    $$ = n;
+  }
 
 multiplicative_expression
-  : unary_expression
-  | multiplicative_expression times unary_expression
-  | multiplicative_expression divide unary_expression
+  : unary_expression { $$ = $1; }
+  | multiplicative_expression TIMES unary_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "*", $1, $3);
+    $$ = n;
+  }
+  | multiplicative_expression DIVIDE unary_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "/", $1, $3);
+    $$ = n;
+  }
 
 unary_operator
-  : plus
-  | minus
-  | not
+  : PLUS { $$ = "+"; }
+  | MINUS { $$ = "-"; }
+  | NOT { $$ = "!"; }
+  | PROCESS_CAST { $$ = "&"; }
+  | DOLLAR { $$ = "$"; }
 
 unary_expression
-  : postfix_expression
+  : postfix_expression { $$ = $1; }
   | unary_operator unary_expression
+  {
+    UnaryExprNode* n = new UnaryExprNode (@$, $1, $2);
+    $$ = n;
+  }
 
 step
   : name_or_path INCR
@@ -1176,43 +1193,42 @@ step
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      driver.add_node (new Node (@$, INCREMENT, "incr", new PathNode (@1, $1)));
+      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), true, sym_table_list.back ()->get_type ($1.at (0)->get_subpath ()));
+      $$ = n;
     }
   | name_or_path DECR
     {
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      driver.add_node (new Node (@$, DECREMENT, "incr", new PathNode (@1, $1)));
+      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), false, sym_table_list.back ()->get_type ($1.at (0)->get_subpath ()));
+      $$ = n;
     }
   
 function_call
   : start_function argument_list RP
     {
-      $1->set_has_arguments ($2);
-      $$ = $1->str_arg_value ();
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
-      m_in_func--;
-    }
-  | start_to_string name_or_path RP
-  {
-
-    TermNode* n = new TermNode (@$, FUNCTION_CALL, "toString");
-    add_term_node (driver, n, false);
-    add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("(")), false);
-    n = new TermNode (@$, VAR, new PathNode (@2, $2));
-    n->path_arg_value()->set_cast (BY_REF);
-    add_term_node (driver, n, false);
-    add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
-    arg_expression.clear ();
-    $$ = "toString";
-  }
-
-start_to_string
-  : TO_STRING LP
-    {
-      if (!m_in_for && !m_in_arguments)
-        lexer_expression_mode_on ();
+      if ($1->get_val().compare("toString") == 0) {
+        if ($2.size () != 1) {
+          driver.set_error ("Wrong number of arguments for toString");
+        } else if ($2.at(0)->get_expr_type () != PROCESS) {
+          driver.set_error ("Wrong argument type for toString");
+        } else {
+          if ($2.at (0)->get_expr_node_type () == UNARY_OP) {
+            ExprNode* n = ((UnaryExprNode*)$2.at (0))->get_child ();
+            n->set_expr_type (CAST_STRING);
+            $$ = n;
+          } else {
+            $2.at(0)->set_expr_type (CAST_STRING);
+            m_in_func--;
+            $$ = $2.at(0);
+          }
+        }
+      } else {
+        $1->set_args ($2);
+        m_in_func--;
+        $$ = $1;
+      }
     }
 
 start_function
@@ -1220,209 +1236,76 @@ start_function
     {
       if (!m_in_for && !m_in_arguments) {
         lexer_expression_mode_on ();
-      } 
-      TermNode* n = new TermNode (@$, FUNCTION_CALL, $1);
-      TermNode *lp = new TermNode (@$, SYMBOL, std::string ("("));
-      if (is_in_expr ()) {
-        NameContext* name_context = name_context_list.back ();
-        name_context->add_term (n);
-        name_context->add_term (lp);
-      } else if (m_in_arguments || m_in_for || m_in_imperative) {
-        driver.add_node (n);
-        driver.add_node (lp);
-      } else  {
-        comp_expression.push_back (n);
-        comp_expression.push_back (lp);
       }
-      arg_expression.clear ();
+      FunctionExprNode* n = new FunctionExprNode (@$, $1);
       m_in_func++;
       $$ = n;
     }
 
 postfix_expression
-  : primary_expression
-  | function_call
+  : primary_expression { $$ = $1; }
+  | function_call { $$ = $1; }
 
 primary_expression
   : INT
     {
-      TermNode *n = new TermNode (@$, VALUE, std::string ($1));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, INT);
+      $$ = n;
     }
   | TRUE
     {
-      TermNode *n = new TermNode (@$, VALUE, std::string ("1"));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, std::string ("1"), LITERAL, BOOL);
+      $$ = n;
     }
   | FALSE
     {
-      TermNode *n = new TermNode (@$, VALUE, std::string ("0"));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, std::string ("0"), LITERAL, BOOL);
+      $$ = n;
     }
   | DOUBLE
     {
-      TermNode *n = new TermNode (@$, VALUE, std::string ($1));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, DOUBLE);
+      $$ = n;
     }
   | STRING
     {
-      TermNode *n = new TermNode (@$, STRING_VALUE, std::string ($1));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, STRING);
+      $$ = n;
     }
   | name_or_path
   {
     name_context_list.pop_back ();
-    TermNode *n;
+    ExprNode *n;
     if (!$1.empty () && $1.at (0)->get_subpath ().substr(0,3) == "DJN") {
-      n = new TermNode (@$, VALUE, $1.at (0)->get_subpath ());
+      n = new ExprNode (@$, $1.at (0)->get_subpath (), LITERAL, INT);
+
     }
     else {
-      n = new TermNode (@$, VAR, new PathNode (@1, $1));
+      smala_t type = sym_table_list.back ()->get_type ($1.at (0)->get_subpath ());
+      n = new PathExprNode (@$, new PathNode (@$, $1), type);
     }
-    if (is_in_expr ()) {
-      if (n->arg_type() <= 3)
-        driver.add_node (n);
-      else
-        name_context_list.back ()->add_term (n);
-    } else if (m_in_arguments || m_in_for || m_in_imperative) {
-      driver.add_node (n);
-    } else
-      comp_expression.push_back (n);
-    arg_expression.push_back (n);
     $$ = n;
   }
   | NULL
     {
-      TermNode *n = new TermNode (@$, SMALA_NULL, std::string (""));
-      add_term_node (driver, n, true);
-      $$ = n; 
+      ExprNode *n = new ExprNode (@$, "", LITERAL, NULL_VALUE);
+      $$ = n;
     }
-  | lp assignment_expression rp { $$ = nullptr; }
+  | LP assignment_expression RP { $2->set_enclosed_with_parenthesis (true); $$ = $2; }
 
-plus
-  : PLUS
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("+")), true);
-    }
-minus
-  : MINUS
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("-")), true);
-    }
-times
-  : TIMES
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("*")), true);
-    }
-divide
-  : DIVIDE
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("/")), true);
-    }
-or
-  : OR
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("||")), true);
-    }
-and
-  : AND
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("&&")), true);
-    }
-gt
-  : GT
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string (">")), true);
-    }
-ge
-  : GE
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string (">=")), true);
-    }
-lt
-  : LT
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("<")), true);
-    }
-le
-  : LE
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("<=")), true);
-    }
-eq
-  : EQ
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("==")), true);
-    }
-neq
-  : NEQ
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("!=")), true);
-    }
-not
-  : NOT
-    {
-      add_term_node (driver, new TermNode (@$, OPERATOR, std::string ("!")), true);
-    }
-lp
-  : LP
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("(")), false);
-    }
-rp
-  : RP
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), false);
-    }
-lcb
-  : LCB
-    {
-      TermNode *n = new TermNode (@$, START_LCB_BLOCK, std::string ("{"));
-      driver.add_node (n);
-    }
-comma
-  : COMMA
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (", ")), false);
-    }
-semicolon
-  : SEMICOLON
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("; ")), false);
-    }
-question_mark
-  : QUESTION_MARK
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string ("?")), true);
-      add_term_node (driver, new TermNode (@$, FUNCTION_CALL, std::string ("smala_deref (")), true);
-    }
-colon
-  : COLON
-    {
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (")")), true);
-      add_term_node (driver, new TermNode (@$, SYMBOL, std::string (":")), true);
-      add_term_node (driver, new TermNode (@$, FUNCTION_CALL, std::string ("smala_deref (")), true);
-    }
 
 //------------------------------------------------
 
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
       }
       driver.add_native_expression (expr_node);
       driver.add_node (expr_node);
-      comp_expression.clear ();
-      arg_expression.clear (); 
     }
 
 connector_symbol
@@ -1446,7 +1329,7 @@ binding
   | binding_src binding_type lambda
     {
       /* first build the NativeACtion Component */
-      // vector< pair<ParamType, string> >d_args;
+      // vector< pair<SmalaType, string> >d_args;
       // d_args.push_back (make_pair (LOCAL_NAME, $3->function_name ()));
       // d_args.push_back (make_pair (INT, "1"));
       // Node *native = new Node (LAMBDA, "NativeAction", "");
@@ -1498,10 +1381,8 @@ start_assignment_sequence
       driver.add_node (node);
 
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      node->set_has_arguments (true);
 
-      driver.add_node (new TermNode (@$, VALUE, "1"));
-      driver.add_node (new TermNode (@$, END, ""));
+      node->add_arg (new ExprNode (@$, "1", LITERAL, BOOL));
 
       node->set_node_type (CONTAINER);
       parent_list.push_back (node);
@@ -1516,44 +1397,27 @@ assignment_list
 binding_src
   : assignment_expression
   {
-    if (comp_expression.size () == 1) {
-      TermNode* n = comp_expression.at (0);
-      if (n->arg_type () == VAR) {
-        n->path_arg_value()->set_cast (NO_CAST);
-        $$ = n->path_arg_value ();
-      } else {
-        driver.set_error ("Wrong source specification in binding expression");
-      }
-    } else {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, false, true, false);
-      expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+     NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, true, false);
+     expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
-      // build a local bool that will serve as an output for a connector
-      // and an input for the binding in construction
-      std::string loc_name ("loc_bool");
-      loc_name.append (to_string(loc_node_num++));
-      std::vector<SubPathNode*> path;
-      path.push_back (new SubPathNode (@$, loc_name, START));
-      Node *node = new Node (@$, SIMPLE, "Bool", loc_name);
-      node->set_has_arguments (true);
-      driver.add_node (node);
-      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      TermNode *n = new TermNode (@$, VALUE, "0");
-      driver.add_node (n);
-      n = new TermNode (@$, END, "");
-      driver.add_node (n);
+    // build a local bool that will serve as an output for a connector
+    // and an input for the binding in construction
+    std::string loc_name ("loc_bool");
+    loc_name.append (to_string(loc_node_num++));
+    std::vector<SubPathNode*> path;
+    path.push_back (new SubPathNode (@$, loc_name, START));
+    Node *node = new Node (@$, SIMPLE, "Bool", loc_name);
+    driver.add_node (node);
+    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+    ExprNode *n = new ExprNode (@$, "0", LITERAL, BOOL);
+    node->add_arg (n);
 
-      expr_node->add_output_node (new PathNode (@$, path));
-      driver.add_native_expression (expr_node);
-      driver.add_node (expr_node);
-      comp_expression.clear ();
-      arg_expression.clear ();
-      path.push_back (new SubPathNode (@$, "true", ITEM));
-      loc_name.append(".true");
-      $$ = new PathNode (@$, path);
-    }
-    comp_expression.clear ();
-    arg_expression.clear ();
+    expr_node->add_output_node (new PathNode (@$, path));
+    driver.add_native_expression (expr_node);
+    driver.add_node (expr_node);
+    path.push_back (new SubPathNode (@$, "true", ITEM));
+    loc_name.append(".true");
+    $$ = new PathNode (@$, path);
   }
 
 binding_type
@@ -1585,7 +1449,7 @@ start_lambda
 assignment
   : assignment_expression assignment_symbol process_list is_model
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, comp_expression, $2, false, $4);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2, false, $4);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         Node *out = new Node (@$, PATH, "Name", $3.at (i));
@@ -1593,8 +1457,6 @@ assignment
       }
       driver.add_native_expression (expr_node);
       driver.add_node (expr_node);
-      comp_expression.clear ();
-      arg_expression.clear (); 
     }
 
 
@@ -1647,6 +1509,7 @@ fsm
       SetParentNode *p_node = new SetParentNode (@$, $1);
       driver.add_node (p_node);
       parent_list.pop_back ();
+      sym_table_list.pop_back ();
     }
 
 fsm_decl
@@ -1658,6 +1521,8 @@ fsm_decl
       parent_list.push_back (node);
       driver.add_node (node);
       if (driver.debug()) driver.new_line(@$);
+      sym_table_list.back()->add_sym (@$, $2, PROCESS);
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
       $$ = node;
     }
 
@@ -1679,6 +1544,7 @@ state_decl
       Node *node = new Node (@$, SIMPLE, "FSMState", $2);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       driver.add_node (node);
+      sym_table_list.back ()->add_sym (@$, $2, PROCESS);
       cur_node = node;
       $$ = node;
     }
@@ -1686,6 +1552,7 @@ state_decl
 start_fsm_state
   : LCB
     {
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
       cur_node->set_node_type (CONTAINER);
       parent_list.push_back (cur_node);
     }
@@ -1694,6 +1561,7 @@ end_fsm_state
     {
       driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
+      sym_table_list.pop_back ();
     }
 
 fsm_transition_list

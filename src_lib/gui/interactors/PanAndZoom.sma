@@ -35,7 +35,7 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
 
   // Store pointer position in localRef coordinates system
   // (used by both zoom and pan management)
-  ScreenToLocal s2l (localRef)
+  ScreenToLocal s2l (&localRef)
 
   // Zoom management
   // set scaling center according to zoom option
@@ -43,7 +43,7 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
     // frame centered zoom option
     Component off {
       // set scaling center to the center of the frame (localRef coordinates system)
-      ScreenToLocal s2l (localRef)
+      ScreenToLocal s2l (&localRef)
       AssignmentSequence seq (1) {
         frame.width /2  =: s2l.inX
         frame.height /2 =: s2l.inY
@@ -61,7 +61,7 @@ PanAndZoom (Process frame, Process bg, Process transforms) {
     // mouse centered zoom option
     Component on {
       // set scaling center to pointer position (localRef coordinates system)
-      ScreenToLocal s2l (localRef)
+      ScreenToLocal s2l (&localRef)
       frame.move.x =:> s2l.inX
       frame.move.y =:> s2l.inY
       s2l.outX =:> transforms.rightScaleBy.cx

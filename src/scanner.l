@@ -159,7 +159,6 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "with"                { return Smala::Parser::make_WITH (loc); }
 "from"                { return Smala::Parser::make_FROM (loc); }
 "addChildrenTo"       { return Smala::Parser::make_ADD_CHILDREN_TO (loc); }
-"toString"            { return Smala::Parser::make_TO_STRING (loc); }
 "if"                  { return Smala::Parser::make_IF (loc); }
 "else"                { return Smala::Parser::make_ELSE (loc); }
 "for"                 { return Smala::Parser::make_FOR (loc); }

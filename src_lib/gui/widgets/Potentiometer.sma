@@ -124,7 +124,7 @@ Potentiometer (Process f, double _x, double _y, double _r) {
       rotary_button.button.move.y =:> p3.y
       (atan2(p3.y - p1.y, p3.x - p1.x) - atan2(p2.y - p1.y, p2.x - p1.x)) =:> new_angle
       cur_a + (new_angle * to_deg) =:> buff
-      buff < 0 ? fmod (360 + buff, 360) : fmod (buff, 360) =:> bd.input
+      buff < 0 ? fmod (360 + buff, 360) : fmod ($buff, 360) =:> bd.input
       bd.result =:> rotary_button.rot.a
     }
     State st_min
@@ -133,7 +133,7 @@ Potentiometer (Process f, double _x, double _y, double _r) {
       rotary_button.button.move.y =:> p3.y
       (atan2(p3.y - p1.y, p3.x - p1.x) - atan2(p2.y - p1.y, p2.x - p1.x)) =:> new_angle
       cur_a + (new_angle * to_deg) =:> buff
-      buff < 0 ? fmod (360 + buff, 360) : fmod (buff, 360) =:> bd.input
+      buff < 0 ? fmod (360 + buff, 360) : fmod ($buff, 360) =:> bd.input
       (bd.result > 10 && bd.result < 50)->move
     }
     State st_max
@@ -142,7 +142,7 @@ Potentiometer (Process f, double _x, double _y, double _r) {
       rotary_button.button.move.y =:> p3.y
       (atan2(p3.y - p1.y, p3.x - p1.x) - atan2(p2.y - p1.y, p2.x - p1.x)) =:> new_angle
       cur_a + (new_angle * to_deg) =:> buff
-      buff < 0 ? fmod (360 + buff, 360) : fmod (buff, 360) =:> bd.input
+      buff < 0 ? fmod (360 + buff, 360) : fmod ($buff, 360) =:> bd.input
       (bd.result < 340 && bd.result >290)->move     
     }
     idle->moving (rotary_button.button.press)

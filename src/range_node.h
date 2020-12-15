@@ -15,7 +15,7 @@
 #pragma once
 
 #include "node.h"
-#include "term_node.h"
+#include "expr_node.h"
 
 namespace Smala
 {
@@ -23,18 +23,17 @@ namespace Smala
   class RangeNode : public Node
   {
   public:
-    RangeNode (const location& loc);
-    RangeNode (const location& loc, const std::string& name, std::vector <TermNode*> left, bool left_open, std::vector <TermNode*> right, bool right_open);
+    RangeNode (const location& loc, const std::string& name, ExprNode* left, bool left_open, ExprNode* right, bool right_open);
     virtual ~RangeNode ();
 
-    std::vector <TermNode*> lower_arg () { return m_lower_arg; }
-    std::vector <TermNode*> upper_arg () { return m_upper_arg; }
+    ExprNode* lower_arg () { return m_lower_arg; }
+    ExprNode* upper_arg () { return m_upper_arg; }
     bool left_open () { return m_left_open; }
     bool right_open () { return m_right_open; }
 
   private:
-    std::vector <TermNode*> m_lower_arg;
-    std::vector <TermNode*> m_upper_arg;
+    ExprNode* m_lower_arg;
+    ExprNode* m_upper_arg;
     bool m_left_open, m_right_open;
   };
 

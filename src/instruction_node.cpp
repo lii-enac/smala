@@ -18,7 +18,7 @@ namespace Smala
 {
 
   InstructionNode::InstructionNode (const location& loc, const std::string& name) :
-      Node (loc, INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
+      Node (loc, INSTRUCTION), m_type (UNKNOWN)
   {
     set_name (name);
 
@@ -38,7 +38,7 @@ namespace Smala
   }
 
   InstructionNode::InstructionNode (const location& loc) :
-      Node (loc, INSTRUCTION), m_has_argument (false), m_type (UNKNOWN)
+      Node (loc, INSTRUCTION), m_type (UNKNOWN)
   {
   }
 

@@ -14,9 +14,6 @@
 
 #pragma once
 
-#include "node.h"
-#include <iostream>
-
 namespace Smala
 {
   enum subpath_type {
@@ -36,13 +33,14 @@ namespace Smala
  };
 
   class PathNode;
+  class ExprNode;
   class SubPathNode : public Node
   {
   public:
-    SubPathNode (const location& loc): Node (loc, SUBPATH), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
-    SubPathNode (const location& loc, const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (loc, SUBPATH), m_path (path), m_type (type), m_cast (cast) {}
-    SubPathNode (const location& loc, const std::vector<TermNode*> node_list): Node (loc, SUBPATH), m_path (""), m_expr (node_list), m_type (EXPR), m_cast (NO_CAST) {}
-    SubPathNode (const location& loc, const std::vector<PathNode*> path_list): Node (loc, SUBPATH), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc): Node (loc, SUBPATH), m_expr (nullptr), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (loc, SUBPATH), m_expr (nullptr), m_path (path), m_type (type), m_cast (cast) {}
+    SubPathNode (const location& loc, ExprNode* n): Node (loc, SUBPATH), m_path (""), m_expr (n), m_type (EXPR), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, const std::vector<PathNode*> path_list): Node (loc, SUBPATH), m_expr (), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
     virtual ~SubPathNode () {}
 
     const std::string& get_subpath () const { return m_path; }
@@ -50,11 +48,11 @@ namespace Smala
     subpath_type get_path_type () { return m_type; }
     void set_path_type (subpath_type type) { m_type = type; }
     std::vector<PathNode*> get_path_list () { return m_path_list; }
-    std::vector<TermNode*> get_expr () { return m_expr; }
+    ExprNode* get_expr () { return m_expr; }
     cast_type get_cast () { return m_cast; }
 
   private:
-    std::vector<TermNode*> m_expr;
+    ExprNode* m_expr;
     std::vector<PathNode*> m_path_list;
     std::string m_path;
     subpath_type m_type;

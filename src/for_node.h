@@ -22,20 +22,17 @@ namespace Smala
   class ForNode : public Node
   {
   public:
-    ForNode (const location& loc) : Node (loc, FOR), m_first (nullptr), m_third (nullptr) {};
+    ForNode (const location& loc) : Node (loc, FOR), m_first (nullptr), m_second (nullptr), m_third (nullptr) {};
     virtual ~ForNode () {}
 
+    void set_statements (Node *first, ExprNode* second, Node *third) { m_first = first; m_second = second; m_third = third; }
     Node* first_st () const { return m_first; }
-    void set_first_st (Node *first) { m_first = first; }
+    ExprNode* second_st () const { return m_second; }
     Node* third_st () const { return m_third; }
-    void set_third_st (Node *third) { m_third = third; }
-    void set_expression (std::vector<Node*>& nodes) { m_expression = nodes; }
-    std::vector<Node*>& get_expression () { return m_expression; }
 
   private:
-    Node* m_first;
-    Node* m_third;
-    std::vector<Node*> m_expression;
+    ExprNode *m_second;
+    Node *m_first, *m_third;
   };
 
 } /* namespace Smala */

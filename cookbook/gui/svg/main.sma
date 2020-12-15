@@ -11,7 +11,7 @@ Component root {
   frame.close -> ex
 
   // see the screenshots of the illustrator SVG export dialog boxes 
-  string path = "res/simple.svg"
+  string path = "http://smala.io/button.svg"
   svg = loadFromXML (path)
   //dump svg
 

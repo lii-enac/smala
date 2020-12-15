@@ -47,6 +47,7 @@ Driver::parse ()
 void
 Driver::set_error ()
 {
+  cerr << location() << " " << std::endl;
   m_error |= 1;
 }
 

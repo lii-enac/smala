@@ -26,9 +26,9 @@ namespace Smala {
     DELETE, DUMP, NOTIFY, RUN, STOP, XMLSERIALIZE, UNKNOWN
   } instruction_t;
 
-  enum ParamType {
-    INT, DOUBLE, STRING, PROCESS, NAME, LOCAL_NAME, VOID
-  };
+  typedef enum SmalaType {
+    BOOL, INT, DOUBLE, STRING, PROCESS, CAST_STRING, NULL_VALUE, NAME, LOCAL_NAME, VOID, UNDEFINED
+  } smala_t;
 
   enum NodeType
   {
@@ -47,13 +47,13 @@ namespace Smala {
     END_CONTAINER,
     END_DEFINE,
     END_ELSE,
-    END_IF_EXPRESSION,
+    END_IF,
     END_LOOP,
     END_MAIN,
     END_NATIVE,
     END_PROPERTY,
     END_REPEAT,
-    END_SET_PROPERTY,
+    EXPR_NODE,
     FOR,
     FOR_EVERY,
     FSM,
@@ -62,7 +62,6 @@ namespace Smala {
     INCREMENT,
     INSTRUCTION,
     LAMBDA,
-    LITERAL,
     LOCAL_NODE,
     MERGE,
     MOVE_AFTER,
@@ -100,7 +99,7 @@ namespace Smala {
     WHILE
   };
 
-class TermNode;
+class ExprNode;
 class PathNode;
 
 typedef void* user_data_t;
@@ -109,13 +108,16 @@ class Node
 {
 public:
     Node (const location& loc, NodeType type);
-    Node (const location& loc, NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<ParamType, std::string> > &arguments);
+    Node (const location& loc, NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<SmalaType, std::string> > &arguments);
     Node (const location& loc, NodeType type, const std::string &value, const std::string &name);
     Node (const location& loc, NodeType type, const std::string &value, PathNode* path);
 
     void set_node_type (NodeType type);
     void set_build_name (const std::string& build_name);
     void set_parent (Node *p);
+    void set_args (std::vector<ExprNode*> args) { m_expr_args = args; }
+    void add_arg (ExprNode *arg) { m_expr_args.push_back (arg); }
+    std::vector<ExprNode*> get_args () { return m_expr_args; }
     Node* parent ();
     std::string build_name () const;
     NodeType node_type () const;
@@ -125,23 +127,20 @@ public:
     void set_djnn_type (const std::string& type);
     const std::string& name () const;
     void set_name (const std::string &name);
-    std::vector< std::pair<ParamType, std::string> > args () const;
-    void add_args (std::vector< std::pair<ParamType, std::string> > &args);
+    std::vector< std::pair<SmalaType, std::string> > args () const;
+    void add_args (std::vector< std::pair<smala_t, std::string> > &args);
     void set_error_location (smala::ErrorLocation *loc);
     smala::ErrorLocation* error_location ();
     bool ignore_parent () { return m_ignore_parent; }
     void set_ignore_parent (bool ignore) { m_ignore_parent = ignore; }
     bool has_arguments ();
     bool has_path () { return m_has_path; }
-    void set_has_arguments (bool v);
     bool duplicate_warning ();
     void set_duplicate_warning (bool v);
     bool in_expression () { return m_in_expression; }
     void set_in_expression (bool v) { m_in_expression = v; }
-    void set_expr_data (std::vector<TermNode*>& nodes) { m_expression = nodes; }
-    std::vector<TermNode*>& get_expr_data () { return m_expression; }
-    void set_args_data (std::vector< std::pair<ParamType, std::string> > args) { m_args = args; }
-    std::vector< std::pair<ParamType, std::string> >& get_args_data () { return m_args; }
+    void set_args_spec (std::vector< std::pair<smala_t, std::string> > args) { m_args_spec = args; }
+    std::vector< std::pair<smala_t, std::string> >& get_args_spec () { return m_args_spec; }
     PathNode* get_path () { return m_path; }
     void set_path (PathNode* p) { m_path = p; }
     void set_user_data (user_data_t data) { m_data = data; }
@@ -158,11 +157,11 @@ public:
     std::string m_djnn_type;
     std::string m_name;
     std::string m_build_name;
-    std::vector< std::pair<ParamType, std::string> > m_args;
-    bool m_has_arguments, m_duplicate_warning, m_in_expression, m_keep_name;
+    std::vector< std::pair<smala_t, std::string> > m_args_spec;
+    std::vector<ExprNode*> m_expr_args;
+    bool m_duplicate_warning, m_in_expression, m_keep_name;
     smala::ErrorLocation* m_location;
     NodeType m_node_type;
-    std::vector<TermNode*> m_expression;
     user_data_t m_data;
     class location m_loc;
     bool m_is_define_or_main;

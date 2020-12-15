@@ -18,13 +18,13 @@ namespace Smala
 {
 
   NewVarNode::NewVarNode (
-      const location& loc, ParamType type, const std::string &name, bool keep_name) :
+      const location& loc, SmalaType type, const std::string &name, bool keep_name) :
       Node (loc, NEW_VAR), m_type (type), m_var_name (name), m_keep_name (keep_name)
   {
   }
 
   NewVarNode::NewVarNode (const location& loc) :
-      Node (loc, NEW_VAR), m_type (VOID), m_var_name ("")
+      Node (loc, NEW_VAR), m_type (VOID), m_var_name (""), m_keep_name (false)
   {
   }
 
@@ -37,7 +37,7 @@ namespace Smala
     return m_var_name;
   }
 
-  ParamType
+  SmalaType
   NewVarNode::type ()
   {
     return m_type;

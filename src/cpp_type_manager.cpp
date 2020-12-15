@@ -15,8 +15,6 @@
 
 #include "cpp_type_manager.h"
 
-#include <iostream>
-
 namespace Smala {
 
 

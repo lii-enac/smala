@@ -24,7 +24,7 @@
 #include "newvar_node.h"
 #include "set_parent_node.h"
 #include "native_code_node.h"
-#include "term_node.h"
+#include "expr_node.h"
 #include "range_node.h"
 
 namespace Smala
@@ -180,6 +180,62 @@ namespace Smala
   }
 
   void
+  Builder::build_for_node (std::ofstream &os, Node *node)
+  {
+    switch (node->node_type ())
+      {
+      case INCREMENT:
+      {
+        os << build_step ((ExprNode*) node);
+        break;
+      }
+      case DECREMENT:
+      {
+        os << build_step ((ExprNode*) node);
+        break;
+      }
+      case NEW_VAR:
+      {
+        NewVarNode *n = dynamic_cast<NewVarNode*> (node);
+        print_type (os, n->type ());
+        std::string new_name;
+        if (n->keep_name ())
+          new_name = n->var_name ();
+        else {
+          switch (n->type ()) {
+            case INT:
+              new_name = "i_var_" + std::to_string (m_var_num++);
+              break;
+            case DOUBLE:
+              new_name = "d_var_" + std::to_string (m_var_num++);
+              break;
+            case STRING:
+              new_name = "s_var_" + std::to_string (m_var_num++);
+              break;
+            case PROCESS:
+              new_name = "var_" + std::to_string (m_cpnt_num++);
+              break;
+            default:
+              new_name =  "";
+          }
+        }
+        if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
+          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
+        os << " " << new_name << " = " << build_expr (n->get_args().at (0));
+        break;
+      }
+      case EXPR_NODE:
+      {
+        os << build_expr ((ExprNode*) node);
+        break;
+      }
+      default:
+        return;
+      }
+  }
+
+
+  void
   Builder::build_node (std::ofstream &os, Node *node)
   {
     m_curloc = node->error_location ();
@@ -213,18 +269,7 @@ namespace Smala
       {
         push_ctxt ();
         indent  (os);
-        build_start_if (os);
-        m_in_static_expr = true;
-        for (Node *n : node->get_expr_data ()) {
-          build_node (os, n);
-        }
-        m_in_static_expr = false;
-        break;
-      }
-      case END_IF_EXPRESSION:
-      {
-        build_end_if (os);
-        m_indent++;
+        build_start_if (os, node);
         break;
       }
       case BREAK:
@@ -235,12 +280,16 @@ namespace Smala
       }
       case INCREMENT:
       {
-        build_step (os, node, true);
+        indent (os);
+        os << build_step ((ExprNode*) node);
+        end_line (os);
         break;
       }
       case DECREMENT:
       {
-        build_step (os, node, false);
+        indent (os);
+        os << build_step ((ExprNode*) node);
+        end_line (os);
         break;
       }
       case END_BLOCK:
@@ -322,21 +371,6 @@ namespace Smala
       {
         set_property (os, node);
         break;
-      }
-      case END_SET_PROPERTY:
-      {
-        end_set_property (os, node);
-        break;
-      }
-      case END_PROPERTY:
-      {
-        end_property (os, node);
-        break;
-      }
-      case GET_PROPERTY:
-      {
-        get_property (os, node);
-         break;
       }
       case ALIAS:
       {
@@ -449,9 +483,11 @@ namespace Smala
         build_native_action_component (os, node);
         break;
       }
-      case TERM_NODE:
+      case EXPR_NODE:
       {
-        build_term_node (os, node);
+        indent (os);
+        os << build_expr ((ExprNode*) node);
+        end_line (os);
         break;
       }
       case NATIVE_CODE:
@@ -494,7 +530,8 @@ namespace Smala
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
           print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
-        os << " " << new_name << " = ";
+        os << " " << new_name << " = " << build_expr (n->get_args().at (0));
+        end_line(os);
         break;
       }
       case DASH_ARRAY:

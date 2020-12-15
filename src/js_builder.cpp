@@ -1459,14 +1459,15 @@ namespace Smala
   {
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
     os << "function " << node->name () << " (p, n";
-    std::vector< std::pair<ParamType, std::string> > data = node->get_args_data();
+    std::vector< std::pair<SmalaType, std::string> > data = node->get_args_spec();
     for (int j = 0; j < data.size (); j++) {
-      std::pair<ParamType, std::string> arg = data.at (j);
+      std::pair<SmalaType, std::string> arg = data.at (j);
       os << ", ";
       //print_type (os, arg.first);
       std::string new_name;
       switch (arg.first) {
         case INT:
+        case BOOL:
           new_name = "i_var_" + std::to_string (m_var_num++);
           break;
         case DOUBLE:
@@ -1685,7 +1686,7 @@ namespace Smala
       os << "djnn::ParentProcess* " << def->name ()
           << " (djnn::ParentProcess*, const std::string &";
       for (int j = 0; j < def->args ().size (); j++) {
-        std::pair<ParamType, std::string> arg = def->args ().at (j);
+        std::pair<SmalaType, std::string> arg = def->args ().at (j);
         os << ", ";
         print_type (os, arg.first);
       }
@@ -1706,7 +1707,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::print_type (std::ofstream &os, ParamType type)
+  JSBuilder::print_type (std::ofstream &os, SmalaType type)
   {
     os << "var";
   }

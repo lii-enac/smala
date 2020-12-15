@@ -82,7 +82,7 @@ namespace Smala {
     void print_native_code (std::ofstream &os);
     void print_component_decl (std::ofstream &os, const std::string &name) override;
     void print_component_constructor (std::ofstream &os, const std::string &constructor) override;
-    void print_type (std::ofstream &os, ParamType type) override;
+    void print_type (std::ofstream &os, SmalaType type) override;
     std::map<std::string, std::string> m_import_types;
     void set_location (std::ofstream &os, Node *n) override { os << "\n//#line " << n->get_location().begin.line << std::endl; }
   private:

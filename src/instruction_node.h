@@ -17,7 +17,6 @@
 #include <vector>
 #include <string>
 #include "node.h"
-#include "term_node.h"
 #include "path_node.h"
 namespace Smala
 {
@@ -31,16 +30,10 @@ namespace Smala
 
     void add_path (PathNode *n);
     std::vector<PathNode*>& path_list ();
-    void set_has_argument (bool v) { m_has_argument = v; }
-    bool has_argument () { return m_has_argument; }
     void set_type (instruction_t type) { m_type = type; }
-    void set_args (std::vector<TermNode*> &expression) { m_expression = expression; m_has_argument = true; }
-    std::vector<TermNode*>& args () { return m_expression; }
     instruction_t type () { return m_type; }
   private:
     std::vector<PathNode*> m_path_list;
-    bool m_has_argument;
-    std::vector<TermNode*> m_expression;
     instruction_t m_type;
   };
 

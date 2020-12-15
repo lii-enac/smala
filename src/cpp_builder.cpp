@@ -171,7 +171,7 @@ namespace Smala
     os << "{ return p.get_double_value(); }\n\n";
 
     os << "inline\n";
-    os << "std::string smala_deref(std::string p)\n";
+    os << "const std::string& smala_deref(const std::string& p)\n";
     os << "{ return p; }\n\n";
 
     os << "inline\n";

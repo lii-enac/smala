@@ -858,7 +858,7 @@ namespace Smala
             // indent (os);
             // os << "}\n";
             // indent (os);
-            emit_not_a_property (os, arg, e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() );
+            emit_not_a_property (os, arg, e->path_arg_value ()->build_string_repr());//e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() );
             std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
             //os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg
             //    << ");\n";
@@ -886,7 +886,7 @@ namespace Smala
             // indent (os);
             // os << "}\n";
             // indent (os);
-            emit_not_a_property (os, arg, e->get_subpath_list().at (0)->get_subpath());
+            emit_not_a_property (os, arg, e->build_string_repr()); //e->get_subpath_list().at (0)->get_subpath());
             std::string new_param_name = transform_name(e->get_subpath_list().at (0)->get_subpath());
             os << native_name << "."<< new_param_name
                 //<< " = dynamic_cast<AbstractProperty*>(" << arg

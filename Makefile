@@ -689,15 +689,17 @@ ifneq ($(dep),no)
 -include $(deps)
 endif
 
-pkgdeps := bison flex rtmidi nlohmann-json
+pkgdeps := bison flex
 
 ifeq ($(os),Linux)
 pkgcmd := apt install -y
+pkgdeps += librtmidi-dev nlohmann-json-dev
 endif
 
 ifeq ($(os),Darwin)
 #https://brew.sh/
 pkgcmd := brew install
+pkgdeps += rtmidi nlohmann-json
 endif
 
 ifeq ($(os),MinGW)
@@ -705,6 +707,7 @@ ifeq ($(os),MinGW)
 # no need to prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
 pkgcmd := pacman -Suy --needed
 CXXFLAGS += -I/usr/include # Fix for FlexLexer.h in /usr/include and in /ming64/include
+pkgdeps += rtmidi nlohmann-json
 endif
 
 install-pkgdeps:

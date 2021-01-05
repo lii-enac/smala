@@ -25,8 +25,6 @@ namespace Smala {
     virtual ~CPPBuilder ();
     int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
   private:
-    void pop_ctxt () override;
-    void push_ctxt () override;
     void build_define (const std::string &prefix);
     void build_use (std::ofstream &os, std::string use) override;
     void build_causal_dep (std::ofstream &os, Node* node) override;

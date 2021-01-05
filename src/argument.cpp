@@ -87,6 +87,6 @@ namespace Smala
     std::cout << "USAGE: smala " <<  "<filenames> [options]\n";
     std::cout << "Options:\n";
     std::cout << "  -g \t enable debug\n";
-    std::cout << "  -lang <cpp|js> \t change the target language\n";
+    std::cout << "  -lang=<cpp|js> \t change the target language\n";
   }
 } /* namespace Smala */

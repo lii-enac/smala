@@ -77,14 +77,17 @@ namespace Smala {
     std::map<std::string, std::string> m_types;
     Node * m_define_or_main_node;
 
-    virtual void pop_ctxt () {}
-    virtual void push_ctxt () {}
+    virtual void pop_ctxt ();
+    virtual void push_ctxt ();
+    void extract_leaves (std::vector<ExprNode*> &leaves, ExprNode *n);
     void indent (std::ofstream &os);
     std::string get_constructor (const std::string &type);
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_for_node (std::ofstream &os, Node *node);
     void build_preamble (std::ofstream &os);
+    bool is_string (ExprNode *e);
+    bool has_complex_term (PathNode *n);
     virtual void build_control_node (std::ofstream &os, Node *n) = 0;
     virtual void print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor) = 0;
     virtual void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) = 0;

@@ -20,8 +20,8 @@
 #include "parser.hpp"
 #include "driver.h"
 #include "cpp_builder.h"
-//#include "js_builder.h"
-//#include "html_builder.h"
+#include "js_builder.h"
+#include "html_builder.h"
 
 #include "core/utils/filesystem.h"
 
@@ -32,9 +32,9 @@ int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
 	Driver driver (arg.debug());
 	Builder *b;
-//	if (arg.lang () == JS )
-//	  b = new JSBuilder ();
-//	else
+	if (arg.lang () == JS )
+	  b = new JSBuilder ();
+	else
 	  b = new CPPBuilder ();
 	int error = 0;
 
@@ -75,10 +75,9 @@ int main (int argc, const char **argv) {
 		}
 	}
 	if (!error) {
-/*	  if (arg.lang () == JS && arg.build_html()) {
-	      build_html (arg.get_target(), arg.files ());
+	  if (arg.lang () == JS && arg.build_html()) {
+      build_html (arg.get_target(), arg.files ());
 	  }
-*/
 	}
 	return error;
 }

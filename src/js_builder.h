@@ -25,28 +25,23 @@ namespace Smala {
     virtual ~JSBuilder ();
     int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
   private:
-    void pop_ctxt () override;
-    void push_ctxt () override;
     void build_define (const std::string &prefix);
     void build_use (std::ofstream &os, std::string use) override;
     void build_causal_dep (std::ofstream &os, Node* node) override;
     void build_import (std::ofstream &os, Node* n) override;
     void build_post_import (std::ofstream &os) override;
+    void build_start_if (std::ofstream &os, Node* n) override;
+    std::string build_expr (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false) override;
     void build_instruction (std::ofstream &os, Node *node) override;
-    void build_term_node (std::ofstream &os, Node *node) override;
     void build_for (std::ofstream &os, Node *node) override;
     void build_for_every (std::ofstream &os, Node *node) override;
     void build_while (std::ofstream &os, Node *node) override;
     void build_print (std::ofstream &os, Node *node) override;
-    void build_step (std::ofstream &os, Node *node, bool is_incr) override;
+    std::string build_step (ExprNode *node) override;
     std::string build_fake_name (PathNode* n, bool out);
-    std::string build_term_str (TermNode* n);
     std::string build_find (PathNode* n, bool ignore_cast);
     std::string build_path (PathNode* n);
     void set_property (std::ofstream &os, Node *node) override;
-    void end_set_property (std::ofstream &os, Node *node) override;
-    void end_property (std::ofstream &os, Node *n) override;
-    void get_property (std::ofstream &os, Node *node) override;
     void alias (std::ofstream &os, Node *node) override;
     void merge (std::ofstream &os, Node *node) override;
     void remove (std::ofstream &os, Node *node) override;
@@ -85,6 +80,7 @@ namespace Smala {
     void print_type (std::ofstream &os, SmalaType type) override;
     std::map<std::string, std::string> m_import_types;
     void set_location (std::ofstream &os, Node *n) override { os << "\n//#line " << n->get_location().begin.line << std::endl; }
+    void end_line (std::ofstream &os) override { os << ";\n"; }
   private:
     bool m_display_initialized;
     int m_expr_in, m_expr_out;

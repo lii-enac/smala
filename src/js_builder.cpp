@@ -106,11 +106,6 @@ namespace Smala
           auto * f = node->get_location().begin.filename;
           os << "//\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
           if (in_code) {
-            auto * tn = dynamic_cast<TermNode*>(node);
-            if (     (!tn || (tn->arg_type() != START_LCB_BLOCK))
-                  && (node->node_type() != START_ELSE)
-                  && (node->node_type() != START_ELSEIF)
-                )
               os << "//Context::instance()->parser_info("
                  << node->get_location().begin.line << ", "
                  << node->get_location().begin.column << ", "
@@ -138,14 +133,8 @@ namespace Smala
       }
 
     }
-    if (m_ast.is_main ()) {
-      m_indent--;
-      indent (os);
+    if (m_ast.is_main ())
       os << "}\n";
-      m_indent--;
-      indent (os);
-      os << "};\n";
-    }
     os.close ();
     return m_error;
   }
@@ -158,14 +147,7 @@ namespace Smala
   void
   JSBuilder::build_import (std::ofstream &os, Node *n)
   {
-    /*auto sep = "/";
-    auto *sep_2 = "";
-    for (auto sub : n->get_path ()->get_subpath_list ())
-      {
-        os << sep_2 << sub->get_subpath ();
-        sep_2 = sep;
-      }
-    os << ".js\';\n";*/
+
   }
 
   void
@@ -174,13 +156,111 @@ namespace Smala
   }
 
   void
+  JSBuilder::build_start_if (std::ofstream &os, Node* n)
+  {
+    os << "if (" << build_expr (n->get_args().at(0)) << ") {\n";
+    m_indent++;
+  }
+
+  std::string
+  JSBuilder::build_expr (ExprNode *e, expr_production_t prod_t, bool build_fake)
+  {
+    std::string expr;
+    if (e->is_enclosed_with_parenthesis())
+      expr += "(";
+    switch (e->get_expr_node_type()) {
+      case LITERAL: {
+        if (e->get_expr_type() == NULL_VALUE)
+          expr += "null";
+        else
+          expr += e->get_val();
+        break;
+      }
+        case PATH_EXPR: {
+          std::string path;
+          if (build_fake) {
+            path = transform_name (build_fake_name(((PathExprNode*)e)->get_path(), false));
+          } else {
+            if (m_in_switch)
+              path = "\"";
+            path += build_path (((PathExprNode*)e)->get_path());
+            // if no path is found check for a global symbol
+            if (path.empty())
+              path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
+            if (m_in_switch) {
+              path += "\"";
+            }
+          }
+          if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
+            expr += "get_string_value (" + path + ")";
+          } else if (m_in_switch || prod_t == process_t || e->get_expr_type() != PROCESS) {
+            expr += path;
+            m_in_switch = false;
+          } else {
+            expr += "get_value (" + path + ")";
+          }
+          break;
+        }
+        case STEP: {
+          expr += build_step (e);
+          break;
+        }
+        case FUNCTION: {
+          expr += e->get_val () + " (";
+          std::string sep = "";
+          for (auto sub : ((FunctionExprNode*)e)->get_args()) {
+            expr += sep + build_expr (sub, prod_t, build_fake);
+            sep = ",";
+          }
+          expr += ")";
+          break;
+        }
+        case UNARY_OP: {
+          UnaryExprNode *un = (UnaryExprNode*) e;
+          if (un->get_val().compare ("$") == 0 && (un->get_child()->get_expr_type() == PROCESS)) {
+            expr += build_expr (un->get_child(), number_t, build_fake);
+          } else if (un->get_val().compare ("&") == 0 && (un->get_child()->get_expr_type() == PROCESS)) {
+            expr += build_expr (un->get_child(), process_t, build_fake);
+          } else {
+            expr += un->get_val () + " " + build_expr (un->get_child(), prod_t, build_fake);
+          }
+          break;
+        }
+        case BINARY_OP: {
+          BinaryExprNode *bin = (BinaryExprNode*) e;
+          if (bin->get_val().compare("+") == 0 || bin->get_val().compare("==") == 0) {
+            if (is_string (bin->get_left_child()) && bin->get_right_child()->get_expr_type() == PROCESS) {
+              expr += build_expr(bin->get_left_child(), string_t, build_fake) + " " + bin->get_val() + " ";
+              expr += build_expr (bin->get_right_child(), string_t, build_fake);
+            } else if (bin->get_left_child()->get_expr_type() == PROCESS && is_string (bin->get_right_child())) {
+              expr += build_expr (bin->get_left_child(), string_t, build_fake);
+              expr += " " + bin->get_val () + " " + build_expr (bin->get_right_child (), string_t, build_fake);
+            } else {
+              expr += build_expr (bin->get_left_child (), prod_t, build_fake) + " " + bin->get_val () + " " + build_expr (bin->get_right_child (), prod_t, build_fake);
+            }
+          } else {
+            expr += build_expr (bin->get_left_child (), prod_t, build_fake) + " " + bin->get_val () + " " + build_expr (bin->get_right_child (), prod_t, build_fake);
+          }
+          break;
+        }
+        case TERNARY_OP:
+          TernaryExprNode *ter = (TernaryExprNode*) e;
+          expr += build_expr (ter->get_condition(), undefined_t, build_fake) + " ? " + build_expr (ter->get_left_child (), prod_t, build_fake) + " : " + build_expr (ter->get_right_child(), prod_t, build_fake);
+          break;
+      }
+      if (e->is_enclosed_with_parenthesis())
+        expr += ")";
+      return expr;
+    }
+
+  void
   JSBuilder::build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n)
   {
     os << " (" << p_name << ", " << name;
-    if (n->has_arguments ())
-      os << ", ";
-    else
-      os << ");\n";
+    for (auto sub : n->get_args()) {
+      os << ", " << build_expr(sub);
+    }
+    os << ");\n";
   }
 
   void
@@ -192,13 +272,8 @@ namespace Smala
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     print_start_component (os, new_name, "SwitchRangeBranch");
     os << " (" << p_name << ", " << name << ", ";
-    for (auto term: n->lower_arg()) {
-      build_term_node (os, term);
-    }
-    os << ", " << n->left_open () << ", ";
-    for (auto term: n->upper_arg ()) {
-      build_term_node (os, term);
-    }
+    os << " (" << p_name << ", " << name << ", " << build_expr (n->lower_arg());
+    os << ", " << n->left_open () << ", " << build_expr (n->upper_arg());
     os << ", " << n->right_open () << ");\n";
   }
 
@@ -227,31 +302,6 @@ namespace Smala
     return fake;
   }
 
-  std::string
-  JSBuilder::build_term_str (TermNode *term)
-  {
-    switch (term->arg_type ()) {
-      case SYMBOL:
-      case OPERATOR:
-      case VALUE:
-      case FUNCTION_CALL:
-      case STRING_VALUE: {
-        return term->str_arg_value ();
-        break;
-      }
-      case VAR: {
-        std::string p = build_find (term->path_arg_value (), false);
-        return p;
-        break;
-      }
-      case SMALA_NULL: {
-        return m_null_symbol;
-        break;
-      }
-      default:
-        return "";
-    }
-  }
 
   std::string
   JSBuilder::build_path (PathNode* n)
@@ -272,29 +322,13 @@ namespace Smala
       if (n_list.at (i)->get_path_type () != EXPR)
         str += n->get_subpath_list ().at (i)->get_subpath ();
       else {
-        std::vector <TermNode*> terms = n->get_subpath_list ().at (i)->get_expr ();
-        str += build_term_str (terms.at (0));
+        ExprNode* expr = n->get_subpath_list ().at (i)->get_expr ();
+        str += build_expr (expr);
        }
      pref = "/";
     }
     str += "\")";
     return str;
-  }
-
-  static bool
-  has_complex_term (PathNode* n)
-  {
-    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
-    for (auto n: n_list) {
-      if (n->get_path_type () == EXPR) {
-        std::vector <TermNode*> terms = n->get_expr ();
-        if (terms.size () > 1)
-          return true;
-        else if (terms.at (0)->arg_type() != VALUE)
-          return true;
-      }
-    }
-    return false;
   }
 
   std::string
@@ -358,51 +392,38 @@ namespace Smala
           str = "find_child (" + str + ", \"" + (*it)->get_subpath () + "\")";
         else {
           str = "find_child (" + str + ", ";
-          for (auto term : (*it)->get_expr ()) {
-            str += build_term_str (term);
-          }
+          str += build_expr ((*it)->get_expr ());
           str += ")";
         }
       }
     }
-    // if (!ignore_cast) {
-    //   switch (n->get_cast ()) {
-    //     case BY_VALUE:
-    //       str += ")";
-    //       break;
-    //     case BY_REF:
-    //       str += "))";
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
-  return str;
-}
+    return str;
+  }
 
-  void
-  JSBuilder::build_step (std::ofstream &os, Node *node, bool is_incr)
+  std::string
+  JSBuilder::build_step (ExprNode *node)
   {
-    if (!m_in_for)
-      indent (os);
+    StepExprNode *step = (StepExprNode*) node;
+    std::string res;
     std::string find = build_find (node->get_path(), false);
     if (find.rfind ("cpnt_", 0) == 0) {
-      os << "set_value (" << find;
-      os << "get_double_value (" << find << ")";
-      if (is_incr)
-        os << " +";
+      res += "set_value (" + find;
+      res += ", get_double_value (" + find + ")";
+      if (step->is_incr ())
+        res += " +";
       else
-        os << " - ";
-      os << " 1, true)";
+        res += " - ";
+      res += " 1, true)";
     } else {
-      os << find;
-      if (is_incr)
-        os << "++";
+      res += find;
+      if (step->is_incr ())
+        res += "++";
       else
-        os << "--";
+        res += "--";
     }
     if (!m_in_for)
-      os << ";\n";
+      res += ";\n";
+    return res;
   }
 
   void
@@ -411,41 +432,9 @@ namespace Smala
     indent (os);
     std::string name ("var_" + std::to_string (m_var_num++));
     os << "var " << name << " = ";
-    std::vector<TermNode*> expr = node->get_expr_data ();
-    for (auto cur: expr) {
-      TermNode *n = dynamic_cast<TermNode*> (cur);
-      switch (n->arg_type ()) {
-        case SYMBOL:
-        case OPERATOR: {
-          if (n->str_arg_value() != "+")
-            print_error_message (error_level::error, "only + symbol is allowed in string expression", 1);
-          os << " " << n->str_arg_value () << " ";
-        }
-          break;
-        case VALUE: {
-          os << n->str_arg_value ();
-        }
-          break;
-        case STRING_VALUE:
-          os << n->str_arg_value ();
-          break;
-        case VAR: {
-          std::string p = build_find (n->path_arg_value (), false);
-          // if the name contains "var_" then this is a simple variable not a djnn property
-          // so write it as is and return
-          std::size_t found = p.find ("var_");
-          if (found != std::string::npos) {
-            os << p;
-            return;
-          }
-          os << "get_string_value (" << p << ")";
-          break;
-        }
-        default:
-          return;
-      }
-    }
-    os << ";\n";
+    ExprNode* expr = node->get_args ().at (0);
+    os << build_expr (expr, string_t);
+    os << ");\n";
     indent (os);
     os << "console.log (\"" << name << "\");\n";
   }
@@ -454,12 +443,7 @@ namespace Smala
   JSBuilder::build_while (std::ofstream &os, Node *node)
   {
     indent (os);
-    os << "while (";
-    m_in_static_expr = true;
-    for (auto cur: node->get_expr_data ()) {
-      build_node (os, cur);
-    }
-    m_in_static_expr = false;
+    os << "while (" << build_expr (node->get_args().at(0)) << ") {";
     os << ") {\n";
     push_ctxt ();
     m_indent++;
@@ -468,10 +452,17 @@ namespace Smala
   void
   JSBuilder::build_for (std::ofstream &os, Node *node)
   {
-    indent (os);
-    os << "for ";
-    push_ctxt ();
+    ForNode *fn = (ForNode*) node;
     m_in_for = true;
+    indent (os);
+    os << "for (";
+    build_for_node (os, fn->first_st());
+    os << "; " << build_expr (fn->second_st()) << "; ";
+    build_for_node (os, fn->third_st());
+    os << ") {";
+    m_indent++;
+    push_ctxt ();
+    m_in_for = false;
   }
 
   void
@@ -519,20 +510,6 @@ namespace Smala
   }
 
   void
-  JSBuilder::pop_ctxt ()
-  {
-    BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-    m_parent_list.pop_back ();
-    if (n) delete n;
-  }
-
-  void
-  JSBuilder::push_ctxt ()
-  {
-    m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
-  }
-
-  void
   JSBuilder::build_control_node (std::ofstream &os, Node *node)
   {
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
@@ -562,14 +539,6 @@ namespace Smala
     }
 
     if (is_binding) {
-      /* check for synchronizer */
-      indent (os);
-      os << "if (get_process_type (" << dst << ") == process_type_e.SYNCHRONIZER_T) {\n";
-      indent (os);
-      os << "\tadd_source (" << dst << ", " << src << ", \"\");\n";
-      indent (os);
-      os << "} else {\n";
-      m_indent++;
       indent (os);
       if (!node->name ().empty ()) {
         std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -583,15 +552,11 @@ namespace Smala
       }
 
       //print_component_constructor (os, constructor);
-      indent (os);
       os << "Binding ";
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
       os << ", " << src << ", "; //\"\", ";
       os << (ctrl->get_in_act () == "true" ? "activation_flag_e.ACTIVATION" : "activation_flag_e.DEACTIVATION" )<< ", " << dst //<< ", \"\""
           << ", " << (ctrl->get_out_act () == "true" ? "activation_flag_e.ACTIVATION" : "activation_flag_e.DEACTIVATION" ) << ");\n";
-      m_indent--;
-      indent (os);
-      os << "}\n";
     } else {
       indent (os);
       if (!node->name ().empty ()) {
@@ -621,13 +586,13 @@ namespace Smala
   JSBuilder::build_multi_control_node (std::ofstream &os,
                                            NativeExpressionNode *node)
   {
-    TermNode* arg_node = node->get_expression ().at (0);
+    ExprNode* arg_node = node->get_expression ();
     std::string p_name =
             node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
-    std::string arg = build_find (arg_node->path_arg_value (), false);
+    std::string arg = build_find (arg_node->get_path (), false);
     std::string control_name = node->is_connector () ? "MultiConnector" : "MultiAssignment";
     int model = node->is_connector () ? !node->is_model () : node->is_model ();
-    if (arg_node->path_arg_value ()->has_wild_card ()) {
+    if (arg_node->get_path ()->has_wild_card ()) {
       for (auto e : node->get_output_nodes ()) {
         indent (os);
         std::string out_arg = build_find (e, false);
@@ -638,7 +603,7 @@ namespace Smala
     }
     indent (os);
     os << "{ var in_names = [\n";
-    std::vector<SubPathNode*> subpaths = arg_node->path_arg_value()->get_subpath_list();
+    std::vector<SubPathNode*> subpaths = arg_node->get_path ()->get_subpath_list();
     std::string comma = "";
     for (auto p:subpaths.back()->get_path_list ()) {
       indent (os);
@@ -685,9 +650,9 @@ namespace Smala
   {
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
-    TermNode* arg_node = node->get_expression ().at (0);
+    ExprNode *arg_node = node->get_expression ();
     std::string arg;
-    if (arg_node->arg_type () != VAR) {
+    if (arg_node->get_expr_node_type () != PATH_EXPR) {
       
       std::string branch_name;
       if (node->parent()) {
@@ -702,14 +667,14 @@ namespace Smala
       
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       indent (os);
-      if (arg_node->str_arg_value ().at (0) == '\"') {
+      if (arg_node->get_expr_type() == STRING) {
         os << "var " << new_name << " = TextProperty (";
       } else {
         os << "var " << new_name << " = DoubleProperty (";
       }
 
       os << p_name;
-      os << ", \"\", " << arg_node->str_arg_value () << ");\n";
+      os << ", \"\", " << arg_node->get_val () << ");\n";
 
       if (!branch_name.empty()) {
         arg = branch_name;
@@ -718,11 +683,11 @@ namespace Smala
       }
 
     } else {
-      if (arg_node->path_arg_value()->has_path_list() || arg_node->path_arg_value()->has_wild_card()) {
+      if (arg_node->get_path()->has_path_list() || arg_node->get_path()->has_wild_card()) {
         build_multi_control_node (os, node);
         return;
       }
-      arg = build_find (arg_node->path_arg_value (), false);
+      arg = build_find (arg_node->get_path (), false);
     }
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -740,7 +705,6 @@ namespace Smala
       for (auto e : node->get_output_nodes ()) {
         indent (os);
         std::string out_arg = build_find (e, false);
-        os << " ";
         if (node->is_paused ())
           os << "Paused";
         if (node->is_connector ())
@@ -781,7 +745,7 @@ namespace Smala
   {
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
-    if (node->get_expression ().size () == 1) {
+    if (node->get_expression ()->get_expr_node_type() < 2) {
       build_simple_control_node (os, node);
       return;
     }
@@ -806,32 +770,34 @@ namespace Smala
        << p_name << ", " << n_expr_name << ", true, " << node->is_model ()
        << ");\n";
 
-    for (auto e : node->get_expression ()) {
-      if ((e->arg_type () == VAR)
-          && sym.find (e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()) == sym.end ()) {
-        std::string arg = build_find (e->path_arg_value(), true);
+    ExprNode* expr = node->get_expression();
+    std::vector <ExprNode*> leaves;
+    extract_leaves (leaves, expr);
+    for (auto l : leaves) {
+      if (l->get_expr_node_type() == PATH_EXPR
+            && sym.find (l->get_path()->get_subpath_list().at (0)->get_subpath()) == sym.end ()) {
+        std::string arg = build_find (l->get_path (), true);
 
         if (arg.compare (0, 6, "d_var_") == 0
             || arg.compare (0, 6, "i_var_") == 0) {
           indent (os);
-          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          os << "var " << new_name << " = DoubleProperty ("
-              << p_name << ", \"\", " << arg << ");\n";
-          indent (os);
-          std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "."<< new_param_name <<  "= " << new_name
-                << ";\n";
+        //  std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        //  os << "var " << new_name << " = DoubleProperty ("
+        //      << p_name << ", \"\", " << arg << ");\n";
+        //  indent (os);
+          std::string new_param_name = transform_name(l->get_path ()->get_subpath_list().at (0)->get_subpath());
+          os << native_name << "."<< new_param_name <<  "= " << arg << ";\n";
+          sym[l->get_path()->get_subpath_list().at (0)->get_subpath()] = new_param_name;
 
         } else if (arg.compare (0, 6, "s_var_") == 0) {
           indent (os);
-          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          os << "var " << new_name << " = TextProperty ("
-              << p_name << ", \"\", " <<arg << ");\n";
-          indent (os);
-          std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
-            os << native_name << "."<< new_param_name <<  "= " << new_name
-                << ";\n";
-
+          //std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          //os << "var " << new_name << " = TextProperty ("
+            //  << p_name << ", \"\", " <<arg << ");\n";
+          //indent (os);
+          std::string new_param_name = transform_name(l->get_path ()->get_subpath_list().at (0)->get_subpath());
+          os << native_name << "."<< new_param_name <<  "= " << arg << ";\n";
+          sym[l->get_path()->get_subpath_list().at (0)->get_subpath()] = new_param_name;
         } else {
           indent (os);
           arg = remove_deref (arg);
@@ -840,7 +806,7 @@ namespace Smala
             os << "var " << new_name
                 << " = " << arg << ";\n";
                         indent (os);
-            std::string fake_name = build_fake_name (e->path_arg_value (), false);
+            std::string fake_name = build_fake_name (l->get_path (), false);
             std::string new_param_name = transform_name (fake_name);
             os << native_name << "."<< new_param_name <<  "= " << new_name
                 << ";\n";
@@ -858,12 +824,12 @@ namespace Smala
             // indent (os);
             // os << "}\n";
             // indent (os);
-            emit_not_a_property (os, arg, e->path_arg_value ()->build_string_repr());//e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() );
-            std::string new_param_name = transform_name(e->path_arg_value ()->get_subpath_list().at (0)->get_subpath());
+            emit_not_a_property (os, arg, l->get_path ()->build_string_repr ());//e->path_arg_value ()->get_subpath_list().at (0)->get_subpath() );
+            std::string new_param_name = transform_name(l->get_path ()->get_subpath_list().at (0)->get_subpath());
             //os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg
             //    << ");\n";
             os << native_name << "."<< new_param_name <<  " = " << arg << ";\n";
-            sym[e->path_arg_value ()->get_subpath_list().at (0)->get_subpath()] = arg;
+            sym[l->get_path ()->get_subpath_list().at (0)->get_subpath()] = arg;
             triggers.push_back (arg);
             
           }
@@ -991,7 +957,7 @@ namespace Smala
     os << "//TODO build_native_expression\n";
     
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
-    if (node->get_expression ().size () == 1) {
+    if (node->get_expression ()->get_expr_node_type() < STEP) {
       return;
     }
     std::string unique_name = m_filename;
@@ -1114,19 +1080,11 @@ namespace Smala
           os << "if (" << arg << ")" << endl ;
           indent (os); indent (os);
           os << "dump (" << arg;
-          if (!n->has_argument ()) {
-            os << ", 0);\n";
-            indent (os);
-            os << "else" << endl ;
-            indent (os); indent (os);
-            //os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
-          }
-          else {
-            for (auto arg : n->args ()) {
-              build_term_node (os, arg);
-            }
-            os << ";\n";
-          }
+          os << ", 0);\n";
+          indent (os);
+          os << "else" << endl ;
+          indent (os); indent (os);
+          //os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case XMLSERIALIZE:
           os << "if (" << arg << ")" << endl ;
@@ -1196,130 +1154,17 @@ namespace Smala
                 && node->duplicate_warning ())
               print_error_message (error_level::warning,
                                    "duplicated name: " + node->name (), 0);
-      os << "var " << var_name << " = ";
+      os << "var " << var_name << " = " << build_expr (node->get_args().at(0), undefined_t) << ";\n";
     } else {
       prop_name = build_find (node->get_path(), false);
       if ( (prop_name.rfind ("cpnt_", 0) == 0) || (prop_name.rfind ("find_child (cpnt_", 0)==0) ) {
-        os << "set_value (" << prop_name << ",";
-        m_in_set_property = true;
+        os << "set_value (" << prop_name << "," << build_expr (node->get_args().at(0), undefined_t) << ", true);\n";
       } else {
-        os << prop_name << " = ";
+        os << prop_name << " = " << build_expr (node->get_args().at(0), undefined_t) << ";\n";
       }
     }
   }
 
-  void
-  JSBuilder::end_set_property (std::ofstream &os, Node *node)
-  {
-    if (m_in_set_property) {
-      os << ", true)";
-      m_in_set_property = false;
-    }
- //   if (!m_in_for)
-   //   os << ";\n";
-  }
-
-  void
-  JSBuilder::end_property (std::ofstream &os, Node *node)
-  {
-    if (node->name ().compare ("Text") == 0)
-      os << ")";
-    os << ", true);\n";
-    m_in_set_text = false;
-  }
-
-  void
-  JSBuilder::build_term_node (std::ofstream &os, Node *node)
-  {
-    TermNode *n = dynamic_cast<TermNode*> (node);
-    switch (n->arg_type ()) {
-      case SYMBOL:
-      case OPERATOR: {
-        if (m_in_set_text) {
-          //os << ")";
-        }
-        os << n->str_arg_value ();
-        if (m_in_set_text) {
-          os << "\"\" + ";
-        }
-      }
-        break;
-      case VALUE: {
-        if (m_in_set_text) {
-          os << "to_string (";
-        }
-        os << n->str_arg_value ();
-        if (m_in_set_text) {
-          os << ")";
-        }
-      }
-        break;
-      case FUNCTION_CALL:
-      case STRING_VALUE:
-        if (m_in_switch)
-          print_error_message (error_level::error, "Wrong type for switch argument", 1);
-        os << n->str_arg_value ();
-        break;
-      case VAR: {
-        if (m_in_switch) {
-          os << "\"" << n->path_arg_value ()->get_subpath_list().at(0)->get_subpath () << "\"";
-          m_in_switch = false;
-          return;
-        }
-        std::string p = build_find (n->path_arg_value (), false);
-        os << p;
-        break;
-      }
-      case SMALA_NULL: {
-        os << m_null_symbol;
-        break;
-      }
-      case START_LCB_BLOCK: {
-        os << "\n";
-        indent (os);
-        os << "{\n";
-        m_indent++;
-        break;
-      }
-      case END_LCB_BLOCK: {
-        os << "\n";
-        m_indent--;
-        indent (os);
-        os << "}\n";
-        break;
-      }
-      case END:
-        os << ");\n";
-        break;
-      default:
-        return;
-    }
-  }
-
-  void
-  JSBuilder::get_property (std::ofstream &os, Node *node)
-  {
-    std::string var_name;
-    var_name = ("pr_var_" + std::to_string (m_var_num++));
-    if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1)
-      print_error_message (error_level::warning,
-                           "duplicated name: " + node->name (), 0);
-    indent (os);
-
-    if (node->djnn_type ().compare ("doubleToString") == 0) {
-      os << "var " << var_name
-          << " = \"\" + get_value_from_double (";
-    } else if (node->djnn_type ().compare ("intToString") == 0) {
-      os << "var " << var_name << " = get_value_from_int (";
-    }
-    std::string arg = build_find (node->get_path(), false);
-    os << arg;
-    if (node->djnn_type ().compare ("doubleToString") == 0
-        || node->djnn_type ().compare ("intToString") == 0) {
-      os << ")";
-    }
-    os << ";\n";
-  }
 
   void
   JSBuilder::alias (std::ofstream &os, Node *node)

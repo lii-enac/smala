@@ -261,8 +261,7 @@ bin_name := smalac
 smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o driver.o node.o smala_native.o ctrl_node.o \
 	newvar_node.o instruction_node.o binary_instruction_node.o expr_node.o name_context.o \
 	native_expression_node.o native_component_node.o range_node.o set_parent_node.o transition_node.o preamble.o ast.o \
-	builder.o cpp_builder.o  main.o parser.o scanner.o
-#js_type_manager.o js_builder.o html_builder.o
+	js_type_manager.o js_builder.o html_builder.o builder.o cpp_builder.o main.o parser.o scanner.o
 	
 
 smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))

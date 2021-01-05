@@ -99,6 +99,94 @@ namespace Smala
     return m_name;
   }
 
+  bool
+  Builder::is_string (ExprNode *e)
+  {
+    switch (e->get_expr_node_type ())
+      {
+      case LITERAL:
+        return e->get_expr_type () == STRING;
+      case PATH_EXPR:
+        return e->get_expr_type () == CAST_STRING;
+      case STEP:
+      case FUNCTION:
+      case UNARY_OP:
+        return false;
+      case BINARY_OP:
+        {
+          BinaryExprNode *bin = (BinaryExprNode*) e;
+          if (bin->get_val ().compare ("+") == 0
+              || bin->get_val ().compare ("==") == 0)
+            {
+              return is_string (bin->get_left_child ())
+                  || is_string (bin->get_right_child ());
+            }
+          else return false;
+        }
+      case TERNARY_OP:
+        {
+          TernaryExprNode *ter = (TernaryExprNode*) e;
+          return is_string (ter->get_left_child ())
+              || is_string (ter->get_right_child ());
+        }
+      }
+    return false;
+  }
+
+  bool
+  Builder::has_complex_term (PathNode* n)
+  {
+    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
+    for (auto n: n_list) {
+      if (n->get_path_type () == EXPR) {
+        if (n->get_expr()->get_expr_node_type () != LITERAL)
+          return true;
+      }
+    }
+    return false;
+  }
+  void
+  Builder::pop_ctxt ()
+  {
+    BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+    m_parent_list.pop_back ();
+    if (n) delete n;
+  }
+
+  void
+  Builder::push_ctxt ()
+  {
+    m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
+  }
+
+  void
+  Builder::extract_leaves (std::vector<ExprNode*> &leaves, ExprNode *n)
+  {
+    switch (n->get_expr_node_type()) {
+      case LITERAL:
+      case PATH_EXPR:
+      case STEP:
+        leaves.push_back (n);
+        break;
+      case FUNCTION:
+        for (auto arg: ((FunctionExprNode*)n)->get_args()) {
+          extract_leaves(leaves, arg);
+        }
+        break;
+      case UNARY_OP:
+        extract_leaves(leaves, ((UnaryExprNode*)n)->get_child());
+        break;
+      case BINARY_OP:
+        extract_leaves(leaves, ((BinaryExprNode*)n)->get_left_child());
+        extract_leaves(leaves, ((BinaryExprNode*)n)->get_right_child());
+        break;
+      case TERNARY_OP:
+        extract_leaves(leaves, ((TernaryExprNode*)n)->get_condition());
+        extract_leaves(leaves, ((TernaryExprNode*)n)->get_left_child());
+        extract_leaves(leaves, ((TernaryExprNode*)n)->get_right_child());
+        break;
+    }
+  }
   void
   Builder::build_preamble (std::ofstream &os)
   {

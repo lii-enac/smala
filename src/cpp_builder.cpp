@@ -350,8 +350,11 @@ namespace Smala
       if (n_list.at (i)->get_path_type () != EXPR)
         str += n->get_subpath_list ().at (i)->get_subpath ();
       else {
+        str += "\")->find_child (";
         ExprNode* expr = n->get_subpath_list ().at (i)->get_expr ();
         str += build_expr (expr);
+        if (i < n_list.size () - 1)
+          str += ")->find_child (\"";
        }
      pref = "/";
     }

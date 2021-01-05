@@ -1397,27 +1397,31 @@ assignment_list
 binding_src
   : assignment_expression
   {
-     NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, true, false);
-     expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+    if ($1->get_expr_node_type () == PATH_EXPR) {
+      $$ = $1->get_path ();
+    } else {
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, true, false);
+      expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
-    // build a local bool that will serve as an output for a connector
-    // and an input for the binding in construction
-    std::string loc_name ("loc_bool");
-    loc_name.append (to_string(loc_node_num++));
-    std::vector<SubPathNode*> path;
-    path.push_back (new SubPathNode (@$, loc_name, START));
-    Node *node = new Node (@$, SIMPLE, "Bool", loc_name);
-    driver.add_node (node);
-    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-    ExprNode *n = new ExprNode (@$, "0", LITERAL, BOOL);
-    node->add_arg (n);
+      // build a local bool that will serve as an output for a connector
+      // and an input for the binding in construction
+      std::string loc_name ("loc_bool");
+      loc_name.append (to_string(loc_node_num++));
+      std::vector<SubPathNode*> path;
+      path.push_back (new SubPathNode (@$, loc_name, START));
+      Node *node = new Node (@$, SIMPLE, "Bool", loc_name);
+      driver.add_node (node);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      ExprNode *n = new ExprNode (@$, "0", LITERAL, BOOL);
+      node->add_arg (n);
 
-    expr_node->add_output_node (new PathNode (@$, path));
-    driver.add_native_expression (expr_node);
-    driver.add_node (expr_node);
-    path.push_back (new SubPathNode (@$, "true", ITEM));
-    loc_name.append(".true");
-    $$ = new PathNode (@$, path);
+      expr_node->add_output_node (new PathNode (@$, path));
+      driver.add_native_expression (expr_node);
+      driver.add_node (expr_node);
+      path.push_back (new SubPathNode (@$, "true", ITEM));
+      loc_name.append(".true");
+      $$ = new PathNode (@$, path);
+    }
   }
 
 binding_type

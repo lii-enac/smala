@@ -261,8 +261,25 @@ bin_name := smalac
 smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o driver.o node.o smala_native.o ctrl_node.o \
 	newvar_node.o instruction_node.o binary_instruction_node.o expr_node.o name_context.o \
 	native_expression_node.o native_component_node.o range_node.o set_parent_node.o transition_node.o preamble.o ast.o \
-	js_type_manager.o js_builder.o html_builder.o builder.o cpp_builder.o main.o parser.o scanner.o
-	
+	js_type_manager.o js_builder.o html_builder.o builder.o cpp_builder.o main.o parser.o scanner.o \
+	process_class_path.o
+
+$(build_dir)/src/process_class_path.cpp:
+	$(eval tmpfile := $(shell mktemp))
+	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
+	pushd $(djnn_path)/src && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile)
+	awk '{print "{\""$$1"\""",""\""$$2"\"""},"}' $(tmpfile) >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  ../djnn-cpp-master/src/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  ../djnn-cpp-master/src/base/trigonometry.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  ../djnn-cpp-master/src/base/text.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
+	printf "{\"MultiConnector\",\"base/connector.h\"}," >> $@
+	printf "{\"MultiAssignment\",\"core/control/assignment.h\"}," >> $@
+	printf '{"",""}};\n}\n' >> $@
+	rm $(tmpfile)
+#	cat <<EOT >> $@
+#	#include <map>
+#	EOT
+
 
 smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))
 

@@ -6,6 +6,7 @@ use physics
 _native_code_
 %{
 #include <cmath>
+//using namespace std;
 %}
 
 _main_

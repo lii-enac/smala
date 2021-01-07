@@ -5,6 +5,7 @@
 #include "core/ontology/process.h"
 #include "core/tree/spike.h"
 #include "core/execution/graph.h"
+#include "core/core-dev.h" // GRAPH_EXEC
 #include "core/tree/blank.h"
 #include "core/tree/component.h"
 #include "core/tree/double_property.h"

@@ -19,11 +19,15 @@ use gui
 
 import Button
 
+_native_code_
+%{
+#include <iostream>
+%}
 
 _action_
 myFunc (Process c) 
 %{
-  cout << ("Button clicked") << endl;
+  std::cout << ("Button clicked") << std::endl;
 %}
 
 

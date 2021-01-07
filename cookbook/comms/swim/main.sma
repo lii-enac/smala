@@ -52,9 +52,11 @@ dans postman
 _native_code_
 %{
 #include "exec_env/global_mutex.h"
+#include "core/execution/graph.h"
 
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

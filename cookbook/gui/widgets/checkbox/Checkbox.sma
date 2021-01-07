@@ -16,6 +16,11 @@ use base
 use display
 use gui
 
+_native_code_
+%{
+using namespace std;
+%}
+
 _define_
 Checkbox (int nb_entry) {
   Int entry (0)

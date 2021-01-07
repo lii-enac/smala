@@ -220,7 +220,7 @@ namespace Smala
         }
     }
     /* inline function */
-    build_post_import (os);
+    //build_post_import (os); // only in case of deref
 
 
     /* user-defined native code here so native expression can use it */

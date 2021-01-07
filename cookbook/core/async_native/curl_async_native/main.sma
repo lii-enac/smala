@@ -22,7 +22,11 @@ import gui.interactors.SimpleDrag
 
 _native_code_
 %{
+#include <iostream>
+
 #include "exec_env/global_mutex.h"
+#include "core/execution/graph.h"
+#include "core/core-dev.h" // GRAPH_EXEC
 
 namespace curl { // fix 'Rectangle' clash name for windowss
 #include <curl/curl.h>
@@ -74,7 +78,7 @@ cpp_action (Process* c)
     auto beg = content.find("<item>");
     beg = content.find("<title>", beg);
     auto end = content.find("</title>", beg+7);
-    string news = content.substr(beg+7,end-(beg+7));
+    std::string news = content.substr(beg+7,end-(beg+7));
     std::cerr << news << std::endl;
     
     

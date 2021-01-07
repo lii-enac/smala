@@ -356,15 +356,25 @@ namespace Smala
         str += n->get_subpath_list ().at (i)->get_subpath ();
       }
       else {
-        if (in_path) {
-          str += "\")";
-          in_path = false;
-        }
-        str += "->find_child (";
         ExprNode* expr = n->get_subpath_list ().at (i)->get_expr ();
-        str += build_expr (expr);
-        str += ")";
-       }
+        if (expr->get_expr_node_type () == LITERAL && expr->get_expr_type () == INT) {
+          if (in_path)
+            str += "/";
+          else {
+            str += "->find_child (\"";
+            in_path = true;
+          }
+          str += expr->get_val ();
+        } else {
+          if (in_path) {
+            str += "\")";
+            in_path = false;
+          }
+          str += "->find_child (";
+          str += build_expr (expr);
+          str += ")";
+        }
+      }
     }
     if (in_path)
       str += "\")";

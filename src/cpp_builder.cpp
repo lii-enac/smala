@@ -212,13 +212,12 @@ namespace Smala
           path = transform_name (build_fake_name(((PathExprNode*)e)->get_path(), false));
         } else {
           if (m_in_switch)
-            path = "\"";
-          path += build_path (((PathExprNode*)e)->get_path());
-          // if no path is found check for a global symbol
-          if (path.empty())
-            path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
-          if (m_in_switch) {
-            path += "\"";
+            path = "\"" + ((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath () + "\"";
+          else {
+            path += build_path (((PathExprNode*)e)->get_path());
+            // if no path is found check for a global symbol
+            if (path.empty())
+              path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
           }
         }
         if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {

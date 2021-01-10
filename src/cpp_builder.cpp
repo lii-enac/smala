@@ -84,6 +84,7 @@ namespace Smala
     os << "#include \"exec_env/exec_env.h\"\n\n";
 */
 
+    //os << "#include \"c_api/djnn_c_api.h\"\n"; // c header
     os << "#include \"core/utils/error.h\" // for Context class\n";
     os << "#undef error // avoid name clash with error macro and possible following #include\n";
     os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
@@ -1669,9 +1670,12 @@ namespace Smala
   {
     std::map<std::string, std::string>::iterator it;
     it = m_import_types.find (constructor);
-    if (it == m_import_types.end ())
+    if (it == m_import_types.end ()) {
       os << "new " << constructor;
-    else
+      //os << "djnn_new_" << constructor; // c header
+    }
+    else {
       os << constructor;
+    }
   }
 } /* namespace Smala */

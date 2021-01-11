@@ -691,12 +691,12 @@ for_loop
     {
       $1->set_statements ($3, $5, $7);
       m_in_for = false;
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
     }
 
 start_for
   : FOR
     {
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
       ForNode *n = new ForNode (@$);
       driver.add_node (n);
       $$ = n;

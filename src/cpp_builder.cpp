@@ -466,6 +466,7 @@ namespace Smala
   CPPBuilder::build_for (std::ofstream &os, Node *node)
   {
     ForNode *fn = (ForNode*) node;
+    push_ctxt ();
     m_in_for = true;
     indent (os);
     os << "for (";
@@ -474,7 +475,6 @@ namespace Smala
     build_for_node (os, fn->third_st());
     os << ") {";
     m_indent++;
-    push_ctxt ();
     m_in_for = false;
   }
 

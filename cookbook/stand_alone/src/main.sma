@@ -13,6 +13,7 @@
  */
 
 use core
+use exec_env
 use base
 use display
 use gui
@@ -23,10 +24,15 @@ import Button
 // smala lib
 //import gui.widgets.Button
 
+_native_code_
+%{
+#include <iostream>
+%}
+
 _action_
 myFunc (Process c) 
 %{
-  cout << ("Button clicked") << endl;
+  std::cout << ("Button clicked") << std::endl;
 %}
 
 

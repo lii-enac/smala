@@ -167,8 +167,11 @@ djnn_libs_SL := $(djnn_libs)
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
 
+CXXFLAGS_CK += -std=c++17 $(djnn_cflags)
+
 ifeq ($(os),Linux)
 #CXXFLAGS +=
+compiler ?= gnu
 CFLAGS +=  -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
@@ -180,6 +183,7 @@ endif
 
 ifeq ($(os),Darwin)
 #CFLAGS +=
+compiler ?= llvm
 YACC = /usr/local/opt/bison/bin/bison -d -W #--report=state
 LEX = /usr/local/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
@@ -193,6 +197,7 @@ DYNLIB = -dynamiclib
 endif
 
 ifeq ($(os),MinGW)
+compiler ?= gnu
 CFLAGS += -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=PATH
@@ -304,7 +309,7 @@ smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
 
-$(smala_lib_objs): CFLAGS += $(djnn_cflags)
+$(smala_lib_objs): CFLAGS += $(CXXFLAGS_CK) #$(djnn_cflags)
 $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs) 
@@ -383,6 +388,62 @@ $(merr): $(merr_objs)
 
 $(build_dir)/src/parser.cpp: src/errors.h
 
+
+
+# ---------------------------------------
+# precompiled headers
+
+# https://stackoverflow.com/questions/58841/precompiled-headers-with-gcc
+# https://stackoverflow.com/questions/26755219/how-to-use-pch-with-clang
+
+compiler ?= llvm
+
+ifeq ($(compiler),llvm)
+pch_ext = .pch
+endif
+ifeq ($(compiler),gnu)
+pch_ext = .gch
+endif
+
+pch := precompiled.h
+pch_src := $(djnn_path)/src/core/utils/build/$(pch)
+pch_dst := $(build_dir)/cookbook/$(pch)$(pch_ext)
+
+pch_: $(pch_dst)
+
+# SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
+# FIXME this is not safe as every other external lib may define something
+ifeq ($(compiler),gnu)
+# https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
+# Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
+CXXFLAGS_CK += -D_REENTRANT
+ifeq ($(display),SDL)
+CXXFLAGS_CK += -Dmain=SDL_main
+endif
+endif
+
+CXXFLAGS_PCH := $(CXXFLAGS_CK)
+
+$(pch_dst): $(pch_src)
+	@mkdir -p $(dir $@)
+ifeq ($V,max)
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+else
+	@$(call rule_message,compiling,$(stylized_target))
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+endif
+
+ifeq ($(compiler),llvm)
+CXXFLAGS_CK += -include-pch $(pch_dst)
+#-fpch-instantiate-templates -fpch-codegen -fpch-debuginfo
+endif
+ifeq ($(compiler),gnu)
+# https://stackoverflow.com/a/3164874
+CXXFLAGS_CK += -I$(dir $(pch_dst)) -include $(pch) -Winvalid-pch
+#-fno-implicit-templates
+#$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
+endif
+
 # -----------
 # cookbook apps
 
@@ -447,7 +508,7 @@ $1_app_link := $$(CXX_CK)
 #$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += $$(djnn_cflags) $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
+$$($1_app_objs): CFLAGS += $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
 $$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
@@ -476,6 +537,7 @@ $$(notdir $1)_dbg_print:
 	@echo $$($1_app_gensrcs)
 
 deps += $$($1_app_objs:.o=.d)
+objs += $$($1_app_objs)
 endef
 
 
@@ -496,6 +558,10 @@ $(foreach a,$(cookbook_apps),$(eval $(call cookbookapp_makerule,$a)))
 cookbook_apps: $(notdir $(cookbook_apps))
 cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 
+
+# precompiled header deps
+$(objs): $(pch_dst)
+$(smala_lib_objs): $(pch_dst)
 
 # ---------------------------------------
 # rules

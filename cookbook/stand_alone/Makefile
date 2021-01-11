@@ -132,17 +132,20 @@ endif
 CXXFLAGS += -MMD -g -std=c++14
 
 ifeq ($(os),Linux)
+compiler ?= gnu
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 endif
 
 ifeq ($(os),Darwin)
+compiler ?= llvm
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 endif
 
 ifeq ($(os),MinGW)
+compiler ?= gnu
 LD_LIBRARY_PATH=PATH
 debugger := gdb
 endif
@@ -184,6 +187,65 @@ else
 app_libs := $(addprefix -ldjnn-,$(djnn_libs))
 endif
 
+ifeq ($(use_pch),yes)
+# ---------------------------------------
+# precompiled headers
+
+# https://stackoverflow.com/questions/58841/precompiled-headers-with-gcc
+# https://stackoverflow.com/questions/26755219/how-to-use-pch-with-clang
+
+ifeq ($(compiler),llvm)
+pch_ext = .pch
+endif
+ifeq ($(compiler),gnu)
+pch_ext = .gch
+endif
+
+pch := precompiled.h
+pch_src := $(djnn_cpp_path)/src/core/utils/build/$(pch)
+#pch_src := helper/$(pch)
+pch_dst := $(build_dir)/$(pch_src)$(pch_ext)
+
+#pch_: $(pch_dst)
+
+# SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
+# FIXME this is not safe as every other external lib may define something
+ifeq ($(compiler),gnu)
+# https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
+# Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
+CXXFLAGS += -D_REENTRANT
+ifeq ($(display),SDL)
+CXXFLAGS += -Dmain=SDL_main
+endif
+endif
+
+CXXFLAGS_PCH := $(CXXFLAGS) $(djnn_cflags) $(smala_cflags)
+
+$(pch_dst): $(pch_src)
+	@mkdir -p $(dir $@)
+ifeq ($V,max)
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+else
+	@$(call rule_message,compiling,$(stylized_target))
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+endif
+
+ifeq ($(compiler),llvm)
+CXXFLAGS += -include-pch $(pch_dst)
+#-fpch-instantiate-templates -fpch-codegen -fpch-debuginfo
+endif
+ifeq ($(compiler),gnu)
+# https://stackoverflow.com/a/3164874
+CXXFLAGS += -I$(dir $(pch_dst)) -include $(pch) -Winvalid-pch
+#-fno-implicit-templates
+#$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
+endif
+
+$(objs): $(pch_dst)
+endif
+
+
+#----------------------------
 
 $(objs): CXXFLAGS += $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
 $(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)

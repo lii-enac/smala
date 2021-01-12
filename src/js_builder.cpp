@@ -182,13 +182,12 @@ namespace Smala
             path = transform_name (build_fake_name(((PathExprNode*)e)->get_path(), false));
           } else {
             if (m_in_switch)
-              path = "\"";
-            path += build_path (((PathExprNode*)e)->get_path());
-            // if no path is found check for a global symbol
-            if (path.empty())
-              path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
-            if (m_in_switch) {
-              path += "\"";
+              path = "\"" + ((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath () + "\"";
+            else {
+              path += build_path (((PathExprNode*)e)->get_path());
+              // if no path is found check for a global symbol
+              if (path.empty())
+               path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
             }
           }
           if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
@@ -304,30 +303,59 @@ namespace Smala
 
 
   std::string
-  JSBuilder::build_path (PathNode* n)
+  JSBuilder::build_path (PathNode *n)
   {
     std::vector<SubPathNode*> n_list = n->get_subpath_list ();
     std::string symbol = n_list.at (0)->get_subpath ();
     std::string str = m_parent_list.back ()->get_symbol (symbol);
-    if (n_list.size () == 1)
-      return str;
-    if (n_list.size () == 2 && (n_list.at (1)->get_path_type () == WILD_CARD || n_list.at (1)->get_path_type () == PATH_LIST))
-      return str;
-    str = "find_child (" + str + ", \"";
-    std::string pref = "";
-    for (int i = 1; i < n_list.size (); i++) {
-      str += pref;
-      if (n_list.at (i)->get_path_type () == WILD_CARD || n_list.at (i)->get_path_type () == PATH_LIST)
-        break;
-      if (n_list.at (i)->get_path_type () != EXPR)
-        str += n->get_subpath_list ().at (i)->get_subpath ();
-      else {
-        ExprNode* expr = n->get_subpath_list ().at (i)->get_expr ();
-        str += build_expr (expr);
-       }
-     pref = "/";
-    }
-    str += "\")";
+    if (n_list.size () == 1) return str;
+    if (n_list.size () == 2
+        && (n_list.at (1)->get_path_type () == WILD_CARD
+            || n_list.at (1)->get_path_type () == PATH_LIST)) return str;
+
+    bool in_path = false;
+    for (int i = 1; i < n_list.size (); i++)
+      {
+        if (n_list.at (i)->get_path_type () == WILD_CARD
+            || n_list.at (i)->get_path_type () == PATH_LIST) break;
+        if (n_list.at (i)->get_path_type () != EXPR)
+          {
+            if (in_path) str += "/";
+            else
+              {
+                str = "find_child (" + str + ", \"";
+                in_path = true;
+              }
+            str += n->get_subpath_list ().at (i)->get_subpath ();
+          }
+        else
+          {
+            ExprNode *expr = n->get_subpath_list ().at (i)->get_expr ();
+            if (expr->get_expr_node_type () == LITERAL
+                && expr->get_expr_type () == INT)
+              {
+                if (in_path) str += "/";
+                else
+                  {
+                    str = "find_child (" + str + ", \"";
+                    in_path = true;
+                  }
+                str += expr->get_val ();
+              }
+            else
+              {
+                if (in_path)
+                  {
+                    str += "\")";
+                    in_path = false;
+                  }
+                str = "find_child (" + str + ", ";
+                str += build_expr (expr);
+                str += ")";
+              }
+          }
+      }
+    if (in_path) str += "\")";
     return str;
   }
 
@@ -339,64 +367,27 @@ namespace Smala
       return "";
 
     std::string str;
-    std::string prefix;
     std::string symbol = n_list.at (0)->get_subpath ();
-    bool complex_term = has_complex_term (n);
+    str = m_parent_list.back ()->get_symbol (symbol);
 
-    /* check for complex expression in terms, if not build classic path*/
-    if (!complex_term)
-      str = build_path (n);
-    else
-      str = m_parent_list.back ()->get_symbol (symbol);
-
-    //if (!ignore_cast) {
-      switch (n->get_cast ()) {
-        case NO_CAST:
-        case BY_PROCESS:
-          prefix = "";
-          break;
-        case BY_VALUE:
-          prefix = "get_double_value (";
-          break;
-        case BY_REF:
-          prefix = "(*((AbstractProperty*)";
-          break;
-      }
-    //}
     if (str.empty ()) {
       // then check if it is a Djnn symbol that is a key prefixed by DJN
-      if (symbol.substr (0, 3) == "DJN")
-        return symbol;
+      if (symbol.substr (0, 3) == "DJN") return symbol;
       else {
         // finally check if it is a Smala symbol
         str = m_type_manager->get_smala_symbol (symbol);
-        if (!str.empty ())
-          return str;
+        if (!str.empty ()) return str;
       }
       // if everything fails, print an error message
-      print_error_message (error_level::error, "Symbol not found: " + symbol,
-                           1);
+      print_error_message (error_level::error, "Symbol not found: " + symbol, 1);
       return symbol;
     }
-    if (str.compare (0, 6, "d_var_") == 0
-        || str.compare (0, 6, "i_var_") == 0
-        || str.compare (0, 6, "s_var_") == 0
-        || str.compare (0, 4, "var_") == 0) {
+    if (str.compare (0, 6, "d_var_") == 0 || str.compare (0, 6, "i_var_") == 0
+        || str.compare (0, 6, "s_var_") == 0 || str.compare (0, 4, "var_") == 0) {
       return str;
     }
-    if (complex_term) {
-      for (auto it = n_list.begin() + 1; it != n_list.end(); ++it) {
-        if ((*it)->get_path_type () == WILD_CARD || (*it)->get_path_type () == PATH_LIST)
-          break;
-        else if ((*it)->get_path_type () != EXPR)
-          str = "find_child (" + str + ", \"" + (*it)->get_subpath () + "\")";
-        else {
-          str = "find_child (" + str + ", ";
-          str += build_expr ((*it)->get_expr ());
-          str += ")";
-        }
-      }
-    }
+    str = build_path (n);
+
     return str;
   }
 
@@ -453,6 +444,7 @@ namespace Smala
   JSBuilder::build_for (std::ofstream &os, Node *node)
   {
     ForNode *fn = (ForNode*) node;
+    push_ctxt ();
     m_in_for = true;
     indent (os);
     os << "for (";
@@ -461,7 +453,6 @@ namespace Smala
     build_for_node (os, fn->third_st());
     os << ") {";
     m_indent++;
-    push_ctxt ();
     m_in_for = false;
   }
 

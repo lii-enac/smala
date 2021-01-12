@@ -220,6 +220,8 @@ namespace Smala
             expr += build_expr (un->get_child(), number_t, build_fake);
           } else if (un->get_val().compare ("&") == 0 && (un->get_child()->get_expr_type() == PROCESS)) {
             expr += build_expr (un->get_child(), process_t, build_fake);
+          } else if (un->get_val().compare ("$") == 0 || un->get_val().compare ("&") == 0){
+            expr += build_expr (un->get_child(), prod_t, build_fake);
           } else {
             expr += un->get_val () + " " + build_expr (un->get_child(), prod_t, build_fake);
           }

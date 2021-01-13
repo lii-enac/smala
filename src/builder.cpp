@@ -350,14 +350,17 @@ namespace Smala
       case START_ELSEIF:
       {
         indent  (os);
+        m_after_else = true;
         build_start_else_if (os);
         break;
       }
       case START_IF:
       {
         push_ctxt ();
-        indent  (os);
+        if (!m_after_else)
+          indent  (os);
         build_start_if (os, node);
+        m_after_else = false
         break;
       }
       case BREAK:

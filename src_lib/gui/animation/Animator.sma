@@ -11,6 +11,8 @@ Animator (int duration, double _min, double _max, int func, int loop)
   Spike pause
   Spike resume
   Spike reset
+  Double min (_min)
+  Double max (_max)
   Double output (0)
   Double min (_min)
   Double max (_max)
@@ -26,7 +28,10 @@ Animator (int duration, double _min, double _max, int func, int loop)
   gen.output * (max - min) + min =:> output
  
   FSM fsm {
-    State stopped
+    State stopped {
+      0 =: inc.state 
+      0 =: gen.input
+    }
     State started {
       Clock cl (60)
       Int num_step (0)

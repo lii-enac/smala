@@ -360,7 +360,7 @@ namespace Smala
         if (!m_after_else)
           indent  (os);
         build_start_if (os, node);
-        m_after_else = false
+        m_after_else = false;
         break;
       }
       case BREAK:

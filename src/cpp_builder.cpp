@@ -93,7 +93,6 @@ namespace Smala
 
     size = m_ast.node_list ().size ();
     location last_loc;
-    bool in_code = false;
 
     for (int i = 0; i < size; ++i) {
       Node * node = m_ast.node_list ().at (i);
@@ -103,7 +102,9 @@ namespace Smala
         if(loc.begin.line != last_loc.begin.line) {
           auto * f = node->get_location().begin.filename;
           os << "\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
-          if (in_code) {
+          if (node->node_type () == START_ELSEIF || node->node_type () == START_ELSE)
+            m_in_code = false;
+          if (m_in_code) {
               os << "Context::instance()->parser_info(" 
                  << node->get_location().begin.line << ", "
                  << node->get_location().begin.column << ", "
@@ -112,6 +113,9 @@ namespace Smala
                  << "\"" << (f?*f:std::string("")) << "\""
                  << ");"
                  << std::endl;
+          }
+          if (node->node_type () == START_IF || node->node_type () == END_BLOCK) {
+            m_in_code = true;
           }
           last_loc = loc;
         }
@@ -125,9 +129,9 @@ namespace Smala
 
       if(debug) {
         if (node->node_type()==START_MAIN || node->node_type()==START_DEFINE)
-          in_code = true;
+          m_in_code = true;
         if (node->node_type()==END_MAIN || node->node_type()==END_DEFINE)
-          in_code = false;
+          m_in_code = false;
       }
 
     }

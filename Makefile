@@ -405,11 +405,11 @@ ifeq ($(compiler),gnu)
 pch_ext = .gch
 endif
 
-pch := precompiled.h
-pch_src := $(djnn_path)/src/core/utils/build/$(pch)
-pch_dst := $(build_dir)/cookbook/$(pch)$(pch_ext)
+pch_file := precompiled.h
+pch_src := $(djnn_path)/src/core/utils/build/$(pch_file)
+pch_dst := $(build_dir)/cookbook/$(pch_file)$(pch_ext)
 
-pch_: $(pch_dst)
+pch: $(pch_dst)
 
 # SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
 # FIXME this is not safe as every other external lib may define something
@@ -439,7 +439,7 @@ CXXFLAGS_CK += -include-pch $(pch_dst)
 endif
 ifeq ($(compiler),gnu)
 # https://stackoverflow.com/a/3164874
-CXXFLAGS_CK += -I$(dir $(pch_dst)) -include $(pch) -Winvalid-pch
+CXXFLAGS_CK += -I$(dir $(pch_dst)) -include $(pch_file) -Winvalid-pch
 #-fno-implicit-templates
 #$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
 endif
@@ -562,6 +562,7 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 # precompiled header deps
 $(objs): $(pch_dst)
 $(smala_lib_objs): $(pch_dst)
+$(smalac_objs): $(pch_dst) # should not be there, but necessary to make make -j lib work in case smalac should be rebuilt
 
 # ---------------------------------------
 # rules

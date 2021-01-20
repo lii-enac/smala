@@ -97,11 +97,13 @@
   vector<SubPathNode*> subpath;
   vector<Node*> expression;
   vector<BuildNameContext*> name_context_list;
+  std::vector<SymTable*> lambda_sym_table_list;
   std::vector<SymTable*> sym_table_list;
   vector<int> int_array;
   Node *cur_node, *root = nullptr;
   //bool m_in_add_children = false;
   bool m_terminate = false;
+  bool m_in_lambda = false;
   int m_in_add_children = 0;
   bool m_in_arguments = false;
   bool m_in_for = false;
@@ -129,6 +131,44 @@
     if (name_context_list.empty ())
       return false;
     return name_context_list.back ()->in_expr ();
+  }
+
+  void pop_sym_table () {
+    if (m_in_lambda)
+      lambda_sym_table_list.pop_back ();
+    else
+      sym_table_list.pop_back ();
+  }
+
+  void push_sym_table () {
+    if (m_in_lambda)
+      lambda_sym_table_list.push_back (new SymTable (lambda_sym_table_list.empty ()? nullptr : lambda_sym_table_list.back ()));
+    else
+      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+  }
+  void add_sym (const location& loc, const std::string& key, smala_t type) {
+    if (m_in_lambda)
+      lambda_sym_table_list.back()->add_sym (loc, key, type);
+    else
+      sym_table_list.back()->add_sym (loc, key, type);
+  }
+
+  bool exists (const std::string &key)
+  {
+    if (m_in_lambda) {
+      return lambda_sym_table_list.back ()->exists (key);
+    } else {
+      return sym_table_list.back ()->exists (key);
+    }
+  }
+
+  SmalaType get_type (const std::string &key)
+  {
+    if (m_in_lambda) {
+      return lambda_sym_table_list.back ()->get_type (key);
+    } else {
+      return sym_table_list.back ()->get_type (key);
+    }
   }
 }
 
@@ -296,7 +336,7 @@ program
   : preamble body
 
 preamble
-  : %empty { sym_table_list.push_back (new SymTable ()); }
+  : %empty { push_sym_table (); }
   | preamble use
   | preamble import
   | preamble native_code { driver.end_debug (); }
@@ -340,7 +380,7 @@ smala_action
     {
       Node *node = new Node (@$, END_NATIVE);
       driver.add_node (node);
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 smala_native_start
@@ -348,11 +388,11 @@ smala_native_start
     {
       driver.start_debug ();
       driver.in_preamble ();
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
-      sym_table_list.back()->add_sym (@$, $5, PROCESS);
+      push_sym_table ();
+      add_sym (@$, $5, PROCESS);
       int sz = $8.size();
       std::string user_data_name = sz >= 1 ? $8.at (sz - 1)->get_subpath () : "no_user_data";
-      sym_table_list.back()->add_sym (@$, user_data_name, PROCESS);
+      add_sym (@$, user_data_name, PROCESS);
       SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
     }
@@ -361,11 +401,11 @@ smala_native_start
       driver.start_debug ();
       SmalaNative *native = new SmalaNative (@$, $2, $5, new PathNode (@$, $8));
       driver.add_node (native);
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
-      sym_table_list.back()->add_sym (@$, $5, PROCESS);
+      push_sym_table ();
+      add_sym (@$, $5, PROCESS);
       int sz = $8.size();
       std::string user_data_name = sz >= 1 ? $8.at (sz - 1)->get_subpath () : "no_user_data";
-      sym_table_list.back()->add_sym (@$, user_data_name, PROCESS);
+      add_sym (@$, user_data_name, PROCESS);
     }
 
 rough_code
@@ -426,7 +466,7 @@ start_define
       Node *e_node = new Node (@$, THIS);
       parent_list.push_back (e_node);
       driver.add_node (e_node);
-      sym_table_list.back()->add_sym (@$, "this", PROCESS);
+      add_sym (@$, "this", PROCESS);
     }
 
 parameters
@@ -443,7 +483,7 @@ parameters
     }
 
 parameter
-  : type NAME { sym_table_list.back()->add_sym (@$, $2, $1); $$ = make_pair ($1, $2); }
+  : type NAME { add_sym (@$, $2, $1); $$ = make_pair ($1, $2); }
 
 //------------------------------------------------
 
@@ -521,7 +561,7 @@ start_eq
         lexer_expression_mode_on ();
       NewVarNode *n = new NewVarNode (@$, $1, $3, $2);
       m_in_imperative = true;
-      sym_table_list.back ()->add_sym (@$, $3, $1);
+      add_sym (@$, $3, $1);
       $$ = n;
     }
   | 
@@ -533,8 +573,8 @@ start_eq
       m_in_imperative = true;
       name_context_list.pop_back ();
       if ($1.size () == 1) {
-        if (!sym_table_list.back ()->exists ($1.at(0)->get_subpath ())) {
-          sym_table_list.back ()->add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
+        if (!exists ($1.at(0)->get_subpath ())) {
+          add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
         }
       }
       $$ = n;
@@ -650,7 +690,7 @@ while_loop
     {
       Node *n = new Node (@$, END_BLOCK);
       driver.add_node (n);
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 start_while
@@ -660,7 +700,7 @@ start_while
       n->add_arg ($3);
       driver.add_node (n);
       lexer_expression_mode_off ();
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      push_sym_table ();
     }
 
 for
@@ -668,13 +708,13 @@ for
   {
     Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
-    sym_table_list.pop_back ();
+    pop_sym_table ();
   }
   | forevery_loop LCB statement_list RCB
   {
     Node *n = new Node (@$, END_BLOCK);
     driver.add_node (n);
-    sym_table_list.pop_back ();
+    pop_sym_table ();
   }
 
 forevery_loop
@@ -682,8 +722,8 @@ forevery_loop
   {
     ForEveryNode *n = new ForEveryNode (@$, $2, new PathNode (@4, $4));
     driver.add_node (n);
-    sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
-    sym_table_list.back()->add_sym (@$, $2, PROCESS);
+    push_sym_table ();
+    add_sym (@$, $2, PROCESS);
   }
 
 for_loop
@@ -696,7 +736,7 @@ for_loop
 start_for
   : FOR
     {
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      push_sym_table ();
       ForNode *n = new ForNode (@$);
       driver.add_node (n);
       $$ = n;
@@ -727,7 +767,7 @@ start_else
   : ELSE LCB
     {
       driver.add_node (new Node (@$, START_ELSE));
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      push_sym_table ();
     }
 
 else
@@ -739,14 +779,14 @@ else
 end_if_exp
   : RP LCB
     {
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      push_sym_table ();
     }
 
 end_if_statement
   : RCB
     {
       driver.add_node (new Node (@$, END_BLOCK));
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 move
@@ -791,7 +831,7 @@ alias
       name_context_list.pop_back ();
       name_context_list.pop_back ();
       driver.add_node (new BinaryInstructionNode (@$, ALIAS, new PathNode (@1, $1), new PathNode (@3, $3)));
-      sym_table_list.back ()->add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
+      add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
     }
 
 merge
@@ -818,7 +858,7 @@ native
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       if ($2 != "_")
-        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+        add_sym (@$, $2, PROCESS);
     }
   | start_native NAME LP NAME COMMA name_or_path COMMA INT RP
     {
@@ -828,7 +868,7 @@ native
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
       if ($2 != "_")
-        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+        add_sym (@$, $2, PROCESS);
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA name_or_path COMMA INT RP
     {
@@ -838,7 +878,7 @@ native
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
       if ($2 != "_")
-        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+        add_sym (@$, $2, PROCESS);
     }
   | NATIVE_COLLECTION NAME LP NAME COMMA name_or_path COMMA INT RP
     {
@@ -848,7 +888,7 @@ native
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       name_context_list.pop_back ();
       if ($2 != "_")
-        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+        add_sym (@$, $2, PROCESS);
     }
 
 start_native
@@ -871,7 +911,7 @@ start_add_child
       Node* n = new Node (@$, ADD_CHILD, "addChild", $1);
       driver.add_node (n);
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      sym_table_list.back ()->add_sym (@$, $1, PROCESS);
+      add_sym (@$, $1, PROCESS);
       $$ = n;
     }
 
@@ -892,7 +932,7 @@ dash_array_decl
       int_array.clear ();
       $$ = $2;
       if ($2 != "_")
-        sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+        add_sym (@$, $2, PROCESS);
     }
 
 int_array_decl
@@ -917,7 +957,7 @@ range_decl
     node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     cur_node = node;
     if ($1 != "_")
-      sym_table_list.back ()->add_sym (@$, $1, PROCESS);
+      add_sym (@$, $1, PROCESS);
   }
 
 first_bound
@@ -1016,14 +1056,14 @@ start_statement_list
       if (cur_node->node_type () != RANGE)
         cur_node->set_node_type (CONTAINER);
       parent_list.push_back (cur_node);
-      sym_table_list.push_back (new SymTable (sym_table_list.empty () ? nullptr : sym_table_list.back()));
+      push_sym_table ();
     }
 end_statement_list
   : RCB 
     { 
       driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 simple_process_decl
@@ -1042,7 +1082,7 @@ simple_process_decl
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       cur_node = node;
       if ($3.compare("_") != 0)
-        sym_table_list.back ()->add_sym (@$, $3, PROCESS);
+        add_sym (@$, $3, PROCESS);
       $$ = node;
     }
 
@@ -1193,7 +1233,7 @@ step
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), true, sym_table_list.back ()->get_type ($1.at (0)->get_subpath ()));
+      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), true, get_type ($1.at (0)->get_subpath ()));
       $$ = n;
     }
   | name_or_path DECR
@@ -1201,7 +1241,7 @@ step
       if (!m_in_for && !m_in_arguments)
         lexer_expression_mode_on ();
       name_context_list.pop_back ();
-      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), false, sym_table_list.back ()->get_type ($1.at (0)->get_subpath ()));
+      StepExprNode *n = new StepExprNode (@$, new PathNode (@1, $1), false, get_type ($1.at (0)->get_subpath ()));
       $$ = n;
     }
   
@@ -1281,7 +1321,7 @@ primary_expression
 
     }
     else {
-      smala_t type = sym_table_list.back ()->get_type ($1.at (0)->get_subpath ());
+      smala_t type = get_type ($1.at (0)->get_subpath ());
       n = new PathExprNode (@$, new PathNode (@$, $1), type);
     }
     $$ = n;
@@ -1433,6 +1473,8 @@ binding_type
 lambda
   : start_lambda LCB statement_list RCB
     {
+      pop_sym_table ();
+      m_in_lambda = false;
       driver.add_node (new Node (@$, END_NATIVE));
       driver.end_preamble ();
       $$ = $1;
@@ -1448,6 +1490,9 @@ start_lambda
       SmalaNative *native = new SmalaNative (@$, new_name, "_src_", new PathNode (@2, $2));
       driver.add_node (native);
       $$ = new NativeComponentNode (@$, new_name, nullptr, new PathNode (@2, $2), "1", SIMPLE_ACTION);
+      m_in_lambda = true;
+      push_sym_table ();
+      add_sym (@$, $2.back()->get_subpath (), PROCESS);
     }
 
 assignment
@@ -1513,7 +1558,7 @@ fsm
       SetParentNode *p_node = new SetParentNode (@$, $1);
       driver.add_node (p_node);
       parent_list.pop_back ();
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 fsm_decl
@@ -1525,8 +1570,8 @@ fsm_decl
       parent_list.push_back (node);
       driver.add_node (node);
       if (driver.debug()) driver.new_line(@$);
-      sym_table_list.back()->add_sym (@$, $2, PROCESS);
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      add_sym (@$, $2, PROCESS);
+      push_sym_table ();
       $$ = node;
     }
 
@@ -1548,7 +1593,7 @@ state_decl
       Node *node = new Node (@$, SIMPLE, "FSMState", $2);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       driver.add_node (node);
-      sym_table_list.back ()->add_sym (@$, $2, PROCESS);
+      add_sym (@$, $2, PROCESS);
       cur_node = node;
       $$ = node;
     }
@@ -1556,7 +1601,7 @@ state_decl
 start_fsm_state
   : LCB
     {
-      sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
+      push_sym_table ();
       cur_node->set_node_type (CONTAINER);
       parent_list.push_back (cur_node);
     }
@@ -1565,7 +1610,7 @@ end_fsm_state
     {
       driver.add_node (new Node (@$, END_CONTAINER));
       parent_list.pop_back ();
-      sym_table_list.pop_back ();
+      pop_sym_table ();
     }
 
 fsm_transition_list

@@ -15,7 +15,6 @@
 */
 
 use core
-use exec_env // _main_ loop
 use base
 use display
 use gui

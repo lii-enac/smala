@@ -66,6 +66,7 @@ namespace Smala
     m_types.clear ();
     m_parent_list.clear ();
     m_parent_list.push_back (new BuildNode (m_null_symbol)); // the first parent is null
+
     if (!ast.is_main ())
       build_define (prefix);
 
@@ -85,6 +86,11 @@ namespace Smala
 */
 
     //os << "#include \"c_api/djnn_c_api.h\"\n"; // c header
+
+    if(m_ast.is_main ()) {
+        build_use(os, "exec_env");
+    }
+
     os << "#include \"core/utils/error.h\" // for Context class\n";
     os << "#undef error // avoid name clash with error macro and possible following #include\n";
     os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
@@ -166,6 +172,7 @@ namespace Smala
       catch(std::out_of_range&) {
       }
     }
+    final_os << "\n";
 
     std::ifstream os2 (tmp_file_name);
     final_os << os2.rdbuf ();
@@ -197,6 +204,8 @@ namespace Smala
       m_display_initialized = true;
     }
     os << "#include \"" << use << "/" << use << "-dev.h\"\n";
+
+    
     //os << "namespace djnn { extern void init_" << use << "(); extern void clear_" << use << "(); }\n"; 
   }
 
@@ -1457,10 +1466,10 @@ namespace Smala
       indent (os);
       os << "init_" << str << " ();\n";
 
-      /*if (str == "core") {
+      if (str == "core") {
         indent (os);
         os << "init_exec_env ();\n"; // do it after init_core ()
-      }*/
+      }
     }
   }
 

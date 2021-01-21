@@ -15,8 +15,13 @@
 #include "name_context.h"
 
 namespace Smala {
+  SymTable::SymTable (SymTable* t) : _prev (t) {
+    if (t == nullptr)
+        init_symtable ();
+  }
 
-  SymTable::SymTable () : _prev (nullptr) {
+  void
+  SymTable::init_symtable () {
     add_global_sym ("syshook", PROCESS);
     add_global_sym ("mainloop", PROCESS);
     add_global_sym ("InputDevices", PROCESS);

@@ -45,14 +45,14 @@ private:
 class SymTable
 {
 public:
-  SymTable ();
-  SymTable (SymTable* t): _prev (t) {}
+  SymTable (SymTable* t);
   ~SymTable () {}
   void add_global_sym (const std::string& key, smala_t type);
   int add_sym (const location& loc, const std::string& key, smala_t type);
   bool exists (const std::string &key) const;
   SmalaType get_type (const std::string &key) const;
 private:
+  void init_symtable ();
   std::map<std::string, SmalaType> _t;
   SymTable *_prev;
 };

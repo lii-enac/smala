@@ -236,6 +236,8 @@ namespace Smala
     os << "inline\n";
     os << "double smala_deref(double p)\n";
     os << "{ return p; }\n\n";
+
+    used_processes["AbstractPropery"] = true;
   }
 
   void
@@ -276,11 +278,13 @@ namespace Smala
         }
         if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
           expr += "((AbstractProperty*)" + path + ")->get_string_value ()";
+          used_processes["AbstractPropery"] = true;
         } else if (m_in_switch || prod_t == process_t || e->get_expr_type() != PROCESS) {
           expr += path;
           m_in_switch = false;
         } else {
           expr += "((AbstractProperty*)" + path + ")->get_double_value ()";
+          used_processes["AbstractPropery"] = true;
         }
         break;
       }
@@ -479,6 +483,7 @@ namespace Smala
     if (find.rfind ("cpnt_", 0) == 0) {
       res += "((AbstractProperty*) " + find + ")->set_value (";
       res += "((AbstractProperty*) " + find + ")->get_double_value ()";
+      used_processes["AbstractPropery"] = true;
       if (step->is_incr ())
         res += " +";
       else
@@ -892,6 +897,7 @@ namespace Smala
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             os << "AbstractProperty* " << new_name
                 << " = dynamic_cast<AbstractProperty*> (" << arg << ");\n";
+            used_processes["AbstractPropery"] = true;
             indent (os);
             emit_not_a_property (os, arg, l->get_path ()->build_string_repr ());
             // os << "if (" << new_name << " == nullptr) {\n";
@@ -926,6 +932,7 @@ namespace Smala
             std::string new_param_name = transform_name(l->get_path ()->get_subpath_list().at (0)->get_subpath());
             os << native_name << "->"<< new_param_name <<  " = dynamic_cast<AbstractProperty*>(" << arg
                 << ");\n";
+            used_processes["AbstractPropery"] = true;
             sym[l->get_path ()->get_subpath_list().at (0)->get_subpath()] = arg;
             triggers.push_back (arg);
             
@@ -954,12 +961,14 @@ namespace Smala
             os << native_name << "->"<< new_param_name
                 << " = dynamic_cast<AbstractProperty*>(" << arg
                 << ");\n";
+            used_processes["AbstractPropery"] = true;
             sym[e->get_subpath_list().at (0)->get_subpath()] = arg;
           } else {
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             os << "AbstractProperty* " << new_name
                 << " = dynamic_cast<AbstractProperty*> (" << arg << ");\n";
             indent (os);
+            used_processes["AbstractPropery"] = true;
             // os << "if (" << new_name << " == nullptr) {\n";
             // indent (os);
             // os << "\tcerr << \"" << e->build_string_repr ()//e->get_subpath_list().at (0)->get_subpath()
@@ -1087,6 +1096,7 @@ namespace Smala
       std::string tn = transform_name(build_fake_name(n, true));
       if(already_handled.count(tn)==0) {
         os << "\tAbstractProperty * " << tn << ";\n";
+        used_processes["AbstractPropery"] = true;
         already_handled[tn] = true;
       }
 
@@ -1112,6 +1122,7 @@ namespace Smala
                 case PROCESS:
                 case CAST_STRING:
                   os << "\tAbstractProperty * ";
+                  used_processes["AbstractPropery"] = true;
                   break;
                 default:
                   print_error_message (error_level::error, "Incorrect type in expression", 1);
@@ -1140,7 +1151,6 @@ namespace Smala
 
     used_processes["NativeExpressionAction"] = true;
     used_processes["AbstractProperty"] = true;
-
   }
 
   void
@@ -1255,6 +1265,7 @@ namespace Smala
       prop_name = build_find (node->get_path(), false);
       if (prop_name.rfind ("cpnt_", 0) == 0) {
         os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << build_expr (node->get_args().at(0), undefined_t) << ", true);\n";
+        used_processes["AbstractPropery"] = true;
       } else {
         os << prop_name << " = " << build_expr (node->get_args().at(0), undefined_t) << ";\n";
       }

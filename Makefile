@@ -278,8 +278,9 @@ $(build_dir)/src/process_class_path.cpp:
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/trigonometry.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/text.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
-	printf "{\"MultiConnector\",\"base/connector.h\"}," >> $@
-	printf "{\"MultiAssignment\",\"core/control/assignment.h\"}," >> $@
+	printf "{\"MultiConnector\",\"base/connector.h\"},\n" >> $@
+	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
+	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@
 	printf '{"",""}};\n}\n' >> $@
 	rm $(tmpfile)
 #	cat <<EOT >> $@

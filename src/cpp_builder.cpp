@@ -294,6 +294,7 @@ namespace Smala
       }
       case FUNCTION: {
         expr += e->get_val () + " (";
+        used_processes[e->get_val ()] = true;
         std::string sep = "";
         for (auto sub : ((FunctionExprNode*)e)->get_args()) {
           expr += sep + build_expr (sub, prod_t, build_fake);

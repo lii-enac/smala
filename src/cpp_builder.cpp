@@ -1,3 +1,4 @@
+
 /*
  *  djnn Smala compiler
  *
@@ -29,6 +30,7 @@
 #include <locale>
 #include <algorithm>
 #include <unistd.h> // getpid
+#include "core/utils/filesystem.h"
 
 namespace Smala
 {

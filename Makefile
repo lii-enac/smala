@@ -166,8 +166,7 @@ djnn_libs_SL := $(djnn_libs)
 
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
-
-CXXFLAGS_CK += -std=c++17 $(djnn_cflags)
+CXXFLAGS_CK += $(djnn_cflags)
 
 ifeq ($(os),Linux)
 #CXXFLAGS +=
@@ -273,7 +272,7 @@ $(build_dir)/src/process_class_path.cpp:
 	@mkdir -p $(dir $@)
 	$(eval tmpfile := $(shell mktemp))
 	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
-	cd $(djnn_path)/src && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile)
+	(cd $(djnn_path)/src && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
 	awk '{print "{\""$$1"\""",""\""$$2"\"""},"}' $(tmpfile) >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/arithmetic.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
@@ -425,7 +424,7 @@ CXXFLAGS_CK += -Dmain=SDL_main
 endif
 endif
 
-CXXFLAGS_PCH := $(CXXFLAGS_CK)
+CXXFLAGS_PCH := $(CXXFLAGS_CK) $(CXXFLAGS)
 
 $(pch_dst): $(pch_src)
 	@mkdir -p $(dir $@)

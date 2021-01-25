@@ -174,7 +174,7 @@ CXXFLAGS_SC += $(djnn_cflags)
 # --
 ifeq ($(os),Linux)
 compiler ?= gnu
-CFLAGS +=  -fpic
+CFLAGS_COMMON +=  -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
@@ -199,7 +199,7 @@ endif
 
 ifeq ($(os),MinGW)
 compiler ?= gnu
-CFLAGS += -fpic
+CFLAGS_COMMON += -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=PATH
 debugger := gdb

@@ -582,6 +582,7 @@ namespace Smala
     m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
 
     used_processes["ProcessCollector"] = true;
+    used_processes["Container"] = true;
   }
 
 

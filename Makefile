@@ -139,8 +139,6 @@ lib_smala_name = libsmala
 #CXX := $(cross_prefix)++
 #CC_CK := $(cookbook_cross_prefix)cc
 #CXX_CK := $(cookbook_cross_prefix)++
-CFLAGS += -g -MMD
-CXXFLAGS += $(CFLAGS) -std=c++17
 #LIBS ?=
 
 install_brew : djnn_path =
@@ -164,12 +162,17 @@ endif
 
 djnn_libs_SL := $(djnn_libs)
 
+# --
+CFLAGS_COMMON += -g -MMD
+CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
+
+CXXFLAGS_CK += $(CXXFLAGS_COMMON) $(djnn_cflags)
+CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
-CXXFLAGS_CK += $(djnn_cflags)
 
+# --
 ifeq ($(os),Linux)
-#CXXFLAGS +=
 compiler ?= gnu
 CFLAGS +=  -fpic
 YACC = bison -d -W
@@ -181,7 +184,6 @@ LDFLAGS_SC += -lstdc++fs
 endif
 
 ifeq ($(os),Darwin)
-#CFLAGS +=
 compiler ?= llvm
 YACC = /usr/local/opt/bison/bin/bison -d -W #--report=state
 LEX = /usr/local/opt/flex/bin/flex
@@ -298,7 +300,6 @@ smalac: config.mk $(smalac)
 $(smalac): $(smalac_objs)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-$(smalac): CFLAGS += $(CXXFLAGS_SC) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 $(smalac): CXX = $(CXX_SC)
 $(smalac): LDFLAGS += $(LDFLAGS_SC)
 
@@ -311,7 +312,7 @@ smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
 
-$(smala_lib_objs): CFLAGS += $(CXXFLAGS_CK) #$(djnn_cflags)
+$(smala_lib_objs): CXXFLAGS += $(CXXFLAGS_CK)
 $(smala_lib_objs): CXX = $(CXX_CK)
 
 $(smala_lib): $(smala_lib_objs) 
@@ -510,7 +511,7 @@ $1_app_link := $$(CXX_CK)
 #$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CFLAGS += $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
+$$($1_app_objs): CXXFLAGS += $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
 $$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
@@ -564,7 +565,9 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 # precompiled header deps
 $(objs): $(pch_dst)
 $(smala_lib_objs): $(pch_dst)
-$(smalac_objs): $(pch_dst) # should not be there, but necessary to make make -j lib work in case smalac should be rebuilt
+
+#'override" necessary to make 'make -j lib' work in case smalac should be rebuilt
+$(smalac_objs): override CXXFLAGS=$(CXXFLAGS_SC)
 
 # ---------------------------------------
 # rules

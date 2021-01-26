@@ -796,7 +796,7 @@ ifeq ($(os),MinGW)
 #https://www.msys2.org/
 # no need to prefix for bison and flex because we need msys2 version pkgdeps := $(addprefix mingw-w64-x86_64-, $(pkgdeps))
 pkgcmd := pacman -Suy --needed
-CXXFLAGS += -I/usr/include # Fix for FlexLexer.h in /usr/include and in /ming64/include
+CXXFLAGS_SC += -I/usr/include # Fix for FlexLexer.h in /usr/include and in /ming64/include
 pkgdeps += rtmidi nlohmann-json
 endif
 

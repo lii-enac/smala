@@ -356,6 +356,7 @@ $(build_dir)/src/location.hh: $(build_dir)/src/parser.cpp
 $(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/j_builder.o $(build_dir)/src/builder.o \
 $(build_dir)/src/main.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/c_builder.o $(build_dir)/src/parser.o $(build_dir)/src/driver.o: $(build_dir)/src/parser.hpp
 
+# find build -name "*.d" | xargs grep -s "location.hh" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
 $(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/newvar_node.o $(build_dir)/src/range_node.o\
 $(build_dir)/src/native_expression_node.o $(build_dir)/src/native_component_node.o $(build_dir)/src/builder.o\
 $(build_dir)/src/smala_native.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/preamble.o $(build_dir)/src/instruction_node.o\

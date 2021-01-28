@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+## [1.15.0] - 2020-01-28
+### compliant with djnn-cpp [1.15.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - NEW start working on javascript code generation from smala : javascript builder
+        - Improved generic builder.
+        - Improved code consistency in smala so in cpp builder.
+        - Fixed all cookbook recipes, app to match the changes.
+    - Lots of works to reduce compilation time : clean headers, precompiled headers, dependencies.
+        BECAREFUL: developer has to be more precise on includes declaration when using C++ code. (eg: C++ native)
+        You can use the auto-generated file build/src/process_class_path.cpp to find which header as to be call for each class/typedef ...
+    - NEW cookbook recipe: The clock made by J.-L. Vinot.
+    - NEW cookbook recipe: imperative 
+    - NEW cookbook recipe: incremental json parsing with djnn concepts
+    - NEW cookbook recipe: javascript.
+    - NEW Makefile for Stand_Alone with precompiled_header option : use_pch = yes
+
+### Added
+### Changed
+    - Fixed all cookbook recipes, app to match the builder changes.
+    - Changed smalac: clean, and improve code.
+    - Changed smalac: surround simple instruction in switch with component
+    - Improved cookbook recipe : swim with offline demo.
+    - Improved cookbook recipe for physics.
+    - Simplest cookbook recipe is now simpler.
+
+### Fixed
+    - Fixed dnd cookbook recipe.
+    - Fixed Linux/MacOs/Windows compilation and dependencies in consequences of the work on the headers
+
 ## [1.14.0] - 2020-11-23
 ### compliant with djnn-cpp [1.14.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

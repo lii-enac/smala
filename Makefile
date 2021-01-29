@@ -151,6 +151,7 @@ djnn_ldlibs := $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
 djnn_libs := $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+djnn_include_path_only := $(subst -I, , $(djnn_cflags))
 else
 djnn_cflags := -I$(djnn_path)/src
 djnn_ldflags := -L$(djnn_path)/build/lib
@@ -158,6 +159,7 @@ djnn_ldflags := -L$(djnn_path)/build/lib
 djnn_ldlibs := -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core
 djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path := $(djnn_path)/build/lib
+djnn_include_path_only := $(djnn_path)/src
 endif
 
 djnn_libs_SL := $(djnn_libs)
@@ -274,12 +276,12 @@ $(build_dir)/src/process_class_path.cpp:
 	@mkdir -p $(dir $@)
 	$(eval tmpfile := $(shell mktemp))
 	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
-	(cd $(djnn_path)/src && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
+	(cd $(djnn_include_path_only) && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
 	awk '{print "{\""$$1"\""",""\""$$2"\"""},"}' $(tmpfile) >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/arithmetic.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/trigonometry.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_path)/src/base/text.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/arithmetic.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/trigonometry.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/text.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
 	printf "{\"MultiConnector\",\"base/connector.h\"},\n" >> $@
 	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
 	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@
@@ -411,7 +413,7 @@ pch_ext = .gch
 endif
 
 pch_file := precompiled.h
-pch_src := $(djnn_path)/src/core/utils/build/$(pch_file)
+pch_src := $(djnn_include_path_only)/core/utils/build/$(pch_file)
 pch_dst := $(build_dir)/cookbook/$(pch_file)$(pch_ext)
 
 pch: $(pch_dst)
@@ -683,6 +685,7 @@ install_brew: djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
 install_brew: djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 install_brew: djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_lib_path = $(subst -L, , $(djnn_lib_path))
+install_brew: djnn_include_path_only := $(subst -I, , $(djnn_cflags))
 install_brew: install
 
 

@@ -14,8 +14,6 @@ Animator (int duration, double _min, double _max, int func, int loop)
   Double min (_min)
   Double max (_max)
   Double output (0)
-  Double min (_min)
-  Double max (_max)
   EasingGenerator gen (func)
   Incr inc (1)
   

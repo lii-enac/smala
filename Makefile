@@ -141,25 +141,25 @@ lib_smala_name = libsmala
 #CXX_CK := $(cookbook_cross_prefix)++
 #LIBS ?=
 
-install_brew : djnn_path =
-install_brew : install
+#install_brew : djnn_path=
+#install_brew : install
 
 ifeq ($(djnn_path),) 
-djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
-djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-djnn_ldlibs := $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
-djnn_libs := $(shell pkg-config $(djnn-pkgconf) --libs)
-djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-djnn_lib_path := $(subst -L, , $(djnn_lib_path))
-djnn_include_path_only := $(subst -I, , $(djnn_cflags))
+djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
+djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
+djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
+djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
+djnn_lib_path = $(subst -L, , $(djnn_lib_path))
+djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 else
-djnn_cflags := -I$(djnn_path)/src
-djnn_ldflags := -L$(djnn_path)/build/lib
+djnn_cflags = -I$(djnn_path)/src
+djnn_ldflags = -L$(djnn_path)/build/lib
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
-djnn_ldlibs := -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core
-djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
-djnn_lib_path := $(djnn_path)/build/lib
-djnn_include_path_only := $(djnn_path)/src
+djnn_ldlibs = -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core
+djnn_libs = $(djnn_ldflags) $(djnn_ldlibs)
+djnn_lib_path = $(djnn_path)/build/lib
+djnn_include_path_only = $(djnn_path)/src
 endif
 
 djnn_libs_SL := $(djnn_libs)
@@ -413,8 +413,8 @@ pch_ext = .gch
 endif
 
 pch_file := precompiled.h
-pch_src := $(djnn_include_path_only)/core/utils/build/$(pch_file)
-pch_dst := $(build_dir)/cookbook/$(pch_file)$(pch_ext)
+pch_src := src_lib/$(pch_file)
+pch_dst := $(build_dir)/src_lib/$(pch_file)$(pch_ext)
 
 pch: $(pch_dst)
 
@@ -423,33 +423,34 @@ pch: $(pch_dst)
 ifeq ($(compiler),gnu)
 # https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
 # Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
-CXXFLAGS_CK += -D_REENTRANT
+CXXFLAGS_PCH += -D_REENTRANT
 ifeq ($(display),SDL)
-CXXFLAGS_CK += -Dmain=SDL_main
+CXXFLAGS_PCH += -Dmain=SDL_main
 endif
 endif
-
-CXXFLAGS_PCH := $(CXXFLAGS_CK) $(CXXFLAGS)
 
 $(pch_dst): $(pch_src)
 	@mkdir -p $(dir $@)
 ifeq ($V,max)
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
 else
 	@$(call rule_message,compiling,$(stylized_target))
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
 endif
 
+$(pch_dst): override CXXFLAGS_PCH_INC=
+
 ifeq ($(compiler),llvm)
-CXXFLAGS_CK += -include-pch $(pch_dst)
+CXXFLAGS_PCH_INC += -include-pch $(pch_dst)
 #-fpch-instantiate-templates -fpch-codegen -fpch-debuginfo
 endif
 ifeq ($(compiler),gnu)
 # https://stackoverflow.com/a/3164874
-CXXFLAGS_CK += -I$(dir $(pch_dst)) -include $(pch_file) -Winvalid-pch
+CXXFLAGS_PCH_INC += -I$(dir $(pch_dst)) -include $(pch_file) -Winvalid-pch
 #-fno-implicit-templates
 #$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
 endif
+
 
 # -----------
 # cookbook apps
@@ -570,6 +571,9 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 $(objs): $(pch_dst)
 $(smala_lib_objs): $(pch_dst)
 
+$(objs): CXXFLAGS_CK += $(CXXFLAGS_PCH_INC)
+$(smala_lib_objs): CXXFLAGS_CK += $(CXXFLAGS_PCH_INC)	
+
 #'override" necessary to make 'make -j lib' work in case smalac should be rebuilt
 $(smalac_objs): override CXXFLAGS=$(CXXFLAGS_SC)
 
@@ -679,14 +683,14 @@ install: default smala_lib install_pkgconf install_headers install_libs install_
 
 
 # we have to redefine all variables already computed in config.mk
-install_brew: djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
+install_brew: install
+install_brew: djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
 install_brew: djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
 install_brew: djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 install_brew: djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_lib_path = $(subst -L, , $(djnn_lib_path))
 install_brew: djnn_include_path_only := $(subst -I, , $(djnn_cflags))
-install_brew: install
 
 
 #----------------------------------------

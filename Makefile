@@ -475,7 +475,7 @@ ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
-$1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux's ld
+$1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux ld
 endif
 $$($1_app_objs): $$(smala_lib)
 
@@ -494,7 +494,7 @@ $1_app_link := $$(CXX_CK)
 #$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CXXFLAGS += $$($1_app_cppflags) $$($1_app_cflags)
+$$($1_app_objs): CXXFLAGS_CK += $$($1_app_cppflags) $$($1_app_cflags)
 $$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
@@ -659,13 +659,13 @@ install: default smala_lib install_pkgconf install_headers install_libs install_
 
 # we have to redefine all variables already computed in config.mk
 install_brew: install
-install_brew: djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
+install_brew: djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
 install_brew: djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
 install_brew: djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 install_brew: djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 install_brew: djnn_lib_path = $(subst -L, , $(djnn_lib_path))
-install_brew: djnn_include_path_only := $(subst -I, , $(djnn_cflags))
+install_brew: djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 
 
 #----------------------------------------

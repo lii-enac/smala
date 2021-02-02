@@ -16,6 +16,8 @@ use base
 use display
 use gui
 
+import gui.shape.text
+
 _define_
 Button (Process frame, string _label, double x_, double y_) {
   Translation t (x_, y_)

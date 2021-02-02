@@ -3,6 +3,8 @@ use base
 use gui
 use display
 
+import display.display
+
 _define_
 ControlKey (Process f, int key)
 {

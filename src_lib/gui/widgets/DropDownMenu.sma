@@ -2,6 +2,8 @@ use core
 use gui
 use base
 
+import gui.shape.text
+
 _action_
 fn_init(Process src, Process data)
 {

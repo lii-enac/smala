@@ -570,7 +570,7 @@ namespace Smala
     os << "} else {\n";
     m_indent++;
     indent (os);
-    os << "djnn_error (nullptr, \"only Container and ProcessCollector can be used in forevery instruction\\n\");\n";
+    os << "djnn__error (nullptr, \"only Container and ProcessCollector can be used in forevery instruction\\n\");\n";
     indent (os);
     os << "exit (0);\n";
     m_indent--;
@@ -827,7 +827,7 @@ namespace Smala
   {
     os << "if (" << arg << "->get_process_type() != PROPERTY_T) {\n";
     indent (os);
-    os << "\tdjnn_error (" << arg << ", \"is not a property\\n\");\n";
+    os << "\tdjnn__error (" << arg << ", \"is not a property\\n\");\n";
     indent (os);
     os << "\texit(0);\n";
     indent (os);

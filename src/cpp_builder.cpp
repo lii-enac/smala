@@ -1206,7 +1206,7 @@ namespace Smala
           //os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case NOTIFY:
-          os << arg << "->notify_activate ();\n";
+          os << arg << "->notify_activation ();\n";
           break;
       case RUN:
         if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {

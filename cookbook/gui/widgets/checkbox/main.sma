@@ -25,6 +25,7 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  mouseTracking = 1
   Checkbox cb (5)
   cb.entries.[1].label = "a"
   cb.entries.[2].label = "b"

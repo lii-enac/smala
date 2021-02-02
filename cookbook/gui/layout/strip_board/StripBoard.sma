@@ -57,13 +57,14 @@ StripBoard (Process parent, double _x, double _y)
   /*          Sort           */
   /*                         */
   /***************************/
-  sorter.sort->(this) {
+  sorter.sort->l_sort:(this) {
     for (int i = 1; i <= $this.strip_list.size; i++) {
       this.strip_list.[i].position = i - 1
     }
-    run this.update_position
+    notify this.update_position
   }
 
+  l_sort~>this.update_position
   /***************************/
   /*                         */
   /*  Selection/deselection  */
@@ -76,14 +77,14 @@ StripBoard (Process parent, double _x, double _y)
       addChildrenTo this.selected_items {
         Ref new_ref (selected)
       }
-      run selected.select
+      notify selected.select
     }
   }
 
   deselection_request->(this) {
     item = getRef (&this.deselection_request)
     if (&item != null) {
-      run item.deselect
+      notify item.deselect
       for (int i = 1; i <= $this.selected_items.size; i++) {
         sel_item = getRef (&this.selected_items.[i])
         if (&sel_item == &item) {
@@ -96,12 +97,12 @@ StripBoard (Process parent, double _x, double _y)
   insertion_point_select->(this) {
     selected = getRef (&this.insertion_point_select)
     if (&selected != null) {
-      run selected.insertion_select
+      notify selected.insertion_select
       this.position = selected.position
       for (int i = 1; i <= $this.strip_list.size; i++) {
         item = &this.strip_list.[i]
         if (&item != &selected) {
-          run item.insertion_deselect
+          notify item.insertion_deselect
         }
       }
     }
@@ -110,7 +111,7 @@ StripBoard (Process parent, double _x, double _y)
   insertion_point_deselect->(this) {
     item = getRef (&this.insertion_point_deselect)
     if (&item != null) {
-      run item.insertion_deselect
+      notify item.insertion_deselect
     }
     this.position = this.strip_list.size - 1
   }
@@ -139,12 +140,12 @@ StripBoard (Process parent, double _x, double _y)
     }
     State with_anim {
       add->(this) {
-        run this.pos_sorter.sort
+        notify this.pos_sorter.sort
         for (int i = $this.position + 1; i <= $this.strip_list.size; i++) {
           this.strip_list.[i].position++
         }
         this.time++
-        run this.update_position
+        notify this.update_position
       }
       end_anim_position->(this) {
         addChildrenTo this.strip_list {
@@ -162,7 +163,7 @@ StripBoard (Process parent, double _x, double _y)
     for (int i = 1; i <= $this.selected_items.size; i++) {
       selected = getRef (&this.selected_items.[i])
       if (&selected != null) {
-        run selected.about_to_delete
+        notify selected.about_to_delete
         
       }
     }
@@ -177,12 +178,12 @@ StripBoard (Process parent, double _x, double _y)
     for (int j = 1; j <= $this.selected_items.size; j++) {
       delete this.selected_items.[j]
     }
-    run this.pos_sorter.sort
+    notify this.pos_sorter.sort
     for (int k = 1; k <= $this.strip_list.size; k++) {
       this.strip_list.[k].position = k - 1
     }
     this.position = $this.strip_list.size
-    run this.update_position
+    notify this.update_position
   }
 
   /***************************/

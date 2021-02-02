@@ -62,7 +62,7 @@
 
 NAME [a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
 INT [0-9]+
-ACTION ("run"|"stop"|"dump"|"delete"|"XMLSerialize")
+ACTION ("run"|"notify"|"stop"|"dump"|"delete"|"XMLSerialize")
 BREAK ("break"|"continue"|"return")
 NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 

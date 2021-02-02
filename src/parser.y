@@ -1494,6 +1494,19 @@ start_lambda
       push_sym_table ();
       add_sym (@$, $2.back()->get_subpath (), PROCESS);
     }
+  | NAME COLON LP name_or_path RP
+    {
+      add_sym (@$, $1, PROCESS);
+      name_context_list.pop_back ();
+      driver.start_debug ();
+      driver.in_preamble ();
+      SmalaNative *native = new SmalaNative (@$, $1, "_src_", new PathNode (@4, $4));
+      driver.add_node (native);
+      $$ = new NativeComponentNode (@$, $1, nullptr, new PathNode (@4, $4), "1", SIMPLE_ACTION);
+      m_in_lambda = true;
+      push_sym_table ();
+      add_sym (@$, $4.back()->get_subpath (), PROCESS);
+    }
 
 assignment
   : assignment_expression assignment_symbol process_list is_model

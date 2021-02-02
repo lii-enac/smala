@@ -90,6 +90,12 @@ os := MinGW
 endif
 endif
 
+# ---------------------------------------
+# save user-provided CXXFLAGS, and use CXXFLAGS as the utltimate compiler configuration
+
+CXXFLAGS_CFG := $(CXXFLAGS)
+CXXFLAGS :=
+
 # cross-compile support
 ifndef cross_prefix
 cross_prefix := g
@@ -132,7 +138,7 @@ LDFLAGS += $(EMFLAGS) \
 
 endif
 
-CXXFLAGS += -MMD -g -std=c++14
+CXXFLAGS_COMMON += -MMD -g -std=c++14
 
 ifeq ($(os),Linux)
 compiler ?= gnu
@@ -154,6 +160,7 @@ debugger := gdb
 endif
 
 ifeq ($(os),em)
+compiler ?= llvm
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 EXE := .html
@@ -196,8 +203,6 @@ endif
 # https://stackoverflow.com/questions/58841/precompiled-headers-with-gcc
 # https://stackoverflow.com/questions/26755219/how-to-use-pch-with-clang
 
-compiler ?= llvm
-
 ifeq ($(compiler),llvm)
 pch_ext = .pch
 endif
@@ -207,31 +212,27 @@ endif
 
 pch_file := precompiled.h
 pch_src := src/$(pch_file)
-pch_dst := $(build_dir)/src_lib/$(pch_file)$(pch_ext)
-
-pch: $(pch_dst)
+pch_dst := $(build_dir)/$(pch_src)$(pch_ext)
 
 # SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
 # FIXME this is not safe as every other external lib may define something
 ifeq ($(compiler),gnu)
 # https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
 # Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
-CXXFLAGS_PCH += -D_REENTRANT
+CXXFLAGS_PCH_DEF += -D_REENTRANT
 ifeq ($(display),SDL)
-CXXFLAGS_PCH += -Dmain=SDL_main
+CXXFLAGS_PCH_DEF += -Dmain=SDL_main
 endif
 endif
 
 $(pch_dst): $(pch_src)
 	@mkdir -p $(dir $@)
 ifeq ($V,max)
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 else
 	@$(call rule_message,compiling,$(stylized_target))
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 endif
-
-$(pch_dst): override CXXFLAGS_PCH_INC=
 
 ifeq ($(compiler),llvm)
 CXXFLAGS_PCH_INC += -include-pch $(pch_dst)
@@ -244,70 +245,21 @@ CXXFLAGS_PCH_INC += -I$(dir $(pch_dst)) -include $(pch_file) -Winvalid-pch
 #$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
 endif
 
+$(pch_dst): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(djnn_cflags) $(CXXFLAGS_COMMON) $(CXXFLAGS_CK)
+
+pch: $(pch_dst)
+clean_pch:
+	rm -f $(pch_dst)
+
 $(objs): $(pch_dst)
-$(objs): CXXFLAGS_CK += $(CXXFLAGS_PCH_INC)
-
-# ifeq ($(use_pch),yes)
-# # ---------------------------------------
-# # precompiled headers
-
-# # https://stackoverflow.com/questions/58841/precompiled-headers-with-gcc
-# # https://stackoverflow.com/questions/26755219/how-to-use-pch-with-clang
-
-# ifeq ($(compiler),llvm)
-# pch_ext = .pch
-# endif
-# ifeq ($(compiler),gnu)
-# pch_ext = .gch
-# endif
-
-# pch := precompiled.h
-# pch_src := src/$(pch)
-# #pch_src := helper/$(pch)
-# pch_dst := $(build_dir)/$(pch_src)$(pch_ext)
-
-# #pch_: $(pch_dst)
-
-# # SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
-# # FIXME this is not safe as every other external lib may define something
-# ifeq ($(compiler),gnu)
-# # https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
-# # Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
-# CXXFLAGS += -D_REENTRANT
-# ifeq ($(display),SDL)
-# CXXFLAGS += -Dmain=SDL_main
-# endif
-# endif
-
-# CXXFLAGS_PCH := $(CXXFLAGS) $(djnn_cflags) $(smala_cflags)
-
-# $(pch_dst): $(pch_src)
-# 	@mkdir -p $(dir $@)
-# ifeq ($V,max)
-# 	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
-# else
-# 	@$(call rule_message,compiling,$(stylized_target))
-# 	$(CXX) -x c++-header $(CXXFLAGS_PCH) $< -o $@
-# endif
-
-# ifeq ($(compiler),llvm)
-# CXXFLAGS += -include-pch $(pch_dst)
-# #-fpch-instantiate-templates -fpch-codegen -fpch-debuginfo
-# endif
-# ifeq ($(compiler),gnu)
-# # https://stackoverflow.com/a/3164874
-# CXXFLAGS += -I$(dir $(pch_dst)) -include $(pch) -Winvalid-pch
-# #-fno-implicit-templates
-# #$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
-# endif
-
-# $(objs): $(pch_dst)
-# endif
-
 
 #----------------------------
 
-$(objs): CXXFLAGS += $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
+#$(objs): CXXFLAGS += $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib
+
+$(objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib\
+	$(CXXFLAGS_COMMON) $(CXXFLAGS_CK)
+
 $(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
 $(exe): LIBS += $(app_libs)
 

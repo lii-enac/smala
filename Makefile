@@ -59,6 +59,13 @@ endif
 endif
 
 # ---------------------------------------
+# save user-provided CXXFLAGS, and use CXXFLAGS as the utltimate compiler configuration
+
+CXXFLAGS_CFG := $(CXXFLAGS)
+CXXFLAGS :=
+
+
+# ---------------------------------------
 # cross-compile support
 
 ifdef cross_prefix
@@ -108,41 +115,7 @@ CC_CK := $(CC)
 CXX_CK := $(CXX)
 endif
 
-# # cross-compile support
-# ifndef cross_prefix
-# ifeq ($(os),Darwin)
-# cross_prefix := llvm-g
-# endif
-# #ifeq ($(os),Linux)
-# cross_prefix := g
-# #endif
-# #cross_prefix := arm-none-eabi-
-# #cross_prefix := em
-# #cross_prefix := i686-w64-mingw32-
-# endif
-
-# ifndef cookbook_cross_prefix
-# ifeq ($(os),Darwin)
-# cookbook_cross_prefix := llvm-g
-# endif
-# #ifeq ($(os),Linux)
-# cookbook_cross_prefix := g
-# #endif
-# #cross_prefix := arm-none-eabi-
-# #cross_prefix := em
-# #cross_prefix := i686-w64-mingw32-
-# endif
-
 lib_smala_name = libsmala
-
-#CC := $(cross_prefix)cc
-#CXX := $(cross_prefix)++
-#CC_CK := $(cookbook_cross_prefix)cc
-#CXX_CK := $(cookbook_cross_prefix)++
-#LIBS ?=
-
-#install_brew : djnn_path=
-#install_brew : install
 
 ifeq ($(djnn_path),) 
 djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
@@ -164,7 +137,8 @@ endif
 
 djnn_libs_SL := $(djnn_libs)
 
-# --
+# ----------------------------------
+
 CFLAGS_COMMON += -g -MMD
 CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
 
@@ -173,7 +147,7 @@ CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
 
-# --
+# -----------------------------------
 ifeq ($(os),Linux)
 compiler ?= gnu
 CFLAGS_COMMON +=  -fpic
@@ -291,7 +265,6 @@ $(build_dir)/src/process_class_path.cpp:
 #	#include <map>
 #	EOT
 
-
 smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))
 
 smalac := $(build_dir)/$(bin_name)
@@ -304,6 +277,8 @@ $(smalac): $(smalac_objs)
 
 $(smalac): CXX = $(CXX_SC)
 $(smalac): LDFLAGS += $(LDFLAGS_SC)
+#'override" necessary to make 'make -j lib' work in case smalac should be rebuilt
+$(smalac_objs): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_SC)
 
 # ------------
 # smala lib
@@ -314,8 +289,8 @@ smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
 
-$(smala_lib_objs): CXXFLAGS += $(CXXFLAGS_CK)
 $(smala_lib_objs): CXX = $(CXX_CK)
+$(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK)
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
@@ -325,18 +300,20 @@ smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)
 
 lib: smala_lib
+clean_lib:
+	rm -f $(smala_lib) $(smala_lib_objs)
 
 # ------------
 # automatic rules
 
-$(build_dir)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# $(build_dir)/%.o: %.cpp
+# 	@mkdir -p $(dir $@)
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# for generated .cpp
-$(build_dir)/%.o: $(build_dir)/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# # for generated .cpp
+# $(build_dir)/%.o: $(build_dir)/%.cpp
+# 	@mkdir -p $(dir $@)
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(build_dir)/%.cpp $(build_dir)/%.hpp: %.y
 	@mkdir -p $(dir $@)
@@ -416,29 +393,25 @@ pch_file := precompiled.h
 pch_src := src_lib/$(pch_file)
 pch_dst := $(build_dir)/src_lib/$(pch_file)$(pch_ext)
 
-pch: $(pch_dst)
-
 # SDL and other stuff define new variables for compiling, canceling the use of pch with gnu cc
 # FIXME this is not safe as every other external lib may define something
 ifeq ($(compiler),gnu)
 # https://gitlab.gnome.org/GNOME/gnome-online-accounts/-/merge_requests/14
 # Both GCC and Clang appear to expand -pthread to define _REENTRANT on their own
-CXXFLAGS_PCH += -D_REENTRANT
+CXXFLAGS_PCH_DEF += -D_REENTRANT
 ifeq ($(display),SDL)
-CXXFLAGS_PCH += -Dmain=SDL_main
+CXXFLAGS_PCH_DEF += -Dmain=SDL_main
 endif
 endif
 
 $(pch_dst): $(pch_src)
 	@mkdir -p $(dir $@)
 ifeq ($V,max)
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 else
 	@$(call rule_message,compiling,$(stylized_target))
-	$(CXX) -x c++-header $(CXXFLAGS_PCH) $(CXXFLAGS_CK) $(CXXFLAGS) $< -o $@
+	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 endif
-
-$(pch_dst): override CXXFLAGS_PCH_INC=
 
 ifeq ($(compiler),llvm)
 CXXFLAGS_PCH_INC += -include-pch $(pch_dst)
@@ -451,6 +424,11 @@ CXXFLAGS_PCH_INC += -I$(dir $(pch_dst)) -include $(pch_file) -Winvalid-pch
 #$(build_dir)/src/core/utils/build/external_template.o: CXXFLAGS += -fimplicit-templates
 endif
 
+$(pch_dst): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF)
+
+pch: $(pch_dst)
+clean_pch:
+	rm -f $(pch_dst)
 
 # -----------
 # cookbook apps
@@ -516,7 +494,7 @@ $1_app_link := $$(CXX_CK)
 #$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
-$$($1_app_objs): CXXFLAGS += $$(CXXFLAGS_CK) $$($1_app_cppflags) $$($1_app_cflags)
+$$($1_app_objs): CXXFLAGS += $$($1_app_cppflags) $$($1_app_cflags)
 $$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
@@ -544,8 +522,8 @@ $$(notdir $1)_dbg_print:
 	@echo $$($1_app_objs)
 	@echo $$($1_app_gensrcs)
 
-deps += $$($1_app_objs:.o=.d)
-objs += $$($1_app_objs)
+app_deps += $$($1_app_objs:.o=.d)
+app_objs += $$($1_app_objs)
 endef
 
 
@@ -568,14 +546,11 @@ cookbook_apps_test: $(addsuffix _test,$(notdir $(cookbook_apps)))
 
 
 # precompiled header deps
-$(objs): $(pch_dst)
+$(app_objs): $(pch_dst)
 $(smala_lib_objs): $(pch_dst)
 
-$(objs): CXXFLAGS_CK += $(CXXFLAGS_PCH_INC)
-$(smala_lib_objs): CXXFLAGS_CK += $(CXXFLAGS_PCH_INC)	
+$(app_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC)
 
-#'override" necessary to make 'make -j lib' work in case smalac should be rebuilt
-$(smalac_objs): override CXXFLAGS=$(CXXFLAGS_SC)
 
 # ---------------------------------------
 # rules

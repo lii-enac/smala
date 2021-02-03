@@ -7,7 +7,7 @@ We provide a Makefile that should work on MacOS (10.12+), Linux, Windows.
 --- MACOS
 ```
 brew tap lii-enac/repo
-brew install djnn-cpp
+brew install smala
 ```
 --- LINUX ubuntu 
 ```

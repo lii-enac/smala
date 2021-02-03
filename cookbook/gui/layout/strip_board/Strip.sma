@@ -87,8 +87,8 @@ Strip (Process holder, int _time, int _position)
       Double delta (0)
       SlowInSlowOutInterpolator siso ()
       position > old_position ? ((position * 45-  old_position * 45) / 10) : -1 * ((old_position * 45 - position * 45) / 10) =: delta
-      holder.count_step_anim.state =:> siso.input
-      old_position * 45 + siso.output * delta * 10 =:> y
+      holder.count_step_anim.state => siso.input
+      old_position * 45 + siso.output * delta * 10 => y
     }
   }
   holder.strip_animation.state =:> anim_pos.state

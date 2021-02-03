@@ -71,7 +71,7 @@ StripBoard (Process parent, double _x, double _y)
   /*                         */
   /***************************/
 
-  selection_request->(this) {
+  selection_request->l_sel_req:(this) {
     selected = getRef (&this.selection_request)
     if (&selected != null) {
       addChildrenTo this.selected_items {
@@ -81,7 +81,7 @@ StripBoard (Process parent, double _x, double _y)
     }
   }
 
-  deselection_request->(this) {
+  deselection_request->l_desel_req:(this) {
     item = getRef (&this.deselection_request)
     if (&item != null) {
       notify item.deselect
@@ -94,7 +94,7 @@ StripBoard (Process parent, double _x, double _y)
     }
   }
 
-  insertion_point_select->(this) {
+  insertion_point_select->l_ins_sel:(this) {
     selected = getRef (&this.insertion_point_select)
     if (&selected != null) {
       notify selected.insertion_select
@@ -108,7 +108,7 @@ StripBoard (Process parent, double _x, double _y)
     }
   }
 
-  insertion_point_deselect->(this) {
+  insertion_point_deselect->l_ins_desel:(this) {
     item = getRef (&this.insertion_point_deselect)
     if (&item != null) {
       notify item.insertion_deselect
@@ -128,38 +128,7 @@ StripBoard (Process parent, double _x, double _y)
   Bool test_anim (0)
   position == strip_list.size =:> test_anim
 
-  FSM with_anim_fsm {
-    State without_anim {
-      add->(this) {
-        addChildrenTo this.strip_list {
-          Strip s (this, $this.time, $this.position)
-        }
-        this.time++
-        this.position = this.strip_list.size
-      }
-    }
-    State with_anim {
-      add->(this) {
-        notify this.pos_sorter.sort
-        for (int i = $this.position + 1; i <= $this.strip_list.size; i++) {
-          this.strip_list.[i].position++
-        }
-        this.time++
-        notify this.update_position
-      }
-      end_anim_position->(this) {
-        addChildrenTo this.strip_list {
-          Strip s (this, $this.time, $this.position)
-        }
-        this.time++
-        this.position = this.strip_list.size
-      }
-    }
-    without_anim->with_anim (test_anim.false)
-    with_anim->without_anim (test_anim.true)
-  }
-
-  del->(this) {
+  del->l_del:(this) {
     for (int i = 1; i <= $this.selected_items.size; i++) {
       selected = getRef (&this.selected_items.[i])
       if (&selected != null) {
@@ -169,9 +138,68 @@ StripBoard (Process parent, double _x, double _y)
     }
   }
 
-  ready_to_delete->(this) {
+  FSM with_anim_fsm {
+    State without_anim {
+      add->l_add:(this) {
+        addChildrenTo this.strip_list {
+          Strip s (this, $this.time, $this.position)
+          graph_add_edge (this.l_sel_req, s.select)
+          graph_add_edge (this.l_desel_req, s.deselect)
+          graph_add_edge (this.l_ins_sel, s.insertion_deselect)
+          graph_add_edge (this.l_ins_sel, s.insertion_select)
+          graph_add_edge (this.l_ins_desel, s.insertion_deselect)
+          graph_add_edge (this.l_del, s.about_to_delete)
+          graph_add_edge (this.l_sort, s.position)
+        }
+        this.time++
+        this.position = this.strip_list.size
+      }
+      l_add~>time
+      l_add~>position
+    }
+    State with_anim {
+      add->l_add:(this) {
+        notify this.pos_sorter.sort
+        for (int i = $this.position + 1; i <= $this.strip_list.size; i++) {
+          this.strip_list.[i].position++
+        }
+        this.time++
+        notify this.update_position
+      }
+      l_add~>pos_sorter.sort
+      l_add~>time
+      l_add~>update_position
+      end_anim_position->l_end:(this) {
+        addChildrenTo this.strip_list {
+          Strip s (this, $this.time, $this.position)
+          graph_add_edge (this.l_sel_req, s.select)
+          graph_add_edge (this.l_desel_req, s.deselect)
+          graph_add_edge (this.l_ins_sel, s.insertion_deselect)
+          graph_add_edge (this.l_ins_sel, s.insertion_select)
+          graph_add_edge (this.l_ins_desel, s.insertion_deselect)
+          graph_add_edge (this.l_del, s.about_to_delete)
+          graph_add_edge (this.l_sort, s.position)
+        }
+        this.time++
+        this.position = this.strip_list.size
+      }
+      l_end~>time
+      l_end~>position
+    }
+    without_anim->with_anim (test_anim.false)
+    with_anim->without_anim (test_anim.true)
+  }
+
+  ready_to_delete->l_ready:(this) {
     for (int i = 1; i <= $this.selected_items.size; i++) {
       selected = getRef (&this.selected_items.[i])
+      graph_remove_edge (this.l_sel_req, selected.select)
+      graph_remove_edge (this.l_desel_req, selected.deselect)
+      graph_remove_edge (this.l_ins_sel, selected.insertion_deselect)
+      graph_remove_edge (this.l_ins_sel, selected.insertion_select)
+      graph_remove_edge (this.l_ins_desel, selected.insertion_deselect)
+      graph_remove_edge (this.l_del, selected.about_to_delete)
+      graph_remove_edge (this.l_sort, selected.position)
       delete selected 
       setRef (&this.selected_items.[i], null)
     }
@@ -185,6 +213,8 @@ StripBoard (Process parent, double _x, double _y)
     this.position = $this.strip_list.size
     notify this.update_position
   }
+  l_ready~>pos_sorter.sort
+  pos_sorter.sort~>update_position
 
   /***************************/
   /*                         */

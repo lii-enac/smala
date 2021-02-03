@@ -1402,6 +1402,7 @@ causal_dep
   : name_or_path CAUSAL_DEP name_or_path
   {
     CausalDependencyNode *node = new CausalDependencyNode (@$, new PathNode (@1, $1), new PathNode (@1, $3));
+    node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     driver.add_node (node);
   }
 
@@ -1500,9 +1501,12 @@ start_lambda
       name_context_list.pop_back ();
       driver.start_debug ();
       driver.in_preamble ();
-      SmalaNative *native = new SmalaNative (@$, $1, "_src_", new PathNode (@4, $4));
+      string new_name ("func_" + std::to_string (func_num++));
+      SmalaNative *native = new SmalaNative (@$, new_name, "_src_", new PathNode (@4, $4));
       driver.add_node (native);
-      $$ = new NativeComponentNode (@$, $1, nullptr, new PathNode (@4, $4), "1", SIMPLE_ACTION);
+      NativeComponentNode *n = new NativeComponentNode (@$, new_name, nullptr, new PathNode (@4, $4), "1", SIMPLE_ACTION);
+      n->set_name ($1);
+      $$ = n;
       m_in_lambda = true;
       push_sym_table ();
       add_sym (@$, $4.back()->get_subpath (), PROCESS);

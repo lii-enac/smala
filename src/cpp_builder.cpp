@@ -1651,8 +1651,9 @@ namespace Smala
     std::string src = build_find (n->src (), true);
     std::string dst = build_find (n->dst (), true);
     indent (os);
-    os << "Graph::instance ().add_edge (" << src << ", " << dst << ");\n";
-    used_processes["Graph"] = true;
+    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+    os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
+    used_processes["GraphEdgeAdder"] = true;
   }
 
   void

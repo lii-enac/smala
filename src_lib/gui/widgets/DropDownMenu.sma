@@ -40,20 +40,15 @@ fn_init(Process src, Process data)
             data.text_color.value =: color.value
             Circle c (5, y - 4, 2)
             t =: data.choice.text
-            bkg.press -> { data.unselect_all =: data.ask_selection
-              "" =: data.choice.text
-            }
-            |->data.fold
+            bkg.press ->  { data.unselect_all =: data.ask_selection
+                            "" =: data.choice.text
+                          }
+            bkg.press->data.fold
           }
         }
-        Bool selected (0)
-        select -> { "selected" =: sw.state
-          1 =: selected
-        }
-        unselect -> { "idle" =: sw.state
-          0 =: selected
-        }
-        selected == 0 ? "idle" : "selected" =: sw.state
+        select -> { "selected" =: sw.state }
+        sw.selected->data.fold
+        unselect -> { "idle" =: sw.state }
       }
     }
     y = y + 18
@@ -125,18 +120,19 @@ DropDownMenu (double _x, double _y)
     unfolded->idle (button.press)
     unfolded->idle (fold)
   }
-  NativeAction init (fn_init, this, 0)
+  
   MaxList sum (fsm.unfolded.items, "width")
+  NativeAction init (fn_init, this, 0)
   sum.output + 20 =:> box.width
 
-  ask_selection->(this) {
+  ask_selection->l_ask:(this) {
     p = getRef (&this.ask_selection)
     for c : this.fsm.unfolded.items {
       if (&c != &p) {
-        run c.unselect
+        notify c.unselect
       }
       if (&p != 0) {
-        run p.select
+        notify p.select
       }
     }
   }

@@ -144,4 +144,5 @@ DropDownMenu (double _x, double _y)
     }
     notify this.fold
   }
+  l_ask~>selected
 }

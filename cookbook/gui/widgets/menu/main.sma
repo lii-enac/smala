@@ -47,7 +47,5 @@ Component root
       Point _ (130, 230)
     }
   }
-  TextComparator comp ("", "")
-  menu.selected =:> comp.left
-  comp.output == 1 ? "idle" : toString(menu.selected) =:> selected.state
+  menu.selected =:> selected.state
 }

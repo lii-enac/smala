@@ -17,6 +17,10 @@ fn_init(Process src, Process data)
         data.box.width - 3 =:> bkg.width
         Spike select
         Spike unselect
+        data.l_ask~>select
+        data.l_ask~>unselect
+        select~>data.fold
+        unselect~>data.fold
         FillColor text_color (#000000)
         data.text_color.value =: text_color.value
         Text text (9, y, toString(t))
@@ -43,12 +47,15 @@ fn_init(Process src, Process data)
             bkg.press ->  { data.unselect_all =: data.ask_selection
                             "" =: data.choice.text
                           }
-            bkg.press->data.fold
           }
         }
-        select -> { "selected" =: sw.state }
-        sw.selected->data.fold
-        unselect -> { "idle" =: sw.state }
+        FSM sel_fsm {
+          State idle
+          State selected
+          idle->selected (select)
+          selected->idle (unselect)
+        }
+        sel_fsm.state=:>sw.state, sel_fsm.initial
       }
     }
     y = y + 18
@@ -135,5 +142,6 @@ DropDownMenu (double _x, double _y)
         notify p.select
       }
     }
+    notify this.fold
   }
 }

@@ -36,12 +36,12 @@ Component root
   FillColor fc1 (0, 0, 0)
   Circle cir (0, 0, 20)
   Text tp (600, 100, "")
-  min (abs($s.dz) * 20, 255.0) => fc1.b
+  fmin (fabs($s.dz) * 20, 255.0) => fc1.b
   f.height - (s.z*100) =:> cir.cy
   s.x * 100 =:> cir.cx
 
   FillColor fc2 (0, 0, 0)
-  min (abs($s1.dz) * 20, 255.0) => fc2.b
+  fmin (fabs($s1.dz) * 20, 255.0) => fc2.b
   Circle cir2 (0, 20, 20)
   f.height - (s1.z*100) =:> cir2.cy
   s1.x * 100 =:> cir2.cx

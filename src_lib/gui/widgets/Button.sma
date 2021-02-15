@@ -39,9 +39,12 @@ Button (Process frame, string _label, double x_, double y_) {
     State pressed {
       150 =: fc.r
     }
+    State out
     idle->pressed (r.press)
     pressed->idle (r.release, click)
-    pressed->idle (frame.release)
+    pressed->out (r.leave)
+    out->pressed (r.enter)
+    out->idle (frame.release)
   }
 
   FillColor w (255, 255, 255)

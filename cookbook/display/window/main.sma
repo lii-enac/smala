@@ -19,17 +19,18 @@ use gui
 
 _main_
 Component root {
-  Frame f ("screenshot", 0, 0, 600, 600)
+  Frame f ("transparent windows", 0, 0, 600, 600, false)
   Exit ex (0, 1)
   f.close -> ex
 
-  FillColor g(0,255,0)
-  Rectangle r(10,10,50,50)
-  0.7 =: f.opacity
+  FillColor g (0, 255, 0)
+  Rectangle r (10, 10, 50, 50)
+  FillColor g (255, 0, 0)
+  Circle  c (60, 60, 30)
+  //0.6 =: f.opacity
 
   Timer t(2000)
   t.end -> {
     900 =: f.width
   }
-
 }

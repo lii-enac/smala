@@ -765,7 +765,7 @@ pkgdeps := bison flex
 
 ifeq ($(os),Linux)
 pkgcmd := apt install -y
-pkgdeps += librtmidi-dev nlohmann-json-dev
+pkgdeps += librtmidi-dev nlohmann-json3-dev
 endif
 
 ifeq ($(os),Darwin)

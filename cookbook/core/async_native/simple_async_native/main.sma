@@ -52,7 +52,7 @@ Component root {
     Text explanation1 (10, 20, "Click the button to launch the async action")
     Text explanation2 (10, 40, "then, drag the rectangle to check that the application is not freezed")
     Text explanation3 (10, 60, "When the action is terminated, \"end\" should appear")
-    Text t (10, 120, "  ")
+    Text t (10, 120, "")
     Text t2 (10, 140, "")
     Button btn (f, "launch", 50, 150)
     FillColor fc (#FF00FF)
@@ -63,6 +63,9 @@ Component root {
     // Bind a C++ native action
     NativeAsyncAction cpp_na (smala_action, root, 1)
     btn.click -> cpp_na
-    btn.click -> {"STARTED" =: t.text}
-    cpp_na.end->{"END" =: t.text}
+    btn.click -> {
+        "STARTED" =: t.text
+        "" =: t2.text
+    }
+    cpp_na.end -> {"END" =: t.text}
 }

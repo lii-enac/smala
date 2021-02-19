@@ -54,7 +54,6 @@ Component root {
     dp.status =:> set_col.state
   }
 
-  Incr inc (1)
   FillColor _ (White)
   Text t_inc (50, 100, "")
 

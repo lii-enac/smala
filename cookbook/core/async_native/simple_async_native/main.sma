@@ -60,7 +60,7 @@ Component root {
     Ref toDrag (r)
     SimpleDrag _ (toDrag, f)
 
-    // Bind a C++ native action
+    // Bind a Smala native action
     NativeAsyncAction cpp_na (smala_action, root, 1)
     btn.click -> cpp_na
     btn.click -> {

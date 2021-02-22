@@ -60,12 +60,12 @@ Component root {
 	Frame f ("f", 0, 0, 500, 600)
     Exit ex (0, 1)
     f.close -> ex
-	FillColor fcc (#FFFFFF)
+	FillColor _ (#404040)
     Text explanation1 (10, 20, "Press color rectangle to give his color to the upper rectangle")
     Text explanation2 (10, 40, "!! Blue rectangle has 3 press zone that will change his y position")
     Text explanation3 (10, 60, "- if blue.press.x < 380 then blue.y = 350 ")
-    Text explanation4 (10, 80, "- if 380 < blue.press.x < 420 then blue.y = 450 ")
-    Text explanation5 (10, 100, "- if 420 < blue.press.x then blue.y = 400 ")
+    Text explanation4 (10, 80, "- if 380 < blue.press.x < 420 then blue.y = 400 ")
+    Text explanation5 (10, 100, "- if 420 < blue.press.x then blue.y = 450 ")
 
     FillColor fc (#FFFFFF)
 	Rectangle _ (200, 200, 100, 100, 0, 0)

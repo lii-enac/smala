@@ -46,7 +46,7 @@
     Text explanation2 (10, 40, "Click on the Increase/Decrease buttons to increase/decrease their size")
     Text explanation3 (10, 60, "Unselect all by clicking on the Clear button")
 
-    Int select (##28F0FA)
+    Int select (#28F0FA)
     Int unselect (#0A0A0A)
 
     OutlineWidth _ (4)

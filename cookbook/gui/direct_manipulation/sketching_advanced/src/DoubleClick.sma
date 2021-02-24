@@ -40,6 +40,7 @@ DoubleClick (Process f, Process shape)
     idle -> first_press (shape.press)
 
     first_press -> first_release (shape.release)
+    first_press -> idle (first_press.t.end)
 
     first_release -> idle (shape.press, double_click)
     first_release -> idle (first_release.t.end)

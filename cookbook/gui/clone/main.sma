@@ -24,24 +24,26 @@ use gui
   Frame f ("clone", 0, 0, 600, 600)
   Exit ex (0, 1)
   f.close -> ex
-  Group p1 {
+
+  FillColor  _ (80, 80, 80)
+  Group gp1 {
     Rectangle rect1 (100, 100, 100, 100, 0, 0)
-    Circle cric1 (300, 100, 50)
+    Circle circ1 (300, 100, 50)
   }
 
   /* clone the all group */
   Translation t1 (0, 200)
-  dolly1 << clone (&p1)
+  dolly1 << clone (&gp1)
 
   /* clone only circle */
   Translation t2 (0, 200)
   FillColor  _ (255, 0, 0)
-  dolly2 << clone (&dolly1.cric1)
+  dolly2 << clone (&dolly1.circ1)
 
   /* test with SVG */
   svg = loadFromXML ("img/aircraft.svg")
 
-  Translation t3 (300, -300)
+  Translation t3 (400, -300)
   Group aircraft {  
     background << svg.background
     label << svg.label

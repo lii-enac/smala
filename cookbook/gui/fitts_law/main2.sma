@@ -135,7 +135,8 @@ Component root
 	fitts.control.miss -> hm_as
 
 	TextPrinter tp
-	"measure\tW\tA\tS\thitmiss\tt" =: tp.input // header
+	//"measure\tW\tA\tS\thitmiss\tt" =: tp.input // header with scale (S)
+	"measure\tW\tA\thitmiss\tt" =: tp.input // header without scale
 
 	fitts.ended -> {
     	measures.index + "\t" + target_width + "\t" + target_distance + "\t"

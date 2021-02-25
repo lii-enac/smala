@@ -98,7 +98,7 @@ Component root
 	}
 	cpp_action (&root) // populate list
 
-	fitts.control.init -> measures.next
+	fitts.ended -> measures.next
 	(measures.index == 32+1) -> ex
 
     // classic
@@ -136,7 +136,8 @@ Component root
 
 	TextPrinter tp
 	"measure\tW\tA\tS\thitmiss\tt" =: tp.input // header
-	fitts.control.init -> {
+
+	fitts.ended -> {
     	measures.index + "\t" + target_width + "\t" + target_distance + "\t"
 		//+ scale + "\t"
 		+ hit_or_miss + "\t" + fitts.target_time_acquisition =: tp.input

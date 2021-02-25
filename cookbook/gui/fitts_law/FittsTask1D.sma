@@ -11,6 +11,8 @@ FittsTask1D(Process f) {
   Int target_distance(500)
   Int target_time_acquisition(0)
 
+  Spike ended
+
   // graphic scene
 
   // bg
@@ -86,8 +88,8 @@ FittsTask1D(Process f) {
     on_starting_area -> started (on_starting_area.start_task.tick)
     started -> miss (bg.press)
     started -> hit (display.target.area.press)
-    miss -> init (miss.t.tick)
-    hit -> init (hit.t.tick)
+    miss -> init (miss.t.tick, ended)
+    hit -> init (hit.t.tick, ended)
   }
 
 }

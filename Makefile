@@ -601,7 +601,11 @@ $(build_dir)/%.o: $(build_dir)/%.cpp
 ifeq ($(PREFIX),)
 # dev install
 smala_install_prefix :=  $(abspath $(build_dir))
+ifeq ($(os),Darwin)
 pkg_config_install_prefix := /usr/local
+else
+pkg_config_install_prefix := /usr
+endif
 else
 # pkg install (brew, deb, arch)
 smala_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
@@ -615,7 +619,7 @@ pkgconf: $(pkgconfig_targets)
 
 $(build_dir)/%.pc: distrib/%.pc.in
 	@mkdir -p $(dir $@)
-	@sed -e 's,@PREFIX@,$(smala_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
+	@sed -e 's,@PREFIX@,$(pkg_config_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
 
 
 # -----------

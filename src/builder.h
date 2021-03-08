@@ -85,7 +85,7 @@ namespace Smala {
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     void build_node (std::ofstream &os, Node *node);
     void build_for_node (std::ofstream &os, Node *node);
-    void build_preamble (std::ofstream &os);
+    void build_preamble (std::ofstream &os, bool debug=false);
     bool is_string (ExprNode *e);
     bool has_complex_term (PathNode *n);
     virtual void build_control_node (std::ofstream &os, Node *n) = 0;
@@ -134,7 +134,7 @@ namespace Smala {
     virtual void build_transition_node (std::ofstream &os, Node *ctrl) = 0;
     std::string build_simple_node (std::ofstream &os, Node *n);
     virtual void build_this_node (std::ofstream &os, Node *n) = 0;
-    virtual void set_location (std::ofstream &os, Node *n) {}
+    virtual void set_location (std::ofstream &os, Node *n, bool debug=false) {}
     virtual void end_line (std::ofstream &os) = 0;
     // virtual void build_new_line (std::ofstream &os, NewLineNode *n) {
     //     os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;

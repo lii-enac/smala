@@ -188,7 +188,7 @@ namespace Smala
     }
   }
   void
-  Builder::build_preamble (std::ofstream &os)
+  Builder::build_preamble (std::ofstream &os, bool debug)
   {
     int size = m_ast.preamble ().nodes ().size ();
     Node *cur_node;
@@ -199,7 +199,7 @@ namespace Smala
         {
         case USE:
           {
-            set_location (os, cur_node);
+            set_location (os, cur_node, debug);
             std::string str = cur_node->name ();
             std::locale loc;
             str[0] = std::toupper (str[0], loc);
@@ -211,7 +211,7 @@ namespace Smala
           }
         case IMPORT:
           {
-            set_location (os, cur_node);
+            set_location (os, cur_node, debug);
             //std::string name = cur_node->name ();
             build_import (os, cur_node);
             break;

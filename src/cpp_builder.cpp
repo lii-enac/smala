@@ -109,9 +109,9 @@ namespace Smala
       m_types.insert (std::pair<std::string, std::string> (name, name));
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
-
-    os << "\n#line 1" << " \"" << m_filename << "\"" << std::endl;
-    build_preamble (os);
+    if(debug)
+      os << "\n#line 1" << " \"" << m_filename << "\"" << std::endl;
+    build_preamble (os, debug);
 
     size = m_ast.node_list ().size ();
     location last_loc;

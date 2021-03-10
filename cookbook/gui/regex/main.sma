@@ -26,11 +26,11 @@ Component root {
 
   Regex regex ("foo=(\\S*) bar=(\\S*)")
   
-  Text reg_txt (10, 30, "str sent:\t")
-  Text foo_txt (10, 50, "foo value:\t")
-  Text bar_txt (10, 70, "bar value:\t")
+  Text reg_txt (10, 30, "str sent:")
+  Text foo_txt (10, 50, "foo value:")
+  Text bar_txt (10, 70, "bar value:")
 
-  FillColor _ (0, 255, 0)
+  FillColor _ (0, 128, 0)
   Text reg_value (80, 30, "")
   Text foo_value (80, 50, "")
   Text bar_value (80, 70, "")
@@ -40,9 +40,9 @@ Component root {
 
   Incr i1 (0)
   Incr i2 (0)
-  i2.delta = 100
-  DoubleFormatter df1 (0, 2)
-  DoubleFormatter df2 (0, 0)
+  i2.delta = 100.01
+  DoubleFormatter df1 (0, 0)
+  DoubleFormatter df2 (0, 2)
   i1.state => df1.input
   i2.state => df2.input
 

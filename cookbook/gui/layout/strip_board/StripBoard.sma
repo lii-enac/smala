@@ -158,17 +158,14 @@ StripBoard (Process parent, double _x, double _y)
       l_add~>position
     }
     State with_anim {
-      add->l_add:(this) {
-        notify this.pos_sorter.sort
+      add->pos_sorter.sort
+      pos_sorter.sort->l_add:(this) {
         for (int i = $this.position + 1; i <= $this.strip_list.size; i++) {
           this.strip_list.[i].position++
         }
-        this.time++
-        notify this.update_position
       }
-      l_add~>pos_sorter.sort
-      l_add~>time
-      l_add~>update_position
+      l_add->update_position
+
       end_anim_position->l_end:(this) {
         addChildrenTo this.strip_list {
           Strip s (this, $this.time, $this.position)

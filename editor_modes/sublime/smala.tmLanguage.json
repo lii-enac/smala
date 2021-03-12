@@ -1,0 +1,140 @@
+{
+  "name": "smala",
+  "file_extensions": [
+    "sma"
+  ],
+  "scope": "source.sma",
+  "variables": {
+    "function_sma": "run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print|toString",
+    "deprecated_sma": "remove"
+  },
+  "contexts": {
+    "main": [
+      {
+        "match": "\"",
+        "scope": "punctuation.definition.string.begin.sma",
+        "push": "double_quoted_string"
+      },
+      {
+        "match": "//",
+        "scope": "comment.line.sma",
+        "push": "line_comment"
+      },
+      {
+        "match": "/\\*",
+        "scope": "comment.block.sma",
+        "push": "block_comment"
+      },
+      {
+        "match": "{",
+        "push": [
+          {
+            "match": "}",
+            "pop": true
+          },
+          {
+            "include": "main"
+          }
+        ]
+      },
+      {
+        "match": ";\\s*$",
+        "scope": "invalid.illegal"
+      },
+      {
+        "match": "%{",
+        "push": "Packages/C++/C++.sublime-syntax",
+        "with_prototype": [
+          {
+            "match": "%}",
+            "pop": true
+          }
+        ]
+      },
+      {
+        "match": "_action_\\n",
+        "scope": "keyword.other.sma",
+        "push": "native_action"
+      },
+      {
+        "match": "\\b(use|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string|_src_|_keep_|)\\b",
+        "scope": "keyword.other.sma"
+      },
+      {
+        "match": "\\s*<<\\s*|\\s*=>\\s*|\\s*=:>\\s*|\\s*=:\\s*|\\s*!?->!?\\s*|\\s*::>\\s*|\\s*::\\s*|\\s*\\|->\\s*",
+        "scope": "keyword.operator.sma"
+      },
+      {
+        "match": "^\\s*(\\b[A-Z].[a-zA-Z0-9]*\\b)",
+        "captures": {
+          "1": "storage.type.sma"
+        }
+      },
+      {
+        "match": "\\b(-)?[0-9]+(.[0-9]*)?\\b",
+        "scope": "constant.numeric.sma"
+      },
+      {
+        "match": "\\b({{function_sma}})\\b",
+        "scope": "storage.type"
+      },
+      {
+        "match": "\\b({{deprecated_sma}})\\b",
+        "scope": "invalid.deprecated"
+      }
+    ],
+    "double_quoted_string": [
+      {
+        "meta_include_prototype": false
+      },
+      {
+        "meta_scope": "string.quoted.double.sma"
+      },
+      {
+        "match": "\\\\.",
+        "scope": "constant.character.escape.sma"
+      },
+      {
+        "match": "\"",
+        "scope": "punctuation.definition.string.end.sma",
+        "pop": true
+      }
+    ],
+    "line_comment": [
+      {
+        "meta_scope": "comment.line.sma"
+      },
+      {
+        "match": "$",
+        "pop": true
+      }
+    ],
+    "block_comment": [
+      {
+        "meta_scope": "comment.block.sma"
+      },
+      {
+        "match": "\\*/",
+        "pop": true
+      }
+    ],
+    "native_action": [
+      {
+        "match": "^([\\w\\-]+)",
+        "scope": "storage.type.function"
+      },
+      {
+        "match": "\\)",
+        "pop": true
+      },
+      {
+        "include": "main"
+      }
+    ],
+    "prototype": [
+      {
+        "include": "comments"
+      }
+    ]
+  }
+}

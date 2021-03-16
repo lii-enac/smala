@@ -1,0 +1,28 @@
+{
+    "name": "smala",
+    "displayName": "smala",
+    "description": "smala grammar for djnn",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.46.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "smala",
+            "aliases": ["smala", "smala"],
+            "extensions": [".sma"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "smala",
+            "scopeName": "source.smala",
+            "path": "./syntaxes/smala.tmLanguage.json",
+            "embeddedLanguages": {
+                "meta.embedded.block.cpp": "cpp",
+            }
+        }]
+    }
+}

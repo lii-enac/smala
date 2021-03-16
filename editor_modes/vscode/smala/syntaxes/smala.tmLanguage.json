@@ -1,0 +1,92 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "smala",
+	"scopeName": "source.smala",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#sma_func"
+		},
+		{
+			"include": "#numeric"
+		},
+		{
+			"include": "#component"
+		},
+		{
+			"include": "#comment_block"
+		},
+		{
+			"include": "#comment_line"
+		},
+		{
+			"include": "#cpp_code"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.smala",
+				"match": "\\b(use|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string|_src_|_keep_)\\b"
+			}]
+		},
+		"sma_func": {
+			"patterns": [{
+				"name": "variable.language.smala",
+				"match": "run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChildrenTo|addChild|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print|toString"
+			}]
+  		},
+		"operators": {
+			"patterns": [{
+				"name": "keyword.operator.smala",
+				"match": "\\s*<<\\s*|\\s*=>\\s*|\\s*=:>\\s*|\\s*=:\\s*|\\s*!?->!?\\s*|\\s*::>\\s*|\\s*::\\s*|\\s*\\|->\\s*"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.smala",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.smala",
+					"match": "\\\\."
+				}
+			]
+		},
+		"numeric": {
+			"patterns": [{
+				"name": "constant.numeric.smala",
+				"match": "\\#?\\b(-)?[0-9ABCDEF]+(.[0-9]*)?\\b"
+			}]
+		},
+		"component": {
+			"patterns": [{
+				"name": "storage.type.smala",
+				"match": "^\\s*(\\b[A-Z].[a-zA-Z0-9]*\\b)"
+			}]
+		},
+		"comment_block": {
+			"name": "comment.block.smala",
+			"begin": "/\\*",
+			"end": "\\*/"
+		},
+		"comment_line": {
+			"name": "comment.line.smala",
+			"match": "//.*"
+		},
+		"cpp_code": {
+            "begin": "%{",
+            "end": "%}",
+            "name": "meta.embedded.block.cpp",
+            "patterns": [ { "include": "source.cpp" } ]
+        }
+	}
+}

@@ -27,7 +27,7 @@ Component root {
   FillColor _ (200, 150, 150)
   Clock cl (20)
   Incr inc (1)
-  inc.delta = 0.02
+  0.02 =: inc.delta
   cl.tick -> inc
 
   Circle c (0, 0, 10)

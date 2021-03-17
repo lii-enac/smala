@@ -21,7 +21,7 @@
             "scopeName": "source.smala",
             "path": "./syntaxes/smala.tmLanguage.json",
             "embeddedLanguages": {
-                "meta.embedded.block.cpp": "cpp",
+                "meta.embedded.block.cpp": "cpp"
             }
         }]
     }

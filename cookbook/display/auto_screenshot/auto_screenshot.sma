@@ -33,7 +33,7 @@ Component root {
 
   WallClock wc
   f.refreshed -> {
-    "screenshot-" + wc.state_text =: f.screenshot_path
+    "shots/screenshot-" + wc.state_text =: f.screenshot_path
   }
   f.refreshed -> f.screenshot
   

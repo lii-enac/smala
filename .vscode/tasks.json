@@ -9,9 +9,10 @@
             "command": "make -j test"
         },
         {
-            "label": "default",
+            "label": "build",
             "type": "shell",
             "command": "make -j",
+            //"dependsOn": ["build djnn-cpp"],
             "problemMatcher": [
                 "$gcc"
             ]

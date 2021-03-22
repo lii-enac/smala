@@ -10,22 +10,22 @@
     "version": "0.2.0",
     "configurations": [
 
-        {
-            "name": "(lldb) Lancer",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-            "args": ["test"],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [
-                {
-                    "name": "DYLD_LIBRARY_PATH",
-                    "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp-master/build/lib"
-                }
-            ],
-            "externalConsole": false,
-            "MIMode": "lldb"
-        }
+    {
+        "name": "(lldb) smala - cookbook",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/cookbook/gui/clock/clock_app",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/cookbook/gui/clock", // path to cookbook file
+        "externalConsole": false,
+        "MIMode": "lldb",
+        "environment": [
+            {
+            "name": "DYLD_LIBRARY_PATH",
+            "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/build/lib:${workspaceFolder}/../djnn-cpp/build/lib"
+            }
+            ]
+    },
     ]
 }

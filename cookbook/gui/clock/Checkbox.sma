@@ -48,10 +48,9 @@
  						label =: choice
  					}
  					st_unselected->st_pressed (c.press)
- 					st_unselected->st_selected (init)
 					st_pressed->st_selected (c.release, unselectAll)
-					st_pressed->st_unselected (c.leave)
-					st_unselected->st_pressed (c.enter)
+					//st_pressed->st_unselected (c.leave)
+					//st_unselected->st_pressed (c.enter)
 					st_selected->st_unselected (unselectAll)
 					/*
  					st_unselected->st_pressed (c.press)

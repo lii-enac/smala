@@ -86,7 +86,7 @@ Component root {
 		}
 
 	}
-	|->scene.view.cb.entries.[3].init
+	scene.view.cb.entries.[3].fsm.initial = "st_selected"
 	Button b (f, "Init time", 500, 600)
 	b.click -> st.compute
 	f.width - 100 =:> b.x

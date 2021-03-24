@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
-## [1.15.0] - 2020-01-28
+## [1.15.0] - 2021-01-28
 ### compliant with djnn-cpp [1.15.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 

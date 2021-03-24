@@ -18,6 +18,7 @@
         "args": [],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}/cookbook/gui/clock", // path to cookbook file
+        "preLaunchTask": "cookbook_apps",
         "externalConsole": false,
         "MIMode": "lldb",
         "environment": [

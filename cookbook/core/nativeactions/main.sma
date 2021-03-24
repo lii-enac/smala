@@ -87,8 +87,8 @@ Component root {
 	NativeAction smala_na (smala_action, fc, 1)
 	green.press -> smala_na
 
-	// Define and bind a smala_lambda (in code native action)
-	blue.press -> (root) {
+	// Define and bind a smala_lambda (in code native action) ... you can give it a name if you want
+	blue.press -> native_lambda_name : (root) {
   		// To create a NEW component (either visual or assignment/binding/connector):
         // add it to a parent (passed as the argument of the native, here fc), thanks to
         //     addChildrenTo parent {

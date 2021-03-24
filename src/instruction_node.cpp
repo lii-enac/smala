@@ -25,6 +25,8 @@ namespace Smala
     // DELETE, DUMP, NOTIFY, RUN, STOP
     if (name == "Delete")
       set_type (DELETE);
+    else if (name == "Delete_content")
+      set_type (DELETE_CONTENT);
     else if (name == "Dump")
       set_type (DUMP);
     else if (name == "Notify")

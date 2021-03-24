@@ -1125,6 +1125,18 @@ namespace Smala
         os << "}\n";
       }
       break;
+      case DELETE_CONTENT: {
+        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        os << "var " << new_name << " = " << arg << ";\n";
+        indent (os); os << "if (" << new_name << " != null) {\n";
+        indent (os); indent (os); os << "clean_up_content (" << new_name << ");\n";
+        indent (os); os << "}";
+        indent (os); os << "else {\n";
+        indent (os); indent (os); os << "console.log (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
+        indent (os); indent (os); os << "exit(0);\n";
+        indent (os); os << "}\n";
+      }
+      break;
       case UNKNOWN:
         print_error_message (error_level::error,
         "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);

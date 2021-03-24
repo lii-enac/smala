@@ -1241,6 +1241,23 @@ namespace Smala
         os << "}\n";
       }
       break;
+      case DELETE_CONTENT: {
+        os << "Layer *is_layer = dynamic_cast<Layer *> (" << arg << ");\n";
+        indent (os); os << "if (is_layer) {\n";
+        indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
+        indent (os); indent (os); os << "exit(0);\n";
+        indent (os); os << "}\n";
+        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        indent (os); os << "Container *" << new_name << " = dynamic_cast<Container *> (" << arg << ");\n";
+        indent (os); os << "if (" << new_name << ") {\n";
+        indent (os); indent (os); os << new_name << "->clean_up_content ();\n";
+        indent (os); os << "}\n";
+        indent (os); os << "else {\n";
+        indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
+        indent (os); indent (os); os << "exit(0);\n";
+        indent (os); os << "}\n";
+      }
+      break;
       case UNKNOWN:
         print_error_message (error_level::error,
         "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);

@@ -23,7 +23,7 @@ namespace Smala {
 
   typedef enum
   {
-    DELETE, DUMP, NOTIFY, RUN, STOP, XMLSERIALIZE, UNKNOWN
+    DELETE, DELETE_CONTENT, DUMP, NOTIFY, RUN, STOP, XMLSERIALIZE, UNKNOWN
   } instruction_t;
 
   typedef enum SmalaType {

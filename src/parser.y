@@ -211,6 +211,7 @@
 %token DIVIDE "/"
 %token COLON ":"
 %token QUESTION_MARK "?"
+%token MODULO "%"
 %token AND "&&"
 %token OR "||"
 %token LT "<"
@@ -1209,6 +1210,11 @@ multiplicative_expression
   | multiplicative_expression DIVIDE unary_expression
   {
     BinaryExprNode* n = new BinaryExprNode (@$, "/", $1, $3);
+    $$ = n;
+  }
+  | multiplicative_expression MODULO unary_expression
+  {
+    BinaryExprNode* n = new BinaryExprNode (@$, "%", $1, $3);
     $$ = n;
   }
 

@@ -331,7 +331,12 @@ namespace Smala
             expr += build_expr (bin->get_left_child (), prod_t, build_fake) + " " + bin->get_val () + " " + build_expr (bin->get_right_child (), prod_t, build_fake);
           }
         } else {
-          expr += build_expr (bin->get_left_child (), prod_t, build_fake) + " " + bin->get_val () + " " + build_expr (bin->get_right_child (), prod_t, build_fake);
+          if (bin->get_val().compare("%") == 0)
+            expr += "(int)"; // hum! hum! are we sure that we want to force the cast
+          expr += build_expr (bin->get_left_child (), prod_t, build_fake) + " " + bin->get_val () + " ";
+          if (bin->get_val().compare("%") == 0)
+            expr += "(int)"; // hum! hum! are we sure that we want to force the cast
+          expr += build_expr (bin->get_right_child (), prod_t, build_fake);
         }
         break;
       }

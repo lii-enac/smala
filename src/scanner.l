@@ -111,6 +111,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "/"                   { return Smala::Parser::make_DIVIDE (loc); }
 "?"                   { return Smala::Parser::make_QUESTION_MARK (loc); }
 "!"                   { return Smala::Parser::make_NOT (loc); }
+"%"                   { return Smala::Parser::make_MODULO (loc); }
 ":"                   { return Smala::Parser::make_COLON (loc); }
 "=>"                  { return Smala::Parser::make_CONNECTOR (loc); }
 "=:>"                 { return Smala::Parser::make_ASSGNT_CONN (loc); }

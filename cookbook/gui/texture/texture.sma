@@ -9,10 +9,11 @@ Component root
   Frame f ("my frame", 0, 0, 600, 300)
   Exit ex (0, 1)
   f.close -> ex
-  NoOutline _()
  
   Texture t ("texture.png")
+
   Rectangle r (10, 10, 150, 80, 5, 5)
+  
   Translation _ (70, -90)
   PathClip border {
     PathMove _(100, 110)

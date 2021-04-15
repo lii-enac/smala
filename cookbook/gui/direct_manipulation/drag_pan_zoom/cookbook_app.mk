@@ -10,6 +10,7 @@
 #  		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
-objs_cookbook_app := src/Drag.o src/PanAndZoom.o src/main.o
+objs_cookbook_app := src/Drag.o src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core
+smala_libs_cookbook_app := smala
 lang_cookbook_app := cpp

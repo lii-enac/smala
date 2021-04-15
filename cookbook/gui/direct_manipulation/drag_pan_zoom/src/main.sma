@@ -19,7 +19,7 @@ use display
 use gui
 
 import Drag
-import PanAndZoom
+import gui.interactors.PanAndZoom
 
 _main_
 Component root {
@@ -48,6 +48,7 @@ Component root {
     // Pan and zoom
     Homography panAndZoomTransform
     PanAndZoom pz (frame, backgroundForPan.bg, panAndZoomTransform)
+    pz.mouseCenteredOption.state = "on"
 
     FillColor _ (70, 70, 70)
     Text ts (200, 200, "The scene can be panned and zoomed, the rectangle can be dragged")

@@ -28,8 +28,14 @@ Component root {
   FillColor fc(255,0,0)
   OutlineColor _(0,0,255)
 
-  //Component bg {
-  Layer bg {
+  //Component bg { // classic group
+  Layer bg { // complete window
+  //Layer bg (0,0,600,600) { // complete window
+  //Layer bg (0,0,600,585) { 
+  //Layer bg (0,0,600,130) { // only height
+  //Layer bg (0,110,600,30) { // this will slighty cut the stars at the bottom and at the top
+  //Layer bg (45,110,500,30) { // this will slighty cut the stars at the bottom, the top, left and right
+  
     Text _(0,20, "this text and 5000 stars are in a layer, while the circle is moving on top")
     Text _(0,30, "a clock applies every 2s a small x translation on the star and thus invalidates the layer")
     Translation t(0,0)

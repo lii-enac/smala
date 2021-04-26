@@ -3,6 +3,11 @@ use base
 use display
 use gui
 
+_native_code_
+%{
+#include <math.h>
+%}
+
 _define_
 PanAndZoom (Process move, Process press, Process release, Process dw) {
     // "input"

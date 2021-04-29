@@ -38,13 +38,28 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     mouseTracking = 1
 
     Double new_zoom (1)
+    Double new_xpan(0)
+    Double new_ypan(0)
+
+    // dzoom * zoom =:> new_zoom
+    // xpan + move.x / new_zoom - move.x / zoom =:> new_xpan
+    // ypan + move.y / new_zoom - move.y / zoom =:> new_ypan
+
     AssignmentSequence zseq (1) {
         dzoom * zoom =: new_zoom
         xpan + move.x / new_zoom - move.x / zoom =: xpan
         ypan + move.y / new_zoom - move.y / zoom =: ypan
+        // new_xpan =: xpan
+        // new_ypan =: ypan
         new_zoom =: zoom
     }
     dzoom -> zseq
+    // new_zoom -> zseq
+    // new_xpan -> zseq
+    // new_ypan -> zseq
+
+    //TextPrinter tp
+    //new_zoom =:> tp.input
 
     // pan management
 

@@ -40,8 +40,8 @@ Component root {
   FillColor fc (255,0,0)
   OutlineColor _ (0,0,255)
 
-  Component bg { // classic group
-  //Layer bg { // complete window
+  //Component bg { // classic group
+  Layer bg { // complete window
   //Layer bg (0,0,600,600) { // complete window
   //Layer bg (0,0,600,585) { 
   //Layer bg (0,0,600,130) { // only height
@@ -51,7 +51,7 @@ Component root {
     Text _(0,20, "this text and 5000 stars are in a layer, while the circle is moving on top")
     Text _(0,30, "a clock applies every 2s a small x translation on the star and thus invalidates the layer")
     Translation t(0,0)
-    for(int i=0; i<50; i++) {
+    for(int i=0; i<1; i++) {
       Component _ {
         Translation _(i/10.0,0)
         Translation t(-50,100)
@@ -72,6 +72,24 @@ Component root {
     }
   }
 
+  FSM DamageLayer {
+    State idle
+    State waiting {
+      Timer t (1000)
+      t.end -> bg.damaged
+    }
+    idle -> waiting (pz.zoom)
+    idle -> waiting (pz.xpan)
+    waiting -> waiting (pz.zoom, waiting.t.reset)
+    waiting -> waiting (pz.xpan, waiting.t.reset)
+    waiting -> idle (waiting.t.end)
+  }
+
+  TextPrinter tp
+  DamageLayer.state =:> tp.input
+  
+  Rectangle _(0,0,1,1,0,0)
+
   //Translation t(0,0)
   //Circle _(0,0, 50)
   mouseTracking = 1
@@ -79,5 +97,5 @@ Component root {
   //frame.move.y =:> t.ty
 
   Clock cl(2000)
-  cl.tick -> { 10 + bg.t.tx =: bg.t.tx }
+  //cl.tick -> { 10 + bg.t.tx =: bg.t.tx }
 }

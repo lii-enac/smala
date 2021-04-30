@@ -24,15 +24,15 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
 
     // zoom management
     Double adw (0) // absolute dw
-    Double tradw (0) // transfert function of adw
+    Double transf_adw (0) // transfert function of adw
     Double dzoom (1) // resulting delta zoom
 
     fabs($dw) =:> adw 
-    (0.00303 * adw + 0.00482) * adw + 1.001 =:> tradw
-    // Pow p (1.01, 0)
+    (0.00303 * adw + 0.00482) * adw + 1.001 =:> transf_adw // polynomial-based transfer function
+    // Pow p (1.01, 0) // exponent-based transfer function
     // adw =:> p.exponent
-    // p.result =:> tradw
-    dw >= 0 ? tradw : 1/tradw =:> dzoom
+    // p.result =:> transf_adw
+    dw >= 0 ? transf_adw : 1/transf_adw =:> dzoom
 
     // we need to know where the cursor is // FIXME put it in wheel event?..
     mouseTracking = 1
@@ -45,25 +45,24 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     Double new_xpan (0)
     Double new_ypan (0)
 
-    dzoom * zoom =:> new_zoom
+    // since we update later zoom in new_zoom, we must avoid creating a coupling between the two, that would build a cycle
+    // This should be harmless, however the activation vector is not cleaned after exec anymore for performance reasons, so it is harmful!
+    // so the following would theoritically be alright, but not practically: we put it in the AssignmentSequence instead
+    // dzoom * zoom =:> new_zoom
     // xpan + move.x / new_zoom - move.x / zoom =:> new_xpan
     // ypan + move.y / new_zoom - move.y / zoom =:> new_ypan
 
     AssignmentSequence zseq (1) {
-        // dzoom * zoom =: new_zoom
+        dzoom * zoom =: new_zoom
         xpan + last_move_x / new_zoom - last_move_x / zoom =: new_xpan
         ypan + last_move_y / new_zoom - last_move_y / zoom =: new_ypan
+
+        new_zoom =: zoom
         new_xpan =: xpan
         new_ypan =: ypan
-        new_zoom =: zoom
     }
-    //dzoom -> zseq
-    new_zoom -> zseq
-    // new_xpan -> zseq
-    // new_ypan -> zseq
+    dzoom -> zseq
 
-    //TextPrinter tp
-    //new_zoom =:> tp.input
 
     // pan management
 
@@ -94,6 +93,5 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
         pressing -> panning (move)
         panning -> idle (release)
     }
-    TextPrinter tp
-    pan_control.state =:> tp.input
+
 }

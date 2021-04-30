@@ -17,9 +17,9 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     // dw: e.g., frame.wheel.dy, amout of delta zoom as input by the user
 
     // "output"
-    Double zoom(1)
-    Double xpan(0)
-    Double ypan(0)
+    Double zoom (1)
+    Double xpan (0)
+    Double ypan (0)
 
 
     // zoom management
@@ -45,7 +45,7 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     Double new_xpan (0)
     Double new_ypan (0)
 
-    // since we update later zoom in new_zoom, we must avoid creating a coupling between the two, that would build a cycle
+    // since we update zoom in new_zoom later, we must avoid creating a coupling between them, as that would build a cycle
     // This should be harmless, however the activation vector is not cleaned after exec anymore for performance reasons, so it is harmful!
     // so the following would theoritically be alright, but not practically: we put it in the AssignmentSequence instead
     // dzoom * zoom =:> new_zoom
@@ -76,8 +76,8 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
             press.y =: ylast
         }
         State panning {
-            Double dx(0)
-            Double dy(0)
+            Double dx (0)
+            Double dy (0)
             AssignmentSequence seq (1) {
                 move.x - xlast =: dx
                 move.y - ylast =: dy

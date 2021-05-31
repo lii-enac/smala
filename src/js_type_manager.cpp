@@ -25,7 +25,7 @@ namespace Smala {
     type_entry coreGS[] = {
       {"syshook", "(&MainLoop::instance ())"},
       {"mainloop", "(&MainLoop::instance ())"},
-      {"_DEBUG_GRAPH_CYCLE", "_DEBUG_GRAPH_CYCLE_DETECT"},
+      {"_DEBUG_GRAPH_CYCLE_DETECT", "_DEBUG_GRAPH_CYCLE_DETECT"},
       {"0", "0"}
     };
     coreGlobalSymbols = coreGS;

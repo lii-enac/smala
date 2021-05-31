@@ -35,6 +35,7 @@ Component root {
   f.refreshed -> {
     "shots/screenshot-" + wc.state_text =: f.screenshot_path
   }
-  f.refreshed -> f.screenshot
+  //bad !! make loop
+  //f.refreshed -> f.screenshot
   
 }

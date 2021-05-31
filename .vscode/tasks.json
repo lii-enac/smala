@@ -9,9 +9,18 @@
             "command": "make -j test"
         },
         {
-            "label": "build",
+            "label": "build smala",
             "type": "shell",
             "command": "make -j",
+            //"dependsOn": ["build djnn-cpp"],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "clear smala",
+            "type": "shell",
+            "command": "make -j clear",
             //"dependsOn": ["build djnn-cpp"],
             "problemMatcher": [
                 "$gcc"

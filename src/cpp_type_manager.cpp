@@ -24,6 +24,7 @@ namespace Smala {
       {"syshook", "(&MainLoop::instance ())"},
       {"mainloop", "(&MainLoop::instance ())"},
       {"_DEBUG_GRAPH_CYCLE_DETECT", "_DEBUG_GRAPH_CYCLE_DETECT"},
+      {"_DEBUG_SEE_COLOR_PICKING_VIEW", "_DEBUG_SEE_COLOR_PICKING_VIEW"},
       {"0", "0"}
     };
     coreGlobalSymbols = coreGS;

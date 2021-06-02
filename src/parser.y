@@ -1659,6 +1659,24 @@ transition
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       if (driver.debug()) driver.new_line(@$);
     }
+  | NAME COLON NAME ARROW NAME LP name_or_path COMMA name_or_path RP
+    {
+      name_context_list.pop_back ();
+      name_context_list.pop_back ();
+      TransitionNode *node = new TransitionNode (@$, "FSMTransition", $1, $3, $5, new PathNode (@7, $7), new PathNode (@9, $9));
+
+      driver.add_node (node);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      if (driver.debug()) driver.new_line(@$);
+    }
+  | NAME COLON NAME ARROW NAME LP name_or_path RP
+    {
+      name_context_list.pop_back ();
+      TransitionNode *node = new TransitionNode (@$, "FSMTransition", $1, $3, $5, new PathNode (@7, $7), nullptr);
+      driver.add_node (node);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      if (driver.debug()) driver.new_line(@$);
+    }
   | LCB state_list RCB ARROW NAME LP name_or_path RP
     {
       name_context_list.pop_back ();

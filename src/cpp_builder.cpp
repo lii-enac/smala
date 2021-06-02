@@ -1573,7 +1573,7 @@ namespace Smala
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
     os << "new " << constructor << " (" << m_parent_list.back ()->get_symbol (ctrl->parent ()->name())
-        << ", " << m_null_string;
+        << ", " << "\"" << ctrl->name () << "\"";
 
     std::string src, dst;
     src = m_parent_list.back ()->get_symbol (ctrl->get_src ());

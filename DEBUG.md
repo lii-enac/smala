@@ -13,7 +13,7 @@ You can use several option to debug on smala :
   _DEBUG_GRAPH_CYCLE_DETECT = 0|1;
 
 ## Activation Sequence 
-  - display order in which component are activated and dactivated by GRAPH_EXEC
+  - display order in which component are activated and deactivated by GRAPH_EXEC
 
   _DEBUG_SEE_ACTIVATION_SEQUENCE = 0|1
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US  = 1000 // microsecond

@@ -72,7 +72,7 @@ Component root {
 	Incr inc (1)
 	inc.delta = 0.1
 	x aka inc.state
-	c.tick->inc
+	c.tick->inc.step
 
 	AssignmentSequence reset_x (1) {
 		0 =: x

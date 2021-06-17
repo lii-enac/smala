@@ -3,7 +3,7 @@ use base
 use animation
 
 _define_
-Animator (int duration, double _min, double _max, int func, int loop)
+Animator (int duration, double _min, double _max, int func, int loop, int start_on_activation)
 {
   Spike start
   Spike abort
@@ -26,10 +26,7 @@ Animator (int duration, double _min, double _max, int func, int loop)
   gen.output * (max - min) + min =:> output
  
   FSM fsm {
-    State stopped {
-      0 =: inc.state 
-      0 =: gen.input
-    }
+    State stopped
     State started {
       Clock cl (60)
       Int num_step (0)
@@ -47,4 +44,7 @@ Animator (int duration, double _min, double _max, int func, int loop)
   fps aka fsm.started.cl.period
   reset -> { 0 =: inc.state 
              0 =: gen.input }
+  if (start_on_activation) {
+    fsm.initial = "started"
+  }
 }

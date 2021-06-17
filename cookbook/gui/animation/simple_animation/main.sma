@@ -29,9 +29,9 @@ Component root
   FillColor _ (#10FF10)
   Circle c3 (250, 350, 10)
 
-  Animator an (3000, 350, 150, DJN_OUT_ELASTIC, 0)
+  Animator an (3000, 350, 150, DJN_OUT_ELASTIC, 0, 0)
   an.output =:> c2.cy
-  Animator an2 (3000, 150, 350, DJN_OUT_ELASTIC, 0)
+  Animator an2 (3000, 150, 350, DJN_OUT_ELASTIC, 0, 0)
   an2.output =:> c3.cy
   
   restart.click->an.start

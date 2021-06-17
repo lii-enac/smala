@@ -24,10 +24,9 @@ Component root
 	1 =: s.lowpass_gain
 	0.1 =: s.lowpass_freq
 	
-	Animator an (30000, 2, 1, DJN_OUT_ELASTIC, 0)
+	Animator an (30000, 2, 1, DJN_OUT_ELASTIC, 0, 1)
 	an.output =:> s.x
-	20 =: an.fps
-	|-> an.start
+	an.fps = 20
 
 	//TextPrinter tp
 	//an.output => tp.input

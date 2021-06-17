@@ -28,7 +28,7 @@ Component root
   
   
   // Use the same animator to avoid glitch between co-occurent animations
-  Animator an (2000, 0, 1, DJN_IN_OUT_BOUNCE, 1)
+  Animator an (2000, 0, 1, DJN_IN_OUT_BOUNCE, 1, 0)
   an.output * (-200) + 350 =:> c.cy
   an.output * 10 + 10 =:> c.r
 

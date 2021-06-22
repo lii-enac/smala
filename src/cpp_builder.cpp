@@ -1261,6 +1261,8 @@ namespace Smala
         indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
         indent (os); indent (os); os << "exit(0);\n";
         indent (os); os << "}\n";
+
+        used_processes["Layer"] = true;
       }
       break;
       case UNKNOWN:

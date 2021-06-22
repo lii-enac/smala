@@ -232,7 +232,7 @@ namespace Smala
     os << "{ return p.get_double_value(); }\n\n";
 
     os << "inline\n";
-    os << "const std::string& smala_deref(const std::string& p)\n";
+    os << "const djnn::string& smala_deref(const djnn::string& p)\n";
     os << "{ return p; }\n\n";
 
     os << "inline\n";
@@ -514,7 +514,7 @@ namespace Smala
   {
     indent (os);
     std::string name ("var_" + std::to_string (m_var_num++));
-    os << "std::string " << name << " ( ";
+    os << "djnn::string " << name << " ( ";
     ExprNode* expr = node->get_args ().at (0);
     os << build_expr (expr, string_t);
     os << ");\n";
@@ -687,7 +687,7 @@ namespace Smala
       return;
     }
     indent (os);
-    os << "{ std::vector <std::string> in_names;\n";
+    os << "{ djnn::vector <djnn::string> in_names;\n";
     std::vector<SubPathNode*> subpaths = arg_node->get_path()->get_subpath_list();
     std::string comma = "";
     for (auto p:subpaths.back()->get_path_list ()) {
@@ -705,7 +705,7 @@ namespace Smala
       indent (os);
       std::string out_arg = build_find (e, false);
       comma = "";
-      os << "{ std::vector <std::string> out_names;\n";
+      os << "{ djnn::vector <djnn::string> out_names;\n";
       for (auto p: e->get_subpath_list().back()->get_path_list()) {
         indent (os);
         os << "out_names.push_back (\"";
@@ -1053,7 +1053,7 @@ namespace Smala
   {
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
-    os << node->action_name () << "(CoreProcess *" << node->param_name () << ", std::vector<CoreProcess*> " << node->list_name() << ")\n";
+    os << node->action_name () << "(CoreProcess *" << node->param_name () << ", vector<CoreProcess*> " << node->list_name() << ")\n";
     const std::string code = node->code ();
     if (code[0] != '{') {
       os << "{\n";
@@ -1086,7 +1086,7 @@ namespace Smala
 
     os << "\n";
     os << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
-    os << "\t" << native_name_struct << R"( (ParentProcess *p, const std::string &n, bool string_setter, bool isModel)
+    os << "\t" << native_name_struct << R"( (ParentProcess *p, const djnn::string &n, bool string_setter, bool isModel)
       : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
@@ -1126,7 +1126,7 @@ namespace Smala
                   os << "\tdouble ";
                   break;
                 case STRING:
-                  os << "\tstd::string ";
+                  os << "\tdjnn::string ";
                   break;
                 case PROCESS:
                 case CAST_STRING:
@@ -1440,7 +1440,7 @@ namespace Smala
   CPPBuilder::build_define_node (std::ofstream &os, Node *node)
   {
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
-    os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const std::string &n";
+    os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
     std::vector< std::pair<SmalaType, std::string> > data = node->get_args_spec();
     for (int j = 0; j < data.size (); j++) {
       std::pair<SmalaType, std::string> arg = data.at (j);
@@ -1651,11 +1651,12 @@ namespace Smala
     std::replace (s.begin (), s.end (), '/', '_');
     for (int i = 0; i < prefix.length (); i++)
       s.at (i) = std::toupper (s.at (i));
-    os << "#pragma once\n#include <string>\n\n";
+    //os << "#pragma once\n#include <string>\n\n";
+    os << "#pragma once\n\n";
     for (int i = 0; i < m_ast.define_node_list ().size (); i++) {
       Node *def = m_ast.define_node_list ().at (i);
       os << "djnn::ParentProcess* " << def->name ()
-          << " (djnn::ParentProcess*, const std::string &";
+          << " (djnn::ParentProcess*, const djnn::string &";
       for (int j = 0; j < def->args ().size (); j++) {
         std::pair<SmalaType, std::string> arg = def->args ().at (j);
         os << ", ";
@@ -1691,7 +1692,7 @@ namespace Smala
         break;
       }
       case STRING: {
-        os << "const std::string&";
+        os << "const djnn::string&";
         break;
       }
       case NAME:

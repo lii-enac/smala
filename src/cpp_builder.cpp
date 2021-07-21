@@ -181,7 +181,7 @@ namespace Smala
     final_os.close();
     os2.close();
 
-    std::filesystem::remove(tmp_file_name);
+    filesystem::remove(tmp_file_name);
 
     return m_error;
   }

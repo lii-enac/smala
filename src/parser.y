@@ -198,6 +198,7 @@
 %token PAUSED_CONNECTOR "::>"
 %token ASSIGNMENT "=:"
 %token PAUSED_ASSIGNMENT "::"
+%token LAZY_ASSIGNMENT "=?:"
 %token PROCESS "Process"
 %token PROCESS_CAST "&"
 %token FSM "FSM"
@@ -1345,7 +1346,7 @@ primary_expression
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2 == 0 ? true:false, true, $2 == 2 ? false:true);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2 == 0 ? true:false, false, true, $2 == 2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1447,7 +1448,7 @@ binding_src
     if ($1->get_expr_node_type () == PATH_EXPR) {
       $$ = $1->get_path ();
     } else {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, true, false);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, false, true, false);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
       // build a local bool that will serve as an output for a connector
@@ -1521,7 +1522,7 @@ start_lambda
 assignment
   : assignment_expression assignment_symbol process_list is_model
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2, false, $4);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==1, $2==2, false, $4);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         Node *out = new Node (@$, PATH, "Name", $3.at (i));
@@ -1533,8 +1534,9 @@ assignment
 
 
 assignment_symbol
-  : ASSIGNMENT { $$ = false; lexer_expression_mode_off (); }
-  | PAUSED_ASSIGNMENT { $$ = true; lexer_expression_mode_off (); }
+  : ASSIGNMENT { $$ = 0; lexer_expression_mode_off (); }
+  | PAUSED_ASSIGNMENT { $$ = 1; lexer_expression_mode_off (); }
+  | LAZY_ASSIGNMENT { $$ = 2; lexer_expression_mode_off (); }
 
 is_model
   : %empty { $$ = false; }

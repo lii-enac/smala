@@ -658,8 +658,12 @@ namespace Smala
       os << " (" << node->parent ()->build_name () << ", " << node->name ();
       os << ", " << src << ", \"\"" << ", ";
       os << dst << ", \"\"";
-      if (node->djnn_type ().compare ("Assignment") == 0
-          || node->djnn_type ().compare ("PausedAssignment") == 0) {
+      if (
+           node->djnn_type ().compare ("Assignment") == 0
+        || node->djnn_type ().compare ("PausedAssignment") == 0
+        || node->djnn_type ().compare ("LazyAssignment") == 0
+      )
+      {
         os << ", " << node->args ().at (0).second;
       }
       os << ");\n";
@@ -794,6 +798,8 @@ namespace Smala
         os << "new ";
         if (node->is_paused ())
           os << "Paused";
+        if (node->is_lazy ())
+          os << "Lazy";
         if (node->is_connector ()) {
           os << "Connector (";
           used_processes["Connector"];
@@ -806,7 +812,7 @@ namespace Smala
                                    << out_arg //<< ", \"\""
                                    ;
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
-        if (!node->is_paused ()) {
+        if (!node->is_paused () && !node->is_lazy ()) {
           if(node->is_connector())
           os << ", " << !node->is_model ();
             else

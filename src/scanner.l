@@ -118,6 +118,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "::>"                 { return Smala::Parser::make_PAUSED_CONNECTOR (loc); }
 "=:"                  { return Smala::Parser::make_ASSIGNMENT (loc); }
 "::"                  { return Smala::Parser::make_PAUSED_ASSIGNMENT (loc); }
+"=?:"                 { return Smala::Parser::make_LAZY_ASSIGNMENT (loc); }
 "&&"                  { return Smala::Parser::make_AND (loc); }
 "||"                  { return Smala::Parser::make_OR (loc); }
 "<"                   { return Smala::Parser::make_LT (loc); }

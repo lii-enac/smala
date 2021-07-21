@@ -3,7 +3,7 @@ use base
 use animation
 
 _define_
-Animator (int duration, double _min, double _max, int func, int loop, int start_on_activation)
+Animator (int _duration, double _min, double _max, int func, int loop, int start_on_activation)
 {
   Spike start
   Spike abort
@@ -14,6 +14,7 @@ Animator (int duration, double _min, double _max, int func, int loop, int start_
   Double min (_min)
   Double max (_max)
   Double output (0)
+  Int duration (_duration)
   EasingGenerator gen (func)
   Incr inc (1)
   

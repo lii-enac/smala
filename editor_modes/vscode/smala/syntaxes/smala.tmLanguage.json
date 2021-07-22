@@ -41,7 +41,7 @@
 		"sma_func": {
 			"patterns": [{
 				"name": "variable.language.smala",
-				"match": "run|stop|delete_content|delete|notify|merge|dump|with|from|loadFromXML|addChildrenTo|addChild|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print|toString"
+				"match": "\\b(run|stop|delete_content|delete|notify|merge|dump|with|from|loadFromXML|addChildrenTo|addChild|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print|toString)\\b"
 			}]
   		},
 		"operators": {

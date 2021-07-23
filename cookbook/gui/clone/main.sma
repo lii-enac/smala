@@ -25,9 +25,13 @@ use gui
   Exit ex (0, 1)
   f.close -> ex
 
-  FillColor  _ (80, 80, 80)
+  FillColor  _ (255, 80, 0)
   Group gp1 {
+    FillOpacity fo (0.5)
+    OutlineOpacity oo (0.5)
     Rectangle rect1 (100, 100, 100, 100, 0, 0)
+    FillOpacity fo2 (2)
+    OutlineOpacity oo2 (2)
     Circle circ1 (300, 100, 50)
   }
 

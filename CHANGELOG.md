@@ -5,6 +5,69 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
+
+## [1.16.0] - 2021-07-28
+### compliant with djnn-cpp [1.&6.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+note: debut on changelog. This section has to be completed, if we have time. 
+### NEW
+    - NEW Component : please refer to djnn CHANGELOG
+        - SimpleTextEdit, SimpleText
+        - DirectoryObserver
+        - LazyAssignment : do not trigger if the new value is the same old value : symbol to use '=?:'
+    - NEW smala component : 
+        - GraphEdgeAdder
+     - NEW keywords :
+        - 'delete_content' to use on containers
+        - '%' modulo operator
+        - Added labels for fsm transitions: 'toto: idle -> state1'
+    - NEW lib/widget component :
+        - button
+    - NEW cookbooks : 
+        - layer
+        - fill_and_delete_content
+        - share_cursor
+        - timed_automaton
+    - NEW editor_mode :
+        - Added vscode plugin: syntax enlightening
+        - Improved sublime support
+    - NEW support for vscode.
+    - NEW debug options that can be called directly from smala code :
+        - see DEBUG.md for more details
+        - _DEBUG_SEE_COLOR_PICKING_VIEW
+        - _DEBUG_GRAPH_CYCLE_DETECT
+        - _DEBUG_SEE_ACTIVATION_SEQUENCE
+        - _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US
+        - _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED
+    
+### Changed
+    - Improved packages dependency 
+    _ Improved packages build system
+    - Improved lib/widget component :
+        - Animator
+
+### Fixed
+    - Fixed documentation
+    - Fixed pkgconfig file generation
+    - Fixed cookbooks :
+        - physics
+        - window
+        - Client
+        - async_native
+        - nativeactions
+        - native_collection_action
+        - Clone
+        - sketching_simple/advanced
+        - fitts_law
+        - checkbox
+        - strip_board
+        - DropDownMenu
+        - tab
+        - regex
+        - Clock
+
+
 ## [1.15.0] - 2021-01-28
 ### compliant with djnn-cpp [1.15.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes

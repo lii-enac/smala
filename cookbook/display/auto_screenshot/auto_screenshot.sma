@@ -32,10 +32,12 @@ Component root {
   SimpleDrag _ (toDrag, f)
 
   WallClock wc
-  f.refreshed -> {
+  AssignmentSequence set_path(1) {
     "shots/screenshot-" + wc.state_text =: f.screenshot_path
   }
-  //bad !! make loop
-  //f.refreshed -> f.screenshot
+  
+  // make sure set_path is executed before screenshot
+  f.refreshed -> set_path
+  set_path -> f.screenshot
   
 }

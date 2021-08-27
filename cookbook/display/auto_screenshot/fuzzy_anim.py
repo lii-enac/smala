@@ -30,11 +30,14 @@ filenames = sorted(filenames)
 tocmp = load_and_process(os.path.join(filenames[0]))
 copy2(filenames[0], dst_dir_name)
 
+def build_blended_name_from_source_name (filename):
+    return os.path.join(dst_dir_name, os.path.basename(filename))
+
 for filename in filenames[1:]:
     print (filename)
     img = load_and_process(filename)
     blended = Image.blend(tocmp, img, alpha=0.6)
-    blended_name = os.path.join(dst_dir_name, os.path.basename(filename))
+    blended_name = build_blended_name_from_source_name (filename)
     blended.save(blended_name)
 
     #tocmp = img
@@ -42,4 +45,4 @@ for filename in filenames[1:]:
     num_out += 1
     num_in += 1
 
-print("filtered "+str(num_out)+"/"+str(num_in))
+print("processed "+str(num_out)+"/"+str(num_in))

@@ -33,6 +33,14 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+        {
+            "label": "app",
+            "type": "shell",
+            "command": "make -j simplest",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

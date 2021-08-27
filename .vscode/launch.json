@@ -14,17 +14,21 @@
         "name": "(lldb) smala - cookbook",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/build/cookbook/gui/clock/clock_app",
+        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
         "args": [],
         "stopAtEntry": false,
-        "cwd": "${workspaceFolder}/cookbook/gui/clock", // path to cookbook file
-        "preLaunchTask": "cookbook_apps",
+        "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest", // path to cookbook file
+        "preLaunchTask": "app",
         "externalConsole": false,
         "MIMode": "lldb",
         "environment": [
             {
             "name": "DYLD_LIBRARY_PATH",
             "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/build/lib:${workspaceFolder}/../djnn-cpp/build/lib"
+            },
+            {
+                "name": "GALLIUM_DRIVER",
+                "value": "llvmpipe"
             }
             ]
     },

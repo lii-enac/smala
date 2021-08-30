@@ -70,6 +70,6 @@ Button (Process frame, string _label, double x_, double y_) {
   thisLabel.width + 20 =:> clamp_width.min
   clamp_width.result =:> r.width
   clamp_height.result =:> r.height
-  r.height / 2.0 + (r.height - thisLabel.height)/2.0 + thisLabel.descent/2.0 =:> thisLabel.y
+  r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y
   r.width / 2.0 =:> thisLabel.x
 }

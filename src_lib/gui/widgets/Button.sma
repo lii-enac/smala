@@ -16,7 +16,7 @@ use base
 use display
 use gui
 
-import gui.shape.text
+//import gui.shape.text
 
 _define_
 Button (Process frame, string _label, double x_, double y_) {
@@ -26,35 +26,50 @@ Button (Process frame, string _label, double x_, double y_) {
   x aka t.tx
   y aka t.ty
   Spike click
+  Spike release
   /*----- interface -----*/
 
-  FillColor fc (50, 50, 50)
-  Rectangle r (0, 0, 100, 40, 10, 10)
+  Int idle_color (#323232)
+  Int pressed_color (#535353)
+  FillColor fc (#323232)
+  Rectangle r (0, 0, 100, 40, 5, 5)
 
-  width aka r.width
-  height aka r.height
+  press aka r.press
+
+  Double height (15)
+  Double width (100)
+  ClampMin clamp_width (0, 0)
+  ClampMin clamp_height (20, 20) 
+  min_width aka clamp_width.min
+  min_height aka clamp_height.min
+  width =:> clamp_width.input
+  height =:> clamp_height.input
 
   FSM fsm {
     State idle {
-      50 =: fc.r
+      idle_color =: fc.value
     }
     State pressed {
-      150 =: fc.r
+      pressed_color =: fc.value
+      r.release->release
     }
-    State out
+    State out {
+      idle_color =: fc.value
+    }
     idle->pressed (r.press)
     pressed->idle (r.release, click)
     pressed->out (r.leave)
     out->pressed (r.enter)
-    out->idle (frame.release)
+    out->idle (r.release)
   }
 
   FillColor w (255, 255, 255)
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text
-  r.height / 2 + 3 =: thisLabel.y
-  thisLabel.width + 20 =:> r.width
-  r.width / 2 =:> thisLabel.x
-  //thisLabel.width + 20 =:> r.width
+  thisLabel.width + 20 =:> clamp_width.min
+  clamp_width.result =:> r.width
+  clamp_height.result =:> r.height
+  r.height / 2.0 + (r.height - thisLabel.height)/2.0 + thisLabel.descent/2.0 =:> thisLabel.y
+  r.width / 2.0 =:> thisLabel.x
 }

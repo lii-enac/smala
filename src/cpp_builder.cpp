@@ -1427,13 +1427,28 @@ namespace Smala
   void
   CPPBuilder::build_this_node (std::ofstream &os, Node *node)
   {
+    ThisNode* th = dynamic_cast<ThisNode*>(node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    node->set_build_name (new_name);
+    th->set_build_name (new_name);
     if (m_parent_list.back ()->add_entry ("this", new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
     indent (os);
-    os << "auto* " << new_name << " = new Component (p, n);\n";
+    if (th->inherit()) {
+      os << "auto* " << new_name << " = ";
+      ExprNode* e = th->get_super_class ();
+      std::string expr =  e->get_val () + " (p, n";
+      used_processes[e->get_val ()] = true;
+      std::string sep = "";
+      for (auto sub : ((FunctionExprNode*)e)->get_args()) {
+        expr += sep + build_expr (sub, undefined_t, false);
+        sep = ",";
+      }
+      expr += ");\n";
+      os  << expr;
+    } else {
+      os << "auto* " << new_name << " = new Component (p, n);\n";
+    }
     used_processes["Component"] = true;
 
     /* We make the hypothesis that "this" is the first node after _define_ thus

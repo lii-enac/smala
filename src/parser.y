@@ -51,6 +51,7 @@
   #include "name_context.h"
   #include "forevery_node.h"
   #include "expr_node.h"
+  #include "this_node.h"
 
   using namespace std;
 
@@ -183,6 +184,7 @@
 %define parse.error verbose
 %define api.token.prefix {TOKEN_}
 
+%token AS "as"
 %token KEEP "_keep_"
 %token EOL "EOL"
 %token <string> BREAK "break|continue|return"
@@ -289,6 +291,7 @@
 %type <Node*> assignment_sequence
 %type <Node*> start_assignment_sequence
 %type <Node*> start_add_child
+%type <ThisNode*> constructor
 %type < vector<PathNode*> > process_list
 %type < vector<std::string> > state_list
 %type <ExprNode*> start_function
@@ -455,6 +458,15 @@ start_main
     }
 
 start_define
+  : constructor
+  | constructor AS function_call
+  {
+    $1->set_inherit (true);
+    $1->set_super_class ($3);
+    lexer_expression_mode_off ();
+  }
+
+constructor
   : DEFINE NAME LP parameters RP
     {
       driver.end_preamble ();
@@ -465,11 +477,13 @@ start_define
       driver.add_define_node (node);
       driver.add_node (node);
 
-      Node *e_node = new Node (@$, THIS);
+      ThisNode *e_node = new ThisNode (@$, "this");
       parent_list.push_back (e_node);
       driver.add_node (e_node);
       add_sym (@$, "this", PROCESS);
+      $$ = e_node;
     }
+
 
 parameters
   : %empty { vector< pair<SmalaType, string> > params; $$ = params; }

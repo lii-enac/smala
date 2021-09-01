@@ -916,6 +916,14 @@ start_add_child
       add_sym (@$, $1, PROCESS);
       $$ = n;
     }
+    | INSERT
+    {
+      lexer_expression_mode_on ();
+      Node* n = new Node (@$, ADD_CHILD, "addChild", "");
+      driver.add_node (n);
+      n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      $$ = n;
+    }
 
 
 //------------------------------------------------

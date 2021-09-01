@@ -1369,9 +1369,11 @@ namespace Smala
   {
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
-      print_error_message (error_level::warning,
-                           "duplicated name: " + node->name (), 0);
+    if (!node->name().empty()) {
+      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
+      }
     }
     m_cur_building_name = new_name;
     os << "auto *" << new_name << " = " << build_expr (node->get_args().at (0), process_t);

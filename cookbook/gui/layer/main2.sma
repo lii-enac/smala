@@ -27,8 +27,15 @@ Component root {
   Frame frame ("layer", 0, 0, 600, 600)
   Exit ex (0, 1)
   frame.close -> ex
+  // 255 =: frame.background_color.r
+  // 255 =: frame.background_color.g
+  // 255 =: frame.background_color.b
 
   PanAndZoom pz (frame.move, frame.press, frame.release, frame.wheel.dy)
+
+  
+  //Image _("mire.png", 1,1, -1,-1)
+  //Image _("parrot.png", 1,10, -1,-1)
 
   Scaling zoom_tr (1,1, 0,0)
   Translation pan_tr (0,0)
@@ -40,7 +47,10 @@ Component root {
   FillColor fc (255,0,0)
   OutlineColor _ (0,0,255)
 
+  //Rotation _(30, 0,0)
+  
   //Component bg { // classic group
+  //  Bool damaged(1)
   Layer bg { // complete window
   //Layer bg (0,0,600,600) { // complete window
   //Layer bg (0,0,600,585) { 
@@ -48,10 +58,11 @@ Component root {
   //Layer bg (0,110,600,30) { // this will slighty cut the stars at the bottom and at the top
   //Layer bg (45,110,500,30) { // this will slighty cut the stars at the bottom, the top, left and right
   
+    //Text _(0,20, "this")
     Text _(0,20, "this text and 5000 stars are in a layer, while the circle is moving on top")
-    Text _(0,30, "a clock applies every 2s a small x translation on the star and thus invalidates the layer")
-    Translation t(0,0)
-    for(int i=0; i<1; i++) {
+    //Text _(0,30, "a clock applies every 2s a small x translation on the star and thus invalidates the layer")
+    //Translation t(0,0)
+    for(int i=0; i<1000; i++) {
       Component _ {
         Translation _(i/10.0,0)
         Translation t(-50,100)
@@ -70,12 +81,20 @@ Component root {
         }
       }
     }
+    //Image _("mire.png", 1,10, -1,-1)
+    FillOpacity _(0.5)
+    Rectangle _(1,30, 50, 50, 0, 0)
   }
+
+  NoOutline _()
+  //FillOpacity _(1.0)
+  FillColor _(255,255,0)
+  Rectangle _(5,50,10,10,0,0)
 
   FSM DamageLayer {
     State idle
     State waiting {
-      Timer t (1000)
+      Timer t (100)
       t.end -> bg.damaged
     }
     idle -> waiting (pz.zoom)
@@ -85,17 +104,32 @@ Component root {
     waiting -> idle (waiting.t.end)
   }
 
-  TextPrinter tp
-  DamageLayer.state =:> tp.input
+  // TextPrinter tp
+  // DamageLayer.state =:> tp.input
   
-  Rectangle _(0,0,1,1,0,0)
-
+  
   //Translation t(0,0)
   //Circle _(0,0, 50)
-  mouseTracking = 1
+  // mouseTracking = 1
   //frame.move.x =:> t.tx
   //frame.move.y =:> t.ty
 
-  Clock cl(2000)
-  //cl.tick -> { 10 + bg.t.tx =: bg.t.tx }
+  //Timer cl(500)
+  //cl.end -> { 10 + bg.t.tx =: bg.t.tx }
+
+  AssignmentSequence seq(1) {
+    pz.xpan + 50 =: pz.xpan
+    pz.ypan + 50 =: pz.ypan
+    pz.zoom * 2 =: pz.zoom
+  }
+
+  // Timer cl2(1000)
+  // cl2.end -> seq
+  // Timer cl2(2000)
+  // cl2.end -> seq
+
+  // TextPrinter tp
+  // pz.xpan =:> tp.input
+  // pz.ypan =:> tp.input
+
 }

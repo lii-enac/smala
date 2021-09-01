@@ -18,8 +18,10 @@ use gui
 
 //import gui.shape.text
 
+import gui.widgets.AbstractWidget
+
 _define_
-Button (Process frame, string _label, double x_, double y_) {
+Button (Process frame, string _label, double x_, double y_) as AbstractWidget () {
   Translation t (x_, y_)
 
   /*----- interface -----*/
@@ -36,16 +38,12 @@ Button (Process frame, string _label, double x_, double y_) {
 
   press aka r.press
 
-  Double height (15)
-  Double width (100)
   ClampMin clamp_width (0, 0)
   ClampMin clamp_height (20, 20) 
-  min_width aka clamp_width.min
-  min_height aka clamp_height.min
-  Double max_width (0)
-  Double max_height (0)
-  width =:> clamp_width.input
-  height =:> clamp_height.input
+  clamp_width.min =:> this.min_width
+  clamp_height.min =:> this.min_height
+  this.width =:> clamp_width.input
+  this.height =:> clamp_height.input
 
   FSM fsm {
     State idle {

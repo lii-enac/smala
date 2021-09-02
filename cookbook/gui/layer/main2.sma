@@ -60,9 +60,11 @@ Component root {
   
     //Text _(0,20, "this")
     Text _(0,20, "this text and 5000 stars are in a layer, while the circle is moving on top")
-    //Text _(0,30, "a clock applies every 2s a small x translation on the star and thus invalidates the layer")
-    //Translation t(0,0)
-    for(int i=0; i<1000; i++) {
+    Text _(0,30, "every 2s a clock applies a small x translation on the stars and thus invalidates the layer")
+    Text _(0,40, "during a pan and zoom, after 500ms of stillness, the layer is freezed")
+
+    Translation t(0,0)
+    for(int i=0; i<5000; i++) {
       Component _ {
         Translation _(i/10.0,0)
         Translation t(-50,100)
@@ -81,20 +83,21 @@ Component root {
         }
       }
     }
-    //Image _("mire.png", 1,10, -1,-1)
-    FillOpacity _(0.5)
-    Rectangle _(1,30, 50, 50, 0, 0)
+    // Image _("mire.png", 1,10, -1,-1)
+    // FillOpacity _(0.5)
+    // Rectangle _(1,30, 50, 50, 0, 0)
   }
 
   NoOutline _()
-  //FillOpacity _(1.0)
+  FillOpacity _(1.0)
   FillColor _(255,255,0)
-  Rectangle _(5,50,10,10,0,0)
+  //Rectangle _(5,50,10,10,0,0)
+  Circle _(5,50,5)
 
   FSM DamageLayer {
     State idle
     State waiting {
-      Timer t (100)
+      Timer t (500) // beware, make sure the time is greater than the time it takes to render a frame, otherwise the layer will constantly be damaged
       t.end -> bg.damaged
     }
     idle -> waiting (pz.zoom)
@@ -114,14 +117,18 @@ Component root {
   //frame.move.x =:> t.tx
   //frame.move.y =:> t.ty
 
-  //Timer cl(500)
-  //cl.end -> { 10 + bg.t.tx =: bg.t.tx }
+  Clock cl(2000)
+  AssignmentSequence do_translate(1) {
+    10 + bg.t.tx =: bg.t.tx
+  }
+  cl.tick -> do_translate
+  do_translate -> bg.damaged
 
-  AssignmentSequence seq(1) {
+  /*AssignmentSequence seq(1) {
     pz.xpan + 50 =: pz.xpan
     pz.ypan + 50 =: pz.ypan
     pz.zoom * 2 =: pz.zoom
-  }
+  }*/
 
   // Timer cl2(1000)
   // cl2.end -> seq

@@ -17,9 +17,10 @@ use display
 use gui
 
 //import gui.shape.text
+import gui.widgets.IWidget
 
 _define_
-Button (Process frame, string _label, double x_, double y_) {
+Button (Process container, string _label, double x_, double y_) inherits IWidget (container) {
   Translation t (x_, y_)
 
   /*----- interface -----*/
@@ -35,17 +36,6 @@ Button (Process frame, string _label, double x_, double y_) {
   Rectangle r (0, 0, 100, 40, 5, 5)
 
   press aka r.press
-
-  Double height (15)
-  Double width (100)
-  ClampMin clamp_width (0, 0)
-  ClampMin clamp_height (20, 20) 
-  min_width aka clamp_width.min
-  min_height aka clamp_height.min
-  Double max_width (0)
-  Double max_height (0)
-  width =:> clamp_width.input
-  height =:> clamp_height.input
 
   FSM fsm {
     State idle {
@@ -69,9 +59,10 @@ Button (Process frame, string _label, double x_, double y_) {
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text
-  thisLabel.width + 20 =:> clamp_width.min
-  clamp_width.result =:> r.width
-  clamp_height.result =:> r.height
+  thisLabel.width + 20 =:> this.min_width
+  thisLabel.height + 10 =:> this.min_height
+  this.width =:> r.width
+  this.height =:> r.height
   r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y
   r.width / 2.0 =:> thisLabel.x
 }

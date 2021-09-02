@@ -290,7 +290,9 @@ smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_sr
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
 
 $(smala_lib_objs): CXX = $(CXX_CK)
-$(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK)
+$(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -Ibuild/src_lib
+
+src_lib/gui/widgets/Button.o: IWidget.h
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)

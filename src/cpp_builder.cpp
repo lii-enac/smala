@@ -1439,10 +1439,9 @@ namespace Smala
       ExprNode* e = th->get_super_class ();
       std::string expr =  e->get_val () + " (p, n";
       used_processes[e->get_val ()] = true;
-      std::string sep = "";
+      std::string sep = ",";
       for (auto sub : ((FunctionExprNode*)e)->get_args()) {
         expr += sep + build_expr (sub, undefined_t, false);
-        sep = ",";
       }
       expr += ");\n";
       os  << expr;

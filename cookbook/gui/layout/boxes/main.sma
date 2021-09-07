@@ -47,6 +47,6 @@ Component root {
         sub3 
       }
     }
-    addChildrenTo vbox.items { b1, wc, b2, b3 }
+    addChildrenTo hbox.items { b1, wc, b2, b3 }
   }
 }

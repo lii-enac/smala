@@ -63,8 +63,9 @@ fn_set_min_size (Process src, Process data)
 }
 
 _define_
-VBox (Process parent int _is_sub_box)
+VBox (int _is_sub_box)
 {
+  parent = find (this, "..")
   width aka parent.width
   height aka parent.height
   Int is_sub_box (_is_sub_box)

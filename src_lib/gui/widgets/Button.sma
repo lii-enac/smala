@@ -55,7 +55,7 @@ Button (Process container, string _label, double x_, double y_) inherits IWidget
     out->idle (r.release)
   }
 
-  FillColor w (255, 255, 255)
+  FillColor text_color (255, 255, 255)
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text

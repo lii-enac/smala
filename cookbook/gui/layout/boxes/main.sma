@@ -16,7 +16,7 @@ use core
 use base
 use gui
 
-import gui.widgets.IWidget
+import gui.widgets.WidgetContainer
 import gui.widgets.Button
 import gui.widgets.HBox
 import gui.widgets.VBox
@@ -27,38 +27,26 @@ Component root {
   Exit ex (0, 1)
   f.close->ex
   TextPrinter tp
-  HBox vb1 (f, 0)
-  Button b1 (f, "My Button", 0, 0)
-  Button b2 (f, "Quit", 0, 0)
-  b2.click->ex
-  Button b3 (f, "Yet Another Button", 0, 0)
-  b3.click -> { "Hello!" =: tp.input }
 
-  IWidget sub (f)
-  addChildrenTo sub {
-    Translation pos (0, 0)
-    x aka pos.tx
-    y aka pos.ty
-    NoFill _
-    NoOutline _
-    Rectangle r (0, 0, 0, 0, 0, 0)
-    sub.width =:> r.width
-    sub.height =:> r.height
-    Button sub1 (r, "Sub button 1", 0, 0)
-    Button sub2 (r, "Sub button 2", 0, 0)
-    Button sub3 (r, "Sub button 3", 0, 0)
-    VBox hbox (sub, 1)
-    addChildrenTo hbox.items {
-      << sub1
-      << sub2
-      << sub3
+  WidgetContainer wc1 (f) {
+    HBox hbox (0)
+    Button b1 (wc1, "My Button", 0, 0)
+    Button b2 (wc1, "Quit", 0, 0)
+    b2.click->ex
+    Button b3 (wc1, "Yet Another Button", 0, 0)
+    b3.click -> { "Hello!" =: tp.input }
+    WidgetContainer wc (wc1) {
+      VBox vbox (1)
+      Button sub1 (wc, "Sub button 1", 0, 0)
+      Button sub2 (wc, "Sub button 2", 0, 0)
+      Button sub3 (wc, "Sub button 3", 0, 0)
+      addChildrenTo vbox.items
+      { 
+        sub1,
+        sub2,
+        sub3 
+      }
     }
-  }
-
-  addChildrenTo vb1.items {
-    << b1
-    << sub
-    << b2
-    << b3
+    addChildrenTo vbox.items { b1, wc, b2, b3 }
   }
 }

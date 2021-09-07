@@ -1405,6 +1405,17 @@ namespace Smala
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
 
+    AddChildrenToNode* add_children_to = dynamic_cast<AddChildrenToNode*> (node);
+    if (!add_children_to->children ().empty()) {
+      for (auto name : add_children_to->children ()) {
+        indent (os);
+        os << s << "->add_child (" << build_find (name, false) << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
+      }
+      m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
+      /* FIXME dirty trick to set the parent name of the enclosed nodes*/
+      node->set_build_name (s);
+      return;
+    }
     if (node->get_path()->get_subpath_list().size ()> 1) {
       indent (os);
       os << "auto *" << new_name << " = " << s << ";\n";

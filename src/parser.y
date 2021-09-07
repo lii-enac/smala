@@ -52,6 +52,7 @@
   #include "forevery_node.h"
   #include "expr_node.h"
   #include "this_node.h"
+  #include "add_children_to_node.h"
 
   using namespace std;
 
@@ -291,6 +292,7 @@
 %type <Node*> assignment_sequence
 %type <Node*> start_assignment_sequence
 %type <Node*> start_add_child
+%type <AddChildrenToNode*> start_add_children_to
 %type <ThisNode*> constructor
 %type < vector<PathNode*> > process_list
 %type < vector<std::string> > state_list
@@ -1585,17 +1587,27 @@ add_children_to
       //m_in_add_children = false;
       --m_in_add_children;
     }
+  | start_add_children_to LCB pname_list RCB
+    {
+      for (auto name: name_list) {
+        $1->add_child (name);
+      }
+      driver.add_node (new Node (@$, END_CONTAINER));
+      parent_list.pop_back ();
+      --m_in_add_children;
+    }
 
 start_add_children_to
   : ADD_CHILDREN_TO name_or_path
     {
       name_context_list.pop_back ();
-      Node *n = new Node (@$, ADD_CHILDREN_TO, "addChildrenTo", new PathNode (@2, $2));
+      AddChildrenToNode *n = new AddChildrenToNode (@$, "addChildrenTo", new PathNode (@2, $2));
       n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       parent_list.push_back (n);
       driver.add_node (n);
       //m_in_add_children = true;
       ++m_in_add_children;
+      $$ = n;
     }
 
 fsm

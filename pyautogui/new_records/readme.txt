@@ -1,0 +1,1 @@
+.directory where new record datas from ./record_autogui.py are stocked

@@ -1,0 +1,1 @@
+.directory where record datas use by ./replay_autogui.py are stocked

@@ -12,6 +12,7 @@ _screenshot_counter = 0
 _app_name = "default"
 _debug = False
 _is_retina = False
+_save_directory = "new_records/"
 
 def on_key_press(key):
     global _is_ctrl_pressed, _debug, _is_retina
@@ -39,7 +40,7 @@ def on_key_press(key):
             else:
                 retina_name = ""
                 retina_coef = 1
-            screenshot_name = _app_name + "_" + str(_screenshot_counter) + retina_name + "_Ref.bmp"
+            screenshot_name = _save_directory + _app_name + "_" + str(_screenshot_counter) + retina_name + "_Ref.bmp"
             pyautogui.screenshot (screenshot_name, region=(X*retina_coef, Y*retina_coef, width*retina_coef, height*retina_coef))
             if _debug:
                 print (screenshot_name, X*retina_coef, Y*retina_coef, width*retina_coef, height*retina_coef, pos.x, pos.y)
@@ -106,7 +107,7 @@ def main(argv):
         elif opt in ("-r", "--retina"):
             if arg == 'true':
                 _is_retina = True
-    datafile = _app_name + "_data.txt"
+    datafile = _save_directory + _app_name + "_data.txt"
 
     # not working for second screen :/
     #if subprocess.call("system_profiler SPDisplaysDataType | grep -i 'retina'", shell=True) == 0:
@@ -117,6 +118,9 @@ def main(argv):
     print ('Data file:\t', datafile)
     print ('debug_mode:\t', _debug)
     print ('Retina display:\t', _is_retina, '\n')
+    print ('WARNING:')
+    print ('all files will be saved in : new_records directory')
+    print ('You have to manually copy them if you want to use them\nwith ./replay_autogui.py\n\n')
     print ("Press CTRL+ALT to make screenshot")
     print ("Press ESC to Quit")
     print ("---------------------------------\n")

@@ -1,0 +1,1 @@
+.directory where screenshot references used by ./replay_autogui.py are stocked

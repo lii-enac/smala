@@ -89,24 +89,21 @@ def main(argv):
 
     # getopt
     try:
-      opts, args = getopt.getopt(argv,"hi:mr:",["itest=", "mode=", "retina="])
+      opts, args = getopt.getopt(argv,"hi:dr",["itest=", "debug", "retina"])
     except getopt.GetoptError:
-      print ('replay_autogui.py -i|-itest <test_name> -m|--mode <debug> -r|--retina <true>')
+      print ('replay_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
       sys.exit(2)
     for opt, arg in opts:
+        print ("opt: ", opt, "arg:", arg)
         if opt == '-h':
-          print ('replay_autogui.py -i|-itest <test_name> -m|--mode <debug> -r|--retina <true>')
+          print ('replay_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
           sys.exit()
         elif opt in ("-i", "--itest"):
           _app_name = arg
-        elif opt in ("-m", "--mode"):
-            if arg == 'debug':
-                _debug = True
-            else:
-                _debug = False
+        elif opt in ("-d", "--debug"):
+            _debug = True
         elif opt in ("-r", "--retina"):
-            if arg == 'true':
-                _is_retina = True
+            _is_retina = True
     datafile = _save_directory + _app_name + "_data.txt"
 
     # not working for second screen :/
@@ -121,6 +118,10 @@ def main(argv):
     print ('WARNING:')
     print ('all files will be saved in : new_records directory')
     print ('You have to manually copy them if you want to use them\nwith ./replay_autogui.py\n\n')
+
+    print ('lauching test:', _app_name + "_test")
+    subprocess.Popen([ "make", "-j", _app_name + "_test"], cwd="..", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    print ('')
     print ("Press CTRL+ALT to make screenshot")
     print ("Press ESC to Quit")
     print ("---------------------------------\n")

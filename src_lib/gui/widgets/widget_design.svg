@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="793.70081"
+   height="1122.5197"
+   viewBox="0 0 793.70081 1122.5197"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
+   sodipodi:docname="widget_design.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="437.0632"
+     inkscape:cy="101.18932"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     inkscape:showpageshadow="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="2158"
+     inkscape:window-height="1266"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0">
+    <sodipodi:guide
+       position="178.20568,1053.5197"
+       orientation="0,1"
+       id="guide1523"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="31.371625,1046.5197"
+       orientation="0,1"
+       id="guide1525"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="9.0000002,1155.4813"
+       orientation="-1,0"
+       id="guide1533"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-24.783191,1028.5197"
+       orientation="0,1"
+       id="guide1535"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-48.822885,1102.5197"
+       orientation="0,1"
+       id="guide1557"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#e8e8e8;fill-opacity:1;stroke:#ffffff;stroke-width:0.529;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect1505"
+       width="795.02179"
+       height="1125.7809"
+       x="0"
+       y="0" />
+    <g
+       id="g1562">
+      <rect
+         style="fill:#323232;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect1507"
+         width="69"
+         height="40"
+         x="0"
+         y="0"
+         ry="5" />
+      <text
+         xml:space="preserve"
+         style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#ffffff;fill-opacity:1"
+         x="8.3964844"
+         y="24.928049"
+         id="text1515"><tspan
+           sodipodi:role="line"
+           id="tspan1513"
+           x="8.3964844"
+           y="24.928049"
+           style="font-size:18px">Button</tspan></text>
+    </g>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1517"
+       width="18"
+       height="18"
+       x="0"
+       y="60"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+       x="23"
+       y="76"
+       id="text1521"><tspan
+         sodipodi:role="line"
+         id="tspan1519"
+         x="23"
+         y="76"
+         style="font-size:18px;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
+    <rect
+       style="fill:#535353;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1527"
+       width="18"
+       height="18"
+       x="0"
+       y="85"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+       x="23"
+       y="101"
+       id="text1531"><tspan
+         sodipodi:role="line"
+         id="tspan1529"
+         x="23"
+         y="101"
+         style="font-size:18px;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 3,94 6,6 5,-11"
+       id="path1537" />
+    <g
+       id="g1570"
+       transform="translate(83.91139)">
+      <rect
+         style="fill:#535353;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect1564"
+         width="69"
+         height="40"
+         x="0"
+         y="0"
+         ry="5" />
+      <text
+         xml:space="preserve"
+         style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#ffffff;fill-opacity:1"
+         x="8.3964844"
+         y="24.928049"
+         id="text1568"><tspan
+           sodipodi:role="line"
+           id="tspan1566"
+           x="8.3964844"
+           y="24.928049"
+           style="font-size:18px">Button</tspan></text>
+    </g>
+    <g
+       id="g1596">
+      <text
+         xml:space="preserve"
+         style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+         x="23"
+         y="129"
+         id="text1581"><tspan
+           sodipodi:role="line"
+           id="tspan1579"
+           x="23"
+           y="129"
+           style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
+      <circle
+         style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="path1588"
+         cx="9"
+         cy="122"
+         r="9" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+       x="23"
+       y="153.49089"
+       id="text1600"><tspan
+         sodipodi:role="line"
+         id="tspan1598"
+         x="23"
+         y="153.49089"
+         style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="circle1602"
+       cx="9"
+       cy="146.49089"
+       r="9" />
+    <circle
+       style="fill:#535353;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="circle1609"
+       cx="9"
+       cy="146.49089"
+       r="6" />
+  </g>
+</svg>

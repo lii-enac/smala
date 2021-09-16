@@ -17,26 +17,30 @@ use base
 use display
 use gui
 
-import Checkbox
+import gui.widgets.CheckBox
+import gui.widgets.RadioButton
+import gui.widgets.WidgetContainer
+import gui.widgets.VBox
+import gui.widgets.CheckBoxManager
 
 _main_
 Component root {
-  Frame f ("my frame", 0, 0, 400, 200)
+  Frame f ("my frame", 0, 0, 400, 150)
   Exit ex (0, 1)
   f.close -> ex
-
-  mouseTracking = 1
-  Checkbox cb (5)
-  cb.entries.[1].label = "a"
-  cb.entries.[2].label = "b"
-  cb.entries.[3].label = "c"
-  cb.entries.[4].label = "d"
-  cb.entries.[5].label = "e"
-
-  FillColor fc (0, 0, 0)
-  Incr incr (1)  
-  Text t (150, 50, "")
-  "Selected entry: " + cb.entry + " state: " + incr.state =:> t.text
-
-  cb.entries.[2].selected -> incr
+  TextPrinter tp
+  WidgetContainer container (f) {
+    VBox vbox (0)
+    CheckBox c1 (container, "First choice", 0, 0)
+    CheckBox c2 (container, "Second choice", 0, 0)
+    CheckBox c3 (container, "Third choice", 0, 0)
+    addChildrenTo vbox.items {
+      c1, 
+      c2,
+      c3
+    }
+    CheckBoxManager manager (vbox.items, vbox.items.[1])
+    TextPrinter tp
+    manager.value =:> tp.input
+  }
 }

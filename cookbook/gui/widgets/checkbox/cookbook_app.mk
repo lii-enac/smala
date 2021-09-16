@@ -11,5 +11,6 @@
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := Checkbox.o main.o
+objs_cookbook_app := main.o
 djnn_libs_cookbook_app := gui display base exec_env core
+smala_libs_cookbook_app := smala

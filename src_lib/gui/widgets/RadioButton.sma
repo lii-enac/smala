@@ -45,15 +45,15 @@ RadioButton (Process container, string _label, double x_, double y_) inherits IW
   c.press->press
 
   FSM fsm {
-    State idle 
-    State selected {
+    State st_idle 
+    State st_selected {
       FillColor fc2 (#535353)
       NoOutline _
       Circle _ (9, 9, 6)
     }
-    idle->selected (press, selected)
-    selected->idle (press, unselected)
-    selected->idle (unselect)
+    st_idle->st_selected (press, selected)
+    st_selected->st_idle (press, unselected)
+    st_selected->st_idle (unselect)
   }
 
   FillColor text_color (#323232)

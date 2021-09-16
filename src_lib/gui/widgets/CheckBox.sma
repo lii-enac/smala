@@ -45,12 +45,12 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   r.press -> press
 
   FSM fsm {
-    State idle {
+    State st_idle {
       idle_color =: fc.value
       //check_color =: oc.value
       2 =: ow.width
     }
-    State selected {
+    State st_selected {
       //idle_color =: oc.value
       check_color =: fc.value
       1 =: ow.width
@@ -64,9 +64,9 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
         Point _ (13, 4)
       }
     }
-    idle->selected (press, selected)
-    selected->idle (press, unselected)
-    selected->idle (unselect)
+    st_idle->st_selected (press, selected)
+    st_selected->st_idle (press, unselected)
+    st_selected->st_idle (unselect)
   }
 
   FillColor text_color (#323232)

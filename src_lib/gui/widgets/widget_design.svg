@@ -23,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="158.5"
-     inkscape:cy="217"
+     inkscape:zoom="4.0850501"
+     inkscape:cx="88.982997"
+     inkscape:cy="96.938836"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -141,7 +141,7 @@
          y="76"
          style="font-size:18px;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
     <rect
-       style="fill:#535353;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#535353;fill-opacity:1;stroke:#535353;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect1527"
        width="18"
        height="18"

@@ -37,17 +37,19 @@ RadioButton (Process container, string _label, double x_, double y_) inherits IW
   OutlineWidth _ (2)
   OutlineColor oc (#535353)
   FillColor fc (#ffffff)
-  Circle r (9, 9, 9)
+  Translation offset (0, 0)
+  Circle c (9, 9, 9)
+  this.height / 2 - c.cy =:> offset.ty
 
   Spike press
-  r.press->press
+  c.press->press
 
   FSM fsm {
     State idle 
     State selected {
       FillColor fc2 (#535353)
       NoOutline _
-      Circle r (9, 9, 6)
+      Circle _ (9, 9, 6)
     }
     idle->selected (press, selected)
     selected->idle (press, unselected)
@@ -55,7 +57,7 @@ RadioButton (Process container, string _label, double x_, double y_) inherits IW
   }
 
   FillColor text_color (#323232)
-  Text thisLabel (23, 16, _label)
+  Text thisLabel (23, 15, _label)
   thisLabel.press->press
   label aka thisLabel.text
   thisLabel.width + 33 =:> this.min_width

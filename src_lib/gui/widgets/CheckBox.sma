@@ -37,7 +37,9 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   OutlineWidth ow (2)
   OutlineColor oc (#535353)
   FillColor fc (#ffffff)
-  Rectangle r (0, 0, 18, 18, 2, 2)
+  Translation offset (0, 0)
+  Rectangle r (0, 0, 16, 16, 2, 2)
+  this.height/2 - r.height/2 =:> offset.ty
 
   Spike press
   r.press -> press
@@ -45,20 +47,21 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   FSM fsm {
     State idle {
       idle_color =: fc.value
-      check_color =: oc.value
+      //check_color =: oc.value
       2 =: ow.width
     }
     State selected {
-      idle_color =: oc.value
+      //idle_color =: oc.value
       check_color =: fc.value
       1 =: ow.width
+      OutlineColor oc (#ffffff)
       OutlineJoinStyle _ (1)
       OutlineCapStyle _ (1)
       OutlineWidth _ (2)
       Polyline p {
-        Point _ (4, 9)
-        Point _ (9, 14)
-        Point _ (14, 4)
+        Point _ (4, 8)
+        Point _ (8, 13)
+        Point _ (13, 4)
       }
     }
     idle->selected (press, selected)
@@ -67,7 +70,7 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   }
 
   FillColor text_color (#323232)
-  Text thisLabel (23, 16, _label)
+  Text thisLabel (23, 14, _label)
   thisLabel.press->press
   label aka thisLabel.text
   thisLabel.width + 33 =:> this.min_width

@@ -3,12 +3,20 @@
 import os
 import sys, getopt
 import replay_autogui
+from os import walk
 
-test_list = [
-  "dnd", \
-  "bindings", \
-  "clone"
-]
+datas_dir = 'datas'
+
+f = []
+for (dirpath, dirnames, filenames) in walk(datas_dir):
+    f.extend(filenames)
+    break
+
+test_list = []
+for filename in f:
+  filename = filename.split('_data.txt')[0]
+  test_list.append (filename)
+# print (test_list)
 
 def main(argv):
 
@@ -32,6 +40,7 @@ def main(argv):
     print ("\n\n------------------- ALL TESTS ----------------------")
     print ('Retina display:\t\t', _is_retina, '\n') 
 
+    print ("List of the test: ", test_list)
     print ('Erasing: ALL results and diffs ')
     os.system ('rm -rf results/*.bmp')
     os.system ('rm -rf results/diffs/*.bmp')

@@ -71,5 +71,5 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   thisLabel.press->press
   label aka thisLabel.text
   thisLabel.width + 33 =:> this.min_width
-  30 =:> this.min_height
+  this.min_height = 30
 }

@@ -20,6 +20,7 @@ import gui.widgets.WidgetContainer
 import gui.widgets.Button
 import gui.widgets.HBox
 import gui.widgets.VBox
+import gui.widgets.Slider
 
 _main_
 Component root {
@@ -40,13 +41,17 @@ Component root {
       Button sub1 (wc, "Sub button 1", 0, 0)
       Button sub2 (wc, "Sub button 2", 0, 0)
       Button sub3 (wc, "Sub button 3", 0, 0)
+      Slider s (wc, 0, 0)
+      s.value => tp.input
       addChildrenTo vbox.items
       { 
         sub1,
         sub2,
-        sub3 
+        sub3,
+        s 
       }
     }
+    
     addChildrenTo hbox.items { b1, wc, b2, b3 }
   }
 }

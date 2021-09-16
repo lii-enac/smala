@@ -293,7 +293,7 @@ $(smala_lib_objs): CXX = $(CXX_CK)
 $(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -Ibuild/src_lib
 
 $(build_dir)/$(smala_lib_dir)/gui/widgets/Slider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/ToggleButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
+$(build_dir)/$(smala_lib_dir)/gui/widgets/RadioButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/CheckBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/Button.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/WidgetContainer.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h

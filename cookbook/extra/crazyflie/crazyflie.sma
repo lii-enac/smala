@@ -4,7 +4,7 @@ use display
 use gui
 use extra
 
-import gui.widgets.Button
+import gui.widgets.PushButton
 
 
 _main_
@@ -18,9 +18,9 @@ Component root {
 
 	FillColor _(0,0,255)
 
-	Button takeoff(f, "takeoff", 10, 10)
+	PushButton takeoff(f, "takeoff", 10, 10)
 	takeoff.click -> drone.takeoff
 
-	Button land(f, "land", 10, 100)
+	PushButton land(f, "land", 10, 100)
 	land.click -> drone.land
 }

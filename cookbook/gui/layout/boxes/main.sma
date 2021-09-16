@@ -17,7 +17,7 @@ use base
 use gui
 
 import gui.widgets.WidgetContainer
-import gui.widgets.Button
+import gui.widgets.PushButton
 import gui.widgets.HBox
 import gui.widgets.VBox
 import gui.widgets.Slider
@@ -31,16 +31,16 @@ Component root {
 
   WidgetContainer wc1 (f) {
     HBox hbox (0)
-    Button b1 (wc1, "My Button", 0, 0)
-    Button b2 (wc1, "Quit", 0, 0)
+    PushButton b1 (wc1, "My Button", 0, 0)
+    PushButton b2 (wc1, "Quit", 0, 0)
     b2.click->ex
-    Button b3 (wc1, "Yet Another Button", 0, 0)
+    PushButton b3 (wc1, "Yet Another Button", 0, 0)
     b3.click -> { "Hello!" =: tp.input }
     WidgetContainer wc (wc1) {
       VBox vbox (1)
-      Button sub1 (wc, "Sub button 1", 0, 0)
-      Button sub2 (wc, "Sub button 2", 0, 0)
-      Button sub3 (wc, "Sub button 3", 0, 0)
+      PushButton sub1 (wc, "Sub button 1", 0, 0)
+      PushButton sub2 (wc, "Sub button 2", 0, 0)
+      PushButton sub3 (wc, "Sub button 3", 0, 0)
       Slider s (wc, 0, 0)
       s.value => tp.input
       addChildrenTo vbox.items

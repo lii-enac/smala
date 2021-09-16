@@ -20,7 +20,7 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-Button (Process container, string _label, double x_, double y_) inherits IWidget (container) {
+PushButton (Process container, string _label, double x_, double y_) inherits IWidget (container) {
   Translation t (x_, y_)
 
   /*----- interface -----*/

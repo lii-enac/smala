@@ -10,7 +10,7 @@ _native_code_
     extern void clear_midi ();
 %}
 
-import gui.widgets.Button
+import gui.widgets.PushButton
 
 // try with https://tytel.org/helm/ or https://asb2m10.github.io/dexed/
 
@@ -69,14 +69,14 @@ Component root
     f.move.y -> cc_vol_cmd.do_it_2
 
     // program change: works with dexed, not with helm
-    Button btn_pc (f, "program change", 150, 50)
+    PushButton btn_pc (f, "program change", 150, 50)
     Int pc_midi_cmd(0xC0)
     Int pc(2)
     midi_p cc_pc_cmd (channel, pc_midi_cmd, pc, _val1)
     btn_pc.click -> cc_pc_cmd.do_it_1
 
     // bank select: works with dexed, not with helm
-    Button btn_bs (f, "bank select", 300, 50)
+    PushButton btn_bs (f, "bank select", 300, 50)
     Int cc_bank_select_msb (0x0)
     Int bank_msb(1)
     midi_p bank_msb_cmd (channel, cc_midi_cmd, cc_bank_select_msb, bank_msb)

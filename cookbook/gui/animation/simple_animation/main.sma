@@ -4,7 +4,7 @@ use gui
 use animation
 
 import gui.animation.Animator
-import gui.widgets.Button
+import gui.widgets.PushButton
 _main_
 Component root
 {
@@ -18,9 +18,9 @@ Component root
   f.{width, height} =:> bkg.{width, height}
 
 
-  Button restart (f, "(re)start", 10, 10)
-  Button reset (f, "reset", 10, 10)
-  Button abort (f, "stop", 10, 10)
+  PushButton restart (f, "(re)start", 10, 10)
+  PushButton reset (f, "reset", 10, 10)
+  PushButton abort (f, "stop", 10, 10)
   restart.x + restart.width + 10 =:> reset.x
   reset.x + reset.width + 10 =:> abort.x
   

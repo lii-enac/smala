@@ -18,7 +18,7 @@ use base
 use display
 use gui
 
-import gui.widgets.Button
+import gui.widgets.PushButton
 import gui.interactors.SimpleDrag
 
 /*
@@ -218,7 +218,7 @@ Component root {
     Text explanation3 (10, 60, "When the action is terminated, the title of the online ressource should appear")
     Text t (10, 120, "  ")
     Text t2 (10, 140, "")
-    Button btn (f, "launch", 50, 150)
+    PushButton btn (f, "launch", 50, 150)
 
     Rectangle r (200, 200, 100, 100, 0, 0)
     Ref toDrag (r)

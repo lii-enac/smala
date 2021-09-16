@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="793.70081"
    height="1122.5197"
    viewBox="0 0 793.70081 1122.5197"
    version="1.1"
    id="svg8"
-   inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
-   sodipodi:docname="widget_design.svg">
+   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
+   sodipodi:docname="widget_design.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -24,8 +24,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="437.0632"
-     inkscape:cy="101.18932"
+     inkscape:cx="158.5"
+     inkscape:cy="217"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -34,11 +34,12 @@
      inkscape:showpageshadow="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="2158"
-     inkscape:window-height="1266"
+     inkscape:window-width="1440"
+     inkscape:window-height="776"
      inkscape:window-x="0"
      inkscape:window-y="25"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:pagecheckerboard="0">
     <sodipodi:guide
        position="178.20568,1053.5197"
        orientation="0,1"
@@ -83,7 +84,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -185,26 +186,23 @@
            y="24.928049"
            style="font-size:18px">Button</tspan></text>
     </g>
-    <g
-       id="g1596">
-      <text
-         xml:space="preserve"
-         style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+    <text
+       xml:space="preserve"
+       style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+       x="23"
+       y="129"
+       id="text1581"><tspan
+         sodipodi:role="line"
+         id="tspan1579"
          x="23"
          y="129"
-         id="text1581"><tspan
-           sodipodi:role="line"
-           id="tspan1579"
-           x="23"
-           y="129"
-           style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
-      <circle
-         style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="path1588"
-         cx="9"
-         cy="122"
-         r="9" />
-    </g>
+         style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path1588"
+       cx="9"
+       cy="122"
+       r="9" />
     <text
        xml:space="preserve"
        style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
@@ -228,5 +226,31 @@
        cx="9"
        cy="146.49089"
        r="6" />
+    <g
+       id="g11874"
+       transform="translate(-9)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd"
+         id="rect245"
+         width="140"
+         height="6"
+         x="9"
+         y="180"
+         ry="3" />
+      <rect
+         style="fill:#535353;fill-opacity:1;fill-rule:evenodd"
+         id="rect8282"
+         width="50"
+         height="6"
+         x="9"
+         y="180"
+         ry="3" />
+      <circle
+         style="fill:#323232;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4737"
+         cx="61"
+         cy="183"
+         r="10" />
+    </g>
   </g>
 </svg>

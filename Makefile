@@ -296,6 +296,7 @@ $(build_dir)/$(smala_lib_dir)/gui/widgets/Label.o: $(build_dir)/$(smala_lib_dir)
 $(build_dir)/$(smala_lib_dir)/gui/widgets/Slider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/RadioButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/CheckBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
+$(build_dir)/$(smala_lib_dir)/gui/widgets/ToggleButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/PushButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/WidgetContainer.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 

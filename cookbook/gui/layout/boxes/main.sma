@@ -29,7 +29,6 @@ Component root {
   Frame f ("frame", 0, 0, 600, 200)
   Exit ex (0, 1)
   f.close->ex
-  TextPrinter tp
 
   WidgetContainer wc1 (f) {
     HBox hbox (0)
@@ -52,8 +51,7 @@ Component root {
         }
         idle->connected (sub3.toggle)
         connected->idle (sub3.toggle)
-      }
-      
+      }      
       addChildrenTo vbox.items
       { 
         sub1,
@@ -63,7 +61,6 @@ Component root {
         s 
       }
     }
-    
     addChildrenTo hbox.items { b1, wc, b2, b3 }
   }
 }

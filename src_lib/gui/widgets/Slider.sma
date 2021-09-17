@@ -43,13 +43,12 @@ Slider (Process container, double x_, double y_) inherits IWidget (container) {
   handle.cx =:> fill.width
   
   this.width =:> slider.width
-  this.min_width = 150
-  this.min_height = 30
-  this.height / 2 - 5 =:> pos.ty
+  this.min_width = 140
+  this.min_height = 20
+  this.height / 2 - 10 =:> pos.ty
 
   Double coeff (1)
   slider.width/ (slider.width-20) =:> coeff
-  (((handle.cx - 10)*coeff)/slider.width) * 100 => value
   BoundedValue bv (10, 130, 10)
   slider.width - 10 =:> bv.max
   
@@ -58,12 +57,15 @@ Slider (Process container, double x_, double y_) inherits IWidget (container) {
     State idle {
       Int cur_pos (0)
       Double ratio (0)
+      #323232 =: fg.value
       handle.cx - 10 =: cur_pos
-      cur_pos == 0 ? 0 : slider.width/cur_pos =: ratio
-      ratio == 0 ? 10 : slider.width/ratio + 10 => handle.cx
+      cur_pos == 0 ? 0 : (slider.width - 20)/cur_pos =: ratio
+      ratio == 0 ? 10 : (slider.width - 20)/ratio + 10 => handle.cx
     }
     State moving {
       Double offset (0)
+      #535353 =: fg.value
+      (((handle.cx - 10)*coeff)/slider.width) * 100 =:> value
       handle.press.x - handle.cx =: offset
       handle.move.x - offset =:> bv.input
       bv.result =:> handle.cx

@@ -18,9 +18,11 @@ use gui
 
 import gui.widgets.WidgetContainer
 import gui.widgets.PushButton
+import gui.widgets.ToggleButton
 import gui.widgets.HBox
 import gui.widgets.VBox
 import gui.widgets.Slider
+import gui.widgets.Label
 
 _main_
 Component root {
@@ -40,14 +42,24 @@ Component root {
       VBox vbox (1)
       PushButton sub1 (wc, "Sub button 1", 0, 0)
       PushButton sub2 (wc, "Sub button 2", 0, 0)
-      PushButton sub3 (wc, "Sub button 3", 0, 0)
+      ToggleButton sub3 (wc, "Connect slider", 0, 0)
+      Label l (wc, "Value: ", 0, 0)
       Slider s (wc, 0, 0)
-      s.value => tp.input
+      FSM fsm {
+        State idle
+        State connected {
+          "Value: " + s.value =:> l.text
+        }
+        idle->connected (sub3.toggle)
+        connected->idle (sub3.toggle)
+      }
+      
       addChildrenTo vbox.items
       { 
         sub1,
         sub2,
         sub3,
+        l,
         s 
       }
     }

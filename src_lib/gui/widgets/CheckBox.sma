@@ -34,10 +34,14 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   Int check_color (#535353)
   Int idle_color (#ffffff)
 
+  Translation offset (0, 0)
+  
+  FillColor text_color (#323232)
+  Text thisLabel (23, 14, _label)
   OutlineWidth ow (2)
   OutlineColor oc (#535353)
   FillColor fc (#ffffff)
-  Translation offset (0, 0)
+  
   Rectangle r (0, 0, 16, 16, 2, 2)
   this.height/2 - r.height/2 =:> offset.ty
 
@@ -69,10 +73,10 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
     st_selected->st_idle (unselect)
   }
 
-  FillColor text_color (#323232)
-  Text thisLabel (23, 14, _label)
+  
+
   thisLabel.press->press
   label aka thisLabel.text
-  thisLabel.width + 33 =:> this.min_width
-  this.min_height = 30
+  thisLabel.width + 23 =:> this.min_width
+  this.min_height = 16
 }

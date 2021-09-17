@@ -43,4 +43,8 @@ IWidget (Process container)
 	req_height =:> clamp_min_height.input
 	clamp_min_height.result =:> clamp_max_height.input
 	height aka clamp_max_height.result
+
+	FontFamily _ ("B612")
+    FontSize _ (4, 12)
+    FontWeight _ (25)
 }

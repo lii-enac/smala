@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="793.70081"
    height="1122.5197"
    viewBox="0 0 793.70081 1122.5197"
    version="1.1"
    id="svg8"
-   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
-   sodipodi:docname="widget_design.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
+   sodipodi:docname="widget_design.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -25,7 +25,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="4.0850501"
      inkscape:cx="88.982997"
-     inkscape:cy="96.938836"
+     inkscape:cy="62.17794"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -112,14 +112,14 @@
       <text
          xml:space="preserve"
          style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#ffffff;fill-opacity:1"
-         x="8.3964844"
-         y="24.928049"
+         x="6.3405471"
+         y="26.7185"
          id="text1515"><tspan
            sodipodi:role="line"
            id="tspan1513"
-           x="8.3964844"
-           y="24.928049"
-           style="font-size:18px">Button</tspan></text>
+           x="6.3405471"
+           y="26.7185"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B612;-inkscape-font-specification:B612">Button</tspan></text>
     </g>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -139,7 +139,7 @@
          id="tspan1519"
          x="23"
          y="76"
-         style="font-size:18px;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B612;-inkscape-font-specification:B612;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
     <rect
        style="fill:#535353;fill-opacity:1;stroke:#535353;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect1527"
@@ -158,7 +158,7 @@
          id="tspan1529"
          x="23"
          y="101"
-         style="font-size:18px;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B612;-inkscape-font-specification:B612;fill:#323232;fill-opacity:1">MyCheckBox</tspan></text>
     <path
        style="fill:none;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 3,94 6,6 5,-11"
@@ -177,14 +177,14 @@
       <text
          xml:space="preserve"
          style="font-size:18px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#ffffff;fill-opacity:1"
-         x="8.3964844"
-         y="24.928049"
+         x="4.2700195"
+         y="26.407227"
          id="text1568"><tspan
            sodipodi:role="line"
            id="tspan1566"
-           x="8.3964844"
-           y="24.928049"
-           style="font-size:18px">Button</tspan></text>
+           x="4.2700195"
+           y="26.407227"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B6;-inkscape-font-specification:B6">Button</tspan></text>
     </g>
     <text
        xml:space="preserve"
@@ -196,7 +196,7 @@
          id="tspan1579"
          x="23"
          y="129"
-         style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B612;-inkscape-font-specification:B612;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
     <circle
        style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path1588"
@@ -213,7 +213,7 @@
          id="tspan1598"
          x="23"
          y="153.49089"
-         style="font-size:18px;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:B612;-inkscape-font-specification:B612;fill:#323232;fill-opacity:1">MyRadioButton</tspan></text>
     <circle
        style="fill:#ffffff;fill-opacity:1;stroke:#535353;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="circle1602"

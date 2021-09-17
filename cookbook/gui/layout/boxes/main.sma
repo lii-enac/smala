@@ -29,6 +29,7 @@ Component root {
   Frame f ("frame", 0, 0, 600, 200)
   Exit ex (0, 1)
   f.close->ex
+  TextPrinter tp
 
   WidgetContainer wc1 (f) {
     HBox hbox (0)

@@ -124,7 +124,7 @@ ComboBox (Process container, double x_, double y_) inherits IWidget (container) 
       }
       State st_dpy {
         -90 =: arrow.r.a
-        0 =: arrow.pos2.ty
+        2 =: arrow.pos2.ty
         FillColor _ (White)
         OutlineColor _ (#323232)
         Rectangle bg (0, 0,100, 100, 0, 0)

@@ -23,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.0850501"
-     inkscape:cx="88.982997"
-     inkscape:cy="62.17794"
+     inkscape:zoom="1.8446944"
+     inkscape:cx="331.30389"
+     inkscape:cy="109.85784"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -34,8 +34,8 @@
      inkscape:showpageshadow="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1440"
-     inkscape:window-height="776"
+     inkscape:window-width="2128"
+     inkscape:window-height="1308"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
@@ -75,6 +75,9 @@
        inkscape:label=""
        inkscape:locked="false"
        inkscape:color="rgb(0,0,255)" />
+    <inkscape:grid
+       type="xygrid"
+       id="grid878" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -252,5 +255,35 @@
          cy="183"
          r="10" />
     </g>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#323232;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       id="rect870"
+       width="220"
+       height="20"
+       x="200"
+       y="0"
+       ry="0" />
+    <rect
+       style="fill:#323232;stroke:#323232;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;fill-opacity:1"
+       id="rect872"
+       width="20"
+       height="20"
+       x="400"
+       y="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:16px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:Helvetica;fill:#323232;fill-opacity:1"
+       x="203"
+       y="14.56"
+       id="text876"><tspan
+         sodipodi:role="line"
+         id="tspan874"
+         x="203"
+         y="14.56"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:B612;-inkscape-font-specification:B612;fill:#323232;fill-opacity:1">My Selection</tspan></text>
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 415,15 V 5 l -10,5 z"
+       id="path880" />
   </g>
 </svg>

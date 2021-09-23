@@ -54,6 +54,10 @@ fn_set_min_size (Process src, Process data)
     if (item.min_height > min_height) {
       min_height = is_sub_box ? item.min_height : 2 * vspace + item.min_height
     }
+    p = find (item, "change_parent")
+    if (&p != 0) {
+      run item.change_parent
+    }
   }
   data.min_height = min_height
   if (is_sub_box) {
@@ -75,6 +79,7 @@ HBox (int _is_sub_box)
   Int min_width (0)
   Int min_height (0)
   List items
+  List hover
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
   width->update_items_pos_and_geom
   NativeAction set_min_size (fn_set_min_size, this, 0)

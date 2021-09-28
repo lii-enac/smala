@@ -15,6 +15,13 @@
 use core
 use base
 
+_native_code_
+%{
+static Process* find_without_warning (Process* p, string path)
+{
+  return p->find_child_impl(path);
+}
+%}
 _action_
 fn_update_items_pos_and_geom (Process src, Process data)
 {
@@ -53,7 +60,7 @@ fn_set_min_size (Process src, Process data)
     if (item.min_height > min_height) {
       min_height = item.min_height
     }
-    p = find (item, "change_parent")
+    p = find_without_warning (item, "change_parent")
     if (&p != 0) {
       run item.change_parent
     }

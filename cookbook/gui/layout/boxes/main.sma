@@ -30,6 +30,10 @@ Component root {
   Frame f ("frame", 0, 0, 600, 200)
   Exit ex (0, 1)
   f.close->ex
+  FillColor _ (200, 200, 200)
+  NoOutline _
+  Rectangle bkg (0, 0, 0, 0, 0, 0)
+  f.{width,height}=:>bkg.{width,height}
   TextPrinter tp
 
   WidgetContainer wc1 (f) {

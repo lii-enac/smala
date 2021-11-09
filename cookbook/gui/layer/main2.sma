@@ -52,12 +52,17 @@ Component root {
   //Component bg { // classic group
   //  Bool damaged(1)
   Layer bg { // complete window
+  //Layer bg (200) { // complete window with padding
   //Layer bg (0,0,600,600) { // complete window
   //Layer bg (0,0,600,585) { 
   //Layer bg (0,0,600,130) { // only height
   //Layer bg (0,110,600,30) { // this will slighty cut the stars at the bottom and at the top
   //Layer bg (45,110,500,30) { // this will slighty cut the stars at the bottom, the top, left and right
-  
+
+    // Image _("mire.png", 1,10, -1,-1)
+    FillOpacity _(0.5)
+    Rectangle _(1,30, -50, 50, 0, 0)
+
     //Text _(0,20, "this")
     Text _(0,20, "this text and 5000 stars are in a layer, while the circle is moving on top")
     Text _(0,30, "every 2s a clock applies a small x translation on the stars and thus invalidates the layer")
@@ -83,9 +88,6 @@ Component root {
         }
       }
     }
-    // Image _("mire.png", 1,10, -1,-1)
-    // FillOpacity _(0.5)
-    // Rectangle _(1,30, 50, 50, 0, 0)
   }
 
   NoOutline _()

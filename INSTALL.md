@@ -9,19 +9,21 @@ We provide a Makefile that should work on MacOS (10.12+), Linux, Windows.
 brew tap lii-enac/repo
 brew install smala
 ```
---- LINUX ubuntu 
+--- LINUX ubuntu
+download linux package for ubuntu 20.04: https://github.com/lii-enac/smala/releases
+then:
 ```
-linux package for ubuntu 20.04: https://github.com/lii-enac/smala/releases
 dpkg -i smala-x.xx.x.deb
 ```
 --- WINDOWS 10
+download pacmac (ArchLinux) package .tar.zst from https://github.com/lii-enac/smala/releases
+then:
 ```
-install pacmac (ArchLinux) package .tar.zst from https://github.com/lii-enac/smala/releases 
 pacman -U smala-x.xx.x-1.pkg.tar.zst
 ```
 ---- or FROM sources.
 
- open a terminal (a mingw64 one on windows, not an MSYS2 one), cd to the parent of the djnn-cpp directory and copy/paste the following commands:
+open a terminal (a mingw64 one on windows, not an MSYS2 one), cd to the parent of the djnn-cpp directory and copy/paste the following commands:
 
 ```
 git clone https://github.com/lii-enac/smala.git  

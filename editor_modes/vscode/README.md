@@ -7,7 +7,7 @@ Mathieu Poirier
 2. then install smala extension for VSCode by copying editor_modes/vscode/smala directory in your ~/.vscode/extensions
 
 macosx/Linux:
-cp -r editor_modes/vscode/smala ~/.vscode/extensions/.
+cp -r editor_modes/vscode/smala $HOME/.vscode/extensions/.
 
 Windows:
-tbc
+cp -r editor_modes/vscode/smala $USERPROFILE/.vscode/extensions/.

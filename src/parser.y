@@ -101,7 +101,7 @@
   vector<BuildNameContext*> name_context_list;
   std::vector<SymTable*> lambda_sym_table_list;
   std::vector<SymTable*> sym_table_list;
-  vector<int> int_array;
+  vector<double> double_array;
   Node *cur_node, *root = nullptr;
   //bool m_in_add_children = false;
   bool m_terminate = false;
@@ -945,9 +945,9 @@ start_add_child
 //------------------------------------------------
 
 dash_array
-  : dash_array_decl LP int_array_decl RP
+  : dash_array_decl LP double_array_decl RP
     {
-      DashArrayNode *node = new DashArrayNode (@$, $1, int_array);
+      DashArrayNode *node = new DashArrayNode (@$, $1, double_array);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
     }
@@ -955,16 +955,16 @@ dash_array
 dash_array_decl
   : DASHARRAY NAME
     {
-      int_array.clear ();
+      double_array.clear ();
       $$ = $2;
       if ($2 != "_")
         add_sym (@$, $2, PROCESS);
     }
 
-int_array_decl
+double_array_decl
   : %empty
-  | int_array_decl INT COMMA { int_array.push_back (std::stoi ($2)); }
-  | int_array_decl INT { int_array.push_back (std::stoi ($2)); }
+  | double_array_decl DOUBLE COMMA { double_array.push_back (std::stof ($2)); }
+  | double_array_decl DOUBLE { double_array.push_back (std::stof ($2)); }
 
 range_list
   : range

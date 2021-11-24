@@ -25,7 +25,7 @@ Component root {
   f.close -> ex
 
   FillColor w (White)
-  Text txt (100, 300, "Click anywhere on the Window to modify background opacity and  color")
+  Text txt (100, 300, "Click anywhere on the Window to modify background opacity and color")
   FillColor g (0, 255, 0)
   Rectangle r (10, 10, 50, 50)
   FillColor g (255, 0, 0)

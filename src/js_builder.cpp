@@ -1177,6 +1177,13 @@ namespace Smala
     }
   }
 
+  void
+  JSBuilder::self_set_property (std::ofstream &os, Node *n)
+  {
+    //TODO implement this
+    std::cout << "WARNING: self assignment not yet implemented\n";
+  }
+
 
   void
   JSBuilder::alias (std::ofstream &os, Node *node)

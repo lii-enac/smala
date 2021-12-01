@@ -26,6 +26,7 @@
 #include "native_collection_action_node.h"
 #include "forevery_node.h"
 #include "causal_dep_node.h"
+#include "self_assign_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -543,7 +544,7 @@ namespace Smala
     build_for_node (os, fn->first_st());
     os << "; " << build_expr (fn->second_st()) << "; ";
     build_for_node (os, fn->third_st());
-    os << ") {";
+    os << ") {\n";
     m_indent++;
     m_in_for = false;
   }
@@ -1298,11 +1299,49 @@ namespace Smala
     } else {
       prop_name = build_find (node->get_path(), false);
       if (prop_name.rfind ("cpnt_", 0) == 0) {
-        os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << build_expr (node->get_args().at(0), undefined_t) << ", true);\n";
+        os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << build_expr (node->get_args().at(0), undefined_t) << ", true)";
+        if (!m_in_for)
+          os << ";\n";
         used_processes["AbstractProperty"] = true;
       } else {
-        os << prop_name << " = " << build_expr (node->get_args().at(0), undefined_t) << ";\n";
+        os << prop_name << " = " << build_expr (node->get_args().at(0), undefined_t);
+        if (!m_in_for)
+          os << ";\n";
       }
+    }
+  }
+
+  void
+  CPPBuilder::self_set_property (std::ofstream &os, Node *n)
+  {
+    SelfAssignNode *node = (SelfAssignNode*)n;
+    std::string prop_name = node->get_path()->get_subpath_list().at(0)->get_subpath();
+    std::string found = m_parent_list.back ()->get_symbol (prop_name);
+    std::string symbol = (std::string) node->symbol ();
+    prop_name = build_find (node->get_path(), false);
+    if (prop_name.rfind ("cpnt_", 0) == 0) {
+      used_processes["AbstractProperty"] = true;
+      used_processes["TextProperty"] = true;
+      if (!m_in_for) {
+        os << "\tif ( ((AbstractProperty*)" << prop_name << ")->get_prop_type() == String) {\n";
+        os << "\t\tdjnn_warning (" << prop_name << ", \"invalid operand for String Property\");\n";
+        os << "\t}";
+        os << "else {\n";
+        os << "\t\t((AbstractProperty*) "<< prop_name << ")->set_value (";
+        os <<  "((AbstractProperty*) "<< prop_name << ")->get_double_value () " << symbol;
+        os << " " << build_expr (node->get_args().at(0), undefined_t) << ", true);\n";
+        os << "\t}";
+      } else {
+        os << "((AbstractProperty*) "<< prop_name << ")->set_value (";
+        os <<  "((AbstractProperty*) "<< prop_name << ")->get_double_value () " << symbol;
+        os << " " << build_expr (node->get_args().at(0), undefined_t) << ", true)";
+      }
+    } else {
+      if (!m_in_for)
+        indent (os);
+      os << prop_name << " " << symbol << "= " << build_expr (node->get_args().at(0), undefined_t);
+      if (!m_in_for)
+        os << ";\n";
     }
   }
 

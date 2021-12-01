@@ -123,6 +123,7 @@ namespace Smala {
     virtual void build_instruction (std::ofstream &os, Node *n) = 0;
     virtual void build_range_node (std::ofstream &os, Node *node, const string& new_name) = 0;
     virtual void set_property (std::ofstream &os, Node *n) = 0;
+    virtual void self_set_property (std::ofstream &os, Node *n) = 0;
     virtual void alias (std::ofstream &os, Node *n) = 0;
     virtual void merge (std::ofstream &os, Node *n) = 0;
     virtual void remove (std::ofstream &os, Node *n) = 0;

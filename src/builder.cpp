@@ -282,6 +282,16 @@ namespace Smala
         os << build_step ((ExprNode*) node);
         break;
       }
+      case SET_PROPERTY:
+      {
+        set_property (os, node);
+        break;
+      }
+      case SELF_SET_PROPERTY:
+      {
+        self_set_property (os, node);
+        break;
+      }
       case NEW_VAR:
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
@@ -461,6 +471,11 @@ namespace Smala
       case SET_PROPERTY:
       {
         set_property (os, node);
+        break;
+      }
+      case SELF_SET_PROPERTY:
+      {
+        self_set_property (os, node);
         break;
       }
       case ALIAS:

@@ -53,6 +53,7 @@
   #include "expr_node.h"
   #include "this_node.h"
   #include "add_children_to_node.h"
+  #include "self_assign_node.h"
 
   using namespace std;
 
@@ -213,6 +214,10 @@
 %token DECR "--"
 %token TIMES "*"
 %token DIVIDE "/"
+%token MINUS_EQ "-="
+%token PLUS_EQ "+="
+%token TIMES_EQ "*="
+%token DIVIDE_EQ "/="
 %token COLON ":"
 %token QUESTION_MARK "?"
 %token MODULO "%"
@@ -309,6 +314,7 @@
 %type <string> unary_operator
 %type <ExprNode*> step
 %type <Node*> for_imperative_assignment
+%type <string> self_assign
 %type <ExprNode*> first_bound
 %type <ExprNode*> second_bound
 %type <ExprNode*> argument
@@ -582,8 +588,7 @@ start_eq
       add_sym (@$, $3, $1);
       $$ = n;
     }
-  | 
-    name_or_path SIMPLE_EQ
+  | name_or_path SIMPLE_EQ
     {
       if (!m_in_for)
         lexer_expression_mode_on ();
@@ -597,6 +602,26 @@ start_eq
       }
       $$ = n;
     }
+  | name_or_path self_assign
+    {
+      if (!m_in_for)
+        lexer_expression_mode_on ();
+      SelfAssignNode *n = new SelfAssignNode (@$, new PathNode (@1, $1), $2);
+      m_in_imperative = true;
+      name_context_list.pop_back ();
+      if ($1.size () == 1) {
+        if (!exists ($1.at(0)->get_subpath ())) {
+          add_sym (@$, $1.at(0)->get_subpath (), PROCESS);
+        }
+      }
+      $$ = n;
+    }
+  
+  self_assign
+  : PLUS_EQ   { $$ = "+"; }
+  | MINUS_EQ  { $$ = "-"; }
+  | TIMES_EQ  { $$ = "*"; }
+  | DIVIDE_EQ { $$ = "/"; }
 
 keep
   : %empty { $$ = 0; }

@@ -42,6 +42,7 @@ namespace Smala {
     std::string build_find (PathNode* n, bool ignore_cast);
     std::string build_path (PathNode* n);
     void set_property (std::ofstream &os, Node *node) override;
+    void self_set_property (std::ofstream &os, Node *n) override;
     void alias (std::ofstream &os, Node *node) override;
     void merge (std::ofstream &os, Node *node) override;
     void remove (std::ofstream &os, Node *node) override;

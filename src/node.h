@@ -81,6 +81,7 @@ namespace Smala {
     RANGE,
     REMOVE,
     REPEAT,
+    SELF_SET_PROPERTY,
     SET_PARENT,
     SET_PROPERTY,
     SIMPLE,

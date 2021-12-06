@@ -27,7 +27,7 @@ namespace Smala {
   } instruction_t;
 
   typedef enum SmalaType {
-    BOOL, INT, DOUBLE, STRING, PROCESS, CAST_STRING, NULL_VALUE, NAME, LOCAL_NAME, VOID, UNDEFINED
+    BOOL, INT, DOUBLE, STRING, PROCESS, CAST_STRING, NATIVE_CODE_T, NULL_VALUE, NAME, LOCAL_NAME, VOID, UNDEFINED
   } smala_t;
 
   enum NodeType
@@ -151,6 +151,8 @@ public:
     const location& get_location () { return m_loc; }
     void set_is_define_or_main () { m_is_define_or_main = true; }
     bool is_define_or_main () const { return m_is_define_or_main; }
+    void set_include_native (bool v) { m_include_native = v;}
+    bool include_native () { return m_include_native;}
  private:
     bool m_ignore_parent, m_has_path;
     Node *m_parent;
@@ -166,6 +168,7 @@ public:
     user_data_t m_data;
     class location m_loc;
     bool m_is_define_or_main;
+    bool m_include_native;
 };
 
 }

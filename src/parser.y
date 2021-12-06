@@ -265,6 +265,7 @@
 %token NATIVE_COLLECTION "NativeCollectionAction"
 %token NATIVE_ACTION "_action_"
 %token NATIVE_CODE "_native_code_"
+%token NATIVE_CODE_T "NativeCode"
 %token <string> CODE "<native code>"
 %token DASHARRAY "DashArray"
 %token <string> INT "<int>"
@@ -484,7 +485,12 @@ constructor
       node->set_args_spec ($4);
       driver.add_define_node (node);
       driver.add_node (node);
-
+      for (auto p: $4) {
+        if (p.first == NATIVE_CODE_T) {
+          node->set_include_native (true);
+          break;
+        }
+      }
       ThisNode *e_node = new ThisNode (@$, "this");
       parent_list.push_back (e_node);
       driver.add_node (e_node);
@@ -719,6 +725,7 @@ type
   | DOUBLE_T { $$ = DOUBLE; }
   | STRING_T { $$ = STRING; }
   | PROCESS { $$ = PROCESS; }
+  | NATIVE_CODE_T { $$ = NATIVE_CODE_T; }
 
 print
   : PRINT LP assignment_expression RP

@@ -277,6 +277,9 @@ namespace Smala
             // if no path is found check for a global symbol
             if (path.empty())
               path += m_type_manager->get_smala_symbol (((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ());
+            // if path is always empty keep it 
+            if (path.empty())
+              path += ((PathExprNode*)e)->get_path()->get_subpath_list().at (0)->get_subpath ();
           }
         }
         if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
@@ -1532,6 +1535,8 @@ namespace Smala
         case STRING:
           new_name = "s_var_" + std::to_string (m_var_num++);
           break;
+        case NATIVE_CODE_T:
+          used_processes["NativeCode"] = true;
         case LOCAL_NAME:
         case NAME:
         case PROCESS:
@@ -1624,10 +1629,13 @@ namespace Smala
                              "duplicated name: " + node->name (), 0);
     }
     indent (os);
+    std::string function_name = m_parent_list.back ()->get_symbol (node->function_name ());
+    if (function_name.empty ())
+      function_name = node->function_name ();
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     os << "auto* " << new_name << " = new " << constructor << " (" << p_name
-        << ", " << name << ", " << node->function_name () << ", ";
+        << ", " << name << ", " << function_name << ", ";
     if (type == COLLECTION_ACTION) {
       std::string list = build_find (node->path_list(), false);
       os << list << ", ";
@@ -1727,8 +1735,13 @@ namespace Smala
       s.at (i) = std::toupper (s.at (i));
     //os << "#pragma once\n#include <string>\n\n";
     os << "#pragma once\n\n";
-    for (int i = 0; i < m_ast.define_node_list ().size (); i++) {
-      Node *def = m_ast.define_node_list ().at (i);
+
+    bool set_include = false;
+    for (auto def: m_ast.define_node_list ()) {
+      if (def->include_native () && !set_include) {
+        os << "#include \"core/control/native_action.h\"\n\n";
+        set_include = true;
+      }
       os << "djnn::ParentProcess* " << def->name ()
           << " (djnn::ParentProcess*, const djnn::string &";
       for (int j = 0; j < def->args ().size (); j++) {
@@ -1767,6 +1780,10 @@ namespace Smala
       }
       case STRING: {
         os << "const djnn::string&";
+        break;
+      }
+      case NATIVE_CODE_T: {
+        os << "djnn::NativeCode*";
         break;
       }
       case NAME:

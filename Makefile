@@ -257,6 +257,7 @@ $(build_dir)/src/process_class_path.cpp:
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/trigonometry.h   | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/text.h           | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/previous.h       | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/previous.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/deref.h          | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/deref.h\"},"}' >> $@
 	printf "{\"MultiConnector\",\"base/connector.h\"},\n" >> $@
 	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
 	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@

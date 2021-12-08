@@ -252,10 +252,11 @@ $(build_dir)/src/process_class_path.cpp:
 	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
 	(cd $(djnn_include_path_only) && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
 	awk '{print "{\""$$1"\""",""\""$$2"\"""},"}' $(tmpfile) >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/arithmetic.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/arithmetic.h     | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/trigonometry.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
-	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/text.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/trigonometry.h   | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/trigonometry.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/text.h           | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/text.h\"},"}' >> $@
+	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/previous.h       | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/previous.h\"},"}' >> $@
 	printf "{\"MultiConnector\",\"base/connector.h\"},\n" >> $@
 	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
 	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@

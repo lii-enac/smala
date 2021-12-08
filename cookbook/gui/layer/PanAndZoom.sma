@@ -16,16 +16,23 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     // release: e.g., frame.release
     // dw: e.g., frame.wheel.dy, amout of delta zoom as input by the user
 
-    // "output"
+    // "output" // should be connected e.g. to a Translation and a Scaling
+
     Double zoom (1)
     Double xpan (0)
     Double ypan (0)
 
+    // "delta output", in case it's useful
+
+    Double dzoom (1)
+    Double dx (0)
+    Double dy (0)
+
 
     // zoom management
+
     Double adw (0) // absolute dw
-    Double transf_adw (0) // transfert function of adw
-    Double dzoom (1) // resulting delta zoom
+    Double transf_adw (0) // transfert function of adw    
 
     fabs($dw) =:> adw 
     (0.00303 * adw + 0.00482) * adw + 1.001 =:> transf_adw // polynomial-based transfer function
@@ -47,16 +54,18 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
 
     // since we update zoom in new_zoom later, we must avoid creating a coupling between them, as that would build a cycle
     // this should be harmless, however the activation vector is not cleaned after exec anymore for performance reasons, so it is harmful!
-    // so the following connectors would theoritically be alright, but not practically as compared to a assignment, they create a coupling
-    // hence we put them as assignments in the AssignmentSequence instead
+    // so the following connectors would theoritically be alright, but not practical as compared to assignments, since they create a coupling
+    // hence we move them as assignments into an AssignmentSequence instead
     // dzoom * zoom =:> new_zoom
     // xpan + move.x / new_zoom - move.x / zoom =:> new_xpan
     // ypan + move.y / new_zoom - move.y / zoom =:> new_ypan
 
     AssignmentSequence zseq (1) {
         dzoom * zoom =: new_zoom
-        xpan + last_move_x / new_zoom - last_move_x / zoom =: new_xpan
-        ypan + last_move_y / new_zoom - last_move_y / zoom =: new_ypan
+        last_move_x / new_zoom - last_move_x / zoom =: dx
+        last_move_y / new_zoom - last_move_y / zoom =: dy
+        xpan + dx =: new_xpan
+        ypan + dy =: new_ypan
 
         new_zoom =: zoom
         new_xpan =: xpan
@@ -77,13 +86,11 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
             press.y =: ylast
         }
         State panning {
-            Double dx (0)
-            Double dy (0)
             AssignmentSequence seq (1) {
-                move.x - xlast =: dx
-                move.y - ylast =: dy
-                xpan + dx / zoom =: xpan
-                ypan + dy / zoom =: ypan
+                (move.x - xlast) / zoom =: dx
+                (move.y - ylast) / zoom =: dy
+                xpan + dx =: xpan
+                ypan + dy =: ypan
                 move.x =: xlast
                 move.y =: ylast
             }

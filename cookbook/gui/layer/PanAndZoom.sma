@@ -11,6 +11,7 @@ _native_code_
 _define_
 PanAndZoom (Process move, Process press, Process release, Process dw) {
     // "input"
+
     // move: e.g., frame.move // unfortunately, we need to know where the cursor is while zooming
     // press: e.g., frame.press
     // release: e.g., frame.release
@@ -52,13 +53,15 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
     Double new_xpan (0)
     Double new_ypan (0)
 
-    // since we update zoom in new_zoom later, we must avoid creating a coupling between them, as that would build a cycle
-    // this should be harmless, however the activation vector is not cleaned after exec anymore for performance reasons, so it is harmful!
-    // so the following connectors would theoritically be alright, but not practical as compared to assignments, since they create a coupling
-    // hence we move them as assignments into an AssignmentSequence instead
+    // --- it could have been the following:
     // dzoom * zoom =:> new_zoom
     // xpan + move.x / new_zoom - move.x / zoom =:> new_xpan
     // ypan + move.y / new_zoom - move.y / zoom =:> new_ypan
+
+    // --- since we update zoom in new_zoom, we must avoid creating a coupling between them, as that would build a cycle
+    // this should be harmless, however the activation vector is not cleaned after exec anymore for performance reasons, so it is harmful!
+    // so the above connectors would theoritically be alright, but not practical as compared to assignments, since they create a coupling
+    // hence we move them as assignments into an AssignmentSequence instead:
 
     AssignmentSequence zseq (1) {
         dzoom * zoom =: new_zoom
@@ -89,8 +92,11 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
             AssignmentSequence seq (1) {
                 (move.x - xlast) / zoom =: dx
                 (move.y - ylast) / zoom =: dy
-                xpan + dx =: xpan
-                ypan + dy =: ypan
+                xpan + dx =: new_xpan
+                ypan + dy =: new_ypan
+                new_xpan =: xpan
+                new_ypan =: ypan
+
                 move.x =: xlast
                 move.y =: ylast
             }

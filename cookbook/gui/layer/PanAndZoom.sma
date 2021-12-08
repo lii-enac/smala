@@ -9,21 +9,23 @@ _native_code_
 %}
 
 _define_
-PanAndZoom (Process move, Process press, Process release, Process dw) {
-    // "input"
+PanAndZoom (Process move, Process press, Process release, Process dwheel) {
+    // input
 
-    // move: e.g., frame.move // unfortunately, we need to know where the cursor is while zooming
+    // move: e.g., frame.move // unfortunately, we need to know where the cursor is while zooming // FIXME put it in wheel event?..
     // press: e.g., frame.press
     // release: e.g., frame.release
-    // dw: e.g., frame.wheel.dy, amout of delta zoom as input by the user
+    // dwheel: e.g., frame.wheel.dy, amoumt of delta zoom input by the user
 
-    // "output" // should be connected e.g. to a Translation and a Scaling
+
+    // output // should be connected e.g. to a Translation and a Scaling
 
     Double zoom (1)
     Double xpan (0)
     Double ypan (0)
 
-    // "delta output", in case it's useful
+
+    // delta output, in case it's useful
 
     Double dzoom (1)
     Double dx (0)
@@ -32,15 +34,18 @@ PanAndZoom (Process move, Process press, Process release, Process dw) {
 
     // zoom management
 
+    // transfer function
     Double adw (0) // absolute dw
     Double transf_adw (0) // transfert function of adw    
 
-    fabs($dw) =:> adw 
+    fabs($dwheel) =:> adw 
     (0.00303 * adw + 0.00482) * adw + 1.001 =:> transf_adw // polynomial-based transfer function
     // Pow p (1.01, 0) // exponent-based transfer function
     // adw =:> p.exponent
     // p.result =:> transf_adw
-    dw >= 0 ? transf_adw : 1/transf_adw =:> dzoom
+
+    // inversing zoom according to dwheel sign
+    dwheel >= 0 ? transf_adw : 1/transf_adw =:> dzoom
 
     // we need to know where the cursor is // FIXME put it in wheel event?..
     mouseTracking = 1

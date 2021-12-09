@@ -29,16 +29,6 @@ Component root {
   frame.close -> ex
   mouseTracking = 1
 
-  // background to track mouse presses outside draggable shapes in order to prevent pan/drag conflict
-  // (listening frame.press doesn't allow to differentiate press inside or outside shapes)
-  Component backgroundForPan {
-    NoOutline _
-    NoFill _
-    Rectangle bg (0, 0, 0, 0, 0, 0)
-    frame.width =:> bg.width
-    frame.height =:> bg.height
-  }
-
   // A few arbitrary transforms
   Rotation arbitraryRotation (19, 0, 0)
   Translation arbitraryTranslation (56, 24)
@@ -47,7 +37,7 @@ Component root {
   Component zoomScene {
     // Pan and zoom
     Homography panAndZoomTransform
-    PanAndZoom pz (frame, backgroundForPan.bg, panAndZoomTransform)
+    PanAndZoom pz (frame, frame.background_rect, panAndZoomTransform)
     pz.mouseCenteredOption.state = "on"
 
     FillColor _ (70, 70, 70)

@@ -26,6 +26,12 @@ Component root {
 	f.close -> ex
 	mouseTracking = 1
 
+	FillColor fc (255, 0, 0)
+	Text t  (100, 100, "BE CAREFUL !")
+	Text t1 (100, 120, "This recipe is not working correctly for now.")
+	Text t2 (100, 140, "It has to be remade")
+
+
 	// A few arbitrary transforms
 	// (RotateResizeRectangle below uses local coordinates, so one can transform
 	// the scene before it at will without impacting its interactions)

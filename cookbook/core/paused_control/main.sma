@@ -24,7 +24,7 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-  FillColor fc (0, 0, 0)
+  FillColor fc (255, 0, 0)
   Text t_prev_prev (20, 120, "0")
   Text t_prev (100, 120, "0")
   Text t_cur (180, 120, "0")

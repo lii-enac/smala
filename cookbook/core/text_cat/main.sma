@@ -22,7 +22,7 @@ Component root {
   Frame f ("f", 0, 0, 500, 600)
   Exit ex (0, 1)
   f.close -> ex
-  FillColor fc (0, 0, 0)
+  FillColor fc (255, 0, 0)
   Text t (20, 20, "")
   "frame width =  " + f.width + " frame height = " + f.height =:> t.text
 }

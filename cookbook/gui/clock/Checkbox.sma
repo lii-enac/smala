@@ -30,6 +30,7 @@
  				NoFill nf
  				OutlineColor oc (127, 127, 127)
  				OutlineWidth ow (3)
+                PickFill _
  				Circle c (_x + (n * 80), _y, 20)
  				FillColor darkgrey (40, 40, 40)
  				FontSize fs (4, 18)

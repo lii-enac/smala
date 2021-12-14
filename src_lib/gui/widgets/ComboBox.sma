@@ -75,7 +75,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
     }
     text_items.size * 15 + 3 =:> data.for_hover.fsm.st_dpy.bg.height
     MaxList max (text_items, "t/width")
-    max.output =:> data.min_width
+    max.output + 50 =:> data.min_width
   }
 }
 
@@ -138,5 +138,7 @@ ComboBox (Process container, double x_, double y_) inherits IWidget (container) 
     }
   }
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
+  str_items.$added -> update_items_pos_and_geom
+  str_items.$removed -> update_items_pos_and_geom
   NativeAction change_parent (fn_change_parent, this, 1)
 }

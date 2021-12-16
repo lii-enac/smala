@@ -1558,7 +1558,7 @@ namespace Smala
   {
 
     /* main */
-    os << "int\nmain () {\n";
+    os << "int\nmain (int argc, char* argv[]) {\n";
     m_indent = 1;
     int size = m_ast.preamble ().use ().size ();
     bool has_display = false;

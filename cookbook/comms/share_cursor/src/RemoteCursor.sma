@@ -19,7 +19,6 @@ use gui
 _native_code_
 %{
   #include <iostream>
-  #include "base/base.h"
   using namespace std;
 %}
 

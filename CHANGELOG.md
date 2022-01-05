@@ -6,6 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
 
+## [1.17.0] - 2021-01-05
+### compliant with djnn-cpp [1.17.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+### NEW
+    - Added support for M1 Macos
+    - NEW smala :
+        - Added kind of inheritance mechanism between user componant : eq:  Buttons inherits the Widget
+        - Added new syntax for addChildrentTo: eq. addChildrentTo parent { item1, item2, item3}
+        - Added support to pyautogui for auto interaction test : python script and exemples
+        - Added a mechanism to pass a function as an argument and the type NativeCode in component definition
+        - Added support argc argv for _main_ process
+    - NEW smala component and cookbook : 
+        - Deref bool, text
+        - Previous : double, int text
+        - HBox and VBox componants and there cookbooks
+        - WidgetContainer component
+        - layout/boxes cookbook
+        - Collision :  add a collision detection cookbook
+        - Argv cookbook
+    - NEW in lib smala: 
+        - svg mockup for widget design
+        - Checkbox
+        - Toggle button
+        - Checkbox manager for exclusive choice
+        - simple horizontal slider widget
+        - Label Widget
+        - ComboBox widget
+### Added
+    - Enabled anonymous insert
+    - Added self assignment operators
+### Changed
+    - Improved cookbook:
+        - Layer: padding
+        - Dash Array with double
+        - Swims
+    - Improved lib/widget component:
+        - Button --> PushButton
+        - RadioButton
+    - Improved compilation dependencies
+    - Improved Install.md
+    - Cleaned code
+### Fixed
+    - Fixed cookbooks:
+        - Buttons
+        - Clock
+
 ## [1.16.0] - 2021-07-28
 ### compliant with djnn-cpp [1.&6.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
@@ -39,14 +85,12 @@ note: debut on changelog. This section has to be completed, if we have time.
         - _DEBUG_GRAPH_CYCLE_DETECT
         - _DEBUG_SEE_ACTIVATION_SEQUENCE
         - _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US
-        - _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED
-    
+        - _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED  
 ### Changed
     - Improved packages dependency 
     _ Improved packages build system
     - Improved lib/widget component :
         - Animator
-
 ### Fixed
     - Fixed documentation
     - Fixed pkgconfig file generation
@@ -85,7 +129,6 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW cookbook recipe: incremental json parsing with djnn concepts
     - NEW cookbook recipe: javascript.
     - NEW Makefile for Stand_Alone with precompiled_header option : use_pch = yes
-
 ### Added
 ### Changed
     - Fixed all cookbook recipes, app to match the builder changes.

@@ -161,14 +161,19 @@ endif
 
 ifeq ($(os),Darwin)
 compiler ?= llvm
-YACC := $(shell brew --prefix bison)/bin/bison -d
-LEX := $(shell brew --prefix flex)/bin/flex
+ifeq ($(PREFIX),)
+brew_prefix := $(shell brew --prefix)
+else
+brew_prefix := $(HOMEBREW_PREFIX)
+endif
+YACC := $(brew_prefix)/opt/bison/bin/bison -d
+LEX := $(brew_prefix)/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /usr/bin/lldb
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
-LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
+CXXFLAGS_SC += -I$(brew_prefix)/opt/flex/include
+LDFLAGS_SC += -L$(brew_prefix)/opt/flex/lib
 lib_suffix =.dylib
 DYNLIB = -dynamiclib
 endif

@@ -170,10 +170,11 @@ YACC := $(brew_prefix)/opt/bison/bin/bison -d
 LEX := $(brew_prefix)/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
-debugger := PATH=/usr/bin /usr/bin/lldb
+debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-CXXFLAGS_SC += -I$(brew_prefix)/opt/flex/include
-LDFLAGS_SC += -L$(brew_prefix)/opt/flex/lib
+other_runtime_lib_path := /Users/conversy/recherche/istar/code/misc/MGL/build
+CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
+LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
 lib_suffix =.dylib
 DYNLIB = -dynamiclib
 endif
@@ -457,7 +458,7 @@ libs_cookbook_app :=
 cflags_cookbook_app :=
 cppflags_cookbook_app :=
 res_dir :=
-other_runtime_lib_path :=
+other_runtime_lib_path ?=
 
 ckappname := $$(notdir $1)
 $1_app_srcs_dir := cookbook/$1
@@ -673,7 +674,31 @@ $(smala_install_prefix)/bin/$(bin_name): build/$(bin_name)
 	@mkdir -p $(dir $@)
 	install -m 755 $< $@
 
-install: default smala_lib install_pkgconf install_headers install_libs install_bin
+
+ifeq ($(os),Linux)
+vscode_home = $(HOME)/.vscode/extensions
+sublime_home = $(HOME)/.config/sublime-text-3/Packages/User
+endif
+
+ifeq ($(os),Darwin)
+vscode_home = $(HOME)/.vscode/extensions
+sublime_home = "$(HOME)/Library/Application Support/Sublime Text 3/Packages/User"
+endif
+
+ifeq ($(os),MinGW)
+vscode_home = $(USERPROFILE)/.vscode/extensions
+sublime_home = "C:\Users\$(USERPROFILE)\AppData\Roaming\Sublime Text 3\Packages\User"
+endif
+
+install_editor_modes:
+	if [ -d $(vscode_home) ]; then \
+		cp -r editor_modes/vscode/smala $(vscode_home); \
+	fi
+	if [ -d $(sublime_home) ]; then \
+		cp editor_modes/sublime/smala.sublime-syntax editor_modes/sublime/smala.tmPreferences editor_modes/sublime/Make-color.sublime-build $(sublime_home); \
+	fi
+
+install: default smala_lib install_pkgconf install_headers install_libs install_bin install_editor_modes
 
 
 

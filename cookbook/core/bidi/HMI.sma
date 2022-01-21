@@ -47,4 +47,6 @@ HMI ()
 
         addChildrenTo vbox.items {l, sf, l2, sc}
     }
+    sf aka wc.vbox.items.[2]
+    sc aka wc.vbox.items.[4]
 }

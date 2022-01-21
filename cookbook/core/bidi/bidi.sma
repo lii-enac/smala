@@ -34,7 +34,7 @@ import HMI
 
 _main_
 Component root {
-  _DEBUG_GRAPH_CYCLE_DETECT = 1
+  //_DEBUG_GRAPH_CYCLE_DETECT = 1
 
   Double fahrenheit (0)
   Double celsius (0)
@@ -43,11 +43,10 @@ Component root {
   (9./5.) * celsius + 32 => fahrenheit
 
   HMI hmi()
-  p aka hmi.wc.vbox
 
-  fahrenheit => p.sf.value
-  p.sf.value => fahrenheit
+  fahrenheit => hmi.sf.value
+  hmi.sf.value => fahrenheit
   
-  celsius => p.sc.value
-  p.sc.value => celsius
+  celsius => hmi.sc.value
+  hmi.sc.value => celsius
 }

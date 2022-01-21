@@ -61,6 +61,7 @@ Slider (Process container, double x_, double y_) inherits IWidget (container) {
       handle.cx - 10 =: cur_pos
       cur_pos == 0 ? 0 : (slider.width - 20)/cur_pos =: ratio
       ratio == 0 ? 10 : (slider.width - 20)/ratio + 10 => handle.cx
+      value->{((value / 100) * slider.width + 10*coeff)/coeff =: handle.cx}
     }
     State moving {
       Double offset (0)

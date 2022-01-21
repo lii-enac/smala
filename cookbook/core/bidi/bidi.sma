@@ -24,6 +24,8 @@ import gui.widgets.HBox
 import gui.widgets.Slider
 import gui.widgets.Label
 
+import HMI
+
 // does not work yet, but it would be excellent it if would
 // idea: when detecting a cycle, test if it's with properties
 // if yes
@@ -32,15 +34,7 @@ import gui.widgets.Label
 
 _main_
 Component root {
-  //_DEBUG_GRAPH_CYCLE_DETECT = 1
-
-  Frame f ("my frame", 0, 0, 300, 300)
-  Exit ex (0, 1)
-  f.close -> ex
-  f.background_color.r = 200
-  f.background_color.g = 200
-  f.background_color.b = 200
-  // conversion model (bidi)
+  _DEBUG_GRAPH_CYCLE_DETECT = 1
 
   Double fahrenheit (0)
   Double celsius (0)
@@ -48,21 +42,12 @@ Component root {
   (5./9.) * (fahrenheit-32) => celsius
   (9./5.) * celsius + 32 => fahrenheit
 
-  // GUI
-  WidgetContainer wc (f) {
-    VBox hbox (0)
-    Label l (wc, "farenheit:", 0, 0)
-    Slider sf (wc, 0, 0)
-    "farenheit: " + sf.value =:> l.text
-    //bidi
-    fahrenheit => sf.value
-    sf.value => fahrenheit
-    Label l2 (wc, "celsius:", 0, 0)
-    Slider sc (wc, 0, 0)
-    "celsius: " + sc.value =:> l2.text
-    //bidi
-    celsius => sc.value
-    sc.value => celsius
-    addChildrenTo hbox.items {l, sf, l2, sc}
-  }
+  HMI hmi()
+  p aka hmi.wc.vbox
+
+  fahrenheit => p.sf.value
+  p.sf.value => fahrenheit
+  
+  celsius => p.sc.value
+  p.sc.value => celsius
 }

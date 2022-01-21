@@ -12,7 +12,7 @@
 #
 
 #objs_cookbook_app := Button.o bindings.o
-objs_cookbook_app := bidi.o
+objs_cookbook_app := HMI.o bidi.o
 
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

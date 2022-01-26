@@ -51,6 +51,7 @@ init_ros ()
 _main_
 Component root {
   init_ros ()
+
   Frame f ("my frame", 500, 500, 500, 500)
   Exit ex (0, 1)
   f.close -> ex

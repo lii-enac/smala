@@ -96,10 +96,10 @@ Component root
     f.close -> ex
     //mouseTracking = 1
 
-    //FillColor _(255,255,0)
-    //Rectangle _(0,0,10,10)
-
-    //Scaling _(0.1,0.1,0,0)
+    Scaling _(0.5,0.5,0,0) // Retina :-/
     DataImage im(0,0,0,0)
     NativeAsyncAction na(cpp_action, root, 0)
+
+    FillColor _(255,0,0)
+    Circle _(100,100,50)
 }

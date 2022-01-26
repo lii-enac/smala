@@ -1,3 +1,22 @@
+/*
+ *  djnn Smala compiler
+ *
+ *  The copyright holders for the contents of this file are:
+ *    Ecole Nationale de l'Aviation Civile, France (2020)
+ *  See file "license.terms" for the rights and conditions
+ *  defined by copyright holders.
+ *
+ *
+ *  Contributors:
+ *    Stéphane Conversy <stephane.conversy@enac.fr>
+ *
+ */
+
+// video capture demonstration with opencv
+// on macos: brew install opencv@3
+//      or libavdevice?: see https://github.com/leixiaohua1020/simplest_ffmpeg_device/blob/master/simplest_ffmpeg_readcamera/simplest_ffmpeg_readcamera.cpp
+
+
 use core
 use base
 use display
@@ -8,18 +27,13 @@ _native_code_
 #include "exec_env/global_mutex.h"
 #include "core/execution/graph.h"
 
-//  brew install opencv@3
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
-//#include <opencv2/highgui.hpp>
-
-#include <unistd.h> // sleep
 
 #include <iostream>
 using namespace std;
 using namespace cv;
-// or ibavdevice: see https://github.com/leixiaohua1020/simplest_ffmpeg_device/blob/master/simplest_ffmpeg_readcamera/simplest_ffmpeg_readcamera.cpp
 
 void
 cpp_action(Process *p)
@@ -81,7 +95,6 @@ cpp_action(Process *p)
         update->activate();
         GRAPH_EXEC;
         release_exclusive_access(DBG_REL);
-        
     }
     
 }

@@ -9,6 +9,6 @@
 #  	Contributors:
 #  		Stephane Conversy <stephane.conversy@enac.fr>
 
-objs_cookbook_app := TextLineEdit.o main.o
+objs_cookbook_app := RosPublisher.o RosSubscriber.o TextLineEdit.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core comms
 smala_libs_cookbook_app := smala

@@ -4,7 +4,7 @@ use base
 _native_code_
 %{
 
-#if 0
+#if 1
 
 #include <chrono>
 #include <functional>
@@ -50,9 +50,15 @@ class MinimalPublisher : public rclcpp::Node
 static void
 init_publisher ()
 {
-//rclcpp::init(argc, argv);
+  rclcpp::init(0,0); //argc, argv);
 }
 
+static void
+ros_async (Process* c)
+{
+  rclcpp::spin(std::make_shared<MinimalPublisher>());
+  rclcpp::shutdown();
+}
 
 
 %}
@@ -60,6 +66,7 @@ init_publisher ()
 _define_
 RosPublisher ()
 {
- init_publisher ()
+ //init_publisher ()
+ NativeAsyncAction na(ros_async, this, 0)
  String msg ("")
 }

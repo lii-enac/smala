@@ -37,8 +37,20 @@ import RosSubscriber
 //   return 0;
 // }
 
+_native_code_
+%{
+#include "rclcpp/rclcpp.hpp"
+
+static void
+init_ros ()
+{
+  rclcpp::init(0,0); //argc, argv);
+}
+%}
+
 _main_
 Component root {
+  init_ros ()
   Frame f ("my frame", 500, 500, 500, 500)
   Exit ex (0, 1)
   f.close -> ex

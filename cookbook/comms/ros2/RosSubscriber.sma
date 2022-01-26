@@ -4,7 +4,7 @@ use base
 _native_code_
 %{
 
-#if 0
+#if 1
 
 #include <chrono>
 #include <functional>
@@ -43,14 +43,23 @@ class MinimalSubscriber : public rclcpp::Node
 
 static void init_subscriber ()
 {
-    // rclcpp::init(argc, argv);
+    //rclcpp::init(argc, argv);
 }
+
+static void
+ros_async (Process* c)
+{
+  rclcpp::spin(std::make_shared<MinimalSubscriber>());
+  rclcpp::shutdown();
+}
+
 %}
 
 
 _define_
 RosSubscriber ()
 {
-    init_subscriber ()
+    //init_subscriber ()
+    NativeAsyncAction na(ros_async, this, 0)
     String msg ("")
 }

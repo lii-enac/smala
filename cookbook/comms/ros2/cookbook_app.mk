@@ -12,8 +12,8 @@
 objs_cookbook_app := RosPublisher.o RosSubscriber.o TextLineEdit.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core comms
 smala_libs_cookbook_app := smala
-cflags_cookbook_app += -I/opt/ros/foxy/include
-# libs_cookbook_app += -L/opt/ros/foxy/lib -lrclcpp -lrcpputils -lrcl -lrcutils \
+cflags_cookbook_app += -I/opt/ros/galactic/include
+# libs_cookbook_app += -L/opt/ros/galactic/lib -lrclcpp -lrcpputils -lrcl -lrcutils \
 # 	-lrmw -lrmw_implementation -lrcl_yaml_param_parser \
 # 	-llibstatistics_collector -lrosgraph_msgs__rosidl_typesupport_cpp \
 # 	-lstatistics_msgs__rosidl_typesupport_cpp \
@@ -32,11 +32,14 @@ cflags_cookbook_app += -I/opt/ros/foxy/include
 # 	-laction_msgs__rosidl_typesupport_cpp \
 
 ifeq ($(os),Linux)
-ros_libs_install_path ?= /opt/ros/foxy/lib
+ros_libs_install_path ?= /opt/ros/galactic/lib
 ros_libs := $(shell ls $(ros_libs_install_path)/lib*.so | xargs echo)
+ros_libs := $(filter-out $(ros_libs_install_path)/librmw_cyclonedds_cpp.so, $(ros_libs))
 ros_libs := $(patsubst $(ros_libs_install_path)/lib%.so,-l%,$(ros_libs))
+
+
 endif
 
-libs_cookbook_app += -L/opt/ros/foxy/lib $(ros_libs)
+libs_cookbook_app += -L/opt/ros/galactic/lib $(ros_libs)
 
-other_runtime_lib_path := /opt/ros/foxy/lib
+other_runtime_lib_path := /opt/ros/galactic/lib

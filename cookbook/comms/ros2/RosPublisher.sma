@@ -1,3 +1,4 @@
+
 use core
 use base
 
@@ -21,55 +22,84 @@ using std::placeholders::_1;
 #include "core/execution/graph.h"
 
 
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
+#include "core/ontology/process.h"
+#include "core/ontology/coupling.h"
+#include "core/control/action.h"
+#include "core/tree/spike.h"
+#include "core/tree/double_property.h"
+#include "core/tree/text_property.h"
+#include "exec_env/external_source.h"
 
-class MinimalPublisher : public rclcpp::Node
-{
-  public:
-    MinimalPublisher(djnn::Process *c)
-    : Node("minimal_publisher"), count_(0), c_(c)
+using namespace djnn;
+
+class MyRosPublisher : public FatProcess, public ExternalSource
+  {
+  private:
+
+    /* SEND ACTION */
+    class SendMsgAction : public Action
     {
-      publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-      timer_ = this->create_wall_timer(
-      500ms, std::bind(&MinimalPublisher::timer_callback, this));
+    public:
+      SendMsgAction (ParentProcess* parent, const string& name) :
+        Action (parent, name) {};
+    
+      virtual ~SendMsgAction () {}
+      void impl_activate () override { ((MyRosPublisher*)get_parent())->send_msg (); }
+    };
+  public:
+    MyRosPublisher (ParentProcess* parent, const string& n) :
+      FatProcess (n),
+      ExternalSource (n),
+      _msg (this, "message", ""),
+      _action (this, "send"),
+      _c_msg (&_msg, ACTIVATION, &_action, ACTIVATION)
+
+    {
+      _node = std::make_shared<rclcpp::Node>("MinimalPublisher");
+      publisher_ =_node->create_publisher<std_msgs::msg::String>("topic", 10);
+      finalize_construction (parent, n);
+    }
+    ~MyRosPublisher() {}
+
+    void impl_activate () override {
+      _c_msg.enable ();
+      ExternalSource::start ();  
+    }
+    void impl_deactivate () override {
+      _c_msg.disable ();
+      ExternalSource::please_stop ();
     }
 
-  private:
-    void timer_callback()
-    {
+    void run () override {
+      rclcpp::spin(_node);
+      rclcpp::shutdown();
+    }
+  
+    void send_msg () {
       auto message = std_msgs::msg::String();
-      get_exclusive_access(DBG_GET);
-      auto * t = dynamic_cast<djnn::TextProperty*>(c_->get_parent()->find_child("msg"));
-      const string edit_box_string = t->get_value ();
-      GRAPH_EXEC;
-      release_exclusive_access(DBG_REL);
-      message.data = "Hello, world! " + edit_box_string + " " + std::to_string(count_++);
-      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+      message.data = "Sending msg: " + _msg.get_value ();
+      RCLCPP_INFO(_node->get_logger(), "Publishing: '%s'", message.data.c_str());
       publisher_->publish(message);
     }
-    rclcpp::TimerBase::SharedPtr timer_;
+
+    void serialize (const string& format) override{}
+
+  private:
+    TextProperty _msg;
+    SendMsgAction _action;
+    Coupling _c_msg;
+    rclcpp::Node::SharedPtr _node;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-    size_t count_;
-    djnn::Process *c_;
-};
+  };
+
 
 #endif
-
-static void
-ros_async (Process* c)
-{
-  rclcpp::spin(std::make_shared<MinimalPublisher>(c));
-  rclcpp::shutdown();
-}
-
 
 %}
 
 _define_
 RosPublisher ()
 {
- //init_publisher ()
- NativeAsyncAction na(ros_async, this, 0)
- String msg ("")
+ MyRosPublisher ros_pub
+ msg aka ros_pub.message
 }

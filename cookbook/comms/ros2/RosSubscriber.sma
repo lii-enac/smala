@@ -40,6 +40,7 @@ class MinimalSubscriber : public rclcpp::Node
       get_exclusive_access(DBG_GET);
       auto * t = dynamic_cast<djnn::TextProperty*>(c_->get_parent()->find_child("msg"));
       t->set_value (msg->data.c_str(), true);
+      GRAPH_EXE;
       release_exclusive_access(DBG_REL);
     }
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;

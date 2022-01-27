@@ -31,8 +31,12 @@ cflags_cookbook_app += -I/opt/ros/foxy/include
 # 	-laction_msgs__rosidl_typesupport_c \
 # 	-laction_msgs__rosidl_typesupport_cpp \
 
-ros_libs := $(shell ls /opt/ros/foxy/lib/lib*.so | xargs echo)
-ros_libs := $(patsubst /opt/ros/foxy/lib/lib%.so,-l%,$(ros_libs))
+ifeq ($(os),Linux)
+ros_libs_install_path ?= /opt/ros/foxy/lib
+ros_libs := $(shell ls $(ros_libs_install_path)/lib*.so | xargs echo)
+ros_libs := $(patsubst $(ros_libs_install_path)/lib%.so,-l%,$(ros_libs))
+endif
+
 libs_cookbook_app += -L/opt/ros/foxy/lib $(ros_libs)
 
 other_runtime_lib_path := /opt/ros/foxy/lib

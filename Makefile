@@ -550,6 +550,7 @@ disable_cookbook_apps ?= \
 	extra/crazyflie_drone_app \
 	comms/swim \
 	comms/midi \
+	comme/ros2 \
 	gui/physics
 
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))

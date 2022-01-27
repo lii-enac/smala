@@ -45,10 +45,10 @@ cpp_action(Process *p)
     // cap.open(0);
     
     // OR advance usage: select any API backend
-    int deviceID = 0;             // 0 = open default camera
-    int apiID = cv::CAP_ANY;      // 0 = autodetect default API
-    // open selected camera using selected API
-    cap.open(deviceID, apiID);
+    // int deviceID = 0;             // 0 = open default camera
+    // int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+    // // open selected camera using selected API
+    // cap.open(deviceID, apiID);
     
     // OR remote stream
     string url =
@@ -57,6 +57,7 @@ cpp_action(Process *p)
         //"rtsp://admin:123456@192.168.1.216/H264?ch=1&subtype=0"
     ;
     cap.open(url);
+
     // check if we succeeded
     if (!cap.isOpened()) {
         cerr << "ERROR! Unable to open camera\n";

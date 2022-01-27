@@ -39,15 +39,24 @@ void
 cpp_action(Process *p)
 {
     //cerr << "initing opencv" << endl<<flush;
-    Mat frame;
     VideoCapture cap;
+    
     // open the default camera using default API
     // cap.open(0);
+    
     // OR advance usage: select any API backend
     int deviceID = 0;             // 0 = open default camera
     int apiID = cv::CAP_ANY;      // 0 = autodetect default API
     // open selected camera using selected API
     cap.open(deviceID, apiID);
+    
+    // OR remote stream
+    string url =
+        "rtsp://rtsp.stream/pattern"
+        //"rtsp://rtsp.stream/movie"
+        //"rtsp://admin:123456@192.168.1.216/H264?ch=1&subtype=0"
+    ;
+    cap.open(url);
     // check if we succeeded
     if (!cap.isOpened()) {
         cerr << "ERROR! Unable to open camera\n";
@@ -79,6 +88,7 @@ cpp_action(Process *p)
 
     //--- GRAB AND WRITE LOOP
     //cout << "Start grabbing" << endl;
+    Mat frame;
     for (;;)
     {
         // wait for a new frame from camera and store it into 'frame'
@@ -88,6 +98,8 @@ cpp_action(Process *p)
             cerr << "ERROR! blank frame grabbed\n";
             break;
         }
+
+        //std::cerr << frame.rows << " " << frame.cols << std::endl;
         
         get_exclusive_access(DBG_GET);        
         frame_data.assign((const char*)frame.ptr(), w*h*3);

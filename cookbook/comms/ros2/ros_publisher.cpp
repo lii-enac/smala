@@ -2,15 +2,15 @@
 
 using namespace djnn;
 
-MyRosPublisher::MyRosPublisher (ParentProcess* parent, const string& n) :
+MyRosPublisher::MyRosPublisher (ParentProcess* parent, const string& n, const string& topic_name) :
   FatProcess (n),
   ExternalSource (n),
   _msg (this, "message", ""),
   _action (this, "send"),
   _c_msg (&_msg, ACTIVATION, &_action, ACTIVATION)
 {
-  _node = std::make_shared<rclcpp::Node>("MinimalPublisher");
-  publisher_ =_node->create_publisher<std_msgs::msg::String>("topic", 10);
+  _node = std::make_shared<rclcpp::Node>(n);
+  publisher_ =_node->create_publisher<std_msgs::msg::String>(topic_name, 10);
   finalize_construction (parent, n);
 }
 
@@ -31,7 +31,7 @@ MyRosPublisher::impl_deactivate ()
 void 
 MyRosPublisher::send_msg () {
   auto message = std_msgs::msg::String();
-  message.data = "Sending msg: " + _msg.get_value ();
+  message.data = _msg.get_value ();
   RCLCPP_INFO(_node->get_logger(), "Publishing: '%s'", message.data.c_str());
   publisher_->publish(message);
 }

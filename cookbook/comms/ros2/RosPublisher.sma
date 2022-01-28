@@ -7,6 +7,6 @@ import ros_publisher
 _define_
 RosPublisher ()
 {
- MyRosPublisher ros_pub
+ MyRosPublisher ros_pub ("topic")
  msg aka ros_pub.message
 }

@@ -29,7 +29,7 @@ class MyRosPublisher : public FatProcess, public ExternalSource
       void impl_activate () override { ((MyRosPublisher*)get_parent())->send_msg (); }
     };
   public:
-    MyRosPublisher (ParentProcess* parent, const string& n);
+    MyRosPublisher (ParentProcess* parent, const string& n, const string& topic_name);
     ~MyRosPublisher() {}
 
     void impl_activate () override;

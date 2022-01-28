@@ -551,7 +551,8 @@ disable_cookbook_apps ?= \
 	comms/swim \
 	comms/midi \
 	comms/ros2 \
-	gui/physics
+	gui/physics \
+	gui/graphics/video
 
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))
 

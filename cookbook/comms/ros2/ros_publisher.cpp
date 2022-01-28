@@ -1,5 +1,3 @@
-#if 1
-
 #include "ros_publisher.h"
 
 using namespace djnn;
@@ -43,5 +41,3 @@ MyRosPublisher::run () {
   rclcpp::spin(_node);
   rclcpp::shutdown();
 }
-
-#endif

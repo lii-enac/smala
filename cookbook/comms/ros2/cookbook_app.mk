@@ -12,7 +12,7 @@
 objs_cookbook_app := ros_publisher.o RosPublisher.o RosSubscriber.o TextLineEdit.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core comms
 smala_libs_cookbook_app := smala
-cflags_cookbook_app += -I/opt/ros/galactic/include
+cflags_cookbook_app += -I/opt/ros/galactic/include -I./cookbook/comms/ros2
 # libs_cookbook_app += -L/opt/ros/galactic/lib -lrclcpp -lrcpputils -lrcl -lrcutils \
 # 	-lrmw -lrmw_implementation -lrcl_yaml_param_parser \
 # 	-llibstatistics_collector -lrosgraph_msgs__rosidl_typesupport_cpp \

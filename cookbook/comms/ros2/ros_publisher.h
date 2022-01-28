@@ -1,12 +1,9 @@
-#if 1
-
 #include <functional>
 #include <memory>
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-
 
 
 #include "core/ontology/process.h"
@@ -42,8 +39,6 @@ class MyRosPublisher : public FatProcess, public ExternalSource
   
     void send_msg ();
 
-    void serialize (const string& format) override {}
-
   private:
     TextProperty _msg;
     SendMsgAction _action;
@@ -51,5 +46,3 @@ class MyRosPublisher : public FatProcess, public ExternalSource
     rclcpp::Node::SharedPtr _node;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   };
-
-#endif

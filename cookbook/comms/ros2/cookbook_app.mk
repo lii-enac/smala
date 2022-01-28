@@ -37,9 +37,12 @@ ros_libs := $(shell ls $(ros_libs_install_path)/lib*.so | xargs echo)
 ros_libs := $(filter-out $(ros_libs_install_path)/librmw_cyclonedds_cpp.so, $(ros_libs))
 ros_libs := $(patsubst $(ros_libs_install_path)/lib%.so,-l%,$(ros_libs))
 
-
-endif
+# @Mathieu Magnaudet ou Poirier: to test:
+# rlcpp_lib_deps := $(shell ldd $(ros_libs_install_path)/librlcpp.so | awk '{print $1}' | xargs echo | sed -e 's/.so.*//' | sed -e 's:/lib.*::'| sed -e 's/lib/-l/' | xargs echo)
+# ros_libs := $(rlcpp_lib_deps)
+# ros_libs := $(filter -l%,$(ros_libs))
 
 libs_cookbook_app += -L/opt/ros/galactic/lib $(ros_libs)
-
 other_runtime_lib_path := /opt/ros/galactic/lib
+
+endif

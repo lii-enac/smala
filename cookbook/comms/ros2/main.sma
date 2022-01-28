@@ -18,24 +18,8 @@ use display
 use gui
 
 import TextLineEdit
-import RosPublisher
-import RosSubscriber
-
-// int main(int argc, char * argv[])
-// {
-//   rclcpp::init(argc, argv);
-//   rclcpp::spin(std::make_shared<MinimalPublisher>());
-//   rclcpp::shutdown();
-//   return 0;
-// }
-
-// int main(int argc, char * argv[])
-// {
-//   rclcpp::init(argc, argv);
-//   rclcpp::spin(std::make_shared<MinimalSubscriber>());
-//   rclcpp::shutdown();
-//   return 0;
-// }
+import ros_subscriber
+import ros_publisher
 
 _native_code_
 %{
@@ -67,8 +51,8 @@ Component root {
   FontSize _ (4, 20)
   Text t (100, 200, "")
   
-  RosPublisher pub
-  tle.validated_text =:> pub.msg
-  RosSubscriber sub
-  sub.msg =:> t.text
+  RosSubscriber sub ("topic")
+  RosPublisher  ros_pub ("topic")
+  tle.validated_text =:> ros_pub.message
+  sub.message =:> t.text
   }

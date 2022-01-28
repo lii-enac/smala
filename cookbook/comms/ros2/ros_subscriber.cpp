@@ -8,7 +8,7 @@ using std::placeholders::_1;
 
 using namespace djnn;
 
-MyRosSubscriber::MyRosSubscriber (ParentProcess* parent, const string& n, const string& topic_name) :
+RosSubscriber::RosSubscriber (ParentProcess* parent, const string& n, const string& topic_name) :
   FatProcess (n),
   ExternalSource (n),
   _topic_name (topic_name),
@@ -20,15 +20,15 @@ MyRosSubscriber::MyRosSubscriber (ParentProcess* parent, const string& n, const 
 }
 
 void
-MyRosSubscriber::impl_activate ()
+RosSubscriber::impl_activate ()
 {
   subscription_ =_node->create_subscription<std_msgs::msg::String>(
-      _topic_name, 10, std::bind(&MyRosSubscriber::receive_msg, this, _1));
+      _topic_name, 10, std::bind(&RosSubscriber::receive_msg, this, _1));
   ExternalSource::start ();  
 }
 
 void
-MyRosSubscriber::impl_deactivate ()
+RosSubscriber::impl_deactivate ()
 {
   // Here we should disable the subcription but it 
   // seems there is no way to do it properly
@@ -39,7 +39,7 @@ MyRosSubscriber::impl_deactivate ()
 }
 
 void 
-MyRosSubscriber::receive_msg (const std_msgs::msg::String::SharedPtr msg) {
+RosSubscriber::receive_msg (const std_msgs::msg::String::SharedPtr msg) {
   RCLCPP_INFO(_node->get_logger(), "I heard: '%s'", msg->data.c_str());
   get_exclusive_access(DBG_GET);
   _msg.set_value (msg->data.c_str(), true);
@@ -48,7 +48,7 @@ MyRosSubscriber::receive_msg (const std_msgs::msg::String::SharedPtr msg) {
 }
 
 void
-MyRosSubscriber::run () {
+RosSubscriber::run () {
   rclcpp::spin(_node);
   rclcpp::shutdown();
 }

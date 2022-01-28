@@ -2,7 +2,7 @@
 
 using namespace djnn;
 
-MyRosPublisher::MyRosPublisher (ParentProcess* parent, const string& n, const string& topic_name) :
+RosPublisher::RosPublisher (ParentProcess* parent, const string& n, const string& topic_name) :
   FatProcess (n),
   ExternalSource (n),
   _msg (this, "message", ""),
@@ -15,21 +15,21 @@ MyRosPublisher::MyRosPublisher (ParentProcess* parent, const string& n, const st
 }
 
 void
-MyRosPublisher::impl_activate ()
+RosPublisher::impl_activate ()
 {
   _c_msg.enable ();
   ExternalSource::start ();  
 }
 
 void
-MyRosPublisher::impl_deactivate ()
+RosPublisher::impl_deactivate ()
 {
   _c_msg.disable ();
   ExternalSource::please_stop ();
 }
 
 void 
-MyRosPublisher::send_msg () {
+RosPublisher::send_msg () {
   auto message = std_msgs::msg::String();
   message.data = _msg.get_value ();
   RCLCPP_INFO(_node->get_logger(), "Publishing: '%s'", message.data.c_str());
@@ -37,7 +37,7 @@ MyRosPublisher::send_msg () {
 }
 
 void
-MyRosPublisher::run () {
+RosPublisher::run () {
   rclcpp::spin(_node);
   rclcpp::shutdown();
 }

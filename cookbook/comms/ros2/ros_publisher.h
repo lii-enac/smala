@@ -14,7 +14,7 @@
 
 using namespace djnn;
 
-class MyRosPublisher : public FatProcess, public ExternalSource
+class RosPublisher : public FatProcess, public ExternalSource
   {
   private:
 
@@ -26,11 +26,11 @@ class MyRosPublisher : public FatProcess, public ExternalSource
         Action (parent, name) {};
     
       virtual ~SendMsgAction () {}
-      void impl_activate () override { ((MyRosPublisher*)get_parent())->send_msg (); }
+      void impl_activate () override { ((RosPublisher*)get_parent())->send_msg (); }
     };
   public:
-    MyRosPublisher (ParentProcess* parent, const string& n, const string& topic_name);
-    ~MyRosPublisher() {}
+    RosPublisher (ParentProcess* parent, const string& n, const string& topic_name);
+    ~RosPublisher() {}
 
     void impl_activate () override;
     void impl_deactivate () override;

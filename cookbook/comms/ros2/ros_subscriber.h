@@ -14,11 +14,11 @@
 
 using namespace djnn;
 
-class MyRosSubscriber : public FatProcess, public ExternalSource
+class RosSubscriber : public FatProcess, public ExternalSource
   {
   public:
-    MyRosSubscriber (ParentProcess* parent, const string& n, const string& topic_name);
-    ~MyRosSubscriber() {}
+    RosSubscriber (ParentProcess* parent, const string& n, const string& topic_name);
+    ~RosSubscriber() {}
 
     void impl_activate () override;
     void impl_deactivate () override;

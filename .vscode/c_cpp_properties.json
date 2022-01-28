@@ -8,6 +8,7 @@
                 "${workspaceFolder}/../djnn-cpp/src",
                 "${workspaceFolder}/cookbook/comms/ros2",
                 "/usr/local/include",
+                "/opt/ros/galactic/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/**"
             ],
             "defines": [],

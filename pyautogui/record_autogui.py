@@ -91,12 +91,12 @@ def main(argv):
     try:
       opts, args = getopt.getopt(argv,"hi:dr",["itest=", "debug", "retina"])
     except getopt.GetoptError:
-      print ('replay_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
+      print ('record_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
       sys.exit(2)
     for opt, arg in opts:
         print ("opt: ", opt, "arg:", arg)
         if opt == '-h':
-          print ('replay_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
+          print ('record_autogui.py -i|-itest <test_name> -d|--debug -r|--retina')
           sys.exit()
         elif opt in ("-i", "--itest"):
           _app_name = arg

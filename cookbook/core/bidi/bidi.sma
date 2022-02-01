@@ -33,7 +33,7 @@ import HMI
 
 _main_
 Component root {
-  //_DEBUG_GRAPH_CYCLE_DETECT = 1
+  _AUTHORIZE_CYCLE = 1
 
   // first bidi: fahrenheit <=> celsius model
   Double fahrenheit (0)

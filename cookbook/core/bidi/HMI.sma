@@ -37,9 +37,9 @@ HMI ()
     WidgetContainer wc (f) {
         VBox vbox (0)
 
-        Label l (wc, "farenheit:", 0, 0)
+        Label l (wc, "fahrenheit:", 0, 0)
         Slider sf (wc, 0, 0)
-        "farenheit: " + sf.value =:> l.text
+        "fahrenheit: " + sf.value =:> l.text
         
         Label l2 (wc, "celsius:", 0, 0)
         Slider sc (wc, 0, 0)

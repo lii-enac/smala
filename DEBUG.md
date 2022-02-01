@@ -10,7 +10,7 @@ You can use several option to debug on smala :
  
 ## detect cycle in graph and display informations
 
-  _DEBUG_GRAPH_CYCLE_DETECT = 0|1;
+  _DEBUG_GRAPH_CYCLE_DETECT = 0|1
 
 ## Activation Sequence 
   - display order in which component are activated and deactivated by GRAPH_EXEC
@@ -34,6 +34,10 @@ Component root {
   ...
 }
 
+## experimental mode with cycle 
+  - explicitly accept cycles in graph without displaying information
+
+  _AUTHORIZE_CYCLE = 0|1
 
 ## others tools :
 	- *dump* XXXX : will dump the an ASCII tree from XXXX in the Terminal.

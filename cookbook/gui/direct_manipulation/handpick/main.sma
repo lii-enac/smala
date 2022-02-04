@@ -59,6 +59,7 @@ Component root
   Exit ex (0, 1)
   f.close->ex
   
+  // the polygon to test "insideness"
   Component p {
     FillColor fc(0,255,0)
     Translation _(-500, 0)
@@ -76,18 +77,21 @@ Component root
     }
 
     Spike dummy
-    p.press -> dummy // make p pickable
+    p.press -> dummy // make p pickable, to make it appear in the picking view
   }
 
+  // the shape that will be inside the polygon
   FillColor _(255,0,0)
   Circle c(100,100,10)
 
+  // stuff to trigger picking and reaction to picking
   Spike inside
   Spike outside
   NativeAction na(pick, root, 1)
   c.cx -> na
   c.cy -> na
 
+  // reaction to picking
   FSM fsm {
     State out {
       0 =: p.fc.r
@@ -99,12 +103,11 @@ Component root
     in->out(outside)
   }
 
+  // animate the circle above the polygon
   Incr i(1)
   10 =: i.delta
   Clock cl(100)
   cl.tick -> i
   i.state =:> c.cx
-
-  
 
 }

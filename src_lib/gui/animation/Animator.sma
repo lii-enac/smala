@@ -24,7 +24,7 @@ Animator (int _duration, double _min, double _max, int func, int loop, int start
   } else {
     inc.state >= 1 -> end
   }
-  gen.output * (max - min) + min =:> output
+  
  
   FSM fsm {
     State stopped
@@ -33,7 +33,8 @@ Animator (int _duration, double _min, double _max, int func, int loop, int start
       Int num_step (0)
       duration/cl.period =:> num_step
       1 / num_step =:> inc.delta
-      cl.tick->inc      
+      cl.tick->inc
+      gen.output * (max - min) + min =:> output
     }
     State paused
     started->stopped (end)

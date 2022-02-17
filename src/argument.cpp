@@ -46,6 +46,9 @@ namespace Smala
               exit (0);
           }
           i++;
+      } else if (str.compare ("-builddir")==0) {
+        if (i<argc)
+          m_options["builddir"] = argv[i+1];
       }
     }
     if (m_filenames.empty ()) {

@@ -36,7 +36,7 @@ public:
 	bool debug () { return _debug; }
 	bool build_html () { return _build_html; };
 	const std::string& get_target () const { return m_target_name; }
-  std::string get_option (const std::string& key);
+  	std::string get_option (const std::string& key);
 	void usage ();
 
 private:

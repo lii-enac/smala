@@ -70,10 +70,25 @@ namespace Smala
     m_parent_list.clear ();
     m_parent_list.push_back (new BuildNode (m_null_symbol)); // the first parent is null
 
-    if (!ast.is_main ())
-      build_define (prefix);
+    std::string sep="";
+    if (!builddir.empty()) {
+      if (builddir[builddir.size()-1] != '/')
+        sep = "/";
+    }
 
-    m_filename = prefix + ".cpp";
+    if (!ast.is_main ()) {
+      std::string header_path;
+      if (!builddir.empty())
+        header_path = builddir + sep + prefix;
+      else
+        header_path = prefix;
+      build_define (header_path); // FIXME should open a temporary file for header .h
+    }
+
+    if (!builddir.empty())
+        m_filename = builddir + sep + prefix + ".cpp";
+    else
+        m_filename = prefix + ".cpp";;
     //std::ofstream os (prefix + ".cpp");
 
     // create a temporary output file that will be copied into the final output file

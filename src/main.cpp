@@ -76,7 +76,7 @@ int main (int argc, const char **argv) {
 	}
 	if (!error) {
 	  if (arg.lang () == JS && arg.build_html()) {
-      build_html (arg.get_target(), arg.files ());
+      	build_html (arg.get_target(), arg.files ());
 	  }
 	}
 	return error;

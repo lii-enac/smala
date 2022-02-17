@@ -580,6 +580,14 @@ $(app_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF) $(CXX
 
 
 # ---------------------------------------
+# stand alone
+
+stand_alone_dir ?= ../stand_alone
+stand_alone:
+	mkdir $(stand_alone_dir)
+	cp -r cookbook/stand_alone/* $(stand_alone_dir)
+
+# ---------------------------------------
 # rules
 
 # .sma to .js
@@ -600,6 +608,12 @@ $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+
+# .sma to .cpp, .c etc
+# $(build_dir)/%.cpp $(build_dir)/%.h: %.sma
+# 	@mkdir -p $(dir $@)
+# 	@echo smalac -cpp $^ -builddir $(dir $@)
+# 	@$(smalac) -cpp $^ -builddir $(dir $@)
 
 # from .c user sources
 $(build_dir)/%.o: %.c

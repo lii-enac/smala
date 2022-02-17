@@ -47,6 +47,15 @@ uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
 rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 rwildcardmul = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
 
+# A literal space.
+space :=
+space +=
+
+# Joins elements of the list in arg 2 with the given separator.
+#   1. Element separator.
+#   2. The list.
+join-with = $(subst $(space),$1,$(strip $2))
+
 # ---------------------------------------
 # os
 
@@ -523,9 +532,9 @@ $$(notdir $1)_objs: $$($1_app_objs)
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$($1_other_runtime_lib_path)" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$($1_other_runtime_lib_path)" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
 	rm -f $$($1_app_exe) $$($1_app_objs) $$($1_app_gensrcs)
@@ -550,7 +559,6 @@ disable_cookbook_apps ?= \
 	extra/crazyflie_drone_app \
 	comms/swim \
 	comms/midi \
-	comms/ros2 \
 	gui/physics \
 	gui/graphics/video
 

@@ -17,6 +17,6 @@ cp editor_modes/sublime/smala.tmPreferences ~/.config/sublime-text-3/Packages/Us
 cp editor_modes/sublime/Make-color.sublime-build ~/.config/sublime-text-3/Packages/User/
 
 Windows:
-cp editor_modes/sublime/smala.sublime-syntax C:\Users\<USER NAME>\AppData\Roaming\Sublime Text 3\Packages\User\
-cp editor_modes/sublime/smala.tmPreferences C:\Users\<USER NAME>\AppData\Roaming\Sublime Text 3\Packages\User\
-cp editor_modes/sublime/Make-color.sublime-build C:\Users\<USER NAME>\AppData\Roaming\Sublime Text 3\Packages\User\
+cp editor_modes/sublime/smala.sublime-syntax C:\Users\$USERPROFILE\AppData\Roaming\Sublime Text 3\Packages\User\
+cp editor_modes/sublime/smala.tmPreferences C:\Users\$USERPROFILE\AppData\Roaming\Sublime Text 3\Packages\User\
+cp editor_modes/sublime/Make-color.sublime-build C:\Users\$USERPROFILE\AppData\Roaming\Sublime Text 3\Packages\User\

@@ -13,6 +13,11 @@ ifeq ($(os),MinGW)
 pkgcmd := pacman -Suy --needed
 endif
 
+# external libraries
+CXXFLAGS += $(shell pkg-config --cflags $(pkdeps))
+# LDFLAGS +=
+LIBS += $(shell pkg-config --libs $(pkgdeps))
+
 install-pkgdeps:
 	$(pkgcmd) $(pkgdeps)
 .PHONY: install-pkgdeps

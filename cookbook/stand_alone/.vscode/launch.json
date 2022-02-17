@@ -1,0 +1,51 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
+    //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
+    //"program": "${workspaceFolder}/build/cookbook/comms/midi/midi_app",
+    //"program": "${workspaceFolder}/build/cookbook/core/nativeactions/nativeactions_app",
+    //"program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
+
+    "version": "0.2.0",
+    "configurations": [
+
+    {
+        "name": "(lldb) smala - cookbook",
+        //"type": "cppdbg",
+        "type": "lldb",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/button",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "app",
+        "externalConsole": false,
+        //"MIMode": "lldb",
+        //"miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb",
+        "linux": {
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        "osx": {
+            "MIMode": "lldb",
+            "miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb"
+        },
+        "windows": {
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+        },
+        "environment": [
+            {
+            "name": "DYLD_LIBRARY_PATH",
+            "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/build/lib:${workspaceFolder}/../djnn-cpp/build/lib"
+            },
+            {
+                "name": "GALLIUM_DRIVER",
+                "value": "llvmpipe"
+            }
+            ]
+    },
+    ]
+}

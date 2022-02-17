@@ -43,7 +43,13 @@ Component root {
 
   NativeAction na (myFunc, 1)
 
-
   Button b (f, "myButton", 10, 100)
   b.click -> na
+
+  // loading a resource
+  string path = "res/simple.svg"
+  svg = loadFromXML (path)
+  //dump svg
+  Translation _(200,0)
+  t << svg
 }

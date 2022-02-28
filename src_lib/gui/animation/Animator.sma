@@ -29,7 +29,7 @@ Animator (int _duration, double _min, double _max, int func, int loop, int start
   FSM fsm {
     State stopped
     State started {
-      Clock cl (60)
+      Clock cl (20)
       Int num_step (0)
       duration/cl.period =:> num_step
       1 / num_step =:> inc.delta

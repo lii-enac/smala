@@ -1493,6 +1493,23 @@ start_assignment_sequence
       cur_node = node;
       $$ = node;
     }
+  | NAME COLON LCB
+  {
+      add_sym (@$, $1, PROCESS);
+      std::string loc_name ("loc_ass_seq_" + std::to_string(loc_node_num++));
+      Node *node = new Node (@$, SIMPLE, "AssignmentSequence", loc_name);
+      driver.add_node (node);
+
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+
+      node->add_arg (new ExprNode (@$, "1", LITERAL, BOOL));
+
+      node->set_node_type (CONTAINER);
+      node->set_name ($1);
+      parent_list.push_back (node);
+      cur_node = node;
+      $$ = node;   
+  }
 
 assignment_list
   : assignment

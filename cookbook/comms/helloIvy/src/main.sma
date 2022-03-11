@@ -24,7 +24,7 @@ use comms
 
 _main_
 Component root {
-    Frame f ("Hello Ivy", 100, 100, 200, 200)
+    Frame f ("helloIvy", 100, 100, 200, 200)
     Exit ex (0, 1)
     f.close -> ex
 

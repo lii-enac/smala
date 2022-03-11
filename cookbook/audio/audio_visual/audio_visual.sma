@@ -9,7 +9,7 @@ _main_
 Component root
 {
 	// sadly emscripten audio does not work without gui
-	Frame f("simple audio", 0, 0, 400, 400)
+	Frame f("audio visual", 0, 0, 400, 400)
   	Exit ex (0, 1)
   	f.close -> ex
 

@@ -101,11 +101,11 @@ Component root {
     State waiting {
       Timer t (500) // beware, make sure the time is greater than the time it takes to render a frame, otherwise the layer will constantly be damaged
       t.end -> bg.damaged
+      pz.zoom -> t.reset
+      pz.xpan -> t.reset
     }
     idle -> waiting (pz.zoom)
     idle -> waiting (pz.xpan)
-    waiting -> waiting (pz.zoom, waiting.t.reset)
-    waiting -> waiting (pz.xpan, waiting.t.reset)
     waiting -> idle (waiting.t.end)
   }
 

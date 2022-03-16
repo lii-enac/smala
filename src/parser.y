@@ -200,6 +200,7 @@
 %token CONNECTOR "=>"
 %token ASSGNT_CONN "=:>"
 %token PAUSED_CONNECTOR "::>"
+%token LAZY_CONNECTOR "=?>"
 %token ASSIGNMENT "=:"
 %token PAUSED_ASSIGNMENT "::"
 %token LAZY_ASSIGNMENT "=?:"
@@ -1402,7 +1403,7 @@ primary_expression
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2 == 0 ? true:false, false, true, $2 == 2 ? false:true);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==0, $2==3, true, $2==2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (int i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1414,6 +1415,7 @@ connector
 connector_symbol
   : CONNECTOR { lexer_expression_mode_off (); $$ = 1; }
   | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = 0; }
+  | LAZY_CONNECTOR { lexer_expression_mode_off (); $$ = 3; }
   | ASSGNT_CONN { lexer_expression_mode_off (); $$ = 2; }
 
 binding

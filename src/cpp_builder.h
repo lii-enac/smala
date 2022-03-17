@@ -49,7 +49,7 @@ namespace Smala {
     void move (std::ofstream &os, Node *n, const std::string &c) override;
     void add_child (std::ofstream &os, Node *node) override;
     void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) override;
-    void build_end_add_child (std::ofstream &os) override;
+    void build_end_add_child (std::ofstream &os, Node *n) override;
     void add_children_to (std::ofstream &os, Node *node) override;
     void build_control_node (std::ofstream &os, Node *n) override;
     void build_multi_control_node (std::ofstream &os, NativeExpressionNode *node);

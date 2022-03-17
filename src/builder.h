@@ -129,7 +129,7 @@ namespace Smala {
     virtual void remove (std::ofstream &os, Node *n) = 0;
     virtual void move (std::ofstream &os, Node *n, const string& c) {};
     virtual void add_child (std::ofstream &os, Node *n) = 0;
-    virtual void build_end_add_child (std::ofstream &os) = 0;
+    virtual void build_end_add_child (std::ofstream &os, Node* n) = 0;
     virtual void fetch_add_child (std::ofstream &os, const std::string &parent, const std::string &child, const std::string &name) {};
     virtual void add_children_to (std::ofstream &os, Node *n) = 0;
     virtual void build_transition_node (std::ofstream &os, Node *ctrl) = 0;

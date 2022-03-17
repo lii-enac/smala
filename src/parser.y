@@ -259,6 +259,7 @@
 %token MOVE "move"
 %token WITH "with"
 %token FROM "from"
+%token VALUEOF "valueof"
 %token MAIN "_main_"
 %token DEFINE "_define_"
 %token NATIVE "NativeAction"
@@ -953,6 +954,10 @@ add_child
       driver.add_node (n);
       lexer_expression_mode_off ();
       $1->add_arg ($2);
+      if ($1->keep_name ()) {
+        n->set_keep_name (true);
+        n->set_name ($1->name ());
+      }
     }
 
 start_add_child
@@ -965,7 +970,16 @@ start_add_child
       add_sym (@$, $1, PROCESS);
       $$ = n;
     }
-    | INSERT
+    | VALUEOF NAME INSERT
+    {
+      lexer_expression_mode_on ();
+      Node* n = new Node (@$, ADD_CHILD, "addChild", $2);
+      driver.add_node (n);
+      n->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      n->set_keep_name (true);
+      $$ = n;
+    } 
+    |INSERT
     {
       lexer_expression_mode_on ();
       Node* n = new Node (@$, ADD_CHILD, "addChild", "");

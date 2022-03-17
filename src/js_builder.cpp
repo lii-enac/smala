@@ -1246,22 +1246,30 @@ namespace Smala
   {
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
-      print_error_message (error_level::warning,
-                           "duplicated name: " + node->name (), 0);
+    if (!node->name().empty() && !node->keep_name ()) {
+      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
+        print_error_message (error_level::warning,
+                             "duplicated name: " + node->name (), 0);
+      }
     }
     m_cur_building_name = new_name;
     os << "var" << new_name << " = ";
   }
 
   void
-  JSBuilder::build_end_add_child (std::ofstream &os)
+  JSBuilder::build_end_add_child (std::ofstream &os, Node *n)
   {
     os << ";\n";
     indent (os);
     os << "add_child (" << m_parent_list.back ()->name () << ", "
-        << m_cur_building_name << ", \""
-        << m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
+        << m_cur_building_name;
+   //      << ", \""       << m_parent_list.back ()->get_key (m_cur_building_name) << "\");\n";
+    if (n->keep_name ()) {
+      os << ", " << m_parent_list.back ()->get_symbol (n->name());
+    } else {
+      os << ", \""
+        << m_parent_list.back ()->get_key (m_cur_building_name) << "\"";}
+    os << ");\n";
   }
 
   void

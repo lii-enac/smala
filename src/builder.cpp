@@ -525,7 +525,7 @@ namespace Smala
       }
       case END_ADD_CHILD:
       {
-        build_end_add_child (os);
+        build_end_add_child (os, node);
         break;
       }
       case ADD_CHILDREN_TO:

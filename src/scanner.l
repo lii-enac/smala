@@ -172,6 +172,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "for"                 { return Smala::Parser::make_FOR (loc); }
 "while"               { return Smala::Parser::make_WHILE (loc); }
 "print"               { return Smala::Parser::make_PRINT (loc); }
+"valueof"             { return Smala::Parser::make_VALUEOF (loc); }
 "NativeCode"          { return Smala::Parser::make_NATIVE_CODE_T (loc); }
 {NATIVE_CODE}         { loc.lines (std::count(yytext, yytext+yyleng, '\n')); return Smala::Parser::make_CODE (yytext, loc); }
 {INT}                 { return Smala::Parser::make_INT (yytext, loc); }

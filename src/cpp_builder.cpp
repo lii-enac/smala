@@ -1272,8 +1272,9 @@ namespace Smala
       }
       break;
       case DELETE_CONTENT: {
-        os << "Layer *is_layer = dynamic_cast<Layer *> (" << arg << ");\n";
-        indent (os); os << "if (is_layer) {\n";
+        std::string new_layer_name ("is_layer_" + std::to_string (m_cpnt_num++));
+        os << "Layer *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
+        indent (os); os << "if (" << new_layer_name << ") {\n";
         indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
         indent (os); indent (os); os << "exit(0);\n";
         indent (os); os << "}\n";

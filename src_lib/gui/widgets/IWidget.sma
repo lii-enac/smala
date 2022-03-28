@@ -45,6 +45,6 @@ IWidget (Process container)
 	height aka clamp_max_height.result
 
 	FontFamily _ ("B612")
-    FontSize _ (4, 12)
+    FontSize _ (5, 13) // 5 to use the pixel unit. Allows to have the same rendering on MAC & Linux
     FontWeight _ (25)
 }

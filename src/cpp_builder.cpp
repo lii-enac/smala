@@ -1251,7 +1251,10 @@ namespace Smala
           os << arg << "->deactivate ();\n";
         break;
       case DELETE: {
-         /* delete first.second */
+        /* 
+          Be Careful !
+          in case of modification this code is replicated in DELETE CONTENT
+        */
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
         os << "auto *" << new_name << " = " << arg << ";\n";
         indent (os);
@@ -1278,10 +1281,34 @@ namespace Smala
         indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
         indent (os); indent (os); os << "exit(0);\n";
         indent (os); os << "}\n";
-        std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-        indent (os); os << "Container *" << new_name << " = dynamic_cast<Container *> (" << arg << ");\n";
-        indent (os); os << "if (" << new_name << ") {\n";
-        indent (os); indent (os); os << new_name << "->clean_up_content ();\n";
+        std::string new_container_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        indent (os); os << "Container *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
+        indent (os); os << "if (" << new_container_name << ") {\n";
+
+        /*
+          note:
+          We DO NOT use Container->clean_up_content () anymore
+          because the delete in clean_up_content are not scheduled  
+          instead use the same code as DELETE (just above)
+          old code:
+          indent (os); indent (os); os << new_name << "->clean_up_content ();\n";
+        */
+        
+        std::string new_container_size (new_container_name + "_size");
+        indent (os); indent (os); os << "int "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
+        indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
+        /* replicate of DELETE */
+        std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
+        indent (os); indent (os); indent (os); os << "auto *" << new_child_name << " = " << new_container_name << "->children ()[i];\n";
+        indent (os); indent (os); indent (os); os << "if (" << new_child_name << ") {\n";
+        indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
+        indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
+        indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_child_name << "));\n";
+        indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_delete ();\n";
+        indent (os); indent (os); indent (os); indent (os); os << new_child_name << " = nullptr;\n";
+        indent (os); indent (os); indent (os); os << "}\n";
+        /* end replicate of DELETE */
+        indent (os); indent (os); os << "}\n";
         indent (os); os << "}\n";
         indent (os); os << "else {\n";
         indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";

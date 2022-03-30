@@ -17,6 +17,7 @@ use display
 use gui
 
 import gui.widgets.IWidget
+import ComboBoxItem
 
 _native_code_
 %{
@@ -39,51 +40,26 @@ fn_change_parent (Process src, Process data)
   addChildrenTo gparent.hover {
     data.for_hover
   }
-
 }
 
 _action_
-fn_update_items_pos_and_geom (Process src, Process data)
+fn_init_items_pos_and_geom (Process src, Process data)
 {
-  
-  addChildrenTo data.for_hover.fsm.st_dpy {
-    List text_items { 
-      int dy = 15
-      for item : data.str_items {
-        Component _ {
-          FillColor fc (White)
-          NoOutline _
-          Rectangle r (0, dy - 13, 0, 16, 0, 0)
-          FillColor _ (#323232)
-          Text t (3, dy, toString (item))
-          data.r_selected.width - 20 =:> r.width
-          dy = dy + 15
-          FSM behavior {
-            State st_idle {
-              #FFFFFF =: fc.value
-            }
-            State st_hover {
-              #999999 =: fc.value
-              r.press-> { t.text =: data.selected_item.text}
-              data.selected_item.text->data.unselect
-            }
-            st_idle->st_hover (r.enter)
-            st_hover->st_idle (r.leave)
-          }
-        }
-      }
+  addChildrenTo data.for_hover.fsm.st_dpy.text_items {
+    int dy = 15
+    for item : data.for_hover.str_items {
+      ComboBoxItem _ (data, item, dy)
+      dy = dy + 15
     }
-    text_items.size * 15 + 3 =:> data.for_hover.fsm.st_dpy.bg.height
-    MaxList max (text_items, "t/width")
-    max.output + 50 =:> data.min_width
   }
 }
 
 _define_
-ComboBox (Process container, double x_, double y_) inherits IWidget (container) {
+ComboBox (Process container, double x_, double y_, int _default_width) inherits IWidget (container) {
   mouseTracking = 1
   Translation t (x_, y_)
-  
+  Int default_width (_default_width)
+
   /*----- interface -----*/
   x aka t.tx
   y aka t.ty
@@ -113,11 +89,13 @@ ComboBox (Process container, double x_, double y_) inherits IWidget (container) 
 
   //selected_item.width + 25 =:> this.min_width
   this.min_height = 20
-  this.width  =:> r_selected.width
+  
   this.height/2 - 10 =:> offset.ty
 
-  List str_items
+  
+
   Component for_hover {
+    List str_items
     FSM fsm {
       State st_idle {
         0 =: arrow.r.a, arrow.pos2.ty
@@ -130,15 +108,34 @@ ComboBox (Process container, double x_, double y_) inherits IWidget (container) 
         Rectangle bg (0, 0,100, 100, 0, 0)
         r_selected.width - 20 =:> bg.width
         FillColor _ (#323232)
-        
+        List text_items
+        text_items.size * 15 + 3 =:> bg.height
       }
       st_idle->st_dpy (r_selection.press)
       st_dpy->st_idle (r_selection.press)
       st_dpy->st_idle (unselect)
     }
   }
-  NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
-  str_items.$added -> update_items_pos_and_geom
-  str_items.$removed -> update_items_pos_and_geom
+
+  for_hover_fsm aka for_hover.fsm
+  str_items aka for_hover.str_items
+  MaxList max (for_hover.fsm.st_dpy.text_items, "t/width")
+  for_hover.str_items.size  == 0 ? default_width : max.output + 50 =:> this.width
+  this.width  =:> r_selected.width
+  NativeAction init_items_pos_and_geom (fn_init_items_pos_and_geom, this, 0)
+  str_items.$added -> (this) {
+    new_item = getRef (this.str_items.$added)
+    dump this.for_hover_fsm
+    int size = getInt (this.for_hover_fsm.st_dpy.text_items.size)
+    int y = (size + 1) * 15
+    addChildrenTo this.for_hover_fsm.st_dpy.text_items {
+      ComboBoxItem item (this, new_item, y)
+    }
+  }
+/*  for_hover.str_items.$removed -> (this) {
+    p = getRef (this.str_items.$removed)
+
+  }
+  */
   NativeAction change_parent (fn_change_parent, this, 1)
 }

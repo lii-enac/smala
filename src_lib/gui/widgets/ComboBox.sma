@@ -26,6 +26,14 @@ Process* getParent (Process *p)
   return p->get_parent ();
 }
 
+int has_item (Process *item, Process *list) {
+  for (auto p : ((djnn::List*)list)->children ()) {
+    if (((djnn::TextProperty*)item)->get_value () == ((djnn::TextProperty*)p->find_child("t/text"))->get_value ()) {
+      return 1;
+    }
+  }
+   return 0;
+}
 %}
 _action_
 fn_change_parent (Process src, Process data)
@@ -122,14 +130,18 @@ ComboBox (Process container, double x_, double y_, int _default_width) inherits 
   MaxList max (for_hover.fsm.st_dpy.text_items, "t/width")
   for_hover.str_items.size  == 0 ? default_width : max.output + 50 =:> this.width
   this.width  =:> r_selected.width
+  default_width =: this.max_width
   NativeAction init_items_pos_and_geom (fn_init_items_pos_and_geom, this, 0)
   str_items.$added -> (this) {
     new_item = getRef (this.str_items.$added)
-    dump this.for_hover_fsm
     int size = getInt (this.for_hover_fsm.st_dpy.text_items.size)
     int y = (size + 1) * 15
-    addChildrenTo this.for_hover_fsm.st_dpy.text_items {
-      ComboBoxItem item (this, new_item, y)
+    for item : this.str_items {
+      if (has_item (item, this.for_hover_fsm.st_dpy.text_items) == 0) {
+        addChildrenTo this.for_hover_fsm.st_dpy.text_items {
+          ComboBoxItem item (this, new_item, y)
+        }
+      }
     }
   }
 /*  for_hover.str_items.$removed -> (this) {

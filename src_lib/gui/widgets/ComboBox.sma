@@ -63,7 +63,7 @@ fn_init_items_pos_and_geom (Process src, Process data)
 }
 
 _define_
-ComboBox (Process container, double x_, double y_, int _default_width) inherits IWidget (container) {
+ComboBox (Process container, double x_, double y_, int _default_width, int _width_by_content) inherits IWidget (container) {
   mouseTracking = 1
   Translation t (x_, y_)
   Int default_width (_default_width)
@@ -128,18 +128,21 @@ ComboBox (Process container, double x_, double y_, int _default_width) inherits 
   for_hover_fsm aka for_hover.fsm
   str_items aka for_hover.str_items
   MaxList max (for_hover.fsm.st_dpy.text_items, "t/width")
-  for_hover.str_items.size  == 0 ? default_width : max.output + 50 =:> this.width
-  this.width  =:> r_selected.width
-  default_width =: this.max_width
+  if (_width_by_content) {
+    for_hover.str_items.size  == 0 ? default_width : max.output + 50 =:> r_selected.width
+  } else {
+    this.width  =:> r_selected.width
+  }
+  //default_width =: this.max_width
   NativeAction init_items_pos_and_geom (fn_init_items_pos_and_geom, this, 0)
   str_items.$added -> (this) {
-    new_item = getRef (this.str_items.$added)
     int size = getInt (this.for_hover_fsm.st_dpy.text_items.size)
     int y = (size + 1) * 15
     for item : this.str_items {
       if (has_item (item, this.for_hover_fsm.st_dpy.text_items) == 0) {
         addChildrenTo this.for_hover_fsm.st_dpy.text_items {
-          ComboBoxItem item (this, new_item, y)
+          ComboBoxItem new_item (this, item, y)
+          y += 15
         }
       }
     }

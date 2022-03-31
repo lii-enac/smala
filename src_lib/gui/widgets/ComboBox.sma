@@ -27,6 +27,7 @@ Process* getParent (Process *p)
 }
 
 int has_item (Process *item, Process *list) {
+  string str_item = ((djnn::TextProperty*)item)->get_value ();
   for (auto p : ((djnn::List*)list)->children ()) {
     if (((djnn::TextProperty*)item)->get_value () == ((djnn::TextProperty*)p->find_child("t/text"))->get_value ()) {
       return 1;
@@ -34,6 +35,17 @@ int has_item (Process *item, Process *list) {
   }
    return 0;
 }
+
+int has_str_item (Process *item, Process *list) {
+  string str_item = ((djnn::TextProperty*)item->find_child("t/text"))->get_value ();
+  for (auto p : ((djnn::List*)list)->children ()) {
+    if ( ((djnn::TextProperty*)p)->get_value () == str_item) {
+      return 1;
+    }
+  }
+   return 0;
+}
+
 %}
 _action_
 fn_change_parent (Process src, Process data)
@@ -133,7 +145,7 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
   } else {
     this.width  =:> r_selected.width
   }
-  //default_width =: this.max_width
+
   NativeAction init_items_pos_and_geom (fn_init_items_pos_and_geom, this, 0)
   str_items.$added -> (this) {
     int size = getInt (this.for_hover_fsm.st_dpy.text_items.size)
@@ -147,10 +159,18 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
       }
     }
   }
-/*  for_hover.str_items.$removed -> (this) {
-    p = getRef (this.str_items.$removed)
-
+  str_items.$removed -> (this) {
+    for item : this.for_hover_fsm.st_dpy.text_items {
+      if (has_str_item (item, this.str_items) == 0) {
+          delete item
+      }
+    }
+    int y = 15
+    for item : this.for_hover_fsm.st_dpy.text_items {
+      item.y = y
+      y += 15
+    }
   }
-  */
+
   NativeAction change_parent (fn_change_parent, this, 1)
 }

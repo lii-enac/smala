@@ -6,9 +6,11 @@ _define_
 ComboBoxItem (Process box, Process item, int dy) {
   FillColor fc (White)
   NoOutline _
-  Rectangle r (0, dy - 13, 0, 16, 0, 0)
+  Translation pos (0, dy)
+  y aka pos.ty
+  Rectangle r (0, - 13, 0, 16, 0, 0)
   FillColor _ (#323232)
-  Text t (3, dy, toString (item))
+  Text t (3, 0, toString (item))
   box.r_selected.width - 20 =:> r.width
   FSM behavior {
     State st_idle {

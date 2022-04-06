@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-StandAloneSlider (Process f, int _x, int _y, int _width, int _lower, int _upper, double _init_val, string _unit)
+StandAloneSlider (int _x, int _y, int _width, int _lower, int _upper, double _init_val, string _unit)
 {
   Translation pos (_x, _y)
   x aka pos.tx
@@ -113,7 +113,7 @@ StandAloneSlider (Process f, int _x, int _y, int _width, int _lower, int _upper,
       #ffa700 =: button.fill.value
       button_pos.tx =: init_tx
       button.press.x =: offset_x
-      f.move.x - offset_x => delta_x
+      button.move.x - offset_x => delta_x
       delta_x + init_tx => pos_bv.input
       pos_bv.result => button_pos.tx, fg.width
       pos_bv.result*((_upper - _lower)/$bg.width) + _lower =:> bv.input

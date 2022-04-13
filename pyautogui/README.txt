@@ -29,8 +29,11 @@ ___________________________________
 
 FROM smala/pyautogui/ directory:
 
+cmd: 
+Press CTRL+ALT to make screenshot
+Press ESC to Quit
 
-- record_autogui.py script : 
+- record_autogui.py script :
 cmd: autogui.py -i|-itest <test_name> -d|--debug -r|--retina
     -i : test to use without "_test"
     -d : verbose debug informations
@@ -46,4 +49,9 @@ cmd: replay_autogui.py -i <test_name> -t|--test -r|--retina -n|--no_interpolatio
     -r : use retina resolution
     -n : do not use mouse move interpolation ... really precise BUT really slow
 
+exemple: ./replay_autogui.py -i simplest -t -r
+
 - launch_tests.py :
+    -r : use retina resolution
+
+exemple: ./launch_tests.py -r

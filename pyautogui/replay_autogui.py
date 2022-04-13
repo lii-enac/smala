@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
 import os
-import sys, getopt, subprocess
+import sys, getopt, subprocess, time
 import pyautogui
 from PIL import Image
 from PIL import ImageChops, ImageStat
@@ -18,6 +18,7 @@ _data_dir = "datas/"
 _ref_dir = "references/"
 _result_dir = "results/"
 _diff_dir = _result_dir + "diffs/"
+_RATIO = 1
 
 def fct_move (line, button):
   global _interpolate_mode, _is_pressed
@@ -60,7 +61,7 @@ def fct_key_press (line):
 
 def fct_compare_images ():
   global _is_retina, _app_name, _max_screenshot
-  global _ref_dir, _result_dir, _diff_dir
+  global _ref_dir, _result_dir, _diff_dir, _RATIO
   if _is_retina:
     retina_name = '_Retina'
   else:
@@ -80,7 +81,7 @@ def fct_compare_images ():
 
     #TODO: return False or True ?
     #if diff.getbbox() != None:
-    if diff_ratio > 0.05:
+    if diff_ratio > _RATIO:
       diff_name = _diff_dir + _app_name + "_" + str(i) + retina_name + "_DIFF.bmp"
       diff.save(diff_name)
       print("WARNING --- images are DIFFERENT - those differences has been saved in:", diff_name)
@@ -164,7 +165,8 @@ def main(argv):
     
     print ('lauching test:', _app_name + "_test")
     subprocess.Popen([ "make", "-j", _app_name + "_test"], cwd="..", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    
+    time.sleep (1) #wait for a second that the app launch 
+
     print ("---------------------------------\n")
 
   

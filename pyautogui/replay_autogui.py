@@ -19,6 +19,7 @@ _ref_dir = "references/"
 _result_dir = "results/"
 _diff_dir = _result_dir + "diffs/"
 _RATIO = 1
+_time_to_wait = 2
 
 def fct_move (line, button):
   global _interpolate_mode, _is_pressed
@@ -131,6 +132,7 @@ def fct_screenshot (line):
 
 def main(argv):
     global _interpolate_mode, _datafile, _app_name, _is_retina, _data_dir, _ref_dir
+    global _time_to_wait
 
     # getopt
     try:
@@ -165,7 +167,7 @@ def main(argv):
     
     print ('lauching test:', _app_name + "_test")
     subprocess.Popen([ "make", "-j", _app_name + "_test"], cwd="..", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    time.sleep (1) #wait for a second that the app launch 
+    time.sleep (_time_to_wait) #wait for a second that the app launch 
 
     print ("---------------------------------\n")
 

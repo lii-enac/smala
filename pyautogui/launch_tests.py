@@ -14,8 +14,9 @@ for (dirpath, dirnames, filenames) in walk(datas_dir):
 
 test_list = []
 for filename in f:
-  filename = filename.split('_data.txt')[0]
-  test_list.append (filename)
+  if '_data.txt' in filename:
+    filename = filename.split('_data.txt')[0]
+    test_list.append (filename)
 # print (test_list)
 
 def main(argv):

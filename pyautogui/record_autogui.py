@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!python3
 
 from pynput import keyboard
 from pynput.mouse import Listener as MouseListener

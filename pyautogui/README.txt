@@ -1,16 +1,26 @@
 
 
 
+IMPORTANT ! on Macos :
+___________________________________
+
+ouvrir: preference system -> sécurité confidentialité : open all for Terminal
+- Accessibilité
+- surveillence de l'entrée
+- Accès complet au disque
+- Enregistrement de l'ecran
+- Outils de développement
+
+
 
 0 - Intall pyautogui
 ___________________________________
 
 site: https://pyautogui.readthedocs.io/en/latest/install.html
 
-pip3 install pyautogui
-
+pip3 install pynput
 pip3 install Pillow
-
+pip3 install pyautogui
 
 
 On Linux, additionally you need to install the scrot application, as well as Tkinter:

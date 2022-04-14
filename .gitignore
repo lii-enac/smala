@@ -5,3 +5,6 @@ cookbook/display/**/*.ppm
 cookbook/display/**/*.png
 .scannerwork
 cookbook/gui/teensy_test/screenshot-teensy_test-*.png
+.DS_Store
+pyautogui/__pycache__
+pyautogui/results

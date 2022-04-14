@@ -85,10 +85,10 @@ def fct_compare_images ():
     if diff_ratio > _RATIO:
       diff_name = _diff_dir + _app_name + "_" + str(i) + retina_name + "_DIFF.bmp"
       diff.save(diff_name)
-      print("WARNING --- images are DIFFERENT - those differences has been saved in:", diff_name)
+      print("\033[0;31m WARNING --- images are DIFFERENT - those differences has been saved in:", diff_name, "\033[0m")
       result = False
     else:
-      print ("OK - ", im1_name, " - ", im2_name)
+      print ("\033[0;32m [OK] - ", im1_name, " - ", im2_name, "\033[0m")
 
   return result
 

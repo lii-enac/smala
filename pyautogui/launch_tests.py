@@ -59,7 +59,11 @@ def main(argv):
       print ("\033[0;32m [OK] \033[0m - ", i)
     for i in _result_KO:
       print ("\033[0;31m [KO] \033[0m - ", i)
-
+    print ("\033[0;32m----------------------------------------------------- \033[0m")
+    full_nb_result = len(_result_OK) + len(_result_KO)
+    print ("\033[0;32m Total Passed: ", len(_result_OK), "/", full_nb_result, "\033[0m")
+    if not _result_KO == []:
+      print ("\033[0;31m Total Failed: ", len(_result_KO), "/", full_nb_result, "\033[0m")
     print ("\n\n")
     #if result_KO not empty test if bad
     if not _result_KO == []:

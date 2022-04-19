@@ -40,7 +40,7 @@ Component root {
     HBox hbox (0)
     WidgetContainer sub_wc (wc1) {
       VBox vbox (1)
-      ComboBox cb (wc1, 0, 0, 0, 0)
+      ComboBox cb (wc1, 0, 0, 0, 1)
       addChildrenTo cb.str_items {
         String _ ("First")
         String _ ("Second")

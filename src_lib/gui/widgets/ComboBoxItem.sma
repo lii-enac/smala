@@ -3,25 +3,35 @@ use base
 use gui
 
 _define_
-ComboBoxItem (Process box, Process item, int dy) {
-  FillColor fc (White)
-  NoOutline _
-  Translation pos (0, dy)
+ComboBoxItem (Process box, Process item, int dx, int dy) {
+  Translation pos (dx, dy)
   y aka pos.ty
-  Rectangle r (0, - 13, 0, 16, 0, 0)
-  FillColor _ (#323232)
-  Text t (3, 0, toString (item))
-  box.r_selected.width - 20 =:> r.width
+  Component bg {
+    //FillOpacity _ (0.5)
+    FillColor fc (White)
+    NoOutline _
+    Rectangle r (2, - 13, 0, 17, 2, 2)
+  }
+  //FillColor _ (#8fa4af)
+  FillColor tc (#303030)
+  Text t (4, 0, toString (item))
+  box.width - 6 =:> bg.r.width
   FSM behavior {
     State st_idle {
-      #FFFFFF =: fc.value
+      #FFFFFF =: bg.fc.value
+      #303030 =: tc.value
     }
     State st_hover {
-      #999999 =: fc.value
-      r.press-> { t.text =: box.selected_item.text}
-      box.selected_item.text->box.unselect
+      //#8fa4af =: bg.fc.value
+      #197EFF =: bg.fc.value
+      #FFFFFF =: tc.value
+      bg.r.press-> { t.text =: box.text}
+      box.text->box.unselect
     }
-    st_idle->st_hover (r.enter)
-    st_hover->st_idle (r.leave)
+    st_idle->st_hover (bg.r.enter, box.incr)
+    st_hover->st_idle (bg.r.leave, box.decr)
+  }
+  behavior.st_hover->(this) {
+    moveChild this >>
   }
 }

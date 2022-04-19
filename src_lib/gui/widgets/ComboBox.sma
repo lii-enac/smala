@@ -68,7 +68,7 @@ fn_init_items_pos_and_geom (Process src, Process data)
   addChildrenTo data.for_hover.fsm.st_dpy.text_items {
     int dy = 15
     for item : data.for_hover.str_items {
-      ComboBoxItem _ (data, item, dy)
+      ComboBoxItem _ (data, item, 0, dy)
       dy = dy + 15
     }
   }
@@ -85,7 +85,12 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
   y aka t.ty
   Spike post_init
   Spike unselect
+
   /*----- interface -----*/
+  Incr incr (1)
+  Incr decr (1)
+  Bool is_hover (0)
+  incr.state - decr.state != 0 =:> is_hover
 
   Translation offset (0, 0)
   FillColor fc (#ffffff)
@@ -105,6 +110,8 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
       Point _ (15, 15)
     }
   }
+  width aka r_selected.width
+  text aka selected_item.text
   r_selected.width - 20 =:> r_selection.x, arrow.pos.tx
 
   //selected_item.width + 25 =:> this.min_width
@@ -112,7 +119,6 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
   
   this.height/2 - 10 =:> offset.ty
 
-  
 
   Component for_hover {
     List str_items
@@ -121,6 +127,7 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
         0 =: arrow.r.a, arrow.pos2.ty
       }
       State st_dpy {
+         0 =: incr.state, decr.state
         -90 =: arrow.r.a
         2 =: arrow.pos2.ty
         FillColor _ (White)
@@ -130,6 +137,14 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
         FillColor _ (#323232)
         List text_items
         text_items.size * 15 + 3 =:> bg.height
+        FSM check_hover {
+          State not_hover {
+            GenericMouse.left.press -> unselect
+          }
+          State hover
+          hover->not_hover (is_hover.false)
+          not_hover->hover (is_hover.true)
+        }
       }
       st_idle->st_dpy (r_selection.press)
       st_dpy->st_idle (r_selection.press)
@@ -153,7 +168,7 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
     for item : this.str_items {
       if (has_item (item, this.for_hover_fsm.st_dpy.text_items) == 0) {
         addChildrenTo this.for_hover_fsm.st_dpy.text_items {
-          ComboBoxItem new_item (this, item, y)
+          ComboBoxItem new_item (this, item, 0, y)
           y += 15
         }
       }

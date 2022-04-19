@@ -11,6 +11,7 @@ Animator (int _duration, double _min, double _max, int func, int loop, int start
   Spike pause
   Spike resume
   Spike reset
+  Spike rewind
   Double min (_min)
   Double max (_max)
   Double output (0)
@@ -36,9 +37,21 @@ Animator (int _duration, double _min, double _max, int func, int loop, int start
       cl.tick->inc
       gen.output * (max - min) + min =:> output
     }
+    State rewinding {
+      Clock cl (20)
+      Bool end (0)
+      -inc.delta =: inc.delta
+      inc.state <= 0 => end
+      cl.tick->inc
+      gen.output * (max - min) + min =:> output
+
+    }
     State paused
     started->stopped (end)
     {started, paused}->stopped (abort)
+    {started, paused, stopped}->rewinding (rewind)
+    rewinding->stopped (rewinding.end.true, end)
+    rewinding->started (start)
     stopped->started (start, reset)
     started->paused (pause)
     paused->started (resume)

@@ -64,4 +64,7 @@ StandAlonePushButton (string _label, double x_, double y_) {
   thisLabel.height + 10 =:> r.height
   r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y
   r.width / 2.0 =:> thisLabel.x
+
+  width aka r.width
+  height aka r.height
 }

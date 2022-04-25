@@ -3,12 +3,12 @@
 #include "JSONSaxParser.h"
 
 #include "core/ontology/process.h"
-#include "core/tree/spike.h"
+#include "core/control/spike.h"
 #include "core/execution/graph.h"
 #include "core/core-dev.h" // GRAPH_EXEC
-#include "core/tree/blank.h"
+#include "core/control/blank.h"
 #include "core/tree/component.h"
-#include "core/tree/double_property.h"
+#include "core/property/double_property.h"
 
 #include "core/utils/error.h"
 

@@ -5,6 +5,7 @@ import sys, getopt, subprocess, time
 import pyautogui
 from PIL import Image
 from PIL import ImageChops, ImageStat
+from pathlib import Path
 pyautogui.FAILSAFE = True
 
 #global variables
@@ -153,7 +154,12 @@ def main(argv):
           _interpolate_mode = False
         elif opt in ("-r", "--retina"):
           _is_retina = True
-    _datafile = _data_dir + _app_name + "_data.txt"
+    _datafile = _data_dir + _app_name + "_data_nointer.txt"
+    path = Path(_datafile)
+    if path.is_file():
+      _interpolate_mode = False
+    else:
+      _datafile = _data_dir + _app_name + "_data.txt"
 
     print ("\n------------ REPLAY ", _app_name ," -------------")
     print ('test name:\t\t', _app_name)

@@ -35,7 +35,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.smala",
-				"match": "\\b(use|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string|_src_|_keep_)\\b"
+				"match": "\\b(use|inherits|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string|_src_|_keep_)\\b"
 			}]
 		},
 		"sma_func": {

@@ -159,6 +159,7 @@ def main(argv):
     if path.is_file():
       _interpolate_mode = False
     else:
+      _interpolate_mode = True #force True if the script is used launch_test
       _datafile = _data_dir + _app_name + "_data.txt"
 
     print ("\n------------ REPLAY ", _app_name ," -------------")

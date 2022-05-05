@@ -124,7 +124,7 @@ Component root {
     10 + bg.t.tx =: bg.t.tx
   }
   cl.tick -> do_translate
-  do_translate -> bg.damaged
+  //do_translate -> bg.damaged // now Layers auto_redisplay when children have changed
 
   /*AssignmentSequence seq(1) {
     pz.xpan + 50 =: pz.xpan

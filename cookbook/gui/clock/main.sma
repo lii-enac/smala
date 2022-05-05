@@ -19,7 +19,7 @@ use gui
 import WinSizeAdapt
 import SystemTime
 import Checkbox
-import gui.widgets.PushButton
+import gui.widgets.StandAlonePushButton
 
 _main_
 Component root {
@@ -87,7 +87,7 @@ Component root {
 
 	}
 	scene.view.cb.entries.[3].fsm.initial = "st_selected"
-	PushButton b (f, "Init time", 500, 600)
+	StandAlonePushButton b ("Init time", 500, 600)
 	b.click -> st.compute
 	f.width - 100 =:> b.x
 	f.height - 100 =:> b.y

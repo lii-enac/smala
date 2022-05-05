@@ -24,6 +24,7 @@ import gui.widgets.VBox
 import gui.widgets.Slider
 import gui.widgets.Label
 import gui.widgets.ComboBox
+import gui.widgets.HSpace
 
 _main_
 Component root {
@@ -36,34 +37,33 @@ Component root {
   f.{width,height}=:>bkg.{width,height}
   TextPrinter tp
 
-  WidgetContainer wc1 (f) {
-    HBox hbox (0)
-    WidgetContainer sub_wc (wc1) {
-      VBox vbox (1)
-      ComboBox cb (wc1, 0, 0, 0, 1)
+  HBox hbox (f)
+    VBox vbox (hbox)
+      ComboBox cb (0, 0)
       addChildrenTo cb.str_items {
-        String _ ("First")
-        String _ ("Second")
-        String _ ("Third")
+        String _ ("First choice")
+        String _ ("Second choice")
+        String _ ("Third choice")
       }
-      PushButton b1 (wc1, "My Button", 0, 0)
+      PushButton b1 ("My Button")
+      cb.value =:> b1.label
       addChildrenTo vbox.items
       { 
         cb,
         b1
       }
-    }
-    PushButton b2 (wc1, "Quit", 0, 0)
+    HSpace hspace (20)
+    PushButton b2 ("Quit")
     b2.click->ex
-    PushButton b3 (wc1, "Yet Another Button", 0, 0)
+    PushButton b3 ("Say Hello!")
     b3.click -> { "Hello!" =: tp.input }
-    WidgetContainer wc (wc1) {
-      VBox vbox (1)
-      PushButton sub1 (wc, "Sub button 1", 0, 0)
-      PushButton sub2 (wc, "Sub button 2", 0, 0)
-      ToggleButton sub3 (wc, "Connect slider", 0, 0)
-      Label l (wc, "Value: ", 0, 0)
-      Slider s (wc, 0, 0)
+    VBox vbox2 (hbox)
+      PushButton sub1 ("Sub button 1")
+      PushButton sub2 ("Sub button 2")
+      ToggleButton sub3 ("Connect slider")
+      Label l ("Value: ")
+      l.h_alignment = 0
+      Slider s
       FSM fsm {
         State idle
         State connected {
@@ -71,8 +71,8 @@ Component root {
         }
         idle->connected (sub3.toggle)
         connected->idle (sub3.toggle)
-      }      
-      addChildrenTo vbox.items
+      }
+      addChildrenTo vbox2.items
       { 
         sub1,
         sub2,
@@ -80,7 +80,5 @@ Component root {
         l,
         s 
       }
-    }
-    addChildrenTo hbox.items { sub_wc, wc, b2, b3 }
-  }
-}
+  addChildrenTo hbox.items { vbox, hspace, vbox2, b3, b2 }
+ }

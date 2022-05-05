@@ -28,27 +28,31 @@ import gui.widgets.CheckBoxManager
 _main_
 Component root {
   Frame f ("my frame", 500, 500, 300, 100)
+  f.background_color.r = 200
+  f.background_color.g = 200
+  f.background_color.b = 200
   Exit ex (0, 1)
   f.close -> ex
 
-  WidgetContainer container (f) {
-    HBox hbox (0)
-    Label l (container, "", 0, 0)
-    WidgetContainer wc (container) {
-      VBox vbox (1)
-      CheckBox c1 (wc, "First choice", 0, 0)
-      CheckBox c2 (wc, "Second choice", 0, 0)
-      CheckBox c3 (wc, "Third choice", 0, 0)
+    HBox hbox (f)
+    Label l ("")
+    l.preferred_height = 20
+    l.preferred_width = 100
+    VBox vbox (hbox)
+      CheckBox c1 ("First choice")
+      c1.h_alignment = 0
+      CheckBox c2 ("Second choice")
+      c2.h_alignment = 0
+      CheckBox c3 ("Third choice")
+      c3.h_alignment = 0
       addChildrenTo vbox.items {
         c1, 
         c2,
         c3
       }
       CheckBoxManager manager (vbox.items, vbox.items.[1])
-    }
-    wc.manager.value =:> l.text
+    manager.value =:> l.text
     addChildrenTo hbox.items {
-      l, wc
+      l, vbox
     }
-  }
 }

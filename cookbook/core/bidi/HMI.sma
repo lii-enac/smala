@@ -34,15 +34,14 @@ HMI ()
     f.background_color.g = 200
     f.background_color.b = 200
 
-    WidgetContainer wc (f) {
-        VBox vbox (0)
+        VBox vbox (f)
 
-        Label l (wc, "fahrenheit:", 0, 0)
-        Slider sf (wc, 0, 0)
+        Label l ("fahrenheit:")
+        Slider sf
         "fahrenheit: " + sf.value =:> l.text
         
-        Label l2 (wc, "celsius:", 0, 0)
-        Slider sc (wc, 0, 0)
+        Label l2 ("celsius:")
+        Slider sc
         "celsius: " + sc.value =:> l2.text
 
         addChildrenTo vbox.items {l, sf, l2, sc}

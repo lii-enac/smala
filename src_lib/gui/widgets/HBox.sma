@@ -15,81 +15,141 @@
 use core
 use base
 
+import gui.widgets.IWidget
+
 _native_code_
 %{
+#include <iostream>
 static Process* find_without_warning (Process* p, string path)
 {
+  if (p == nullptr)
+    return 0;
   return p->find_child_impl(path);
 }
+
+static void
+check (Process* p, const string& p_name)
+{
+	if (find_without_warning (p, p_name) == 0) {
+		std::cerr << "Process " << p_name << " not found in VBox initialisation\n";
+		exit (0);
+	}
+}
+
 %}
 
 _action_
 fn_update_items_pos_and_geom (Process src, Process data)
 {
-  int is_sub_box = data.is_sub_box
   int nb_items = data.items.size
-  int width = data.width
-  int height = data.height
-  int hspace = data.hspace
-  int vspace = data.vspace
-  int item_width = is_sub_box ? (width - (nb_items - 1)*hspace)/nb_items : (width - (nb_items + 1)*hspace)/nb_items
-  int item_height = is_sub_box ? height : height - 2*vspace
-  int dx = is_sub_box ? 0 : hspace
-  for item : data.items {
-    item.x = dx
-    item.y = is_sub_box ? 0 : vspace
-    item.req_width = item_width
-    item.req_height = item_height
-    dx = dx + hspace + item_width
-  }
-}
 
-_action_
-fn_set_min_size (Process src, Process data)
-{
-  int is_sub_box = data.is_sub_box
-  int nb_items = data.items.size
+  int padding_left = data.padding_left
+  int padding_top = data.padding_top
+  int width = data.container_width - 2*padding_left
+  int height = data.container_height - 2*padding_top
+
   int hspace = data.hspace
-  int vspace = data.vspace
-  int dx = hspace
-  int min_width = is_sub_box ? 0 :  2 * hspace
-  int min_height = is_sub_box ? 0 : 2 * vspace
+
+  int fixed_width = 0
+  int nb_fixed_width = 0
   for item : data.items {
-    if (item.min_width > min_width) {
-      min_width = item.min_width
-    }
-    if (item.min_height > min_height) {
-      min_height = is_sub_box ? item.min_height : 2 * vspace + item.min_height
-    }
-    p = find_without_warning (item, "change_parent")
-    if (&p != 0) {
-      run item.change_parent
+    if ($item.preferred_width != -1) {
+      fixed_width += $item.preferred_width
+      nb_fixed_width++
     }
   }
-  data.min_height = min_height
-  if (is_sub_box) {
-    data.min_width = min_width * nb_items + hspace * (nb_items - 1)
-  } else {
-    data.min_width = min_width * nb_items + hspace * (nb_items + 1)
+  int space_per_item = (width - fixed_width - (nb_items-1)*hspace - 2*padding_left) / (nb_items - nb_fixed_width)
+  int dx = 0
+  int max_height = 0
+  for item : data.items {
+    if ($item.preferred_width != -1) {
+      item.width = $item.preferred_width
+    } else {
+      if ($item.max_width != -1) {
+        item.width = space_per_item < $item.max_width ? (space_per_item < $item.min_width ? $item.min_width : space_per_item) : $item.max_width
+      } else {
+        item.width = space_per_item < $item.min_width ? $item.min_width : space_per_item
+      }
+    }
+    item.x = dx
+    dx += item.width + hspace
+
+    if ($item.preferred_height != -1) {
+      item.height = $item.preferred_height
+    } else {
+      item.height = height - 2*padding_top
+      if ($item.height > $item.max_height && $item.max_height > -1) {
+        item.height = $item.max_height
+      } else if ($item.height < $item.min_height) {
+        item.height = $item.min_height
+      }
+    }
+    if ($item.height > $max_height) {
+      max_height = $item.height
+    } 
   }
+  for item : data.items {
+    if (item.v_alignment == 0) {        // top
+      item.y = 0
+    } else if (item.v_alignment == 1) { // center
+      item.y = max_height/2 - item.height/2
+    } else {                            // bottom
+      item.y = max_height - item.height
+    }
+  }
+  if (data.set_pos == 1) {
+    if ($data.h_alignment == 0) {
+      data.x = padding_left
+    } else if ($data.h_alignment == 1) {
+      data.x = (data.container_width - dx) / 2
+    } else {
+      data.x = data.container_width - dx - padding_left
+    }
+
+    if ($data.v_alignment == 0) {
+      data.y = padding_top
+    } else if ($data.v_alignment == 1) {
+      data.y = (data.container_height - max_height) / 2
+    } else {
+      data.y = data.container_height - max_height - padding_top
+    }
+  }
+  data.width = dx + 2*padding_left
+  data.height = max_height + 2*padding_top
+  data.cell_width = space_per_item
+  data.cell_height = max_height
 }
 
 _define_
-HBox (int _is_sub_box)
+HBox (Process container) inherits IWidget ()
 {
-  parent = find (this, "..")
-  width aka parent.width
-  height aka parent.height
-  Int is_sub_box (_is_sub_box)
+  check (container, "width")
+  check (container, "height")
+  Bool set_pos (1)
+  Int padding_left (5)
+  Int padding_top (5)
+  Int cell_width (0)
+  Int cell_height (0)
   Int hspace (5)
-  Int vspace (5)
-  Int min_width (0)
-  Int min_height (0)
+  if (find_without_warning (container, "cell_width")) {
+    container_width aka container.cell_width
+    container_height aka container.cell_height
+    set_pos = 0
+    padding_left = 0
+    padding_top = 0
+  } else {
+    container_width aka container.width
+    container_height aka container.height
+  }
+
   List items
   List hover
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
-  width->update_items_pos_and_geom
-  NativeAction set_min_size (fn_set_min_size, this, 0)
-  min_width =:> parent.min_width
-  min_height =:> parent.min_height
+  this.container_width->update_items_pos_and_geom
+  this.container_height->update_items_pos_and_geom 
+  SumList sl (items, "min_width")
+  MaxList ml (items, "min_height")
+  sl.output->update_items_pos_and_geom // bad trick to force geometry recomputation at startup, needed for text
+  sl.output + hspace*(items.size - 1) =:> this.min_width
+  ml.output =:> this.min_height
 }

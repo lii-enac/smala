@@ -20,12 +20,8 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-Slider (Process container, double x_, double y_) inherits IWidget (container) {
-  Translation t (x_, y_)
-
+Slider () inherits IWidget () {
   /*----- interface -----*/
-  x aka t.tx
-  y aka t.ty
   Int value (0)
   /*----- interface -----*/
 

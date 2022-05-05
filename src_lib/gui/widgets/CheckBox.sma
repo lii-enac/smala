@@ -20,12 +20,9 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-CheckBox (Process container, string _label, double x_, double y_) inherits IWidget (container) {
-  Translation t (x_, y_)
+CheckBox (string _label) inherits IWidget () {
 
   /*----- interface -----*/
-  x aka t.tx
-  y aka t.ty
   Spike selected
   Spike unselected
   Spike unselect
@@ -78,5 +75,6 @@ CheckBox (Process container, string _label, double x_, double y_) inherits IWidg
   thisLabel.press->press
   label aka thisLabel.text
   thisLabel.width + 23 =:> this.min_width
+  this.min_width = thisLabel.width + 23
   this.min_height = 16
 }

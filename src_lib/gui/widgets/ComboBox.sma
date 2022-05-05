@@ -75,14 +75,11 @@ fn_init_items_pos_and_geom (Process src, Process data)
 }
 
 _define_
-ComboBox (Process container, double x_, double y_, int _default_width, int _width_by_content) inherits IWidget (container) {
+ComboBox (int _default_width, int _width_by_content) inherits IWidget () {
   mouseTracking = 1
-  Translation t (x_, y_)
   Int default_width (_default_width)
 
   /*----- interface -----*/
-  x aka t.tx
-  y aka t.ty
   Spike post_init
   Spike unselect
 
@@ -112,6 +109,7 @@ ComboBox (Process container, double x_, double y_, int _default_width, int _widt
   }
   width aka r_selected.width
   text aka selected_item.text
+  value aka selected_item.text
   r_selected.width - 20 =:> r_selection.x, arrow.pos.tx
 
   //selected_item.width + 25 =:> this.min_width

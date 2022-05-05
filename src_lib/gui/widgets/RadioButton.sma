@@ -20,12 +20,9 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-RadioButton (Process container, string _label, double x_, double y_) inherits IWidget (container) {
-  Translation t (x_, y_)
+RadioButton ( string _label) inherits IWidget () {
 
   /*----- interface -----*/
-  x aka t.tx
-  y aka t.ty
   Spike selected
   Spike unselected
   Spike unselect
@@ -45,7 +42,7 @@ RadioButton (Process container, string _label, double x_, double y_) inherits IW
   c.press->press
 
   FSM fsm {
-    State st_idle 
+    State st_idle
     State st_selected {
       FillColor fc2 (#535353)
       NoOutline _
@@ -61,5 +58,6 @@ RadioButton (Process container, string _label, double x_, double y_) inherits IW
   thisLabel.press->press
   label aka thisLabel.text
   thisLabel.width + 23 =:> this.min_width
+  this.min_width = thisLabel.width + 23
   this.min_height = 30
 }

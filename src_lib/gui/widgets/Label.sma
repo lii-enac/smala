@@ -20,20 +20,13 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-Label (Process container, string _label, double x_, double y_) inherits IWidget (container) {
-  Translation t (x_, y_)
-
-  /*----- interface -----*/
-  x aka t.tx
-  y aka t.ty
-  /*----- interface -----*/
-
+Label (string _label) inherits IWidget () {
   FillColor fc (#323232)
   Translation offset (0, 0)
   Text ui (0, 0, _label)
   text aka ui.text
   this.height/2 + ui.ascent/2 - 1 =:> offset.ty
 
-  ui.width =:> this.min_width
-  ui.height =:> this.min_height
+  ui.width =: this.min_width
+  ui.height =: this.min_height
 }

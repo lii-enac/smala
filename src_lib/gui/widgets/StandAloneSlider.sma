@@ -3,18 +3,18 @@ use base
 use gui
 
 _define_
-StandAloneSlider (int _x, int _y, int _width)
+StandAloneSlider (int _x, int _y, int _width, int _init_val)
 {
   Translation pos (_x, _y)
   x aka pos.tx
   y aka pos.ty
   Double width (_width)
   Double height (0)
-  BoundedValue bv (0, 100, 0)
+  BoundedValue bv (0, 100, _init_val)
   lower aka bv.min
   upper aka bv.max
   output aka bv.result
-  Double value (0)
+  Double value (_init_val)
   String unit ("")
 
   Component ui {

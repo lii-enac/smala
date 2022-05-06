@@ -88,7 +88,7 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
 
   RefProperty upper_layer (_upper_layer)
   String value (_default)
-  selected_value aka value
+  selected_item aka value
   Int default_width (200)
   Incr incr (1)
   Incr decr (1)

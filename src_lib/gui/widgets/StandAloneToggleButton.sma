@@ -47,6 +47,9 @@ StandAloneToggleButton (string _label, double x_, double y_) {
 
   FillColor text_color (255, 255, 255)
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
+  FontFamily _ ("B612")
+  FontSize _ (5, 13) // 5 to use the pixel unit. Allows to have the same rendering on MAC & Linux
+  FontWeight _ (DJN_NORMAL)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text
   thisLabel.width + 20 =:> r.width

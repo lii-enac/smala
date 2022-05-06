@@ -68,7 +68,7 @@ _action_
 fn_init_items_pos_and_geom (Process src, Process data)
 {
   addChildrenTo data.text_items {
-    int dy = 57
+    int dy = 65
     for item : data.str_items {
       ComboBoxItem _ (data, item, 25, dy)
       dy = dy + data.szItem
@@ -86,6 +86,7 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
 
   Spike post_init
   Spike unselect
+  Spike update
   Int nbItems (0)
   Int szItem (17)
   Int max_height (120)
@@ -263,6 +264,16 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
       }
     }
   }
+  update->(this) {
+    delete_content this.text_items
+    int y = 65
+    for item : this.str_items {
+      addChildrenTo this.text_items {
+        ComboBoxItem new_item (this, item, 25, y)
+        y += this.szItem
+      }
+    }
+  }
   
   str_items.$removed -> (this) {
     for item : this.text_items {
@@ -270,7 +281,7 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
         delete item
       }
     }
-    int y = 57
+    int y = 65
     for item : this.text_items {
       item.y = y
       y += this.szItem

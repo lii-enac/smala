@@ -3,17 +3,19 @@ use base
 use gui
 
 _define_
-StandAloneSlider (int _x, int _y, int _width, int _lower, int _upper, double _init_val, string _unit)
+StandAloneSlider (int _x, int _y, int _width)
 {
   Translation pos (_x, _y)
   x aka pos.tx
   y aka pos.ty
   Double width (_width)
   Double height (0)
-  BoundedValue bv (_lower, _upper, _init_val)
+  BoundedValue bv (0, 100, 0)
+  lower aka bv.min
+  upper aka bv.max
   output aka bv.result
-  Double value (_init_val)
-  String unit (_unit)
+  Double value (0)
+  String unit ("")
 
   Component ui {
     Component bg {
@@ -93,13 +95,13 @@ StandAloneSlider (int _x, int _y, int _width, int _lower, int _upper, double _in
   prop << ui.property
   Double coeff (1)
   bg.width/ (bg.width-20) =:> coeff
-  ((value / (_upper - _lower)) * bg.width + 10*coeff)/coeff =: pos_bv.input, button_pos.tx, fg.width
+  ((value / (upper - lower)) * bg.width + 10*coeff)/coeff =: pos_bv.input, button_pos.tx, fg.width
   value =: bv.input
   FSM button_fsm {
   	State idle {
   		#ffffff =: button.fill.value
       "" =: prop.text
-      value->{((value / (_upper - _lower)) * bg.width + 10*coeff)/coeff =: pos_bv.input
+      value->{((value / (upper - lower)) * bg.width + 10*coeff)/coeff =: pos_bv.input
               pos_bv.result =: button_pos.tx, fg.width }
   	}
   	State hover {
@@ -116,7 +118,7 @@ StandAloneSlider (int _x, int _y, int _width, int _lower, int _upper, double _in
       button.move.x - offset_x => delta_x
       delta_x + init_tx => pos_bv.input
       pos_bv.result => button_pos.tx, fg.width
-      pos_bv.result*((_upper - _lower)/$bg.width) + _lower =:> bv.input
+      pos_bv.result*((upper - lower)/$bg.width) + lower =:> bv.input
   	  toString (i_output) + unit =:> prop.text
   	}
   	idle->hover (button.enter)

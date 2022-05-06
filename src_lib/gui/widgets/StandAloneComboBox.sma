@@ -53,10 +53,15 @@ static int has_str_item (Process *item, Process *list) {
 _action_
 fn_change_parent (Process src, Process data)
 {
-  upper_layer = getRef (data.upper_layer)
-  addChildrenTo upper_layer {
-    data.local_panel
+  if (!data.local_panel_in_upper_layer)
+  {
+    data.local_panel_in_upper_layer = 1
+    upper_layer = getRef (data.upper_layer)
+    addChildrenTo upper_layer {
+      data.local_panel
+    }
   }
+
 }
 
 _action_
@@ -85,7 +90,7 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
   Int szItem (17)
   Int max_height (120)
   /*----- interface -----*/
-
+  Bool local_panel_in_upper_layer (0)
   RefProperty upper_layer (_upper_layer)
   String value (_default)
   selected_item aka value

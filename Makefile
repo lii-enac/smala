@@ -320,7 +320,6 @@ $(build_dir)/$(smala_lib_dir)/gui/widgets/HSpace.o: $(build_dir)/$(smala_lib_dir
 $(build_dir)/$(smala_lib_dir)/gui/widgets/VSpace.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/HBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/VBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/WidgetContainer.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)

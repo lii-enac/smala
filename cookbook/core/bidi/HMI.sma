@@ -17,7 +17,6 @@ use base
 use display
 use gui
 
-import gui.widgets.WidgetContainer
 import gui.widgets.PushButton
 import gui.widgets.VBox
 import gui.widgets.HBox

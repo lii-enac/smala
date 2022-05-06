@@ -20,7 +20,6 @@ use gui
 import gui.widgets.Label
 import gui.widgets.CheckBox
 import gui.widgets.RadioButton
-import gui.widgets.WidgetContainer
 import gui.widgets.VBox
 import gui.widgets.HBox
 import gui.widgets.CheckBoxManager

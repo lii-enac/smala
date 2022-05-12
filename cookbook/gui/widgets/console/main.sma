@@ -31,9 +31,13 @@ Component root {
   2 =: ste.spaces_for_tab
   f.width - 20 =:> ste.width
   ste.line_height * ste.lines.size =:> ste.height
+  "Console\n" =: ste.string_input
 
   StandAlonePushButton button ("Click to add line", 450, 100)
   f.width - button.width - 10 =:> button.x
   button.click->{"new line\n" =: ste.string_input}
+  StandAlonePushButton button2 ("Click to clear", 450, 150)
+  f.width - button2.width - 10 =:> button2.x
+  button2.click->ste.clear
 }
 

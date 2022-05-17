@@ -58,8 +58,10 @@ PushButton (string _label) inherits IWidget () {
   label aka thisLabel.text
   thisLabel.width + 20 =:> this.min_width
   this.min_width = thisLabel.width + 20
+  this.preferred_width = thisLabel.width + 20
   thisLabel.height + 10 =:> this.min_height
   this.min_height = thisLabel.height + 10
+  this.preferred_height = thisLabel.height + 10
   this.width =:> r.width
   this.height =:> r.height
   r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y

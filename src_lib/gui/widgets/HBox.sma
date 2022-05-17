@@ -58,7 +58,10 @@ fn_update_items_pos_and_geom (Process src, Process data)
       nb_fixed_width++
     }
   }
-  int space_per_item = (width - fixed_width - (nb_items-1)*hspace - 2*padding_left) / (nb_items - nb_fixed_width)
+  int space_per_item = 0
+  if (nb_items != nb_fixed_width) {
+    space_per_item = (width - fixed_width - (nb_items-1)*hspace - 2*padding_left) / (nb_items - nb_fixed_width)
+  }
   int dx = 0
   int max_height = 0
   for item : data.items {

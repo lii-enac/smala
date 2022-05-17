@@ -49,7 +49,6 @@ fn_update_items_pos_and_geom (Process src, Process data)
   int height = data.container_height - 2*padding_top
   
   int vspace = data.vspace
-
   int fixed_height = 0
   int nb_fixed_height = 0
   for item : data.items {
@@ -58,7 +57,10 @@ fn_update_items_pos_and_geom (Process src, Process data)
       nb_fixed_height++
     }
   }
-  int space_per_item = (height - fixed_height - (nb_items-1)*vspace - 2*padding_top) / (nb_items - nb_fixed_height)
+  int space_per_item = 0
+  if (nb_items != nb_fixed_height) {
+    space_per_item = (height - fixed_height - (nb_items-1)*vspace - 2*padding_top) / (nb_items - nb_fixed_height)
+  }
   int dy = 0
   int max_width = 0
   for item : data.items {

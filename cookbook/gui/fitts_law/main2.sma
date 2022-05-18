@@ -12,6 +12,8 @@ _native_code_
 #include <random>
 #include <cassert>
 
+#include "core/utils/getset.h"
+
 void
 cpp_action (Process* root)
 {
@@ -52,13 +54,13 @@ cpp_action (Process* root)
 	
 	#define GET_PROC(type, varname, parent) auto *varname = dynamic_cast<type*>(parent->find_child (#varname)); assert(varname);
 
-	GET_PROC(SwitchList, measures, root);
+	GET_CHILD (SwitchList, root, measures); 
 	int i=0;
 	for (auto * p: measures->children ()) {
 		auto *measure = dynamic_cast<Component*>(p); assert(measure);
-		GET_PROC(AbstractIntProperty, tw, measure);
-		GET_PROC(AbstractIntProperty, td, measure);
-		GET_PROC(AbstractDoubleProperty, te, measure);
+		GET_CHILD(AbstractIntProperty, measure, tw);
+		GET_CHILD(AbstractIntProperty, measure, td);
+		GET_CHILD(AbstractDoubleProperty, measure, te);
 		tw->set_value (repeats[i].W, true);
 		td->set_value (repeats[i].A, true);
 		te->set_value (repeats[i].E, true);

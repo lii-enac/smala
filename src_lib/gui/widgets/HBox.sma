@@ -74,6 +74,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
         item.width = space_per_item < $item.min_width ? $item.min_width : space_per_item
       }
     }
+
     item.x = dx
     dx += item.width + hspace
 
@@ -91,6 +92,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
       max_height = $item.height
     } 
   }
+  dx -= hspace
   for item : data.items {
     if (item.v_alignment == 0) {        // top
       item.y = 0
@@ -102,23 +104,23 @@ fn_update_items_pos_and_geom (Process src, Process data)
   }
   if (data.set_pos == 1) {
     if ($data.h_alignment == 0) {
-      data.x = padding_left
+      data.off_x = 0
     } else if ($data.h_alignment == 1) {
-      data.x = (data.container_width - dx) / 2
+      data.off_x = (data.container_width - dx) / 2 - padding_left
     } else {
-      data.x = data.container_width - dx - padding_left
+      data.off_x = data.container_width - dx - padding_left
     }
 
     if ($data.v_alignment == 0) {
-      data.y = padding_top
+      data.off_y = 0
     } else if ($data.v_alignment == 1) {
-      data.y = (data.container_height - max_height) / 2
+      data.off_y = (data.container_height - max_height) / 2 - padding_top
     } else {
-      data.y = data.container_height - max_height - padding_top
+      data.off_y = data.container_height - max_height - padding_top
     }
   }
-  data.width = dx + 2*padding_left
-  data.height = max_height + 2*padding_top
+  data.preferred_width = dx + 2*padding_left
+  data.preferred_height = max_height + 2*padding_top
   data.cell_width = space_per_item
   data.cell_height = max_height
 }
@@ -129,8 +131,12 @@ HBox (Process container) inherits IWidget ()
   check (container, "width")
   check (container, "height")
   Bool set_pos (1)
-  Int padding_left (5)
-  Int padding_top (5)
+  Translation offset (0, 0)
+  off_x aka offset.tx
+  off_y aka offset.ty
+  Translation padding (5, 5)
+  padding_left aka padding.tx
+  padding_top aka padding.ty
   Int cell_width (0)
   Int cell_height (0)
   Int hspace (5)

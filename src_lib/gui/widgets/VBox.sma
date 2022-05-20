@@ -48,7 +48,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
   int width = data.container_width - 2*padding_left
   int height = data.container_height - 2*padding_top
 
-  int vspace = data.vspace
+  int space = data.space
   int fixed_height = 0
   int nb_fixed_height = 0
   for item : data.items {
@@ -59,7 +59,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
   }
   int space_per_item = 0
   if (nb_items != nb_fixed_height) {
-    space_per_item = (height - fixed_height - (nb_items-1)*vspace - 2*padding_top) / (nb_items - nb_fixed_height)
+    space_per_item = (height - fixed_height - (nb_items-1)*space - 2*padding_top) / (nb_items - nb_fixed_height)
   }
   int dy = 0
   int max_width = 0
@@ -74,7 +74,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
       }
     }
     item.y = dy
-    dy += item.height + vspace
+    dy += item.height + space
 
     if ($item.preferred_width != -1) {
       item.width = $item.preferred_width
@@ -90,7 +90,7 @@ fn_update_items_pos_and_geom (Process src, Process data)
       max_width = $item.width
     } 
   }
-  dy -= vspace
+  dy -= space
   for item : data.items {
     if (item.h_alignment == 0) { // left
       item.x = 0
@@ -138,7 +138,7 @@ VBox (Process container) inherits IWidget ()
   padding_top aka padding.ty
   Int cell_width (0)
   Int cell_height (0)
-  Int vspace (5)
+  Int space (5)
   if (find_without_warning (container, "cell_width")) {
     container_width aka container.cell_width
     container_height aka container.cell_height
@@ -157,6 +157,6 @@ VBox (Process container) inherits IWidget ()
   SumList sl (items, "min_height")
   MaxList ml (items, "min_width")
   sl.output->update_items_pos_and_geom // bad trick to force geometry recomputation at startup, needed for text
-  sl.output + vspace*(items.size - 1) =:> this.min_height
+  sl.output + space*(items.size - 1) =:> this.min_height
   ml.output =:> this.min_width
 }

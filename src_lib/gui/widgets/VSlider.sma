@@ -27,6 +27,7 @@ VSlider (int _init_val) inherits IWidget () {
   Double value (_init_val)
   bv.result => value
   int radius = 8
+
   OutlineColor _ (#535353)
   FillColor bg_color (White)
   Rectangle bg (7, 0, 6, 140, 3, 3)
@@ -34,7 +35,7 @@ VSlider (int _init_val) inherits IWidget () {
   Rectangle fill (7, 0, 6, 0, 3, 3)
   OutlineColor _ (#535353)
   OutlineWidth handle_width (1)
-  FillColor handle_color (959595)
+  FillColor handle_color (#959595)
   Translation pos (0, 0)
   Circle handle (10, 0, radius)
 

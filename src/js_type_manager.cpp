@@ -77,6 +77,7 @@ namespace Smala {
       {"mouseTracking", "mouse_tracking"},
       {"DrawingRefreshManager", "DrawingRefreshManager"},
       {"GenericMouse", "GenericMouse"},
+      {"GenericKeyboard", "GenericKeyboard"},
       {"Point", "PolyPoint"},
       {"0", "0"}
     };

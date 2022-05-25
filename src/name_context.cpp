@@ -42,6 +42,7 @@ namespace Smala {
     add_global_sym ("mouseTracking", INT);
     add_global_sym ("DrawingRefreshManager", PROCESS);
     add_global_sym ("GenericMouse", PROCESS);
+    add_global_sym ("GenericKeyboard", PROCESS);
     add_global_sym ("DefaultAudioListener", PROCESS);
 
     /* HTML Color Name */

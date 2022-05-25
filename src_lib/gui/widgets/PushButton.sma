@@ -26,10 +26,11 @@ PushButton (string _label) inherits IWidget () {
   /*----- interface -----*/
 
   Int idle_color (#323232)
-  Int pressed_color (#535353)
+  Int pressed_color (#959595)
   Int text_color (#ffffff)
-  FillColor fc (#323232)
-  Rectangle r (0, 0, 100, 40, 5, 5)
+  OutlineColor _ (#535353)
+  FillColor fc (#535353)
+  Rectangle r (0, 0, 100, 40, 3, 3)
 
   press aka r.press
 

@@ -26,39 +26,45 @@ VSlider (int _init_val) inherits IWidget () {
   output aka bv.result
   Double value (_init_val)
   bv.result => value
-
-  OutlineColor _ (200, 200, 200)
+  int radius = 8
+  OutlineColor _ (#535353)
   FillColor bg_color (White)
   Rectangle bg (7, 0, 6, 140, 3, 3)
-  FillColor fill_color (#535353)
+  FillColor fill_color (#959595)
   Rectangle fill (7, 0, 6, 0, 3, 3)
-  FillColor handle_color (#323232)
+  OutlineColor _ (#535353)
+  OutlineWidth handle_width (1)
+  FillColor handle_color (959595)
   Translation pos (0, 0)
-  Circle handle (10, 0, 10)
+  Circle handle (10, 0, radius)
 
-  this.height - 20  =:> bg.height
+  this.height - 2*radius  =:> bg.height
 
-  this.min_width = 20
+  this.min_width = 2*radius
   this.min_height = 100
-  this.preferred_width = 20
+  this.preferred_width = 2*radius
 
   BoundedValue bv_pos (0, $this.height, $pos.ty)
   bg.height =:> bv_pos.max
 
   FSM fsm_handle {
     State idle {
-      #323232 =: handle_color.value
+      #959595 =: handle_color.value
       (value-min)/(max-min) * (bg.height) =:> pos.ty, fill.height
     }
+    State hover {
+      #FFFFFF =: handle_color.value
+    }
     State move {
-      #535353 =: handle_color.value
       Double off_y (0)
       handle.press.y - pos.ty =: off_y
       handle.move.y - off_y =:> bv_pos.input
       bv_pos.result => pos.ty, fill.height
       (pos.ty/(bg.height)) * (max-min) + min =:> bv.input
     }
-    idle->move (handle.press)
+    idle->hover (handle.enter)
+    hover->idle (handle.leave)
+    hover->move (handle.press)
     move->idle (handle.release)
   }
 }

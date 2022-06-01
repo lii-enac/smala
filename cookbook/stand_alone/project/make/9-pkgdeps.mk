@@ -14,9 +14,10 @@ pkgcmd := pacman -Suy --needed
 endif
 
 # external libraries
+ifneq ($(strip $(pkdeps)),)
 CXXFLAGS += $(shell pkg-config --cflags $(pkdeps))
-# LDFLAGS +=
 LIBS += $(shell pkg-config --libs $(pkgdeps))
+endif
 
 install-pkgdeps:
 	$(pkgcmd) $(pkgdeps)

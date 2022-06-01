@@ -27,6 +27,6 @@ Label (string _label) inherits IWidget () {
   text aka ui.text
   this.height/2 + ui.ascent/2 - 1 =:> offset.ty
 
-  ui.width =: this.min_width, this.preferred_width
-  ui.height =: this.min_height, this.preferred_height
+  ui.width =: this.min_width//, this.preferred_width
+  ui.height =: this.min_height//, this.preferred_height
 }

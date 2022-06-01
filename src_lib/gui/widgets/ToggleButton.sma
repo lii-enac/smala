@@ -26,9 +26,10 @@ ToggleButton (string _label) inherits IWidget () {
   /*----- interface -----*/
 
   Int idle_color (#323232)
-  Int pressed_color (#535353)
-  FillColor fc (#323232)
-  Rectangle r (0, 0, 100, 40, 5, 5)
+  Int pressed_color (#959595)
+  Int text_color (#ffffff)
+  FillColor fc (#535353)
+  Rectangle r (0, 0, 100, 40, 3, 3)
 
   press aka r.press
 
@@ -43,14 +44,17 @@ ToggleButton (string _label) inherits IWidget () {
     pressed->idle (r.press, toggle)
   }
 
-  FillColor text_color (255, 255, 255)
+  FillColor tc (255, 255, 255)
+  text_color =: tc.value
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text
   thisLabel.width + 20 =:> this.min_width
   this.min_width = thisLabel.width + 20
+  this.preferred_width = thisLabel.width + 20
   thisLabel.height + 10 =:> this.min_height
   this.min_height = thisLabel.height + 10
+  this.preferred_height = thisLabel.height + 10
   this.width =:> r.width
   this.height =:> r.height
   r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y

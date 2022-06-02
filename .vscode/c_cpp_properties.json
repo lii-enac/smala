@@ -11,6 +11,7 @@
                 "/opt/**",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/**"
             ],
+            "compilerPath": "/usr/bin/clang",
             "defines": [],
             "macFrameworkPath": [],
             "cStandard": "c11",

@@ -36,6 +36,18 @@
             "MIMode": "gdb",
             "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
         },
+        "env":
+                {
+                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/",//:/Users/conversy/recherche/istar/code/misc/MGL/build",
+                },
+                {
+                    "PATH": "${PATH}:${workspaceFolder}/../djnn-cpp/build/lib"
+                }//,
+                // {
+                //     "name": "TSAN_OPTIONS",
+                //     "value": "report_bugs=1 halt_on_error=0 history_size=7"
+                // }
+            ],
         "environment": [
             {
             "name": "DYLD_LIBRARY_PATH",

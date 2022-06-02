@@ -6,13 +6,15 @@
     //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
     //"program": "${workspaceFolder}/build/cookbook/comms/midi/midi_app",
     //"program": "${workspaceFolder}/build/cookbook/core/nativeactions/nativeactions_app",
+    //"program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
 
     "version": "0.2.0",
     "configurations": [
 
     {
         "name": "(lldb) smala - cookbook",
-        "type": "cppdbg",
+        //"type": "cppdbg",
+        "type": "lldb",
         "request": "launch",
         "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
         "args": [],
@@ -20,17 +22,32 @@
         "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest", // path to cookbook file
         "preLaunchTask": "app",
         "externalConsole": false,
-        "MIMode": "lldb",
-        "environment": [
-            {
-            "name": "DYLD_LIBRARY_PATH",
-            "value": "${DYLD_LIBRARY_PATH}:${workspaceFolder}/build/lib:${workspaceFolder}/../djnn-cpp/build/lib"
-            },
-            {
-                "name": "GALLIUM_DRIVER",
-                "value": "llvmpipe"
-            }
-            ]
+        //"MIMode": "lldb",
+        //"miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb",
+        "linux": {
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        "osx": {
+            "MIMode": "lldb",
+            "miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb"
+        },
+        "windows": {
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+        },
+        "env":
+                {
+                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/",//:/Users/conversy/recherche/istar/code/misc/MGL/build",
+                },
+                {
+                    "PATH": "${PATH}:${workspaceFolder}/../djnn-cpp/build/lib"
+                }//,
+                // {
+                //     "name": "TSAN_OPTIONS",
+                //     "value": "report_bugs=1 halt_on_error=0 history_size=7"
+                // }
+        
     },
     ]
 }

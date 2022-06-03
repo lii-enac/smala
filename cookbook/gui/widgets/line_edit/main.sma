@@ -26,11 +26,6 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
   mouseTracking = 1
-  NoOutline _
-  FillColor _ (50, 50, 50)
-  Rectangle bkg (0, 0, 0, 0, 0, 0)
-  f.width  =:> bkg.width
-  f.height =:> bkg.height
   TextLineEdit tle (f, "Enter your text here", 100, 100)
 
   FillColor _ (200, 200, 200)

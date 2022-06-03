@@ -23,7 +23,7 @@ UITextField () inherits IWidget () {
   OutlineColor _ (#535353)
   FillColor bg_color (White)
   Rectangle bg (0, 0, 100, 30, 3, 3)
-  this.min_width = 100
+/*  this.min_width = 100
   this.preferred_width = 100
   this.min_height = 30
   this.width =:> bg.width
@@ -55,7 +55,7 @@ UITextField () inherits IWidget () {
   FSM fsm_cursor {
     State idle
     State edit {
-      /* Cursor */
+
       OutlineColor _ (0, 0, 0)
       OutlineWidth _ (1)
       Clock cl (500)
@@ -119,7 +119,6 @@ UITextField () inherits IWidget () {
 
       Double x_select (0)
 
-      /* Graphic shape for selection */
       FSM rec_selection {
         State no_rec
         State rec {
@@ -161,4 +160,5 @@ UITextField () inherits IWidget () {
     }
   }
   fsm_cursor.state =:> sw_box_edit.state
+  */
 }

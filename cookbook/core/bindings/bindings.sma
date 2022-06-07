@@ -18,15 +18,15 @@ use display
 use gui
 
 //import Button
-import gui.widgets.PushButton
+import gui.widgets.StandAlonePushButton
 
 _main_
 Component root {
   Frame f ("my frame", 0, 0, 1200, 600)
   Exit ex (0, 1)
   f.close -> ex
-  PushButton show (f, "Show", 50, 50)
-  PushButton hide (f, "Hide", 50, 150)
+  StandAlonePushButton show ("Show", 50, 50)
+  StandAlonePushButton hide ("Hide", 50, 150)
 
   FillColor _(255, 0, 0)
   Rectangle rectR (50, 250, 100, 70, 0, 0)

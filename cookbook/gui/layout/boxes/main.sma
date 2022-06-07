@@ -20,7 +20,7 @@ import gui.widgets.PushButton
 import gui.widgets.ToggleButton
 import gui.widgets.HBox
 import gui.widgets.VBox
-import gui.widgets.Slider
+import gui.widgets.HSlider
 import gui.widgets.Label
 import gui.widgets.ComboBox
 import gui.widgets.HSpace
@@ -30,6 +30,7 @@ Component root {
   Frame f ("frame", 0, 0, 600, 200)
   Exit ex (0, 1)
   f.close->ex
+  mouseTracking = 1 
   FillColor _ (200, 200, 200)
   NoOutline _
   Rectangle bkg (0, 0, 0, 0, 0, 0)
@@ -62,7 +63,7 @@ Component root {
       ToggleButton sub3 ("Connect slider")
       Label l ("Value: ")
       l.h_alignment = 0
-      Slider s
+      HSlider s (0)
       FSM fsm {
         State idle
         State connected {

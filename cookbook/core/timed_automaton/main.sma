@@ -21,7 +21,7 @@ use core
 use base
 use gui
 
-import gui.widgets.PushButton
+import gui.widgets.StandAlonePushButton
 
 _main_
 Component root {
@@ -34,9 +34,9 @@ Component root {
 	Text cl_t (50, 200, "0")
 	Text fsm_t (170, 200, "0")
 	FillColor _ (100, 100, 100)
-	PushButton ra (f, "Event a", 50, 30)
-	PushButton rb (f, "Event b", 130, 30)
-	PushButton rc (f, "Reset Clock", 210, 30)
+	StandAlonePushButton ra ("Event a", 50, 30)
+	StandAlonePushButton rb ("Event b", 130, 30)
+	StandAlonePushButton rc ("Reset Clock", 210, 30)
 	
 	/** Graphics **/
 	gui = loadFromXML("graphics.svg")

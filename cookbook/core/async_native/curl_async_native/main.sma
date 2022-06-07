@@ -17,7 +17,7 @@ use base
 use display
 use gui
 
-import gui.widgets.PushButton
+import gui.widgets.StandAlonePushButton
 import gui.interactors.SimpleDrag
 
 _native_code_
@@ -114,7 +114,7 @@ Component root {
     Text explanation3 (10, 60, "When the action is terminated, the title of the online ressource should appear")
     Text t (10, 120, "  ")
     Text t2 (10, 140, "")
-    PushButton btn (f, "launch", 50, 150)
+    StandAlonePushButton btn ("launch", 50, 150)
     FillColor fc (#FF00FF)
     Rectangle r (200, 200, 100, 100, 0, 0)
     Ref toDrag (r)

@@ -17,7 +17,7 @@
  use display
  use gui
 
- import gui.widgets.PushButton
+ import gui.widgets.StandAlonePushButton
 
  _action_
  list_action (list l, Process c)
@@ -68,9 +68,9 @@
         
       }
     }
-    PushButton inc (f, "Increase", 50, 150)
-    PushButton dec (f, "Decrease", 150, 150)
-    PushButton clear (f, "Clear", 250, 150)
+    StandAlonePushButton inc ("Increase", 50, 150)
+    StandAlonePushButton dec ("Decrease", 150, 150)
+    StandAlonePushButton clear ("Clear", 250, 150)
 
     Spike rm_all
     ProcessCollector collection

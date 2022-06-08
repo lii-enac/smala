@@ -21,6 +21,7 @@ use gui
 _native_code_
 %{
 #include <iostream>
+#include <cassert>
 #include "gui/picking/picking.h"
 
 void

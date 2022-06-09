@@ -34,6 +34,7 @@ UITextField () inherits IWidget () {
   FillColor _ (Black)
   TextField field (0, 0, 180, 18, "", 1)
   this.preferred_height = 18
+  this.preferred_width = 100
   this.width =:> bkg.width
   this.width - 10 =:> field.width
 

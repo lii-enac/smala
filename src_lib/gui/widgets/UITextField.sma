@@ -20,145 +20,67 @@ import gui.widgets.IWidget
 
 _define_
 UITextField () inherits IWidget () {
-  OutlineColor _ (#535353)
-  FillColor bg_color (White)
-  Rectangle bg (0, 0, 100, 30, 3, 3)
-/*  this.min_width = 100
-  this.preferred_width = 100
-  this.min_height = 30
-  this.width =:> bg.width
-
-  FillColor text_color (#535353)
-  RectangleClip clip (1, 1, 180, 18)
-  bg.width - 2 =:> clip.width
-  bg.height =:> clip.height
-  Translation back_move (0, 0)
-  Text ui_text (10, 10, "")
-  text aka ui_text.text
-  bg.height/2.0 + (ui_text.ascent - ui_text.descent)/2.0 - 1 =:> ui_text.y
+  mouseTracking = 1
+  Spike validate
   Spike clear
+  String text ("")
+  String init_text ("")
 
-  Bool is_wider (0)
-  ui_text.width > (bg.width - 2) => is_wider
+  OutlineColor _ (#535353)
+  FillColor bg_color (White)  
 
-  FSM text_pos_management {
-    State idle {
-      0 =: back_move.tx
+  Rectangle bkg (0, 0, 190, 21, 3, 3)
+  Translation _ (5, 2)
+  FillColor _ (Black)
+  TextField field (0, 0, 180, 18, "", 1)
+  this.preferred_height = 18
+  this.width =:> field.width, bkg.width
+
+  Int unedit_text_color (#909090)
+  Int edit_text_color (0)
+  text_color aka field.text_color // IntProperty
+  text_selected_color aka field.text_selected_color // IntProperty
+  selection_color aka field.selection_color // IntProperty
+
+  Spike leave
+  FSM in_out {
+    State out {
+      GenericMouse.left.press->leave
     }
-    State wider {
-      -(ui_text.width - bg.width - 2) =:> back_move.tx
-    }
-    idle->wider (is_wider.true)
-    wider->idle (is_wider.false)
+    State in
+    out->in (field.enter)
+    in->out (field.leave)
   }
 
-  FSM fsm_cursor {
-    State idle
+  AssignmentSequence set_text (1) {
+    field.content.text =: text
+  }
+  validate -> set_text
+
+  FSM edit_fsm {
+    State no_edit {
+      unedit_text_color =: text_color
+    }
     State edit {
+      edit_text_color =: text_color
+      /* Cursor */
+      OutlineColor _ (Black)
+      OutlineWidth _ (2)
+      Line cursor (0, 0, 0, 15)
+      field.cursor_end_x =:> cursor.x1, cursor.x2
+      field.cursor_height =:> cursor.y2
+      validate->leave
 
-      OutlineColor _ (0, 0, 0)
-      OutlineWidth _ (1)
-      Clock cl (500)
-      FSM blink {
-        State show {
-          Line cursor (2, 3, 2, 17)
-          ui_text.y - ui_text.ascent - 1 =:> cursor.y1
-          ui_text.height + cursor.y1 + 2 =:> cursor.y2
-        }
-        State hide
-        show->hide (cl.tick)
-        hide->show (cl.tick)
-      }
-      Spike quit
-      FSM in_out {
-        State in
-        State out {
-          GenericMouse.left.press->quit
-        }
-        in->out (bg.leave)
-        out->in (bg.enter)
-      }
+      GenericKeyboard.key\-pressed => field.key_pressed
+      GenericKeyboard.key\-released => field.key_released
+      GenericKeyboard.key\-pressed_text => field.string_input
     }
-    idle->edit (bg.press)
-    edit->idle (edit.quit)
+    no_edit->edit (field.press)
+    no_edit->edit (bkg.press)
+    edit->no_edit (leave)
   }
-  TextField le (ui_text, bg)
-  le.x_cursor + ui_text.x =:> fsm_cursor.edit.blink.show.cursor.x1, fsm_cursor.edit.blink.show.cursor.x2
 
-  Bool is_left (0)
-  Bool is_right (0)
-  Bool is_del (0)
-  Bool is_suppr (0)
-  Bool is_return (0)
-  Bool is_shift_press (0)
-  Bool is_shift_release (0)
-  Bool del_or_replace (0)
-
-  Switch sw_box_edit (idle) {
-    Component idle {
-      0 =: back_move.tx
-      #969696 =: text_color.value
-    }
-    Component edit {
-      #535353 =: text_color.value
-      GenericKeyboard.key\-pressed_text =>le.new_text
-      GenericKeyboard.key\-pressed == 16777223 => is_suppr
-      GenericKeyboard.key\-pressed == 16777219 => is_del
-      GenericKeyboard.key\-pressed == 16777236 => is_right
-      GenericKeyboard.key\-pressed == 16777234 => is_left
-      GenericKeyboard.key\-pressed == 16777220 => is_return
-      GenericKeyboard.key\-pressed == 16777248 => is_shift_press
-      GenericKeyboard.key\-released == 16777248 => is_shift_release
-
-      is_suppr.true->le.suppr
-      is_del.true->le.del
-      is_right.true->le.move_right
-      is_left.true->le.move_left
-
-      is_suppr || is_del || GenericKeyboard.key\-pressed < 16777216 || GenericKeyboard.key\-pressed > 16908289 => del_or_replace
-
-      Double x_select (0)
-
-      FSM rec_selection {
-        State no_rec
-        State rec {
-          FillOpacity _ (0.5)
-          NoOutline _
-          FillColor _ (#0157FF)
-          Rectangle rec (0, 3, 0, 14, 0, 0)
-          ui_text.y - ui_text.ascent - 1 =:> rec.y
-          ui_text.height + 4 =:> rec.height
-          le.x_start + ui_text.x =:> rec.x
-          le.x_cursor + ui_text.x - rec.x =:> rec.width
-        }
-        no_rec->rec (le.start_selection)
-        rec->no_rec (le.end_selection)
-      }
-      
-      FSM select_all_fsm {
-        State idle
-        State wait {
-          Timer t (500)
-          bg.press->le.select_all
-        }
-        idle->wait (bg.press)
-        wait->idle (wait.t.end)
-      }
-      FSM select_fsm {
-        State idle {
-          is_right || is_left -> le.end_selection
-        }
-        State kbd_select
-        State mouse_select {
-          bg.move->le.pointer_move
-        }
-        idle->mouse_select (bg.press, le.start_selection)
-        idle->kbd_select (is_shift_press.true, le.start_selection)
-        kbd_select->idle (is_shift_release.true)
-        mouse_select->idle (bg.release)
-      }
-    }
-  }
-  fsm_cursor.state =:> sw_box_edit.state
-  */
+  clear->field.clear
+  init_text =:> field.content.text
+  field.validate->validate
 }

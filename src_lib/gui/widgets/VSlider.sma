@@ -66,6 +66,7 @@ VSlider (int _init_val) inherits IWidget () {
     idle->hover (handle.enter)
     hover->idle (handle.leave)
     hover->move (handle.press)
+    hover->move (handle.press)
     move->idle (handle.release)
   }
 }

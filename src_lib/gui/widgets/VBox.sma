@@ -45,8 +45,11 @@ fn_update_items_pos_and_geom (Process src, Process data)
   
   int padding_left = data.padding_left
   int padding_top = data.padding_top
-  int width = data.container_width - 2*padding_left
-  int height = data.container_height - 2*padding_top
+  int preferred_width = data.preferred_width
+  int preferred_height = data.preferred_height
+  int width = data.preferred_width == -1 ? data.container_width - 2*padding_left : data.preferred_width - 2*padding_left
+  int height = data.preferred_height == -1 ? data.container_height - 2*padding_top : data.preferred_height - 2*padding_top
+
 
   int space = data.space
   int fixed_height = 0

@@ -6,7 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
 
-## [1.17.0] - 2021-01-05
+
+## [1.18.0] - 2022-06-09
+### compliant with djnn-cpp [1.18.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - Improve Smala syntax editor mode for vscode : please update using editor_mode/vscode/README.md
+    - New cookbook recipes : handpick, console
+    - NEW cookbook recipes : bidi (experimental), ROS2 communication (disable by default), video (stream, rtsp - disable by default)
+    - NEW experimental mode - _AUTHORIZE_CYCLE = 1|0
+    - NEW auto-interactive script test using : pyautogui -- Create NEW git branch : interactive_test_suite
+    - NEW Stand_alone scheme : make stand_alone 
+    - NEW LazyConnector Component : =?>
+    - NEW LazyAssignment Component :  =?:
+    - NEW Component: GenericKeyboard
+    - NEW widgets: UITextField, StandAloneSlider, StandAlonePushButton, StandAloneToggleButton, StandAlonecomboBox, HSpace, VSpace
+
+### Changed
+    - Improved delete_content code generator by using scheduled_delete
+    - Combobox can have zero items, and it is possible to add items one per one
+    - Force to use the pixel unit for font. Allows to have the same rendering on MAC & Linux
+    - AssignmentSequence can be named when defined in a binding
+    - Improves lib widgets: Animator, Combobox, HBox, VBox, VSlider, HSlider, PushButton, Label, ToggleButton, TextLineEdit
+    - Improves cookbook recipes : Layer
+    - slider component : allow the external modification of the value
+    - Improved debug messages.
+    - Improved Readme.md
+    - Cleaned Code, comments
+### Removed 
+    - REMOVED WidgetContainer widget -- not needed anymore !
+
+## [1.17.0] - 2022-01-05
 ### compliant with djnn-cpp [1.17.0]
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 ### NEW

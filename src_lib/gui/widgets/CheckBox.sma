@@ -28,6 +28,8 @@ CheckBox (string _label) inherits IWidget () {
   Spike unselect
   /*----- interface -----*/
 
+  Bool is_selected (0)
+
   Int check_color (#535353)
   Int idle_color (#ffffff)
 
@@ -35,7 +37,7 @@ CheckBox (string _label) inherits IWidget () {
   
   FillColor text_color (#323232)
   Text thisLabel (23, 14, _label)
-  OutlineWidth ow (2)
+  OutlineWidth ow (1)
   OutlineColor oc (#535353)
   FillColor fc (#ffffff)
   
@@ -44,18 +46,13 @@ CheckBox (string _label) inherits IWidget () {
 
   Spike press
   r.press -> press
-
   FSM fsm {
     State st_idle {
-      idle_color =: fc.value
-      //check_color =: oc.value
-      2 =: ow.width
+      0 =: is_selected
     }
     State st_selected {
-      //idle_color =: oc.value
-      check_color =: fc.value
-      1 =: ow.width
-      OutlineColor oc (#ffffff)
+      1 =: is_selected
+      OutlineColor oc (#535353)
       OutlineJoinStyle _ (1)
       OutlineCapStyle _ (1)
       OutlineWidth _ (2)
@@ -70,11 +67,11 @@ CheckBox (string _label) inherits IWidget () {
     st_selected->st_idle (unselect)
   }
 
-  
-
   thisLabel.press->press
   label aka thisLabel.text
-  thisLabel.width + 23 =:> this.min_width
+  thisLabel.width + 23 =:> this.min_width, this.preferred_width
   this.min_width = thisLabel.width + 23
+  this.preferred_width = thisLabel.width + 23
   this.min_height = 16
+  this.preferred_height = 16
 }

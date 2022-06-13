@@ -33,6 +33,10 @@
 #include <unistd.h> // getpid
 #include "core/utils/filesystem.h"
 
+#include <sstream>
+#include <fstream>
+#include <experimental/iterator>
+
 namespace Smala
 {
   static std::string
@@ -89,7 +93,7 @@ namespace Smala
         m_filename = builddir + sep + prefix + ".cpp";
     else
         m_filename = prefix + ".cpp";;
-    //std::ofstream os (prefix + ".cpp");
+    //std::ostream os (prefix + ".cpp");
 
     // create a temporary output file that will be copied into the final output file
     // when we know the includes we need
@@ -203,7 +207,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_use (std::ofstream &os, std::string use)
+  CPPBuilder::build_use (std::ostream &os, std::string use)
   {
     /*if (use.compare ("core") == 0)
       return;
@@ -228,7 +232,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_import (std::ofstream &os, Node *n)
+  CPPBuilder::build_import (std::ostream &os, Node *n)
   {
     os << "#include \"";
     auto sep = "/";
@@ -241,7 +245,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_post_import (std::ofstream &os)
+  CPPBuilder::build_post_import (std::ostream &os)
   {
     os << "inline\n";
     os << "double smala_deref(djnn::AbstractProperty& p)\n";
@@ -259,7 +263,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_start_if (std::ofstream &os, Node* n)
+  CPPBuilder::build_start_if (std::ostream &os, Node* n)
   {
     os << "if (" << build_expr (n->get_args().at(0)) << ") {\n";
     m_indent++;
@@ -380,7 +384,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
+  CPPBuilder::build_range_node (std::ostream &os, Node *node, const string& new_name)
   {
     RangeNode* n = dynamic_cast<RangeNode*> (node);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
@@ -393,7 +397,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor)
+  CPPBuilder::print_start_component (std::ostream &os, const std::string &name, const std::string &constructor)
   {
     print_component_decl (os, name);
     os << " = ";
@@ -529,7 +533,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_print (std::ofstream &os, Node *node)
+  CPPBuilder::build_print (std::ostream &os, Node *node)
   {
     indent (os);
     std::string name ("var_" + std::to_string (m_var_num++));
@@ -542,7 +546,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_while (std::ofstream &os, Node *node)
+  CPPBuilder::build_while (std::ostream &os, Node *node)
   {
     indent (os);
     os << "while (" << build_expr (node->get_args().at(0)) << ") {";
@@ -552,7 +556,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_for (std::ofstream &os, Node *node)
+  CPPBuilder::build_for (std::ostream &os, Node *node)
   {
     ForNode *fn = (ForNode*) node;
     push_ctxt ();
@@ -568,7 +572,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_for_every (std::ofstream &os, Node *node)
+  CPPBuilder::build_for_every (std::ostream &os, Node *node)
   {
     ForEveryNode* n = (ForEveryNode*) node;
     indent (os);
@@ -613,7 +617,7 @@ namespace Smala
 
 
   void
-  CPPBuilder::build_control_node (std::ofstream &os, Node *node)
+  CPPBuilder::build_control_node (std::ostream &os, Node *node)
   {
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
@@ -690,7 +694,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_multi_control_node (std::ofstream &os,
+  CPPBuilder::build_multi_control_node (std::ostream &os,
                                            NativeExpressionNode *node)
   {
     ExprNode* arg_node = node->get_expression ();
@@ -751,7 +755,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_simple_control_node (std::ofstream &os,
+  CPPBuilder::build_simple_control_node (std::ostream &os,
                                          NativeExpressionNode *node)
   {
     std::string p_name =
@@ -853,7 +857,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::emit_not_a_property (std::ofstream &os, const std::string& arg, const std::string& e)
+  CPPBuilder::emit_not_a_property (std::ostream &os, const std::string& arg, const std::string& e)
   {
     os << "if (" << arg << "->get_process_type() != PROPERTY_T) {\n";
     indent (os);
@@ -862,12 +866,11 @@ namespace Smala
     os << "\texit(0);\n";
     indent (os);
     os << "}\n";
-    indent (os);
   }
 
 
   void
-  CPPBuilder::build_native_expression_node (std::ofstream &os, Node *n)
+  CPPBuilder::build_native_expression_node (std::ostream &os, Node *n)
   {
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
@@ -1057,7 +1060,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_native_action (std::ofstream &os, Node *n)
+  CPPBuilder::build_native_action (std::ostream &os, Node *n)
   {
     NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
     os << "void\n";
@@ -1074,7 +1077,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_native_collection_action (std::ofstream &os, Node *n)
+  CPPBuilder::build_native_collection_action (std::ostream &os, Node *n)
   {
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
@@ -1091,7 +1094,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_native_expression (std::ofstream &os, Node *n)
+  CPPBuilder::build_native_expression (std::ostream &os, Node *n)
   {
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ()->get_expr_node_type() < STEP) {
@@ -1188,7 +1191,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_end_define (std::ofstream &os, Node *node)
+  CPPBuilder::build_end_define (std::ostream &os, Node *node)
   {
     indent (os);
     os << "return " << m_parent_list.back ()->get_symbol ("this") << ";\n}\n";
@@ -1204,7 +1207,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_instruction (std::ofstream &os, Node *node)
+  CPPBuilder::build_instruction (std::ostream &os, Node *node)
   {
     InstructionNode *n = dynamic_cast<InstructionNode*> (node);
     for (int i = 0; i < n->path_list ().size (); i++) {
@@ -1327,7 +1330,7 @@ namespace Smala
 }
 
   void
-  CPPBuilder::set_property (std::ofstream &os, Node *node)
+  CPPBuilder::set_property (std::ostream &os, Node *node)
   {
     if (!m_in_for)
       indent (os);
@@ -1358,7 +1361,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::self_set_property (std::ofstream &os, Node *n)
+  CPPBuilder::self_set_property (std::ostream &os, Node *n)
   {
     SelfAssignNode *node = (SelfAssignNode*)n;
     std::string prop_name = node->get_path()->get_subpath_list().at(0)->get_subpath();
@@ -1392,7 +1395,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::alias (std::ofstream &os, Node *node)
+  CPPBuilder::alias (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1411,7 +1414,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::merge (std::ofstream &os, Node *node)
+  CPPBuilder::merge (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1422,7 +1425,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::remove (std::ofstream &os, Node *node)
+  CPPBuilder::remove (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1432,7 +1435,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::move (std::ofstream &os, Node *node, const string &c)
+  CPPBuilder::move (std::ostream &os, Node *node, const string &c)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1450,7 +1453,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::add_child (std::ofstream &os, Node *node)
+  CPPBuilder::add_child (std::ostream &os, Node *node)
   {
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1465,7 +1468,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_end_add_child (std::ofstream &os, Node *n)
+  CPPBuilder::build_end_add_child (std::ostream &os, Node *n)
   {
     os << ";\n";
     indent (os);
@@ -1479,7 +1482,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::fetch_add_child (std::ofstream &os, const std::string &parent,
+  CPPBuilder::fetch_add_child (std::ostream &os, const std::string &parent,
                                const std::string &child, const std::string &name)
   {
     if (parent == m_null_symbol)
@@ -1489,7 +1492,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::add_children_to (std::ofstream &os, Node *node)
+  CPPBuilder::add_children_to (std::ostream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
@@ -1525,7 +1528,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_this_node (std::ofstream &os, Node *node)
+  CPPBuilder::build_this_node (std::ostream &os, Node *node)
   {
     ThisNode* th = dynamic_cast<ThisNode*>(node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1561,7 +1564,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_define_node (std::ofstream &os, Node *node)
+  CPPBuilder::build_define_node (std::ostream &os, Node *node)
   {
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
     os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
@@ -1601,7 +1604,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_main_node (std::ofstream &os)
+  CPPBuilder::build_main_node (std::ostream &os)
   {
 
     /* main */
@@ -1637,7 +1640,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_end_main (std::ofstream &os, Node *node)
+  CPPBuilder::build_end_main (std::ostream &os, Node *node)
   {
     Node* data = (Node*) node->get_user_data ();
     if (data == nullptr)
@@ -1650,7 +1653,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_native_action_component (std::ofstream &os, Node *n)
+  CPPBuilder::build_native_action_component (std::ostream &os, Node *n)
   {
     NativeComponentNode* node = dynamic_cast<NativeComponentNode*> (n);
     native_type type = node->get_native_type();
@@ -1696,7 +1699,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_transition_node (std::ofstream &os, Node *n)
+  CPPBuilder::build_transition_node (std::ostream &os, Node *n)
   {
     TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
@@ -1718,7 +1721,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_dash_array (std::ofstream &os, DashArrayNode *node)
+  CPPBuilder::build_dash_array (std::ostream &os, DashArrayNode *node)
   {
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1751,7 +1754,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_smala_native (std::ofstream &os, Node *node)
+  CPPBuilder::build_smala_native (std::ostream &os, Node *node)
   {
     SmalaNative *n = dynamic_cast<SmalaNative*> (node);
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -1802,7 +1805,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_causal_dep (std::ofstream &os, Node* node)
+  CPPBuilder::build_causal_dep (std::ostream &os, Node* node)
   {
     CausalDependencyNode* n = dynamic_cast<CausalDependencyNode*> (node);
     std::string src = build_find (n->src (), true);
@@ -1814,7 +1817,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::print_type (std::ofstream &os, SmalaType type)
+  CPPBuilder::print_type (std::ostream &os, SmalaType type)
   {
     switch (type) {
       case INT: {
@@ -1845,13 +1848,13 @@ namespace Smala
   }
 
   void
-  CPPBuilder::print_component_decl (std::ofstream &os, const std::string &name)
+  CPPBuilder::print_component_decl (std::ostream &os, const std::string &name)
   {
     os << "auto* " << name;
   }
 
   void
-  CPPBuilder::print_component_constructor (std::ofstream &os,
+  CPPBuilder::print_component_constructor (std::ostream &os,
                                            const std::string &constructor)
   {
     std::map<std::string, std::string>::iterator it;

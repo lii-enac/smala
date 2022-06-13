@@ -188,7 +188,7 @@ namespace Smala
     }
   }
   void
-  Builder::build_preamble (std::ofstream &os, bool debug)
+  Builder::build_preamble (std::ostream &os, bool debug)
   {
     int size = m_ast.preamble ().nodes ().size ();
     Node *cur_node;
@@ -268,7 +268,7 @@ namespace Smala
   }
 
   void
-  Builder::build_for_node (std::ofstream &os, Node *node)
+  Builder::build_for_node (std::ostream &os, Node *node)
   {
     switch (node->node_type ())
       {
@@ -334,7 +334,7 @@ namespace Smala
 
 
   void
-  Builder::build_node (std::ofstream &os, Node *node)
+  Builder::build_node (std::ostream &os, Node *node)
   {
     m_curloc = node->error_location ();
     switch (node->node_type ())
@@ -668,7 +668,7 @@ namespace Smala
   }
 
   std::string
-  Builder::build_simple_node (std::ofstream &os, Node *node)
+  Builder::build_simple_node (std::ostream &os, Node *node)
   {
     std::string constructor = get_constructor (node->djnn_type ());
     if (constructor == "Switch")
@@ -700,7 +700,7 @@ namespace Smala
   }
 
   void
-  Builder::indent (std::ofstream &os)
+  Builder::indent (std::ostream &os)
   {
     for (int i = 0; i < m_indent; i++)
       os << "\t";

@@ -28,6 +28,7 @@
 
 #include <locale>
 #include <algorithm>
+#include <fstream>
 
 
 namespace Smala
@@ -141,23 +142,23 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_use (std::ofstream &os, std::string use)
+  JSBuilder::build_use (std::ostream &os, std::string use)
   {
   }
 
   void
-  JSBuilder::build_import (std::ofstream &os, Node *n)
+  JSBuilder::build_import (std::ostream &os, Node *n)
   {
 
   }
 
   void
-  JSBuilder::build_post_import (std::ofstream &os)
+  JSBuilder::build_post_import (std::ostream &os)
   {
   }
 
   void
-  JSBuilder::build_start_if (std::ofstream &os, Node* n)
+  JSBuilder::build_start_if (std::ostream &os, Node* n)
   {
     os << "if (" << build_expr (n->get_args().at(0)) << ") {\n";
     m_indent++;
@@ -266,7 +267,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_range_node (std::ofstream &os, Node *node, const string& new_name)
+  JSBuilder::build_range_node (std::ostream &os, Node *node, const string& new_name)
   {
     RangeNode* n = dynamic_cast<RangeNode*> (node);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
@@ -280,7 +281,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::print_start_component (std::ofstream &os, const std::string &name, const std::string &constructor)
+  JSBuilder::print_start_component (std::ostream &os, const std::string &name, const std::string &constructor)
   {
     print_component_decl (os, name);
     os << " = ";
@@ -421,7 +422,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_print (std::ofstream &os, Node *node)
+  JSBuilder::build_print (std::ostream &os, Node *node)
   {
     indent (os);
     std::string name ("var_" + std::to_string (m_var_num++));
@@ -434,7 +435,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_while (std::ofstream &os, Node *node)
+  JSBuilder::build_while (std::ostream &os, Node *node)
   {
     indent (os);
     os << "while (" << build_expr (node->get_args().at(0)) << ") {";
@@ -444,7 +445,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_for (std::ofstream &os, Node *node)
+  JSBuilder::build_for (std::ostream &os, Node *node)
   {
     ForNode *fn = (ForNode*) node;
     push_ctxt ();
@@ -460,7 +461,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_for_every (std::ofstream &os, Node *node)
+  JSBuilder::build_for_every (std::ostream &os, Node *node)
   {
     os << "//TODO for_every implementation\n";
     /*
@@ -504,7 +505,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_control_node (std::ofstream &os, Node *node)
+  JSBuilder::build_control_node (std::ostream &os, Node *node)
   {
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
@@ -581,7 +582,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_multi_control_node (std::ofstream &os,
+  JSBuilder::build_multi_control_node (std::ostream &os,
                                            NativeExpressionNode *node)
   {
     ExprNode* arg_node = node->get_expression ();
@@ -643,7 +644,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_simple_control_node (std::ofstream &os,
+  JSBuilder::build_simple_control_node (std::ostream &os,
                                          NativeExpressionNode *node)
   {
     std::string p_name =
@@ -728,7 +729,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::emit_not_a_property (std::ofstream &os, const std::string& arg, const std::string& e)
+  JSBuilder::emit_not_a_property (std::ostream &os, const std::string& arg, const std::string& e)
   {
     os << "if (get_process_type(" << arg << ") != process_type_e.PROPERTY_T) {\n";
     indent (os);
@@ -741,7 +742,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_native_expression_node (std::ofstream &os, Node *n)
+  JSBuilder::build_native_expression_node (std::ostream &os, Node *n)
   {
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
@@ -918,7 +919,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_native_action (std::ofstream &os, Node *n)
+  JSBuilder::build_native_action (std::ostream &os, Node *n)
   {
     NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
     os << "function ";
@@ -935,7 +936,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_native_collection_action (std::ofstream &os, Node *n)
+  JSBuilder::build_native_collection_action (std::ostream &os, Node *n)
   {
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "function ";
@@ -952,7 +953,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_native_expression (std::ofstream &os, Node *n)
+  JSBuilder::build_native_expression (std::ostream &os, Node *n)
   {
     os << "//TODO build_native_expression\n";
     
@@ -1048,7 +1049,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_end_define (std::ofstream &os, Node *node)
+  JSBuilder::build_end_define (std::ostream &os, Node *node)
   {
     indent (os);
     os << "return " << m_parent_list.back ()->get_symbol ("this") << ";\n}\n";
@@ -1064,7 +1065,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_instruction (std::ofstream &os, Node *node)
+  JSBuilder::build_instruction (std::ostream &os, Node *node)
   {
     InstructionNode *n = dynamic_cast<InstructionNode*> (node);
     for (int i = 0; i < n->path_list ().size (); i++) {
@@ -1152,7 +1153,7 @@ namespace Smala
 }
 
   void
-  JSBuilder::set_property (std::ofstream &os, Node *node)
+  JSBuilder::set_property (std::ostream &os, Node *node)
   {
     if (!m_in_for)
       indent (os);
@@ -1178,7 +1179,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::self_set_property (std::ofstream &os, Node *n)
+  JSBuilder::self_set_property (std::ostream &os, Node *n)
   {
     //TODO implement this
     std::cout << "WARNING: self assignment not yet implemented\n";
@@ -1186,7 +1187,7 @@ namespace Smala
 
 
   void
-  JSBuilder::alias (std::ofstream &os, Node *node)
+  JSBuilder::alias (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1205,7 +1206,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::merge (std::ofstream &os, Node *node)
+  JSBuilder::merge (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1216,7 +1217,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::remove (std::ofstream &os, Node *node)
+  JSBuilder::remove (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1226,7 +1227,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::move (std::ofstream &os, Node *node, const string &c)
+  JSBuilder::move (std::ostream &os, Node *node, const string &c)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
@@ -1242,7 +1243,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::add_child (std::ofstream &os, Node *node)
+  JSBuilder::add_child (std::ostream &os, Node *node)
   {
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1257,7 +1258,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_end_add_child (std::ofstream &os, Node *n)
+  JSBuilder::build_end_add_child (std::ostream &os, Node *n)
   {
     os << ";\n";
     indent (os);
@@ -1273,7 +1274,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::fetch_add_child (std::ofstream &os, const std::string &parent,
+  JSBuilder::fetch_add_child (std::ostream &os, const std::string &parent,
                                const std::string &child, const std::string &name)
   {
     if (parent == m_null_symbol)
@@ -1283,7 +1284,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::add_children_to (std::ofstream &os, Node *node)
+  JSBuilder::add_children_to (std::ostream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
@@ -1306,7 +1307,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_this_node (std::ofstream &os, Node *node)
+  JSBuilder::build_this_node (std::ostream &os, Node *node)
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     node->set_build_name (new_name);
@@ -1327,7 +1328,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_define_node (std::ofstream &os, Node *node)
+  JSBuilder::build_define_node (std::ostream &os, Node *node)
   {
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
     os << "function " << node->name () << " (p, n";
@@ -1365,7 +1366,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_main_node (std::ofstream &os)
+  JSBuilder::build_main_node (std::ostream &os)
   {
 
     /* main */
@@ -1409,7 +1410,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_end_main (std::ofstream &os, Node *node)
+  JSBuilder::build_end_main (std::ostream &os, Node *node)
   {
     Node* data = (Node*) node->get_user_data ();
     if (data == nullptr)
@@ -1421,7 +1422,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_native_action_component (std::ofstream &os, Node *n)
+  JSBuilder::build_native_action_component (std::ostream &os, Node *n)
   {
     NativeComponentNode* node = dynamic_cast<NativeComponentNode*> (n);
     native_type type = node->get_native_type();
@@ -1467,7 +1468,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_transition_node (std::ofstream &os, Node *n)
+  JSBuilder::build_transition_node (std::ostream &os, Node *n)
   {
     TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
@@ -1489,7 +1490,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_dash_array (std::ofstream &os, DashArrayNode *node)
+  JSBuilder::build_dash_array (std::ostream &os, DashArrayNode *node)
   {
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1522,7 +1523,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_smala_native (std::ofstream &os, Node *node)
+  JSBuilder::build_smala_native (std::ostream &os, Node *node)
   {
     SmalaNative *n = dynamic_cast<SmalaNative*> (node);
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -1547,7 +1548,7 @@ namespace Smala
   JSBuilder::build_define (const std::string &prefix)
   {
     /*
-    std::ofstream os (prefix + ".h");
+    std::ostream os (prefix + ".h");
     std::string s = prefix;
     std::replace (s.begin (), s.end (), '/', '_');
     for (int i = 0; i < prefix.length (); i++)
@@ -1569,7 +1570,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_causal_dep (std::ofstream &os, Node* node)
+  JSBuilder::build_causal_dep (std::ostream &os, Node* node)
   {
     CausalDependencyNode* n = dynamic_cast<CausalDependencyNode*> (node);
     std::string src = build_find (n->src (), true);
@@ -1579,19 +1580,19 @@ namespace Smala
   }
 
   void
-  JSBuilder::print_type (std::ofstream &os, SmalaType type)
+  JSBuilder::print_type (std::ostream &os, SmalaType type)
   {
     os << "var";
   }
 
   void
-  JSBuilder::print_component_decl (std::ofstream &os, const std::string &name)
+  JSBuilder::print_component_decl (std::ostream &os, const std::string &name)
   {
     os << "var " << name;
   }
 
   void
-  JSBuilder::print_component_constructor (std::ofstream &os,
+  JSBuilder::print_component_constructor (std::ostream &os,
                                            const std::string &constructor)
   {
     std::map<std::string, std::string>::iterator it;

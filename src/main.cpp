@@ -55,15 +55,15 @@ int main (int argc, const char **argv) {
 			std::string prefix;
 			string builddir = arg.get_option("builddir");
 
-			if(!builddir.empty()) { 
-				size_t slash_pos = filename.find('/');
-				if(slash_pos==std::string::npos) slash_pos=0;
-				else ++slash_pos;
-				prefix = filename.substr(slash_pos, filename.size() - slash_pos - 4);
-			}
-			else {
+			// if(!builddir.empty()) { 
+			// 	size_t slash_pos = filename.find('/');
+			// 	if(slash_pos==std::string::npos) slash_pos=0;
+			// 	else ++slash_pos;
+			// 	prefix = filename.substr(slash_pos, filename.size() - slash_pos - 4);
+			// }
+			// else {
 				prefix = filename.substr(0, filename.size() - 4);	
-			}
+			// }
 			error |= b->build (driver.ast (), arg.get_option("builddir"), prefix, arg.debug());
 			if (error) {
 			  remove (b->filename ().c_str());

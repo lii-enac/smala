@@ -89,26 +89,23 @@ namespace Smala
       build_define (header_path); // FIXME should open a temporary file for header .h
     }
 
+    // create a temporary output file that will be copied into the final output file
+    // when we know the includes we need
+    //auto tmp_file_name = prefix + std::to_string(getpid()) + ".cpp";
+    auto tmp_file_name = std::filesystem::temp_directory_path().string() + sep + m_filename + std::to_string(getpid()) + ".cpp";
+    std::ofstream os (tmp_file_name);
+    if (!os.good()) {
+      std::cerr << "temporary file " << tmp_file_name << " not good" << std::endl;
+    }
+
+    // change m_filename, which will be reused in native expression name
     if (!builddir.empty())
         m_filename = builddir + sep + prefix + ".cpp";
     else
-        m_filename = prefix + ".cpp";;
+        m_filename = prefix + ".cpp";
     //std::ostream os (prefix + ".cpp");
 
-    // create a temporary output file that will be copied into the final output file
-    // when we know the includes we need
-    auto tmp_file_name = prefix + std::to_string(getpid()) + ".cpp";
-    std::ofstream os (tmp_file_name);
-/*
-    os << "#include <iostream>\n";
-    os << "#include <string>\n";
-    os << "#include \"core/core.h\"\n";
-    os << "#include \"core/core-dev.h\"\n";
-    os << "#include \"exec_env/exec_env.h\"\n\n";
-*/
-
-    //os << "#include \"c_api/djnn_c_api.h\"\n"; // c header
-
+    
     if(m_ast.is_main ()) {
         build_use(os, "exec_env");
     }
@@ -181,7 +178,16 @@ namespace Smala
       os << "}\n";
     os.close ();
 
+    // if(!builddir.empty()) {
+    //   m_filename = builddir + sep + prefix + ".cpp";
+    // } else {
+    //   m_filename = prefix + ".cpp";
+    // }
+
     std::ofstream final_os (m_filename);
+    if (!final_os.good()) {
+      std::cerr << "dest file " << m_filename << " not good" << std::endl;
+    }
     for (auto p: used_processes) {
       extern std::map<std::string, std::string> process_class_path;
       try {
@@ -197,6 +203,9 @@ namespace Smala
     final_os << "\n";
 
     std::ifstream os2 (tmp_file_name);
+    if (!os2.good()) {
+      std::cerr << "temp file reading not good" << std::endl;
+    }
     final_os << os2.rdbuf ();
     final_os.close();
     os2.close();
@@ -1103,6 +1112,7 @@ namespace Smala
     std::string unique_name = m_filename;
     std::replace (unique_name.begin (), unique_name.end (), '/', '_');
     std::replace (unique_name.begin (), unique_name.end (), '.', '_');
+    std::replace (unique_name.begin (), unique_name.end (), '-', '_');
 
     std::string native_name ("nat_" + unique_name + "_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);

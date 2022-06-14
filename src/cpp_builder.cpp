@@ -74,11 +74,11 @@ namespace Smala
     m_parent_list.clear ();
     m_parent_list.push_back (new BuildNode (m_null_symbol)); // the first parent is null
 
-    std::string sep="";
-    if (!builddir.empty()) {
-      if (builddir[builddir.size()-1] != '/')
-        sep = "/";
-    }
+    std::string sep="/";
+    // if (!builddir.empty()) {
+    //   if (builddir[builddir.size()-1] != '/')
+    //     sep = "/";
+    // }
 
     if (!ast.is_main ()) {
       std::string header_path;
@@ -92,7 +92,7 @@ namespace Smala
     // create a temporary output file that will be copied into the final output file
     // when we know the includes we need
     //auto tmp_file_name = prefix + std::to_string(getpid()) + ".cpp";
-    auto tmp_file_name = std::filesystem::temp_directory_path().string() + sep + m_filename + std::to_string(getpid()) + ".cpp";
+    auto tmp_file_name = std::filesystem::temp_directory_path().string() + sep + "smalac_tmp_" + std::to_string(getpid()) + ".cpp";
     std::ofstream os (tmp_file_name);
     if (!os.good()) {
       std::cerr << "temporary file " << tmp_file_name << " not good" << std::endl;

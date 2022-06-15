@@ -7,9 +7,10 @@ rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2
 rwildcardmul = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
 
 # join https://stackoverflow.com/a/9551487
-space :=
-space +=
-join-with = $(subst $(space),$1,$(strip $2))
+# space :=
+# space +=
+# join-with = $(subst $(space),$1,$(strip $2))
+join-with = $(subst $(eval) ,$1,$(strip $2))
 
 
 # ---------------------------------------

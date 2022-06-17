@@ -19,20 +19,27 @@ use base
 use display
 use gui
 
+import gui.widgets.PushButton
+import gui.widgets.ComboBox
+import gui.widgets.VBox
 _main_
 Component root {
   Frame f ("simplest", 0, 0, 600, 600)
   Exit ex (0, 1)
   f.close -> ex
-  Translation t(0,0)
 
-  OutlineWidth ow(10)
-  FillColor fc(255,0,0)
-  OutlineColor _(0,0,255)
-
-  Circle _(0,0, 50)
-
-  mouseTracking = 1
-  f.move.x =:> t.tx
-  f.move.y =:> t.ty
+  VBox vbox (f)
+  vbox.space = 20
+  PushButton pb ("Button1")
+  ComboBox cb
+  addChildrenTo cb.str_items {
+    String _ ("first item")
+    String _ ("long second item")
+    String _ ("third item")
+  }
+  cb.preferred_width = 100
+  PushButton pb2 ("Button1")
+  addChildrenTo vbox.items {
+    pb, cb, pb2
+  }
 }

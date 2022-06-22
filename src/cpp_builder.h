@@ -23,6 +23,8 @@ namespace Smala {
   public:
     CPPBuilder ();
     virtual ~CPPBuilder ();
+    virtual void pop_ctxt () override;
+    virtual void push_ctxt () override;
     int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
   private:
     void build_define (const std::string &prefix);
@@ -32,12 +34,17 @@ namespace Smala {
     void build_post_import (std::ostream &os) override;
     void build_instruction (std::ostream &os, Node *node) override;
     void build_start_if (std::ostream &os, Node* n) override;
+    void build_start_else (std::ostream &os) override;
+    void build_start_else_if (std::ostream &os) override;
+    void build_end_block (std::ostream &os) override;
     void build_for (std::ostream &os, Node *node) override;
     void build_for_every (std::ostream &os, Node *node) override;
     void build_while (std::ostream &os, Node *node) override;
     void build_print (std::ostream &os, Node *node) override;
     std::string build_step (ExprNode *node) override;
     std::string build_expr (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false) override;
+    std::string build_expr_rec (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false);
+    void build_properties (std::ostream &os) override;
     std::string build_fake_name (PathNode* n, bool out);
     std::string build_find (PathNode* n, bool ignore_cast);
     std::string build_path (PathNode* n);
@@ -57,7 +64,7 @@ namespace Smala {
     void build_native_action (std::ostream &os, Node *n) override;
     void build_native_collection_action (std::ostream &os, Node *n) override;
     void build_native_expression (std::ostream &os, Node *n) override;
-    void emit_not_a_property (std::ostream &os, const std::string& arg, const std::string& e);
+    void emit_not_a_property (std::ostream &os, const std::string& arg);
     void build_native_expression_node (std::ostream &os, Node *n) override;
     void build_main_node (std::ostream &os) override;
     void build_end_main (std::ostream &os, Node *node) override;
@@ -66,9 +73,12 @@ namespace Smala {
     void build_end_define (std::ostream &os, Node *node) override;
     void build_transition_node (std::ostream &os, Node *ctrl) override;
     void build_smala_native (std::ostream &os, Node *node) override;
-    void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) override;
-    void build_range_node (std::ostream &os, Node *node, const string& new_name) override;
+    void build_end_native (std::ostream &os) override;
+    void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) override;
     void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor) override;
+    void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) override;
+    void build_range_node (std::ostream &os, Node *node, const string& new_name) override;
+    
     // void build_new_line (std::ostream &os, NewLineNode *n) override {
     //     //Builder::build_new_line (os, n);
     //     //os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
@@ -82,10 +92,19 @@ namespace Smala {
     std::map<std::string, std::string> m_import_types;
     void set_location (std::ostream &os, Node *n, bool debug=false) override { if (debug) os << "\n#line " << n->get_location().begin.line << std::endl; }
     void end_line (std::ostream &os) override { os << ";\n"; }
+
   private:
     bool m_display_initialized;
-    int m_expr_in, m_expr_out;
-    std::map<std::string,bool> used_processes;
+    int m_expr_in, m_expr_out; // are we in an expression or not?
+
+    std::map<std::string,bool> used_processes; // register which component is used, to generate the corrsponding includes
+    
+    using sym_t = std::map<std::string, std::string>;
+    sym_t sym; // contains aliases and properties created to build the djnn tree, and that can be reused
+    std::vector<sym_t> sym_stack; // this takes care of scope inside define, main(?), native
+    sym_t prop_sym; // like sym, but for properties only
+    std::vector<sym_t> prop_sym_stack; // like sym_stack
+    sym_t m_new_syms_from_build_expr; // this contains newly dynamic_cast'ed properties while building expressions
   };
 
 } /* namespace Smala */

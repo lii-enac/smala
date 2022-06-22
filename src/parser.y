@@ -242,6 +242,7 @@
 %token DOT "."
 %token COMMA ","
 %token IF "if"
+%token OF "of"
 %token ELSE "else"
 %token FOR "for"
 %token WHILE "while"
@@ -272,6 +273,8 @@
 %token DASHARRAY "DashArray"
 %token <string> INT "<int>"
 %token <string> DOUBLE "<double>"
+%token <string> INT_UNIT "<int_unit>"
+%token <string> DOUBLE_UNIT "<double_unit>"
 %token <string> STRING "<string>"
 %token <string> TRUE "TRUE"
 %token <string> FALSE "FALSE"
@@ -798,7 +801,7 @@ start_for
 if_statement
   : if_exp statement_list end_if_statement %prec IF
   | if_exp statement_list end_if_statement start_else statement_list end_if_statement
-  | if_exp statement_list end_if_statement else if_statement
+  | if_exp statement_list end_if_statement else if_statement { driver.add_node (new Node (@$, END_BLOCK)); }
 
 if_exp
   : start_if assignment_expression end_if_exp
@@ -1088,6 +1091,13 @@ simple_process
       }
       $1->set_args ($2);
     }
+  /* | simple_process_decl arguments opt_eol
+    {
+      if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
+        driver.add_node (new SetParentNode (@$, $1));
+      }
+      $1->set_args ($2);
+    } */
   | simple_process_decl eol
     {
       lexer_expression_mode_off ();
@@ -1156,6 +1166,24 @@ simple_process_decl
       cur_node = node;
       if ($3.compare("_") != 0)
         add_sym (@$, $3, PROCESS);
+      $$ = node;
+    }
+  | NAME OF NAME keep NAME
+    {
+      lexer_expression_mode_on ();
+      Node *node = new Node (@$, SIMPLE, $1, $5);
+      node->set_keep_name ($4);
+      if (root == nullptr) {
+        root = node;
+        node->set_is_define_or_main ();
+      }
+      driver.add_node (node);
+      if ((m_in_add_children && !exclude_from_no_parent ($1)) || is_switch ($1))
+        node->set_ignore_parent (true);
+      node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      cur_node = node;
+      if ($5.compare("_") != 0)
+        add_sym (@$, $5, PROCESS);
       $$ = node;
     }
 
@@ -1368,6 +1396,11 @@ primary_expression
   : INT
     {
       ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, INT);
+      $$ = n;
+    }
+  | INT_UNIT
+    {
+      ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, INT_UNIT);
       $$ = n;
     }
   | TRUE

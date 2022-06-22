@@ -174,12 +174,19 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "print"               { return Smala::Parser::make_PRINT (loc); }
 "valueof"             { return Smala::Parser::make_VALUEOF (loc); }
 "NativeCode"          { return Smala::Parser::make_NATIVE_CODE_T (loc); }
+"of"                  { return Smala::Parser::make_OF (loc); }
 {NATIVE_CODE}         { loc.lines (std::count(yytext, yytext+yyleng, '\n')); return Smala::Parser::make_CODE (yytext, loc); }
+
 {INT}                 { return Smala::Parser::make_INT (yytext, loc); }
 "#"[0-9A-Fa-f]+       { return Smala::Parser::make_INT (hexa_filter(yytext), loc); }
 "0x"[0-9A-Fa-f]+      { return Smala::Parser::make_INT (hexa_filter(&yytext[1]), loc); }
 {INT}"."{INT}         { return Smala::Parser::make_DOUBLE (yytext, loc); }
 {INT}"."              { return Smala::Parser::make_DOUBLE (yytext, loc); }
+
+{INT}_[a-z]+          { return Smala::Parser::make_INT_UNIT (yytext, loc); }
+{INT}"."{INT}_[a-z]+  { return Smala::Parser::make_DOUBLE_UNIT (yytext, loc); }
+{INT}"."_[a-z]+       { return Smala::Parser::make_DOUBLE_UNIT (yytext, loc); }
+
 {NAME}         		    { return Smala::Parser::make_NAME (str_filter (yytext), loc); }
 \"(\\.|[^\"])*\"      { return Smala::Parser::make_STRING (yytext, loc); }
 [\t \.]+              { loc.step (); }

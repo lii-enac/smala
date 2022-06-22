@@ -256,6 +256,14 @@ namespace Smala
       return expr;
     }
 
+
+  void
+  JSBuilder::build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* node)
+  {
+    print_start_component (os, var_name, constructor);
+    build_component_arguments (os, parent_name, child_name, node);
+  }
+
   void
   JSBuilder::build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n)
   {

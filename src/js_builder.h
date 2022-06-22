@@ -66,6 +66,7 @@ namespace Smala {
     void build_end_define (std::ostream &os, Node *node) override;
     void build_transition_node (std::ostream &os, Node *ctrl) override;
     void build_smala_native (std::ostream &os, Node *node) override;
+    void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) override;
     void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) override;
     void build_range_node (std::ostream &os, Node *node, const string& new_name) override;
     void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor) override;

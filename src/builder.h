@@ -89,11 +89,13 @@ namespace Smala {
     bool is_string (ExprNode *e);
     bool has_complex_term (PathNode *n);
     virtual void build_control_node (std::ostream &os, Node *n) = 0;
-    virtual void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor) = 0;
-    virtual void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) = 0;
+    virtual void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) = 0;
+    virtual void print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor) = 0;
+    virtual void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) = 0;
     virtual void print_component_decl (std::ostream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ostream &os, const std::string &constructor) = 0;
     virtual std::string build_expr (ExprNode* n, expr_production_t prod_t = undefined_t, bool build_fake = false) = 0;
+    virtual void build_properties (std::ostream &os) {}
     virtual void print_type (std::ostream &os, SmalaType type) = 0;
     virtual void build_causal_dep (std::ostream &os, Node* node) = 0;
     virtual void build_use (std::ostream &os, std::string use) = 0;
@@ -104,9 +106,9 @@ namespace Smala {
     virtual void build_end_define (std::ostream &os, Node *node) = 0;
     virtual void build_end_main (std::ostream &os, Node *node) = 0;
     virtual void build_smala_native (std::ostream &os, Node *n) = 0;
+    virtual void build_start_if (std::ostream &os, Node* n) = 0;
     virtual void build_start_else (std::ostream &os) { os << "else {\n"; }
     virtual void build_start_else_if (std::ostream &os) { os << "else "; }
-    virtual void build_start_if (std::ostream &os, Node* n) = 0;
     virtual void build_end_block (std::ostream &os) {  os << "}\n"; }
     virtual void build_end_native (std::ostream &os) { os << "}\n\n"; }
     virtual void build_break (std::ostream &os, Node *n) { os << n->djnn_type() << ";\n"; }

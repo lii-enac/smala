@@ -238,12 +238,12 @@ namespace Smala
         }
     }
 
-    /* auto-generated native */
+    /* auto-generated native expressions */
     for (auto e: m_ast.native_expression_list ()) {
       build_native_expression (os, e);
     }
 
-    /* user-defined native */
+    /* user-defined native actions */
     for (int i = 0; i < size; ++i) {
       cur_node = m_ast.preamble ().nodes ().at (i);
       switch (cur_node->node_type ()) {
@@ -295,6 +295,10 @@ namespace Smala
       case NEW_VAR:
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
+        auto expr_str = build_expr (n->get_args().at (0));
+        //indent (os);
+        //build_properties (os);
+
         print_type (os, n->type ());
         std::string new_name;
         if (n->keep_name ())
@@ -319,12 +323,15 @@ namespace Smala
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
           print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
-        os << " " << new_name << " = " << build_expr (n->get_args().at (0));
+        os << " " << new_name << " = " << expr_str;
         break;
       }
       case EXPR_NODE:
       {
-        os << build_expr ((ExprNode*) node);
+        auto expr_str = build_expr ((ExprNode*) node);
+        //build_properties (os);
+        //indent (os);
+        os << expr_str;
         break;
       }
       default:
@@ -341,11 +348,13 @@ namespace Smala
       {
       case START_MAIN:
       {
+        push_ctxt ();
         build_main_node (os);
         break;
       }
       case START_DEFINE:
       {
+        push_ctxt ();
         build_define_node (os, node);
         break;
       }
@@ -367,8 +376,9 @@ namespace Smala
       case START_IF:
       {
         push_ctxt ();
-        if (!m_after_else)
+        if (!m_after_else) {
           indent  (os);
+        }
         build_start_if (os, node);
         m_after_else = false;
         break;
@@ -409,6 +419,7 @@ namespace Smala
       case END_DEFINE:
       {
         build_end_define (os, node);
+        pop_ctxt ();
         break;
       }
       case END_CONTAINER:
@@ -421,6 +432,7 @@ namespace Smala
       case END_MAIN:
       {
         build_end_main (os, node);
+        pop_ctxt ();
         break;
       }
       case FOR:
@@ -610,6 +622,11 @@ namespace Smala
       case NEW_VAR:
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
+        auto expr_str = build_expr (n->get_args().at (0));
+        if (!m_in_for)
+          indent (os);
+        build_properties (os);
+
         if (!m_in_for)
           indent (os);
         print_type (os, n->type ());
@@ -636,7 +653,7 @@ namespace Smala
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
           print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
-        os << " " << new_name << " = " << build_expr (n->get_args().at (0));
+        os << " " << new_name << " = " << expr_str;
         end_line(os);
         break;
       }
@@ -671,32 +688,37 @@ namespace Smala
   Builder::build_simple_node (std::ostream &os, Node *node)
   {
     std::string constructor = get_constructor (node->djnn_type ());
+
     if (constructor == "Switch")
       m_in_switch = true;
+
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
 
     if (node->name ().compare ("_") == 0)
       node->set_name ("");
-    std::string new_name;
+
+    std::string var_name;
 
     if (node->keep_name () && !node->name ().empty ())
-      new_name = node->name ();
+      var_name = node->name ();
     else {
-      new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      var_name = "cpnt_" + std::to_string (m_cpnt_num++);
       if (constructor.compare ("IvyAccess") == 0) {
-        new_name = "ivy_" + std::to_string (m_cpnt_num++);
+        var_name = "ivy_" + std::to_string (m_cpnt_num++);
       }
     }
-    node->set_build_name (new_name);
+    node->set_build_name (var_name);
     if (!node->name ().empty ()) {
-      if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
+      if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1 && node->duplicate_warning ())
         print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
     }
-    indent (os);
-    std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-    print_start_component (os, new_name, constructor);
-    build_component_arguments (os, p_name, name, node);
-    return new_name;
+
+    std::string parent_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+    indent (os); 
+    //print_start_component (os, var_name, constructor);
+    //build_component_arguments (os, parent_name, name, node);
+    build_component (os, var_name, constructor, parent_name, name, node);
+    return var_name;
   }
 
   void

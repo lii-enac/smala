@@ -1418,6 +1418,11 @@ primary_expression
       ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, DOUBLE);
       $$ = n;
     }
+  | DOUBLE_UNIT
+    {
+      ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, DOUBLE_UNIT);
+      $$ = n;
+    }
   | STRING
     {
       ExprNode *n = new ExprNode (@$, std::string ($1), LITERAL, STRING);

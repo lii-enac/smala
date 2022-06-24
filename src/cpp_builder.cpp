@@ -788,7 +788,7 @@ namespace Smala
   {
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
-    bool is_binding = node->djnn_type ().compare ("Binding") == 0;
+
 
     std::string src = build_find (ctrl->in ()->get_path(), false);
     std::string src_name, dst;
@@ -812,52 +812,44 @@ namespace Smala
                                1);
     }
 
-    if (is_binding) {
-      indent (os);
-      if (!node->name ().empty ()) {
-        std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-        m_parent_list.back ()->add_entry (node->name (), new_name);
-        node->set_build_name (new_name);
-        print_component_decl (os, new_name);
-        os << " = ";
-        node->set_name ("\"" + node->name () + "\"");
-      } else {
-        node->set_name (m_null_string);
-      }
+    indent (os);
+    
+    if (!node->name ().empty ()) {
+      std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      m_parent_list.back ()->add_entry (node->name (), new_name);
+      node->set_build_name (new_name);
+      print_component_decl (os, new_name);
+      os << " = ";
+      node->set_name ("\"" + node->name () + "\"");
+    } else {
+      node->set_name (m_null_string);
+    }
 
-      os << "new Binding";
-      os << " (" << node->parent ()->build_name () << ", " << node->name ();
-      os << ", " << src << ", "; //\"\", ";
-      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" )<< ", " << dst //<< ", \"\""
-          << ", " << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" ) << ");\n";
+    print_component_constructor (os, constructor);
+    os << " (" << node->parent ()->build_name () << ", " << node->name ();
+    os << ", " << src << ", ";
+    
+    bool is_binding = node->djnn_type ().compare ("Binding") == 0;
+    if (is_binding) {
+      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" ) << ", " << dst
+         << ", " << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
       used_processes["Binding"];
     } else {
-      indent (os);
-      if (!node->name ().empty ()) {
-        std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-        m_parent_list.back ()->add_entry (node->name (), new_name);
-        node->set_build_name (new_name);
-        print_component_decl (os, new_name);
-        os << " = ";
-        node->set_name ("\"" + node->name () + "\"");
-      } else {
-        node->set_name (m_null_string);
-      }
-
-      print_component_constructor (os, constructor);
-      os << " (" << node->parent ()->build_name () << ", " << node->name ();
-      os << ", " << src << ", \"\"" << ", ";
+      os << "\"\"" << ", ";
       os << dst << ", \"\"";
-      if (
-           node->djnn_type ().compare ("Assignment") == 0
+
+      bool is_assignment = node->djnn_type ().compare ("Assignment") == 0
         || node->djnn_type ().compare ("PausedAssignment") == 0
-        || node->djnn_type ().compare ("LazyAssignment") == 0
-      )
+        || node->djnn_type ().compare ("LazyAssignment") == 0;
+
+      if (is_assignment)
       {
+        // is_model...
         os << ", " << node->args ().at (0).second;
       }
-      os << ");\n";
+      
     }
+    os << ");\n";
   }
 
   void

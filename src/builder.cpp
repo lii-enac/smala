@@ -187,6 +187,7 @@ namespace Smala
         break;
     }
   }
+
   void
   Builder::build_preamble (std::ostream &os, bool debug)
   {

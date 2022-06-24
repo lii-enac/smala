@@ -9,6 +9,7 @@
  *
  *  Contributors:
  *      Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+ *      Stéphane Conversy <stephane.conversy@enac.fr>
  *
  */
 
@@ -64,7 +65,8 @@ namespace Smala {
     }
     virtual ~Builder () {};
     virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) = 0;
-    string filename () { return m_filename; }
+    const string& filename () const { return m_filename; }
+  
   protected:
     smala::ErrorLocation *m_curloc;
     int m_indent, m_cpnt_num, m_var_num, m_error, m_sym_num, m_native_num;
@@ -77,55 +79,65 @@ namespace Smala {
     std::map<std::string, std::string> m_types;
     Node * m_define_or_main_node;
 
-    virtual void pop_ctxt ();
-    virtual void push_ctxt ();
-    void extract_leaves (std::vector<ExprNode*> &leaves, ExprNode *n);
-    void indent (std::ostream &os);
-    std::string get_constructor (const std::string &type);
-    void print_error_message (error_level::level_t level, const std::string& message, int error);
-    void build_node (std::ostream &os, Node *node);
-    void build_for_node (std::ostream &os, Node *node);
     void build_preamble (std::ostream &os, bool debug=false);
-    bool is_string (ExprNode *e);
-    bool has_complex_term (PathNode *n);
+    virtual void build_use (std::ostream &os, std::string use) = 0;
+    virtual void build_import (std::ostream &os, Node* n) = 0;
+    virtual void build_post_import (std::ostream &os) {};
+
+    virtual void build_smala_native (std::ostream &os, Node *n) = 0;
+    virtual void build_end_native (std::ostream &os) { os << "}\n\n"; }
+
+    virtual void build_define_node (std::ostream &os, Node *node) = 0;
+    virtual void build_end_define (std::ostream &os, Node *node) = 0;
+    
+    virtual void build_main_node (std::ostream &os) = 0;
+    virtual void build_end_main (std::ostream &os, Node *node) = 0;
+
+    void build_node (std::ostream &os, Node *node);
+    std::string build_simple_node (std::ostream &os, Node *n);
+    
+    void extract_leaves (std::vector<ExprNode*> &leaves, ExprNode *n);
+    virtual std::string build_expr (ExprNode* n, expr_production_t prod_t = undefined_t, bool build_fake = false) = 0;
+    virtual void build_properties (std::ostream &os) {}
+
+    virtual void build_native_expression (std::ostream &os, Node *n) {}
+    virtual void build_native_expression_node (std::ostream &os, Node *n) {};
+
     virtual void build_control_node (std::ostream &os, Node *n) = 0;
+    virtual void build_causal_dep (std::ostream &os, Node* node) = 0;
+
     virtual void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) = 0;
     virtual void print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor) = 0;
     virtual void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) = 0;
     virtual void print_component_decl (std::ostream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ostream &os, const std::string &constructor) = 0;
-    virtual std::string build_expr (ExprNode* n, expr_production_t prod_t = undefined_t, bool build_fake = false) = 0;
-    virtual void build_properties (std::ostream &os) {}
     virtual void print_type (std::ostream &os, SmalaType type) = 0;
-    virtual void build_causal_dep (std::ostream &os, Node* node) = 0;
-    virtual void build_use (std::ostream &os, std::string use) = 0;
-    virtual void build_import (std::ostream &os, Node* n) = 0;
-    virtual void build_post_import (std::ostream &os) {};
-    virtual void build_main_node (std::ostream &os) = 0;
-    virtual void build_define_node (std::ostream &os, Node *node) = 0;
-    virtual void build_end_define (std::ostream &os, Node *node) = 0;
-    virtual void build_end_main (std::ostream &os, Node *node) = 0;
-    virtual void build_smala_native (std::ostream &os, Node *n) = 0;
+    
     virtual void build_start_if (std::ostream &os, Node* n) = 0;
     virtual void build_start_else (std::ostream &os) { os << "else {\n"; }
     virtual void build_start_else_if (std::ostream &os) { os << "else "; }
     virtual void build_end_block (std::ostream &os) {  os << "}\n"; }
-    virtual void build_end_native (std::ostream &os) { os << "}\n\n"; }
-    virtual void build_break (std::ostream &os, Node *n) { os << n->djnn_type() << ";\n"; }
+
     virtual void build_for (std::ostream &os, Node *node) {}
     virtual void build_for_every (std::ostream &os, Node *node) {}
-    virtual void build_while (std::ostream &os, Node *node) {}
-    virtual void build_print (std::ostream &os, Node *node) {}
+    void build_for_node (std::ostream &os, Node *node); // generic behavior for for and for_every
     virtual std::string build_step (ExprNode *node) = 0;
+    virtual void build_while (std::ostream &os, Node *node) {}
+    virtual void build_break (std::ostream &os, Node *n) { os << n->djnn_type() << ";\n"; }
+    
     virtual void build_native_action_component (std::ostream &os, Node *n) = 0;
     virtual void build_native_action (std::ostream &os, Node *n) = 0;
     virtual void build_native_collection_action (std::ostream &os, Node *n) = 0;
-    virtual void build_native_expression (std::ostream &os, Node *n) {}
-    virtual void build_native_expression_node (std::ostream &os, Node *n) {};
-    virtual void build_instruction (std::ostream &os, Node *n) = 0;
-    virtual void build_range_node (std::ostream &os, Node *node, const string& new_name) = 0;
+
+    virtual void build_range_node (std::ostream &os, Node *node, const string& new_name) = 0; // SwitchRange
+    virtual void build_transition_node (std::ostream &os, Node *ctrl) = 0; // FSM transition
+    virtual void build_this_node (std::ostream &os, Node *n) = 0;
+    virtual void build_dash_array (std::ostream &os, DashArrayNode *n) {}
+
     virtual void set_property (std::ostream &os, Node *n) = 0;
     virtual void self_set_property (std::ostream &os, Node *n) = 0;
+
+    virtual void build_instruction (std::ostream &os, Node *n) = 0; // dump, serialize, run, stop etc.
     virtual void alias (std::ostream &os, Node *n) = 0;
     virtual void merge (std::ostream &os, Node *n) = 0;
     virtual void remove (std::ostream &os, Node *n) = 0;
@@ -134,15 +146,22 @@ namespace Smala {
     virtual void build_end_add_child (std::ostream &os, Node* n) = 0;
     virtual void fetch_add_child (std::ostream &os, const std::string &parent, const std::string &child, const std::string &name) {};
     virtual void add_children_to (std::ostream &os, Node *n) = 0;
-    virtual void build_transition_node (std::ostream &os, Node *ctrl) = 0;
-    std::string build_simple_node (std::ostream &os, Node *n);
-    virtual void build_this_node (std::ostream &os, Node *n) = 0;
+    virtual void build_print (std::ostream &os, Node *node) {}
+
+    void indent (std::ostream &os);
     virtual void set_location (std::ostream &os, Node *n, bool debug=false) {}
     virtual void end_line (std::ostream &os) = 0;
-    // virtual void build_new_line (std::ostream &os, NewLineNode *n) {
-    //     os << "#line " << n->_line_number << " \"" << n->_filename << "\"" << std::endl;
-    // }
-    virtual void build_dash_array (std::ostream &os, DashArrayNode *n) {}
+    void print_error_message (error_level::level_t level, const std::string& message, int error);
+    
+    // scope context
+    virtual void pop_ctxt ();
+    virtual void push_ctxt ();
+    // helpers
+    std::string get_constructor (const std::string &type);
+    bool is_string (ExprNode *e);
+    bool has_complex_term (PathNode *n);
+
+    
   };
 
 }

@@ -152,8 +152,12 @@ VBox (Process container) inherits IWidget ()
     container_width aka container.width
     container_height aka container.height
   }
-  List items
-  List hover
+
+  ZOrderedGroup g {
+    List items
+  }
+  items aka g.items
+  
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
   this.container_width->update_items_pos_and_geom
   this.container_height->update_items_pos_and_geom 

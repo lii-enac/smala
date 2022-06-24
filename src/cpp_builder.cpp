@@ -111,7 +111,7 @@ namespace Smala
         header_path = builddir + sep + prefix;
       else
         header_path = prefix;
-      build_define (header_path); // FIXME should open a temporary file for header .h
+      build_header (header_path); // FIXME should open a temporary file for header .h
     }
 
     // create a temporary output file that will be copied into the final output file
@@ -2056,7 +2056,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_define (const std::string &prefix)
+  CPPBuilder::build_header (const std::string &prefix)
   {
     std::ofstream os (prefix + ".h");
     std::string s = prefix;

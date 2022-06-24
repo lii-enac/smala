@@ -70,6 +70,7 @@ namespace Smala
     Builder::push_ctxt ();
     sym_stack.push_back (sym);
     prop_sym_stack.push_back (prop_sym);
+    m_template_props_stack.push_back(m_template_props);
   }
 
   void
@@ -77,12 +78,18 @@ namespace Smala
   {
     //std::cerr << sym_stack.size() << " <<" << std::endl;
     Builder::pop_ctxt ();
+
     sym_stack.pop_back ();
     if(!sym_stack.empty())
       sym = sym_stack.back ();
+
     prop_sym_stack.pop_back ();
     if(!prop_sym_stack.empty())
       prop_sym = prop_sym_stack.back ();
+    
+    m_template_props_stack.pop_back ();
+    if(!m_template_props_stack.empty ())
+      m_template_props = m_template_props_stack.back ();
   }
 
   
@@ -489,7 +496,12 @@ namespace Smala
     // FIXME? should probably be somewhere else
     static const vector<string> prop_components = {"IntProperty", "DoubleProperty", "TextProperty", "BoolProperty", "TemplateProperty"};
     if (find(begin(prop_components), end(prop_components), constructor) != end(prop_components)) {
-      prop_sym[transform_name(child_name)] = var_name;
+      auto tname = transform_name(child_name);
+      prop_sym[tname] = var_name;
+      if (constructor == "TemplateProperty") {
+        m_template_props[var_name] = true;
+        std::cerr << tname << " _ " << var_name << std::endl;
+      }
     }
   }
     
@@ -789,7 +801,6 @@ namespace Smala
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
 
-
     std::string src = build_find (ctrl->in ()->get_path(), false);
     std::string src_name, dst;
     std::string prefix = "var_";
@@ -961,6 +972,7 @@ namespace Smala
       }
       arg = build_find (arg_node->get_path (), false);
     }
+
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
@@ -978,19 +990,32 @@ namespace Smala
         indent (os);
         std::string out_arg = build_find (e, false);
         os << "new ";
+
+        bool templated = (m_template_props.find(arg) != m_template_props.end());
+
+        std::cerr << "- " << arg << " " << out_arg << " " << templated << std::endl;
+
+        if (templated)
+          os << "T";
+
         if (node->is_paused ())
           os << "Paused";
         if (node->is_lazy ())
           os << "Lazy";
+
         if (node->is_connector ()) {
-          os << "Connector (";
+          os << "Connector";
           used_processes["Connector"];
         }
         else {
-          os << "Assignment (";
+          os << "Assignment";
           used_processes["Assignment"];
         }
-        os << p_name << ", \"\", " <<   arg << ", " // << "\"\","
+
+        if (templated)
+          os << "<std::remove_pointer<decltype(" << out_arg << ")>::type>";
+
+        os << " (" << p_name << ", \"\", " <<   arg << ", " // << "\"\","
                                    << out_arg //<< ", \"\""
                                    ;
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
@@ -2039,6 +2064,7 @@ namespace Smala
     sym.clear();
     m_new_syms_from_build_expr.clear();
     prop_sym.clear();
+    m_template_props.clear();
   }
 
   void

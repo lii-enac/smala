@@ -116,6 +116,8 @@ namespace Smala {
     sym_t prop_sym; // like sym, but for properties only
     std::vector<sym_t> prop_sym_stack; // like sym_stack
     sym_t m_new_syms_from_build_expr; // this contains newly dynamic_cast'ed properties while building expressions
+    std::map<std::string, bool> m_template_props;
+    std::vector<std::map<std::string, bool>> m_template_props_stack;
   };
 
 } /* namespace Smala */

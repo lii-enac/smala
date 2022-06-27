@@ -40,12 +40,14 @@ Component root {
   HBox hbox (f)
     VBox vbox (hbox)
       ComboBox cb
+      cb.preferred_width = 100
       addChildrenTo cb.str_items {
         String _ ("First choice")
         String _ ("Second choice")
         String _ ("Third choice")
       }
       PushButton b1 ("My Button")
+      b1.preferred_width = 100
       cb.value =:> b1.label
       addChildrenTo vbox.items
       { 

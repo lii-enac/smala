@@ -39,7 +39,7 @@ Component root {
 
   HBox hbox (f)
     VBox vbox (hbox)
-      ComboBox cb (0, 0)
+      ComboBox cb
       addChildrenTo cb.str_items {
         String _ ("First choice")
         String _ ("Second choice")

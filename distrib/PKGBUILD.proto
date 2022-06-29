@@ -50,6 +50,6 @@ check() {
 package() {
 	cd "$pkgname-$pkgver"
 	echo $pkgdir
-	echo make -j6 install_brew DESTDIR="$pkgdir/" PREFIX="/usr" install
-	make -j6 install_brew DESTDIR="$pkgdir/" PREFIX="/usr" install
+	echo make -j6 install_brew DESTDIR="$pkgdir/" PREFIX="/mingw64" install
+	make -j6 install_brew DESTDIR="$pkgdir/" PREFIX="/mingw64" install
 }	

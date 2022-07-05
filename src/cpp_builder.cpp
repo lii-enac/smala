@@ -1034,7 +1034,7 @@ namespace Smala
 
         if (templated) {
           os << "T";
-          //used_process_name = "T";
+          used_process_name = "T";
         }
 
         if (node->is_paused ())

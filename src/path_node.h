@@ -74,12 +74,12 @@ namespace Smala
       bool has_wild_card () { return m_path.back ()->get_path_type () == WILD_CARD; }
       bool has_path_list () { return m_path.back ()->get_path_type () == PATH_LIST; }
 
-      std::string build_string_repr () const {
+      std::string build_string_repr (const char* sep=".") const {
         std::string res;
-        auto sep = "";
+        auto sep_ = "";
         for (auto & spn: get_subpath_list()) {
-          res += sep + spn->get_subpath ();
-          sep = ".";
+          res += sep_ + spn->get_subpath ();
+          sep_ = sep;
         }
         return res;
       }

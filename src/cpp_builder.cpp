@@ -27,6 +27,7 @@
 #include "forevery_node.h"
 #include "causal_dep_node.h"
 #include "self_assign_node.h"
+#include "template_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -481,6 +482,31 @@ namespace Smala
   void
   CPPBuilder::build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* node)
   {
+    // FIXME? should probably be somewhere else
+    bool is_prop = false;
+    static const vector<string> prop_components = {"IntProperty", "DoubleProperty", "TextProperty", "BoolProperty", "TemplateProperty"};
+    //std::cerr << constructor << std::endl;
+    if (find(begin(prop_components), end(prop_components), constructor) != end(prop_components)) {
+      is_prop = true;
+      if (constructor == "TemplateProperty") {
+        m_template_props[var_name] = true;
+        //std::cerr << " _ " << var_name << std::endl;
+      }
+    }
+
+    if (is_prop) {
+      auto tname = transform_name(child_name);
+      prop_sym[tname] = var_name;
+      PathNode * pn = node->get_path ();
+      if (pn) {
+        auto * tmpl_node = dynamic_cast<TemplatePropertyNode*>(node);
+        assert(tmpl_node);
+        os << "auto * " << var_name << " = dynamic_cast<TemplateProperty<" << tmpl_node->get_template_type_name() << ">*> (" << parent_name << "->find_child(\"" << pn->build_string_repr("/") << "\"));\n";
+        used_processes["TemplateProperty"] = true;
+        return;
+      }
+    }
+
     std::string args_str;
     for (auto sub : node->get_args ()) {
       args_str += ", " + build_expr (sub);
@@ -493,16 +519,7 @@ namespace Smala
     os << args_str;
     os << ");\n";
 
-    // FIXME? should probably be somewhere else
-    static const vector<string> prop_components = {"IntProperty", "DoubleProperty", "TextProperty", "BoolProperty", "TemplateProperty"};
-    if (find(begin(prop_components), end(prop_components), constructor) != end(prop_components)) {
-      auto tname = transform_name(child_name);
-      prop_sym[tname] = var_name;
-      if (constructor == "TemplateProperty") {
-        m_template_props[var_name] = true;
-        std::cerr << tname << " _ " << var_name << std::endl;
-      }
-    }
+    
   }
     
 
@@ -932,8 +949,9 @@ namespace Smala
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     ExprNode *arg_node = node->get_expression ();
     std::string arg;
+    bool templated = false;
+
     if (arg_node->get_expr_node_type () != PATH_EXPR) {
-      
       std::string branch_name;
       if (node->parent()) {
         if (node->parent()->djnn_type().find("Switch")==0) {
@@ -947,23 +965,39 @@ namespace Smala
       }
       
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-      indent (os);
-      if (arg_node->get_expr_type() == STRING) {
-        os << "TextProperty *" << new_name << " = new TextProperty (";
-        used_processes["TextProperty"] = true;
-      } else {
-        os << "DoubleProperty *" << new_name << " = new DoubleProperty (";
-        used_processes["DoubleProperty"] = true;
-      }
-
-      os << p_name;
-      os << ", \"\", " << arg_node->get_val () << ");\n";
-
       if (!branch_name.empty()) {
         arg = branch_name;
       } else {
         arg = new_name;
       }
+  
+      
+      //std::cerr << "°° " << arg << " " << arg_node->get_val () << std::endl;
+      ExprNode * en = dynamic_cast<ExprNode*>(arg_node);
+      assert(en);
+
+      //bool templated = (m_template_props.find(arg) != m_template_props.end());
+      templated = en->get_expr_type() == DOUBLE_UNIT || en->get_expr_type() == INT_UNIT;
+
+      indent (os);
+      if (templated) {
+        //os << "auto * " << new_name << " = new TemplateProperty<decltype(" << arg_node->get_val () << ")> (";
+        os << "auto * " << new_name << " = new TemplateProperty (";
+        used_processes["TemplateProperty"] = true;
+      } else {
+        if (arg_node->get_expr_type() == STRING) {
+          os << "TextProperty * " << new_name << " = new TextProperty (";
+          used_processes["TextProperty"] = true;
+        } else {
+          os << "auto * " << new_name << " = new DoubleProperty (";
+          used_processes["DoubleProperty"] = true;
+        }
+      }
+
+      os << p_name;
+      os << ", \"\", " // empty name
+         << arg_node->get_val ()
+         << ");\n";
 
     } else {
       if (arg_node->get_path()->has_path_list() || arg_node->get_path()->has_wild_card()) {
@@ -976,7 +1010,8 @@ namespace Smala
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
-      os << "auto *" << new_name << " = new Assignment ( " << p_name
+      os << "auto * " << new_name << " = new Assignment ( "
+          << p_name
           << ", "//\"\", "
           << arg << ", "//\"\","
           << out_arg << ", "//\"\", "
@@ -991,12 +1026,16 @@ namespace Smala
         std::string out_arg = build_find (e, false);
         os << "new ";
 
-        bool templated = (m_template_props.find(arg) != m_template_props.end());
+        if(!templated)
+          templated = (m_template_props.find(arg) != m_template_props.end());
 
-        std::cerr << "- " << arg << " " << out_arg << " " << templated << std::endl;
+        //std::cerr << "- " << arg << " " << out_arg << " " << templated << std::endl;
+        string used_process_name;
 
-        if (templated)
+        if (templated) {
           os << "T";
+          //used_process_name = "T";
+        }
 
         if (node->is_paused ())
           os << "Paused";
@@ -1005,12 +1044,15 @@ namespace Smala
 
         if (node->is_connector ()) {
           os << "Connector";
-          used_processes["Connector"];
+          used_process_name += "Connector";
+          
         }
         else {
           os << "Assignment";
-          used_processes["Assignment"];
+          used_process_name += "Assignment";
         }
+
+        used_processes[used_process_name] = true;
 
         if (templated)
           os << "<std::remove_pointer<decltype(" << out_arg << ")>::type>";

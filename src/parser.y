@@ -54,6 +54,7 @@
   #include "this_node.h"
   #include "add_children_to_node.h"
   #include "self_assign_node.h"
+  #include "template_node.h"
 
   using namespace std;
 
@@ -1091,13 +1092,13 @@ simple_process
       }
       $1->set_args ($2);
     }
-  /* | simple_process_decl arguments opt_eol
+  | simple_process_decl AKA name_or_path opt_eol
     {
       if ((m_in_add_children && !exclude_from_no_parent ($1->djnn_type ())) || is_switch ($1->djnn_type ())) {
         driver.add_node (new SetParentNode (@$, $1));
       }
-      $1->set_args ($2);
-    } */
+      $1->set_path(new PathNode (@3, $3));
+    }
   | simple_process_decl eol
     {
       lexer_expression_mode_off ();
@@ -1171,7 +1172,7 @@ simple_process_decl
   | NAME OF NAME keep NAME
     {
       lexer_expression_mode_on ();
-      Node *node = new Node (@$, SIMPLE, $1, $5);
+      auto *node = new TemplatePropertyNode (@$, SIMPLE, $1, $5, $3);
       node->set_keep_name ($4);
       if (root == nullptr) {
         root = node;

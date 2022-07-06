@@ -66,7 +66,7 @@ UITextField () inherits IWidget () {
       edit_text_color =: text_color
       /* Cursor */
       OutlineColor _ (Black)
-      OutlineWidth _ (2)
+      OutlineWidth _ (1)
       Line cursor (0, 0, 0, 15)
       field.cursor_end_x =:> cursor.x1, cursor.x2
       field.cursor_height =:> cursor.y2

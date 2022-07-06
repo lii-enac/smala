@@ -24,6 +24,7 @@ import gui.widgets.HSlider
 import gui.widgets.Label
 import gui.widgets.ComboBox
 import gui.widgets.HSpace
+import gui.widgets.UITextField
 
 _main_
 Component root {
@@ -39,20 +40,27 @@ Component root {
 
   HBox hbox (f)
     VBox vbox (hbox)
-      ComboBox cb
-      cb.preferred_width = 100
-      addChildrenTo cb.str_items {
-        String _ ("First choice")
-        String _ ("Second choice")
-        String _ ("Third choice")
+      Component model {
+        List items {
+          String _ ("First choice")
+          String _ ("Second choice")
+          String _ ("Third choice")
+        }
       }
+      ComboBox cb
+      model =: cb.model
+      cb.preferred_width = 100
+      
       PushButton b1 ("My Button")
       b1.preferred_width = 100
       cb.value =:> b1.label
+      UITextField tf
+      tf.preferred_width = 100
       addChildrenTo vbox.items
       { 
         cb,
-        b1
+        b1,
+        tf
       }
     HSpace hspace (20)
     PushButton b2 ("Quit")

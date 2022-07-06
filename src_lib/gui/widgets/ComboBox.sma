@@ -51,9 +51,14 @@ int has_str_item (Process *item, Process *list) {
 _action_
 fn_init_items_pos_and_geom (Process src, Process data)
 {
+  if (data.model == 0) {
+    return
+  }
+  model = getRef (data.model)
+  
   addChildrenTo data.fsm.st_dpy.text_items {
     int dy = 0
-    for item : data.str_items {
+    for item : model.items {
       ComboBoxItem _ (data, item, 0, dy)
       dy = dy + 15
     }
@@ -66,6 +71,10 @@ ComboBox () inherits IWidget () {
   Incr incr (1)
   Incr decr (1)
   Bool is_hover (0)
+  RefProperty model (0)
+  Deref added (model, "$added")
+  Deref removed (model, "$removed")
+
   incr.state - decr.state != 0 =:> is_hover
 
   /*----- interface -----*/
@@ -79,7 +88,7 @@ ComboBox () inherits IWidget () {
   Int text_color (#ffffff)
   OutlineColor _ (#535353)
   FillColor fc (#535353)
-  Rectangle r (0, 0, 100, 20, 3, 3)
+  Rectangle r (0, 0, 100, 25, 3, 3)
   
   Component arrow {
     FillColor _ (Black)
@@ -112,7 +121,7 @@ ComboBox () inherits IWidget () {
 
   r.height =:> this.min_height, this.preferred_height
 
-  List str_items
+  //List str_items
 
   FSM fsm {
     State st_idle
@@ -130,8 +139,14 @@ ComboBox () inherits IWidget () {
 
       Translation t (0, 15)
       r.height + 15 =:> t.ty
+      Translation lift (0, 0)
+      BoundedValue bv_lift (0, 0, 0)
+      Int szItem (17)
       List text_items
-
+      -(text_items.size-1) * szItem =:> bv_lift.min
+      GenericMouse.wheel.dy > 0 -> { lift.ty + szItem =: bv_lift.input}
+      GenericMouse.wheel.dy < 0 -> { lift.ty - szItem =: bv_lift.input}
+      bv_lift.result =:> lift.ty
       FSM check_hover {
         State not_hover {
           GenericMouse.left.press -> unselect
@@ -148,10 +163,11 @@ ComboBox () inherits IWidget () {
   max_content_height aka fsm.st_dpy.bg.height
   NativeAction init_items_pos_and_geom (fn_init_items_pos_and_geom, this, 0)
 
-  str_items.$added -> (this) {
+  added -> add_items: (this) {
     int size = getInt (this.fsm.st_dpy.text_items.size)
-    int y = (size + 1) * 15
-    for item : this.str_items {
+    int y = size * 15
+    model = getRef (this.model)
+    for item : model.items {
       if (has_item (item, this.fsm.st_dpy.text_items) == 0) {
         addChildrenTo this.fsm.st_dpy.text_items {
           ComboBoxItem new_item (this, item, 0, y)
@@ -160,13 +176,15 @@ ComboBox () inherits IWidget () {
       }
     }
   }
-  str_items.$removed -> (this) {
+  model != 0 -> add_items
+  removed -> (this) {
+    model = getRef (this.model)
     for item : this.fsm.st_dpy.text_items {
-      if (has_str_item (item, this.str_items) == 0) {
+      if (has_str_item (item, model.items) == 0) {
           delete item
       }
     }
-    int y = 15
+    int y = 0
     for item : this.fsm.st_dpy.text_items {
       item.y = y
       y += 15

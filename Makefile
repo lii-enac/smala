@@ -313,7 +313,8 @@ $(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH
 
 $(build_dir)/$(smala_lib_dir)/gui/widgets/ComboBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h $(build_dir)/$(smala_lib_dir)/gui/widgets/ComboBoxItem.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/Label.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/Slider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
+$(build_dir)/$(smala_lib_dir)/gui/widgets/HSlider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
+$(build_dir)/$(smala_lib_dir)/gui/widgets/VSlider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/RadioButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/CheckBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
 $(build_dir)/$(smala_lib_dir)/gui/widgets/ToggleButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h

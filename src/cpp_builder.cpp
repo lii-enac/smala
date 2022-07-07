@@ -1054,8 +1054,12 @@ namespace Smala
 
         used_processes[used_process_name] = true;
 
-        if (templated)
-          os << "<std::remove_pointer<decltype(" << out_arg << ")>::type>";
+        if (templated) {
+          os << "<";
+          os << "std::remove_pointer<decltype(" << arg << ")>::type, ";
+          os << "std::remove_pointer<decltype(" << out_arg << ")>::type";
+          os << ">";
+        }
 
         os << " (" << p_name << ", \"\", " <<   arg << ", " // << "\"\","
                                    << out_arg //<< ", \"\""
@@ -1220,12 +1224,12 @@ namespace Smala
             create_temp_properties << "auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
             used_processes["AbstractProperty"] = true;
             
-            populate_native_fields << native_name << "->" << new_param_name << " = " << new_name << ";\n";
-
             sym[new_param_name] = new_name;
             prop_sym[new_param_name] = new_name;
           }
           const string& new_name = prop_sym[new_param_name];
+          indent (populate_native_fields);
+          populate_native_fields << native_name << "->" << new_param_name << " = " << new_name << ";\n";
           if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
             tmpl_varnames.push_back(new_name);
           }
@@ -1250,8 +1254,7 @@ namespace Smala
           }
           const string& new_name = prop_sym[new_param_name];
           indent (populate_native_fields);
-          populate_native_fields << native_name << "->" << new_param_name << " = " 
-              <<  new_name << ";\n";
+          populate_native_fields << native_name << "->" << new_param_name << " = " <<  new_name << ";\n";
           
           if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
             tmpl_varnames.push_back(new_name);

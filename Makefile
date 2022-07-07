@@ -279,6 +279,7 @@ $(build_dir)/src/process_class_path.cpp:
 	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
 	printf "{\"AbstractProperty\",\"core/property/abstract_property.h\"},\n" >> $@
 	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@
+	printf "{\"AbstractProperty\",\"core/property/abstract_property.h\"},\n" >> $@
 	printf '{"",""}};\n}\n' >> $@
 	rm $(tmpfile)
 #	cat <<EOT >> $@
@@ -618,8 +619,7 @@ $(build_dir)/%.html: %.sma $(smalac)
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
-	@echo smalac $<
-	@$(smalac) -g $< || (c=$$?; rm -f $*.cpp $*.h; (exit $$c))
+	$(smalac) -g $<
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 

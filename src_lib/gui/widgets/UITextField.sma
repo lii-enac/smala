@@ -23,8 +23,11 @@ UITextField () inherits IWidget () {
   mouseTracking = 1
   Spike validate
   Spike clear
+  Spike next
+  Spike activate
   String text ("")
   String init_text ("")
+
 
   OutlineColor _ (#535353)
   FillColor bg_color (White)  
@@ -75,10 +78,13 @@ UITextField () inherits IWidget () {
       GenericKeyboard.key\-pressed => field.key_pressed
       GenericKeyboard.key\-released => field.key_released
       GenericKeyboard.key\-pressed_text => field.string_input
+      GenericKeyboard.key\-pressed == DJN_Key_Tab -> next, set_text
     }
     no_edit->edit (field.press)
     no_edit->edit (bkg.press)
+    no_edit->edit (activate)
     edit->no_edit (leave)
+    edit->no_edit (next)
   }
 
   clear->field.clear

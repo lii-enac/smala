@@ -336,6 +336,11 @@ lib: smala_lib
 clean_lib:
 	rm -f $(smala_lib) $(smala_lib_objs)
 
+ifeq ($(keep_intermediate),yes)
+.SECONDARY:
+endif
+
+
 # ------------
 # automatic rules
 

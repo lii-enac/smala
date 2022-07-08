@@ -277,6 +277,7 @@ $(build_dir)/src/process_class_path.cpp:
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/deref.h          | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/deref.h\"},"}' >> $@
 	printf "{\"MultiConnector\",\"base/connector.h\"},\n" >> $@
 	printf "{\"MultiAssignment\",\"core/control/assignment.h\"},\n" >> $@
+	printf "{\"AbstractProperty\",\"core/property/abstract_property.h\"},\n" >> $@
 	printf "{\"loadFromXML\",\"core/xml/xml.h\"},\n" >> $@
 	printf '{"",""}};\n}\n' >> $@
 	rm $(tmpfile)

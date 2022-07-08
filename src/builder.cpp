@@ -297,8 +297,8 @@ namespace Smala
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
         auto expr_str = build_expr (n->get_args().at (0));
-        //indent (os);
-        //build_properties (os);
+        build_properties (os);
+        indent (os);
 
         print_type (os, n->type ());
         std::string new_name;
@@ -330,8 +330,8 @@ namespace Smala
       case EXPR_NODE:
       {
         auto expr_str = build_expr ((ExprNode*) node);
-        //build_properties (os);
-        //indent (os);
+        build_properties (os);
+        indent (os);
         os << expr_str;
         break;
       }
@@ -604,8 +604,10 @@ namespace Smala
       }
       case EXPR_NODE:
       {
+        auto expr = build_expr ((ExprNode*) node);
+        build_properties (os);
         indent (os);
-        os << build_expr ((ExprNode*) node);
+        os << expr;
         end_line (os);
         break;
       }
@@ -624,8 +626,8 @@ namespace Smala
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
         auto expr_str = build_expr (n->get_args().at (0));
-        if (!m_in_for)
-          indent (os);
+        // if (!m_in_for)
+        //   indent (os);
         build_properties (os);
 
         if (!m_in_for)

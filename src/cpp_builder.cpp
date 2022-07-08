@@ -38,6 +38,29 @@
 #include <fstream>
 #include <experimental/iterator>
 
+//#define BOOST_STACKTRACE_USE_ADDR2LINE
+//#include <boost/stacktrace.hpp>
+
+
+//#include <stdio.h>
+#include <execinfo.h>
+string print_trace(void) {
+    char **strings;
+    size_t i, size;
+    enum Constexpr { MAX_SIZE = 1024 };
+    void *array[MAX_SIZE];
+    size = backtrace(array, MAX_SIZE);
+    strings = backtrace_symbols(array, size);
+    string res;
+    for (i = 0; i < size; i++) {
+        //printf("%s\n", strings[i]);
+        res += string(strings[i]) + " ";
+    }
+    //puts("");
+    free(strings);
+    return res;
+}
+
 namespace Smala
 {
   static std::string
@@ -415,7 +438,7 @@ namespace Smala
             }
           }
 
-          expr += "get_property_value (" + new_path + ")";
+          expr += "get_property_value (" + new_path + ")"; // + print_trace(); // + boost::stacktrace::stacktrace();
         }
         break;
       }
@@ -536,6 +559,8 @@ namespace Smala
   CPPBuilder::build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* node)
   {
     // subsumed by build_component
+
+
     /*
     std::string args_str;
     for (auto sub : node->get_args()) {
@@ -558,7 +583,6 @@ namespace Smala
     std::string args_str;
     auto lower_str = build_expr(n->lower_arg());
     auto upper_str = build_expr(n->upper_arg());
-    indent (os);
     build_properties(os);
 
     indent (os);
@@ -700,7 +724,6 @@ namespace Smala
   {
     ExprNode* expr = node->get_args ().at (0);
     auto expr_str = build_expr (expr, string_t);
-    indent (os);
     build_properties (os);
     
     std::string name ("var_" + std::to_string (m_var_num++));
@@ -717,7 +740,6 @@ namespace Smala
   CPPBuilder::build_while (std::ostream &os, Node *node)
   {
     auto expr_str = build_expr (node->get_args().at(0));
-    indent (os);
     build_properties (os);
 
     indent (os);
@@ -742,17 +764,14 @@ namespace Smala
 
     std::ostringstream first_os;
     build_for_node (first_os, fn->first_st());
-    indent (os);
     build_properties(os);
 
     std::string expr_str = build_expr (fn->second_st());
-    indent (os);
     build_properties(os);
 
     std::ostringstream third_os;
     build_for_node (third_os, fn->third_st());
 
-    indent (os);
     build_properties(os);
 
     indent (os);
@@ -775,8 +794,9 @@ namespace Smala
     std::string list_name = "list_" + std::to_string (m_cpnt_num++);
     std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
     os << "std::vector<CoreProcess*> " << list_name << ";\n";
-    indent (os);
     std::string path = build_find (n->get_path (), true);
+    build_properties(os);
+    indent (os);
     os << "auto *" << loc_name << " = " << path << ";\n";
     indent (os);
     os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
@@ -819,6 +839,7 @@ namespace Smala
     std::string constructor = get_constructor (node->djnn_type ());
 
     std::string src = build_find (ctrl->in ()->get_path(), false);
+    build_properties(os);
     std::string src_name, dst;
     std::string prefix = "var_";
     bool _is_var = src.substr (0, prefix.size ()) == prefix;
@@ -832,14 +853,15 @@ namespace Smala
 
     if (!ctrl->out ()->build_name ().empty ()) {
       dst = ctrl->out ()->build_name ();
-    } else
+    } else {
       dst = build_find (ctrl->out ()->get_path(), false);
+    }
     if (dst.empty ()) {
       print_error_message (error_level::error,
                                "anonymous component in output of control node",
                                1);
     }
-
+    build_properties(os);
     indent (os);
     
     if (!node->name ().empty ()) {
@@ -888,13 +910,15 @@ namespace Smala
     std::string p_name =
             node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     std::string arg = build_find (arg_node->get_path (), false);
+    build_properties(os);
     std::string control_name = node->is_connector () ? "MultiConnector" : "MultiAssignment";
     used_processes[control_name] = true;
     int model = node->is_connector () ? !node->is_model () : node->is_model ();
     if (arg_node->get_path ()->has_wild_card ()) {
       for (auto e : node->get_output_nodes ()) {
-        indent (os);
         std::string out_arg = build_find (e, false);
+        build_properties(os);
+        indent (os);
         os << control_name << " (" << p_name << ", " << arg << ", " << out_arg
             << ", " << model << ");\n";
       }
@@ -916,8 +940,9 @@ namespace Smala
     }
     m_indent++;
     for (auto e : node->get_output_nodes ()) {
-      indent (os);
       std::string out_arg = build_find (e, false);
+      build_properties(os);
+      indent (os);
       comma = "";
       os << "{ djnn::vector <djnn::string> out_names;\n";
       for (auto p: e->get_subpath_list().back()->get_path_list()) {
@@ -945,6 +970,7 @@ namespace Smala
   CPPBuilder::build_simple_control_node (std::ostream &os,
                                          NativeExpressionNode *node)
   {
+    os << "// >> STEF" << endl;
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     ExprNode *arg_node = node->get_expression ();
@@ -1005,16 +1031,19 @@ namespace Smala
         return;
       }
       arg = build_find (arg_node->get_path (), false);
+      build_properties(os);
     }
 
     if (!node->is_connector () && !node->name ().empty ()) {
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
+      build_properties(os);
+      indent(os);
       os << "auto * " << new_name << " = new Assignment ( "
           << p_name
-          << ", "//\"\", "
-          << arg << ", "//\"\","
-          << out_arg << ", "//\"\", "
+          << ", "
+          << arg << ", "
+          << out_arg << ", "
           << node->is_model () << ");\n";
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
           && node->duplicate_warning ())
@@ -1022,9 +1051,8 @@ namespace Smala
                              "duplicated name: " + node->name (), 0);
     } else {
       for (auto e : node->get_output_nodes ()) {
-        indent (os);
         std::string out_arg = build_find (e, false);
-        os << "new ";
+        build_properties(os);
 
         if(!templated)
           templated = (m_template_props.find(arg) != m_template_props.end());
@@ -1032,6 +1060,8 @@ namespace Smala
         //std::cerr << "- " << arg << " " << out_arg << " " << templated << std::endl;
         string used_process_name;
 
+        indent (os);
+        os << "new ";
         if (templated) {
           os << "T";
           used_process_name = "T";
@@ -1045,7 +1075,6 @@ namespace Smala
         if (node->is_connector ()) {
           os << "Connector";
           used_process_name += "Connector";
-          
         }
         else {
           os << "Assignment";
@@ -1067,14 +1096,16 @@ namespace Smala
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
         if (!node->is_paused () && !node->is_lazy ()) {
           if(node->is_connector())
-          os << ", " << !node->is_model ();
-            else
-          os << ", " << node->is_model ();
+            os << ", " << !node->is_model ();
+          else
+            os << ", " << node->is_model ();
         }
 
         os << ");\n";
       }
     }
+    build_properties(os);
+    os << "// << STEF" << endl;
   }
 
 
@@ -1132,6 +1163,7 @@ namespace Smala
       if (l->get_expr_node_type() == PATH_EXPR) {
         auto & whatever_name = l->get_path ()->get_subpath_list().at (0)->get_subpath();
         string arg = build_find (l->get_path (), true);
+        build_properties(create_temp_properties);
         //std::cerr << "--arg: " << arg << " --parent?_name: " << whatever_name << std::endl;
         if (arg.compare (0, 6, "d_var_") == 0 || arg.compare (0, 6, "i_var_") == 0) {
           string new_param_name = transform_name(whatever_name);
@@ -1208,6 +1240,7 @@ namespace Smala
       // whatever_name because I do not know the intent of this variable...
       auto & whatever_name = e->get_subpath_list().at (0)->get_subpath();
       std::string arg = build_find (e, false);
+      build_properties(create_temp_properties);
       if (arg.compare (0, 4, "var_") != 0) {
         if (arg.find ("->") != std::string::npos) {
           std::string fake_name = build_fake_name (e, true);
@@ -1313,6 +1346,7 @@ namespace Smala
     }
     for (auto out : node->get_output_nodes ()) {
       std::string arg = build_find (out, false);
+      build_properties(create_temp_properties);
       indent (os);
       os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
       os << arg << ");\n";
@@ -1504,6 +1538,7 @@ namespace Smala
          "unknown component " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
         return;
       }
+      build_properties(os);
       indent (os);
       switch (n->type ()) {
         case DUMP:
@@ -1619,12 +1654,11 @@ namespace Smala
   void
   CPPBuilder::set_property (std::ostream &os, Node *node)
   {
+    auto expr_str = build_expr (node->get_args().at(0), undefined_t);
+    build_properties(os);
+    
     if (!m_in_for)
       indent (os);
-    
-    auto expr_str = build_expr (node->get_args().at(0), undefined_t);
-    indent (os);
-    build_properties(os);
 
     std::string prop_name = node->get_path()->get_subpath_list().at(0)->get_subpath();
     std::string found = m_parent_list.back ()->get_symbol (prop_name);
@@ -1640,6 +1674,8 @@ namespace Smala
       prop_sym[prop_name] = var_name;
     } else {
       prop_name = build_find (node->get_path(), false);
+      build_properties(os);
+      indent (os);
       if ( (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0)) {
         os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << expr_str << ", true)";
         if (!m_in_for)
@@ -1661,9 +1697,8 @@ namespace Smala
     std::string found = m_parent_list.back ()->get_symbol (prop_name);
     std::string symbol = (std::string) node->symbol ();
     prop_name = build_find (node->get_path(), false);
-
+    build_properties (os);
     auto expr_str = build_expr (node->get_args().at(0), undefined_t);
-    indent (os);
     build_properties (os);
 
     if ( (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0)) {
@@ -1704,12 +1739,13 @@ namespace Smala
   CPPBuilder::alias (std::ostream &os, Node *node)
   {
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
+    std::string arg = build_find (n->right_arg (), false);
+    build_properties (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     indent (os);
     const std::string& whatever_name = n->left_arg ()->get_subpath_list().at(0)->get_subpath();
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << whatever_name << "\", ";
-    std::string arg = build_find (n->right_arg (), false);
     os << "dynamic_cast<FatChildProcess*>(" << arg << "));\n";
     indent (os);
     os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
@@ -1727,6 +1763,7 @@ namespace Smala
     indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
+    build_properties (os);
     os << "merge_children (" << left << ", \"\", "
         << right << ", \"\");\n";
   }
@@ -1738,6 +1775,7 @@ namespace Smala
     indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
+    build_properties (os);
     os << left << "->remove_child ( dynamic_cast<FatChildProcess*>(" << right << "));\n";
   }
 
@@ -1748,8 +1786,10 @@ namespace Smala
     indent (os);
     std::string last;
     std::string left = build_find (n->left_arg (), false);
+    build_properties (os);
     if (n->right_arg ()) {
       std::string last = build_find (n->right_arg (), false);
+      build_properties (os);
       os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
               << c << ", " << last << ");\n";
     }
@@ -1773,8 +1813,8 @@ namespace Smala
     m_cur_building_name = new_name;
 
     auto expr_str = build_expr (node->get_args().at (0), process_t);
-    indent (os);
     build_properties (os);
+    indent (os);
     os << "auto * " << new_name << " = " << expr_str;
   }
 
@@ -1807,12 +1847,15 @@ namespace Smala
   {
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
+    build_properties (os);
 
     AddChildrenToNode* add_children_to = dynamic_cast<AddChildrenToNode*> (node);
     if (!add_children_to->children ().empty()) {
       for (auto name : add_children_to->children ()) {
+        auto child = build_find (name, false);
+        build_properties (os);
         indent (os);
-        os << s << "->add_child (" << build_find (name, false) << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
+        os << s << "->add_child (" << child << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
       }
       m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
@@ -2001,23 +2044,31 @@ namespace Smala
         print_error_message (error_level::warning,
                              "duplicated name: " + node->name (), 0);
     }
-    indent (os);
     std::string function_name = m_parent_list.back ()->get_symbol (node->function_name ());
     if (function_name.empty ())
       function_name = node->function_name ();
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
-    os << "auto * " << new_name << " = new " << constructor << " (" << p_name
-        << ", " << name << ", " << function_name << ", ";
+    
+    std::string list;
     if (type == COLLECTION_ACTION) {
-      std::string list = build_find (node->path_list(), false);
-      os << list << ", ";
+      list = build_find (node->path_list(), false);
+      build_properties(os);
     }
     std::string data;
     if (node->path_data() == nullptr)
       data = m_null_symbol;
-    else
+    else {
       data = build_find(node->path_data(), false);
+      build_properties(os);
+    }
+
+    indent (os);
+    os << "auto * " << new_name << " = new " << constructor << " (" << p_name
+        << ", " << name << ", " << function_name << ", ";
+    if (type == COLLECTION_ACTION) {
+      os << list << ", ";
+    }
     os << data << ", " << node->is_model () << ");\n ";
   }
 
@@ -2153,6 +2204,7 @@ namespace Smala
     CausalDependencyNode* n = dynamic_cast<CausalDependencyNode*> (node);
     std::string src = build_find (n->src (), true);
     std::string dst = build_find (n->dst (), true);
+    build_properties(os);
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";

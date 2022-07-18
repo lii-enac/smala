@@ -43,6 +43,7 @@
 
 
 //#include <stdio.h>
+/*
 #include <execinfo.h>
 string print_trace(void) {
     char **strings;
@@ -60,6 +61,7 @@ string print_trace(void) {
     free(strings);
     return res;
 }
+*/
 
 namespace Smala
 {

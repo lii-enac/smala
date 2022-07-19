@@ -297,7 +297,7 @@ namespace Smala
       {
         NewVarNode *n = dynamic_cast<NewVarNode*> (node);
         auto expr_str = build_expr (n->get_args().at (0));
-        build_properties (os);
+        //build_properties (os); // will be done in build_for
         indent (os);
 
         print_type (os, n->type ());

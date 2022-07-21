@@ -23,6 +23,7 @@ PushButton (string _label) inherits IWidget () {
   /*----- interface -----*/
   Spike click
   Spike release
+  Spike select
   /*----- interface -----*/
 
   Int idle_color (#323232)
@@ -33,10 +34,20 @@ PushButton (string _label) inherits IWidget () {
   Rectangle r (0, 0, 100, 40, 3, 3)
 
   press aka r.press
-
+  Bool ret_key_pressed (0)
+  Bool ret_key_released (0)
+  GenericKeyboard.key\-pressed == DJN_Key_Return => ret_key_pressed
+  GenericKeyboard.key\-released == DJN_Key_Return => ret_key_released
   FSM fsm {
     State idle {
       idle_color =: fc.value
+    }
+    State selected {
+      OutlineColor _ (White)
+      DashArray dash (2.0, 2.0)
+      Rectangle r_dash (3, 3, 94, 34, 3, 3)
+      r.width - 6 =:> r_dash.width
+      r.height - 6 =:> r_dash.height
     }
     State pressed {
       pressed_color =: fc.value
@@ -46,7 +57,11 @@ PushButton (string _label) inherits IWidget () {
       idle_color =: fc.value
     }
     idle->pressed (r.press)
+    idle->selected (select)
+    selected->pressed (r.press)
+    selected->pressed (ret_key_pressed.true)
     pressed->idle (r.release, click)
+    pressed->idle (ret_key_released, click)
     pressed->out (r.leave)
     out->pressed (r.enter)
     out->idle (r.release)

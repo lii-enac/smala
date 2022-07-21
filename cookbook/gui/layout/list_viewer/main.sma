@@ -57,6 +57,7 @@ Component root {
   full_list_viewer.y = 1
 
   Frame small_view ("small view", 600, 0, 600, 200)
+
   ListViewer small_list_viewer (flight_list, prototype.vview)
   small_list_viewer.y = 2
   small_list_viewer.x = 2

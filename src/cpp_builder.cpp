@@ -2127,6 +2127,7 @@ namespace Smala
         }
       }
     }
+    used_processes["DashArray"] = true;
   }
 
   void

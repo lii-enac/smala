@@ -197,7 +197,8 @@ StandAloneComboBox (Process _upper_layer, string _default, double x_, double y_)
   }
   width aka main_label.main_box.width
   text aka main_label.text.text
-  text =:> value
+  //text =:> value
+  value =:> text
   Bool display_lift (0)
   
 

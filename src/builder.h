@@ -24,8 +24,8 @@
 #include "ast.h"
 #include "new_line_node.h"
 
-#define DBG;
-//#define DBG cerr << __FILE__ << ":" << __LINE__ << endl;
+//#define DBG ;
+#define DBG cerr << __FILE__ << ":" << __LINE__ << endl;
 
 namespace Smala {
 

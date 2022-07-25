@@ -150,7 +150,7 @@
     else
       sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
   }
-  
+
   void add_sym (const location& loc, const std::string& key, smala_t type) {
     if (m_in_lambda)
       lambda_sym_table_list.back()->add_sym (loc, key, type);

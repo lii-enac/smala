@@ -63,8 +63,8 @@ string print_trace(void) {
 }
 */
 
-#define emit_compiler_info(OS) //indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n";
-
+//#define emit_compiler_info(OS)
+#define emit_compiler_info(OS) { indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n"; }
 
 namespace Smala
 {
@@ -109,15 +109,15 @@ namespace Smala
     Builder::pop_ctxt ();
 
     sym_stack.pop_back ();
-    if(!sym_stack.empty()) // FIXME should never be empty...
+    //if(!sym_stack.empty()) // FIXME should never be empty...
       sym = sym_stack.back ();
 
     prop_sym_stack.pop_back ();
-    if(!prop_sym_stack.empty())
+    //if(!prop_sym_stack.empty())
       prop_sym = prop_sym_stack.back ();
     
     m_template_props_stack.pop_back ();
-    if(!m_template_props_stack.empty ())
+    //if(!m_template_props_stack.empty ())
       m_template_props = m_template_props_stack.back ();
   }
 
@@ -133,7 +133,11 @@ namespace Smala
     m_ast = ast;
     m_types.clear ();
     m_parent_list.clear ();
+
     m_parent_list.push_back (new BuildNode (m_null_symbol)); // the first parent is null
+    sym_stack.push_back (sym);
+    prop_sym_stack.push_back (prop_sym);
+    m_template_props_stack.push_back(m_template_props);
 
     std::string sep="/";
     // if (!builddir.empty()) {
@@ -342,7 +346,11 @@ namespace Smala
     std::string expr_str = build_expr (n->get_args().at(0));
     build_properties(os);
 
-    indent (os);
+    if (!m_after_else) {
+      indent (os);
+    }
+
+    //indent (os);
     os << "if ("
        << expr_str
        << ") {\n";
@@ -361,7 +369,7 @@ namespace Smala
   {
     //pop_ctxt();
     os << "else {\n";
-    push_ctxt(); DBG;
+    push_ctxt(); //DBG;
   }
 
 
@@ -376,9 +384,10 @@ namespace Smala
   void
   CPPBuilder::build_properties(std::ostream &os)
   {
+    if ( m_new_syms_from_build_expr.empty() ) return;
     emit_compiler_info(os);
     for (auto const & e: m_new_syms_from_build_expr) {
-      indent(os);
+      indent (os);
       os << "auto * " << e.second << " = dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl; 
     }
     m_new_syms_from_build_expr.clear();
@@ -538,6 +547,7 @@ namespace Smala
       if (pn) {
         auto * tmpl_node = dynamic_cast<TemplatePropertyNode*>(node);
         assert(tmpl_node);
+        indent (os);
         os << "auto * " << var_name << " = dynamic_cast<TemplateProperty<" << tmpl_node->get_template_type_name() << ">*> (" << parent_name << "->find_child(\"" << pn->build_string_repr("/") << "\"));\n";
         used_processes["TemplateProperty"] = true;
         return;
@@ -552,6 +562,7 @@ namespace Smala
     build_properties(os);
 
     // emit something like "auto * var_name = constructor"
+    //indent (os);
     print_start_component (os, var_name, constructor);
 
     // emit arguments
@@ -566,6 +577,7 @@ namespace Smala
   CPPBuilder::print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor)
   {
     emit_compiler_info(os);
+    indent (os);
     print_component_decl (os, var_name);
     os << " = ";
     print_component_constructor (os, constructor);
@@ -593,7 +605,6 @@ namespace Smala
   void
   CPPBuilder::build_range_node (std::ostream &os, Node *node, const string& new_name)
   {
-    emit_compiler_info(os);
     RangeNode* n = dynamic_cast<RangeNode*> (node);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
@@ -601,8 +612,10 @@ namespace Smala
     std::string args_str;
     auto lower_str = build_expr(n->lower_arg());
     auto upper_str = build_expr(n->upper_arg());
+    emit_compiler_info(os);
     build_properties(os);
 
+    emit_compiler_info(os);
     indent (os);
     print_start_component (os, new_name, "SwitchRangeBranch");
     os << " (" << p_name << ", " << name << ", " << lower_str;
@@ -765,7 +778,7 @@ namespace Smala
     indent (os);
     os << "while (" << expr_str << ") {";
     os << ") {\n";
-    push_ctxt (); DBG;
+    push_ctxt (); //DBG;
     m_indent++;
   }
 
@@ -780,7 +793,7 @@ namespace Smala
   {
     emit_compiler_info(os);
     ForNode *fn = (ForNode*) node;
-    push_ctxt (); DBG;
+    push_ctxt (); //DBG;
     m_in_for = true;
 
     std::ostringstream first_os;
@@ -812,9 +825,9 @@ namespace Smala
   {
     emit_compiler_info(os);
     ForEveryNode* n = (ForEveryNode*) node;
-    indent (os);
     std::string list_name = "list_" + std::to_string (m_cpnt_num++);
     std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
+    indent (os);
     os << "std::vector<CoreProcess*> " << list_name << ";\n";
     std::string path = build_find (n->get_path (), true);
     build_properties(os);
@@ -846,7 +859,8 @@ namespace Smala
     std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
     os << "for (auto " << var_name << " : " << list_name << ") {\n";
     m_indent++;
-    push_ctxt (); DBG;
+  
+    push_ctxt (); //DBG;
     m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
 
     used_processes["ProcessCollector"] = true;
@@ -885,8 +899,8 @@ namespace Smala
                                1);
     }
     build_properties(os);
-    indent (os);
-    
+
+    indent (os);    
     if (!node->name ().empty ()) {
       std::string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       m_parent_list.back ()->add_entry (node->name (), new_name);
@@ -967,8 +981,8 @@ namespace Smala
       std::string out_arg = build_find (e, false);
       build_properties(os);
       indent (os);
-      comma = "";
       os << "{ djnn::vector <djnn::string> out_names;\n";
+      comma = "";
       for (auto p: e->get_subpath_list().back()->get_path_list()) {
         indent (os);
         os << "out_names.push_back (\"";
@@ -1062,7 +1076,7 @@ namespace Smala
       std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
       build_properties(os);
-      indent(os);
+      indent (os);
       os << "auto * " << new_name << " = new Assignment ( "
           << p_name
           << ", "
@@ -1370,8 +1384,8 @@ namespace Smala
     std::string native_edge_name = new_name;
     if (node->is_connector ()) {
       emit_compiler_info(os);
-      indent (os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      indent (os);
       os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
           << ", \"sync_"+sync_name+"\", " << new_name << ", \"\"); //FIXME remove Synchronizer\n"; // FIXME
       used_processes["Synchronizer"]=true;
@@ -1558,14 +1572,16 @@ namespace Smala
     indent (os);
     os << "return " << m_parent_list.back ()->get_symbol ("this") << ";\n}\n";
     m_indent--;
-    BuildNode* n = m_parent_list.at (m_parent_list.size () - 1);
-    m_parent_list.pop_back ();
-    if (n)
-      delete n;
-    n = m_parent_list.at (m_parent_list.size () - 1);
-    m_parent_list.pop_back ();
-    if (n)
-      delete n;
+    // BuildNode* n;
+    // n = m_parent_list.at (m_parent_list.size () - 1);
+    // m_parent_list.pop_back ();
+    // if (n)
+    //   delete n;
+    // // FIXME why twice ?!!!
+    // n = m_parent_list.at (m_parent_list.size () - 1);
+    // m_parent_list.pop_back ();
+    // if (n)
+    //   delete n;
   }
 
   void
@@ -1585,19 +1601,22 @@ namespace Smala
       switch (n->type ()) {
         case DUMP:
           os << "if (" << arg << ")" << endl ;
-          indent (os); indent (os);
-          os << arg << "->dump";
-          os << " (0);\n";
+          m_indent += 1;
           indent (os);
+          os << arg << "->dump (0);\n";
+          m_indent -= 1;
+          //indent (os);
           //s << "else" << endl ;
           //indent (os); indent (os);
           //os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case XMLSERIALIZE:
           os << "if (" << arg << ")" << endl ;
-          indent (os); indent (os);
-          os << arg << "->serialize (\"XML\");\n";
+          m_indent += 1;
           indent (os);
+          os << arg << "->serialize (\"XML\");\n";
+          m_indent -= 1;
+          //indent (os);
           //os << "else" << endl ;
           //indent (os); indent (os);
           //os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
@@ -1609,7 +1628,7 @@ namespace Smala
           if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
             os << "MainLoop::instance ().activate ();\n";
           } else
-          os << arg << "->activate ();\n";
+            os << arg << "->activate ();\n";
           break;
         case STOP:
           if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
@@ -1626,17 +1645,20 @@ namespace Smala
           os << "auto *" << new_name << " = " << arg << ";\n";
           indent (os);
           os << "if (" << new_name << ") {\n";
-          indent (os); indent (os);
+          m_indent += 1;
+          indent (os);
           os << new_name << "->deactivate ();\n";
-          indent (os); indent (os);
+          indent (os);
           os << "if (" << new_name << "->get_parent ())\n";
-          indent (os); indent (os);
+          m_indent += 1;
           indent (os);
           os << new_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_name << "));\n";
-          indent (os); indent (os);
+          m_indent -= 1;
+          indent (os);
           os << new_name << "->schedule_delete ();\n";
-          indent (os); indent (os);
+          indent (os);
           os << new_name << " = nullptr;\n";
+          m_indent -= 1;
           indent (os);
           os << "}\n";
           }
@@ -1645,6 +1667,7 @@ namespace Smala
           std::string new_layer_name ("is_layer_" + std::to_string (m_cpnt_num++));
           os << "Layer *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
           indent (os); os << "if (" << new_layer_name << ") {\n";
+          
           indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
           indent (os); indent (os); os << "exit(0);\n";
           indent (os); os << "}\n";
@@ -1699,12 +1722,12 @@ namespace Smala
     emit_compiler_info(os);
     auto expr_str = build_expr (node->get_args().at(0), undefined_t);
     build_properties(os);
-    
-    if (!m_in_for)
-      indent (os);
 
     std::string prop_name = node->get_path()->get_subpath_list().at(0)->get_subpath();
     std::string found = m_parent_list.back ()->get_symbol (prop_name);
+    // DBG;
+    // for (auto & pp: m_parent_list) { std::cerr << pp->name() << " * ";}
+    // std::cerr << std::endl;
     // if the symbol is unknown we take it as the definition of a new Process*
     if (found.empty ()) {
       std::string var_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -1712,20 +1735,23 @@ namespace Smala
                 && node->duplicate_warning ())
               print_error_message (error_level::warning,
                                    "duplicated name: " + node->name (), 0);
+      if (!m_in_for)
+        indent (os);
       os << "auto * " << var_name << " = " << expr_str << ";\n";
       sym[prop_name] = var_name;
       prop_sym[prop_name] = var_name;
     } else {
       prop_name = build_find (node->get_path(), false);
       build_properties(os);
-      indent (os);
+      if (!m_in_for)
+        indent (os);
       if ( (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0)) {
         os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << expr_str << ", true)";
         if (!m_in_for)
           os << ";\n";
         used_processes["AbstractProperty"] = true;
       } else {
-        os << prop_name << " = " <<expr_str;
+        os << prop_name << " = " << expr_str;
         if (!m_in_for)
           os << ";\n";
       }
@@ -1750,13 +1776,13 @@ namespace Smala
       used_processes["TextProperty"] = true;
 
       string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-      indent(os);
+      indent (os);
       os << "auto * " << new_name << " = dynamic_cast<AbstractProperty*>(" << prop_name << ");\n";
       sym[prop_name] = new_name;
       prop_sym[prop_name] = new_name;
 
       if (!m_in_for) {
-        indent(os);
+        indent (os);
         os << "if (" << new_name << "->get_prop_type() == String) {\n";
         os << "\t\tdjnn_warning (" << prop_name << ", \"invalid operand for String Property\");\n";
         os << "\t}";
@@ -1786,8 +1812,8 @@ namespace Smala
     std::string arg = build_find (n->right_arg (), false);
     build_properties (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-    indent (os);
     const std::string& whatever_name = n->left_arg ()->get_subpath_list().at(0)->get_subpath();
+    indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << whatever_name << "\", ";
     os << "dynamic_cast<FatChildProcess*>(" << arg << "));\n";
@@ -1805,10 +1831,10 @@ namespace Smala
   {
     emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
-    indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
     build_properties (os);
+    indent (os);
     os << "merge_children (" << left << ", \"\", "
         << right << ", \"\");\n";
   }
@@ -1818,10 +1844,10 @@ namespace Smala
   {
     emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
-    indent (os);
     std::string left = build_find (n->left_arg (), false);
     std::string right = build_find (n->right_arg (), false);
     build_properties (os);
+    indent (os);
     os << left << "->remove_child ( dynamic_cast<FatChildProcess*>(" << right << "));\n";
   }
 
@@ -1830,17 +1856,18 @@ namespace Smala
   {
     emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
-    indent (os);
     std::string last;
     std::string left = build_find (n->left_arg (), false);
     build_properties (os);
     if (n->right_arg ()) {
       std::string last = build_find (n->right_arg (), false);
       build_properties (os);
+      indent (os);
       os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
               << c << ", " << last << ");\n";
     }
     else {
+      indent (os);
       os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
         << c << ", nullptr);\n";
     }
@@ -1850,7 +1877,6 @@ namespace Smala
   CPPBuilder::add_child (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
-    indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (!node->name().empty() && !node->keep_name ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
@@ -1895,7 +1921,6 @@ namespace Smala
   void
   CPPBuilder::add_children_to (std::ostream &os, Node *node)
   {
-    emit_compiler_info(os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
     build_properties (os);
@@ -1905,28 +1930,37 @@ namespace Smala
       for (auto name : add_children_to->children ()) {
         auto child = build_find (name, false);
         build_properties (os);
+        emit_compiler_info(os);
         indent (os);
         os << s << "->add_child (" << child << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
       }
-      m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
+      //m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
+      push_ctxt (s);
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (s);
       return;
     }
     if (node->get_path()->get_subpath_list().size ()> 1) {
-      indent (os);
-      os << "auto * " << new_name << " = " << s << ";\n";
-      m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+      //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+      push_ctxt (new_name);
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (new_name);
+
+      emit_compiler_info(os);
+      indent (os);
+      os << "auto * " << new_name << " = " << s << ";\n";     
       indent (os);
       os << "if (" << new_name << " == nullptr)\n";
+      m_indent += 1;
       indent (os);
+      os << "exit(1);\n";
+      m_indent -=1;
       //os << "\tcerr <<  endl << endl << \"ERROR - processing addChildrenTo - the component \\\"\" << \"" << node->name () << "\\\"\" << \" is null or do not exist yet\" << endl << endl;\n";
       //os << "error " ... // djnn-cpp should raise an error
-      os << "exit(1);\n"; 
+      
     } else {
       m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
+      push_ctxt (s);
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (s);
     }
@@ -1942,7 +1976,6 @@ namespace Smala
     if (m_parent_list.back ()->add_entry ("this", new_name) == 1)
       print_error_message (error_level::warning,
                            "duplicated name: " + node->name (), 0);
-    indent (os);
     if (th->inherit()) {
       ExprNode* e = th->get_super_class ();
       std::string args_str;
@@ -1961,6 +1994,7 @@ namespace Smala
 
       os  << expr;
     } else {
+      indent (os);
       os << "auto * " << new_name << " = new Component (p, n);\n";
     }
     used_processes["Component"] = true;
@@ -1977,15 +2011,17 @@ namespace Smala
 
   void
   CPPBuilder::build_define_node (std::ostream &os, Node *node)
-  {
+  { //DBG;
     emit_compiler_info(os);
+
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything
     sym.clear();
     m_new_syms_from_build_expr.clear();
     prop_sym.clear();
     
-    m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
+    //m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
+
     os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
     std::vector< std::pair<SmalaType, std::string> > data = node->get_args_spec();
     for (int j = 0; j < data.size (); j++) {
@@ -2160,8 +2196,8 @@ namespace Smala
     node->set_build_name (new_name);
     if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
       print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
-    indent (os);
     std::string p_name = node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
+    indent (os);
     os << "DashArray *" << new_name << " =  new DashArray (" << p_name << ", " << name << ");\n";
     int sz = node->get_pattern ().size ();
     if (sz == 0)
@@ -2188,6 +2224,7 @@ namespace Smala
   CPPBuilder::build_smala_native (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
+
     SmalaNative *n = dynamic_cast<SmalaNative*> (node);
 
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -2197,7 +2234,6 @@ namespace Smala
     os << "\tauto *" << src_name << " = c->get_activation_source ();\n";
     os << "\tProcess *" << data_name << " = (Process *) get_native_user_data (c);\n";
 
-    m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1) {
       print_error_message (error_level::warning,
                            "duplicated name: " + n->src (), 0);
@@ -2212,8 +2248,9 @@ namespace Smala
 
     m_indent = 1;
 
-    push_ctxt (); DBG;
-    // since we start a new cpp function, all of our previously created variables are not valid anymore
+    //m_parent_list.push_back (new BuildNode ("0", m_parent_list.back ()));
+    push_ctxt ("0"); //DBG;
+    // since we start a new cpp function, none of our previously created variables are valid anymore
     // so clear everything
     sym.clear();
     m_new_syms_from_build_expr.clear();
@@ -2224,7 +2261,10 @@ namespace Smala
   void
   CPPBuilder::build_end_native (std::ostream &os)
   {
-    pop_ctxt(); DBG;
+    emit_compiler_info(os);
+
+    pop_ctxt(); //DBG;
+    m_indent = 0;
     os << "}\n\n";
   }
 
@@ -2267,8 +2307,8 @@ namespace Smala
     std::string src = build_find (n->src (), true);
     std::string dst = build_find (n->dst (), true);
     build_properties(os);
-    indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+    indent (os);
     os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
     used_processes["GraphEdgeAdder"] = true;
   }
@@ -2307,7 +2347,7 @@ namespace Smala
   void
   CPPBuilder::print_component_decl (std::ostream &os, const std::string &name)
   {
-    emit_compiler_info(os);
+    //emit_compiler_info(os);
     os << "auto * " << name;
   }
 
@@ -2315,7 +2355,7 @@ namespace Smala
   CPPBuilder::print_component_constructor (std::ostream &os,
                                            const std::string &constructor)
   {
-    emit_compiler_info(os);
+    //emit_compiler_info(os);
     std::map<std::string, std::string>::iterator it;
     it = m_import_types.find (constructor);
     if (it == m_import_types.end ()) {

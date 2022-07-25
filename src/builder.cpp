@@ -148,7 +148,7 @@ namespace Smala
 
   void
   Builder::push_ctxt (const string& parent_name)
-  {
+  { //DBG;
     std::string the_parent_name;
     if (!parent_name.empty()) {
       the_parent_name = parent_name;
@@ -160,7 +160,7 @@ namespace Smala
 
   void
   Builder::pop_ctxt ()
-  {
+  { //DBG;
     BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
     m_parent_list.pop_back ();
     if (n) delete n;
@@ -356,47 +356,45 @@ namespace Smala
       {
       case START_MAIN:
       {
-        push_ctxt (); DBG;
+        push_ctxt (); //DBG;
         build_main_node (os);
         break;
       }
       case END_MAIN:
       {
         build_end_main (os, node);
-        pop_ctxt (); DBG;
+        pop_ctxt (); //DBG;
         break;
       }
       case START_DEFINE:
       {
-        push_ctxt (); DBG;
+        push_ctxt ("0"); //DBG;
         build_define_node (os, node);
         break;
       }
       case END_DEFINE:
       {
         build_end_define (os, node);
-        pop_ctxt (); DBG;
+        pop_ctxt (); //DBG;
         break;
       }
       case CONTAINER: // beginning of Component etc. everything that starts with a '{' 
       {
         std::string new_name = build_simple_node (os, node);
-        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
-        //m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
-        push_ctxt (new_name); DBG;
+        push_ctxt (new_name); //DBG;
         break;
       }
       case END_CONTAINER:
       {
-        pop_ctxt (); DBG;
+        pop_ctxt (); //DBG;
         break;
       }
       case START_IF:
       {
-        push_ctxt (); DBG;
-        if (!m_after_else) {
-          indent (os);
-        }
+        push_ctxt (); //DBG;
+        //if (!m_after_else) {
+        //  indent (os);
+        //}
         build_start_if (os, node);
         m_after_else = false;
         break;
@@ -404,7 +402,7 @@ namespace Smala
       case START_ELSE:
       {
         // FIXME pop push ??
-        push_ctxt (); DBG;
+        push_ctxt (); //DBG;
         indent (os);
         build_start_else (os);
         m_indent++;
@@ -423,7 +421,7 @@ namespace Smala
         m_indent--;
         indent (os);
         build_end_block (os);
-        pop_ctxt (); DBG;
+        pop_ctxt (); //DBG;
         break;
       }
       
@@ -485,9 +483,6 @@ namespace Smala
       {
         // FIXME pop ?
         build_end_native (os);
-        // BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-        // m_parent_list.pop_back ();
-        // if (n) delete n;
         pop_ctxt ();
         m_in_native_action = false;
         break;
@@ -564,14 +559,12 @@ namespace Smala
       }
       case ADD_CHILDREN_TO:
       {
-        push_ctxt ();
         add_children_to (os, node);
         break;
       }
       case FSM:
       {
         std::string new_name = build_simple_node (os, node);
-        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
         push_ctxt (new_name);
         break;
       }
@@ -691,7 +684,6 @@ namespace Smala
                 print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
         }
         build_range_node (os, node, new_name);
-        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
         push_ctxt (new_name);
         break;
       }
@@ -735,7 +727,7 @@ namespace Smala
     }
 
     std::string parent_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-    indent (os); 
+    
     //print_start_component (os, var_name, constructor);
     //build_component_arguments (os, parent_name, name, node);
     build_component (os, var_name, constructor, parent_name, name, node);

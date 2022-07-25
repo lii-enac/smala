@@ -458,6 +458,7 @@ define
       end->set_is_define_or_main ();
       driver.add_node (end);
       parent_list.pop_back ();
+      pop_sym_table ();
     }
 
 //------------------------------------------------
@@ -483,16 +484,16 @@ start_define
   }
 
 constructor
-  : DEFINE NAME LP parameters RP
+  : DEFINE NAME {push_sym_table ();} LP parameters RP
     {
       driver.end_preamble ();
       driver.start_debug ();
       driver.set_is_main (false);
       Node *node = new Node  (@$, START_DEFINE, "", $2);
-      node->set_args_spec ($4);
+      node->set_args_spec ($5);
       driver.add_define_node (node);
       driver.add_node (node);
-      for (auto p: $4) {
+      for (auto p: $5) {
         if (p.first == NATIVE_CODE_T) {
           node->set_include_native (true);
           break;

@@ -145,6 +145,19 @@ namespace Smala
     }
     return false;
   }
+
+  void
+  Builder::push_ctxt (const string& parent_name)
+  {
+    std::string the_parent_name;
+    if (!parent_name.empty()) {
+      the_parent_name = parent_name;
+    } else {
+      the_parent_name = m_parent_list.back ()->name ();
+    }
+    m_parent_list.push_back (new BuildNode (the_parent_name, m_parent_list.back ()));
+  }
+
   void
   Builder::pop_ctxt ()
   {
@@ -153,11 +166,6 @@ namespace Smala
     if (n) delete n;
   }
 
-  void
-  Builder::push_ctxt ()
-  {
-    m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
-  }
 
   void
   Builder::extract_leaves (std::vector<ExprNode*> &leaves, ExprNode *n)
@@ -340,7 +348,6 @@ namespace Smala
       }
   }
 
-
   void
   Builder::build_node (std::ostream &os, Node *node)
   {
@@ -349,41 +356,77 @@ namespace Smala
       {
       case START_MAIN:
       {
-        push_ctxt ();
+        push_ctxt (); DBG;
         build_main_node (os);
+        break;
+      }
+      case END_MAIN:
+      {
+        build_end_main (os, node);
+        pop_ctxt (); DBG;
         break;
       }
       case START_DEFINE:
       {
-        push_ctxt ();
+        push_ctxt (); DBG;
         build_define_node (os, node);
+        break;
+      }
+      case END_DEFINE:
+      {
+        build_end_define (os, node);
+        pop_ctxt (); DBG;
+        break;
+      }
+      case CONTAINER: // beginning of Component etc. everything that starts with a '{' 
+      {
+        std::string new_name = build_simple_node (os, node);
+        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        //m_parent_list.push_back (new BuildNode (m_parent_list.back ()->name (), m_parent_list.back ()));
+        push_ctxt (new_name); DBG;
+        break;
+      }
+      case END_CONTAINER:
+      {
+        pop_ctxt (); DBG;
+        break;
+      }
+      case START_IF:
+      {
+        push_ctxt (); DBG;
+        if (!m_after_else) {
+          indent (os);
+        }
+        build_start_if (os, node);
+        m_after_else = false;
         break;
       }
       case START_ELSE:
       {
-        push_ctxt ();
-        indent  (os);
+        // FIXME pop push ??
+        push_ctxt (); DBG;
+        indent (os);
         build_start_else (os);
         m_indent++;
         break;
       }
       case START_ELSEIF:
       {
-        indent  (os);
+        // FIXME pop push ??
+        indent (os);
         m_after_else = true;
         build_start_else_if (os);
         break;
       }
-      case START_IF:
+      case END_BLOCK:
       {
-        push_ctxt ();
-        if (!m_after_else) {
-          indent  (os);
-        }
-        build_start_if (os, node);
-        m_after_else = false;
+        m_indent--;
+        indent (os);
+        build_end_block (os);
+        pop_ctxt (); DBG;
         break;
       }
+      
       case BREAK:
       {
         indent (os);
@@ -404,36 +447,10 @@ namespace Smala
         end_line (os);
         break;
       }
-      case END_BLOCK:
-      {
-        m_indent--;
-        indent (os);
-        build_end_block (os);
-        pop_ctxt ();
-        break;
-      }
+      
       case END_LOOP:
       {
         m_in_for = false;
-        break;
-      }
-      case END_DEFINE:
-      {
-        build_end_define (os, node);
-        pop_ctxt ();
-        break;
-      }
-      case END_CONTAINER:
-      {
-        BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-        m_parent_list.pop_back ();
-        if (n) delete n;
-        break;
-      }
-      case END_MAIN:
-      {
-        build_end_main (os, node);
-        pop_ctxt ();
         break;
       }
       case FOR:
@@ -458,16 +475,20 @@ namespace Smala
       }
       case SMALA_NATIVE:
       {
+        // FIXME push ?!
+        push_ctxt ();
         m_in_native_action = true;
         build_smala_native (os, node);
         break;
       }
       case END_NATIVE:
       {
+        // FIXME pop ?
         build_end_native (os);
-        BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
-        m_parent_list.pop_back ();
-        if (n) delete n;
+        // BuildNode* n = m_parent_list.at (m_parent_list.size() - 1);
+        // m_parent_list.pop_back ();
+        // if (n) delete n;
+        pop_ctxt ();
         m_in_native_action = false;
         break;
       }
@@ -543,13 +564,15 @@ namespace Smala
       }
       case ADD_CHILDREN_TO:
       {
+        push_ctxt ();
         add_children_to (os, node);
         break;
       }
       case FSM:
       {
         std::string new_name = build_simple_node (os, node);
-        m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        push_ctxt (new_name);
         break;
       }
       case SET_PARENT:
@@ -584,12 +607,6 @@ namespace Smala
       case TRANSITION:
       {
         build_transition_node (os, node);
-        break;
-      }
-      case CONTAINER:
-      {
-        std::string new_name = build_simple_node (os, node);
-        m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
         break;
       }
       case LAMBDA:
@@ -674,7 +691,8 @@ namespace Smala
                 print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
         }
         build_range_node (os, node, new_name);
-        m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        //m_parent_list.push_back (new BuildNode (new_name, m_parent_list.back ()));
+        push_ctxt (new_name);
         break;
       }
       case CAUSAL_DEP:

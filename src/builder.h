@@ -24,6 +24,8 @@
 #include "ast.h"
 #include "new_line_node.h"
 
+#define DBG;
+//#define DBG cerr << __FILE__ << ":" << __LINE__ << endl;
 
 namespace Smala {
 
@@ -154,8 +156,9 @@ namespace Smala {
     void print_error_message (error_level::level_t level, const std::string& message, int error);
     
     // scope context
+    virtual void push_ctxt (const string& parent_name = string());
     virtual void pop_ctxt ();
-    virtual void push_ctxt ();
+    
     // helpers
     std::string get_constructor (const std::string &type);
     bool is_string (ExprNode *e);

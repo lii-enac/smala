@@ -24,8 +24,10 @@ namespace Smala {
   public:
     CPPBuilder ();
     virtual ~CPPBuilder ();
+
+    virtual void push_ctxt (const string& parent_name = string()) override;
     virtual void pop_ctxt () override;
-    virtual void push_ctxt () override;
+    
     int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
   private:
     void build_header (const std::string &prefix);

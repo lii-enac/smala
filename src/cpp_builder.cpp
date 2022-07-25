@@ -63,6 +63,9 @@ string print_trace(void) {
 }
 */
 
+#define emit_compiler_info(OS) //indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n";
+
+
 namespace Smala
 {
   static std::string
@@ -90,10 +93,10 @@ namespace Smala
   }
 
   void
-  CPPBuilder::push_ctxt ()
+  CPPBuilder::push_ctxt (const string& parent_name)
   {
-    //std::cerr << sym_stack.size() << " >>" << std::endl;
-    Builder::push_ctxt ();
+    //std::cerr << ">> " << sym_stack.size() << " push " << parent_name << std::endl;
+    Builder::push_ctxt (parent_name);
     sym_stack.push_back (sym);
     prop_sym_stack.push_back (prop_sym);
     m_template_props_stack.push_back(m_template_props);
@@ -102,11 +105,11 @@ namespace Smala
   void
   CPPBuilder::pop_ctxt ()
   {
-    //std::cerr << sym_stack.size() << " <<" << std::endl;
+    //std::cerr << "<< " << sym_stack.size() << " pop" << std::endl;
     Builder::pop_ctxt ();
 
     sym_stack.pop_back ();
-    if(!sym_stack.empty())
+    if(!sym_stack.empty()) // FIXME should never be empty...
       sym = sym_stack.back ();
 
     prop_sym_stack.pop_back ();
@@ -276,6 +279,7 @@ namespace Smala
   void
   CPPBuilder::build_use (std::ostream &os, std::string use)
   {
+    emit_compiler_info(os);
     /*if (use.compare ("core") == 0)
       return;
     else*/
@@ -301,6 +305,7 @@ namespace Smala
   void
   CPPBuilder::build_import (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     os << "#include \"";
     auto sep = "/";
     auto *sep_2 ="";
@@ -314,6 +319,7 @@ namespace Smala
   void
   CPPBuilder::build_post_import (std::ostream &os)
   {
+    emit_compiler_info(os);
     os << "inline\n";
     os << "double smala_deref(djnn::AbstractProperty& p)\n";
     os << "{ return p.get_double_value(); }\n\n";
@@ -332,6 +338,7 @@ namespace Smala
   void
   CPPBuilder::build_start_if (std::ostream &os, Node* n)
   {
+    emit_compiler_info(os);
     std::string expr_str = build_expr (n->get_args().at(0));
     build_properties(os);
 
@@ -352,8 +359,9 @@ namespace Smala
   void
   CPPBuilder::build_start_else_if (std::ostream &os)
   {
+    //pop_ctxt();
     os << "else {\n";
-    push_ctxt();
+    push_ctxt(); DBG;
   }
 
 
@@ -368,6 +376,7 @@ namespace Smala
   void
   CPPBuilder::build_properties(std::ostream &os)
   {
+    emit_compiler_info(os);
     for (auto const & e: m_new_syms_from_build_expr) {
       indent(os);
       os << "auto * " << e.second << " = dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl; 
@@ -507,7 +516,10 @@ namespace Smala
   void
   CPPBuilder::build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* node)
   {
-    // FIXME? should probably be somewhere else
+    emit_compiler_info(os);
+
+    // handle properties
+    // FIXME? handling properties and templates should probably be somewhere else
     bool is_prop = false;
     static const vector<string> prop_components = {"IntProperty", "DoubleProperty", "TextProperty", "BoolProperty", "TemplateProperty"};
     //std::cerr << constructor << std::endl;
@@ -529,21 +541,23 @@ namespace Smala
         os << "auto * " << var_name << " = dynamic_cast<TemplateProperty<" << tmpl_node->get_template_type_name() << ">*> (" << parent_name << "->find_child(\"" << pn->build_string_repr("/") << "\"));\n";
         used_processes["TemplateProperty"] = true;
         return;
-      }
+      } //else ?!
     }
 
+    // handle constructor arguments
     std::string args_str;
     for (auto sub : node->get_args ()) {
       args_str += ", " + build_expr (sub);
     }
     build_properties(os);
 
+    // emit something like "auto * var_name = constructor"
     print_start_component (os, var_name, constructor);
 
+    // emit arguments
     os << " (" << parent_name << ", " << child_name;
     os << args_str;
     os << ");\n";
-
     
   }
     
@@ -551,6 +565,7 @@ namespace Smala
   void
   CPPBuilder::print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor)
   {
+    emit_compiler_info(os);
     print_component_decl (os, var_name);
     os << " = ";
     print_component_constructor (os, constructor);
@@ -578,6 +593,7 @@ namespace Smala
   void
   CPPBuilder::build_range_node (std::ostream &os, Node *node, const string& new_name)
   {
+    emit_compiler_info(os);
     RangeNode* n = dynamic_cast<RangeNode*> (node);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
@@ -724,6 +740,7 @@ namespace Smala
   void
   CPPBuilder::build_print (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     ExprNode* expr = node->get_args ().at (0);
     auto expr_str = build_expr (expr, string_t);
     build_properties (os);
@@ -741,13 +758,14 @@ namespace Smala
   void
   CPPBuilder::build_while (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     auto expr_str = build_expr (node->get_args().at(0));
     build_properties (os);
 
     indent (os);
     os << "while (" << expr_str << ") {";
     os << ") {\n";
-    push_ctxt ();
+    push_ctxt (); DBG;
     m_indent++;
   }
 
@@ -760,8 +778,9 @@ namespace Smala
   void
   CPPBuilder::build_for (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     ForNode *fn = (ForNode*) node;
-    push_ctxt ();
+    push_ctxt (); DBG;
     m_in_for = true;
 
     std::ostringstream first_os;
@@ -791,6 +810,7 @@ namespace Smala
   void
   CPPBuilder::build_for_every (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     ForEveryNode* n = (ForEveryNode*) node;
     indent (os);
     std::string list_name = "list_" + std::to_string (m_cpnt_num++);
@@ -826,7 +846,7 @@ namespace Smala
     std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
     os << "for (auto " << var_name << " : " << list_name << ") {\n";
     m_indent++;
-    push_ctxt ();
+    push_ctxt (); DBG;
     m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
 
     used_processes["ProcessCollector"] = true;
@@ -837,6 +857,7 @@ namespace Smala
   void
   CPPBuilder::build_control_node (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     CtrlNode *ctrl = dynamic_cast<CtrlNode*> (node);
     std::string constructor = get_constructor (node->djnn_type ());
 
@@ -908,6 +929,7 @@ namespace Smala
   CPPBuilder::build_multi_control_node (std::ostream &os,
                                            NativeExpressionNode *node)
   {
+    emit_compiler_info(os);
     ExprNode* arg_node = node->get_expression ();
     std::string p_name =
             node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
@@ -972,7 +994,7 @@ namespace Smala
   CPPBuilder::build_simple_control_node (std::ostream &os,
                                          NativeExpressionNode *node)
   {
-    os << "// >> STEF" << endl;
+    emit_compiler_info(os);
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     ExprNode *arg_node = node->get_expression ();
@@ -1107,7 +1129,6 @@ namespace Smala
       }
     }
     build_properties(os);
-    os << "// << STEF" << endl;
   }
 
 
@@ -1138,6 +1159,7 @@ namespace Smala
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ()->get_expr_node_type() < 2) {
+      emit_compiler_info(os);
       build_simple_control_node (os, node);
       return;
     }
@@ -1170,6 +1192,7 @@ namespace Smala
         if (arg.compare (0, 6, "d_var_") == 0 || arg.compare (0, 6, "i_var_") == 0) {
           string new_param_name = transform_name(whatever_name);
           if (prop_sym.find (new_param_name) == prop_sym.end ()) {
+            emit_compiler_info(populate_native_fields);
             indent (populate_native_fields);
             populate_native_fields << native_name << "->" << new_param_name <<  "= " << arg
                   << ";\n";
@@ -1178,6 +1201,7 @@ namespace Smala
         } else if (arg.compare (0, 6, "s_var_") == 0) {
           string new_param_name = transform_name(whatever_name);
           if (prop_sym.find (new_param_name) == prop_sym.end ()) {
+            emit_compiler_info(populate_native_fields);
             indent (populate_native_fields);
             populate_native_fields << native_name << "->"<< new_param_name <<  "= " << arg << ";\n";
           }
@@ -1190,8 +1214,9 @@ namespace Smala
             if (prop_sym.find (new_param_name) == prop_sym.end ()) {
               std::string tmpl_class_name = "AbstractProperty*";
               std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+
+              emit_compiler_info(create_temp_properties);
               indent (create_temp_properties);
-              
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
               create_temp_properties << "auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
@@ -1216,6 +1241,8 @@ namespace Smala
               std::string new_name;     
               new_name = "cpnt_" + std::to_string (m_cpnt_num++);
               std::string tmpl_class_name = "AbstractProperty*";
+
+              emit_compiler_info(create_temp_properties);
               indent (create_temp_properties);
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
@@ -1226,6 +1253,7 @@ namespace Smala
 
             }
             const auto& new_name = prop_sym[new_param_name];
+            emit_compiler_info(populate_native_fields);
             indent (populate_native_fields);
             populate_native_fields << native_name << "->" << new_param_name << " = " 
               <<  new_name << ";\n";    
@@ -1252,17 +1280,18 @@ namespace Smala
             std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
             std::string tmpl_class_name = "AbstractProperty*";
 
+            emit_compiler_info(create_temp_properties);
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
-
             create_temp_properties << "auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
-            used_processes["AbstractProperty"] = true;
-            
+
+            used_processes["AbstractProperty"] = true;            
             sym[new_param_name] = new_name;
             prop_sym[new_param_name] = new_name;
           }
           const string& new_name = prop_sym[new_param_name];
+          emit_compiler_info(populate_native_fields);
           indent (populate_native_fields);
           populate_native_fields << native_name << "->" << new_param_name << " = " << new_name << ";\n";
           if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
@@ -1279,6 +1308,7 @@ namespace Smala
             new_name = "cpnt_" + std::to_string (m_cpnt_num++);
             std::string tmpl_class_name = "AbstractProperty*";
 
+            emit_compiler_info(create_temp_properties);
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
@@ -1288,6 +1318,7 @@ namespace Smala
             prop_sym[new_param_name] = new_name;
           }
           const string& new_name = prop_sym[new_param_name];
+          emit_compiler_info(populate_native_fields);
           indent (populate_native_fields);
           populate_native_fields << native_name << "->" << new_param_name << " = " <<  new_name << ";\n";
           
@@ -1301,6 +1332,7 @@ namespace Smala
     }
 
     stringstream native_stream;
+    emit_compiler_info(native_stream);
     indent (native_stream);
     native_stream << "auto * " << native_name << " = new " << native_name_struct << "<";
 
@@ -1317,9 +1349,11 @@ namespace Smala
        << ");\n";
 
     // now that properties are built, call finalize_construction(), which in turn will call impl_activate()
+    emit_compiler_info(populate_native_fields);
     indent (populate_native_fields);
     populate_native_fields << native_name << "->finalize_construction (" << p_name << ", " << n_expr_name << ");\n";
 
+    emit_compiler_info(os);
     os << "// >>\n";
     os << create_temp_properties.str() << "\n";
     os << native_stream.str() << "\n";
@@ -1335,6 +1369,7 @@ namespace Smala
     }
     std::string native_edge_name = new_name;
     if (node->is_connector ()) {
+      emit_compiler_info(os);
       indent (os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
       os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
@@ -1346,6 +1381,7 @@ namespace Smala
         os << sync_name << "->add_source (" << t << ", \"\");\n";
       }
     }
+    emit_compiler_info(os);
     for (auto out : node->get_output_nodes ()) {
       std::string arg = build_find (out, false);
       build_properties(create_temp_properties);
@@ -1360,6 +1396,7 @@ namespace Smala
   void
   CPPBuilder::build_native_action (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
     os << "void\n";
     os << node->action_name () << " (CoreProcess *" << node->param_name () << ")\n";
@@ -1377,6 +1414,7 @@ namespace Smala
   void
   CPPBuilder::build_native_collection_action (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
     os << node->action_name () << " (CoreProcess *" << node->param_name () << ", const vector<CoreProcess*> " << node->list_name() << ")\n"; // FIXME shoudl be a ref
@@ -1394,6 +1432,7 @@ namespace Smala
   void
   CPPBuilder::build_native_expression (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ()->get_expr_node_type() < STEP) {
       return;
@@ -1532,6 +1571,7 @@ namespace Smala
   void
   CPPBuilder::build_instruction (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     InstructionNode *n = dynamic_cast<InstructionNode*> (node);
     for (int i = 0; i < n->path_list ().size (); i++) {
       std::string arg = build_find (n->path_list ().at (i), false);
@@ -1656,6 +1696,7 @@ namespace Smala
   void
   CPPBuilder::set_property (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     auto expr_str = build_expr (node->get_args().at(0), undefined_t);
     build_properties(os);
     
@@ -1694,6 +1735,7 @@ namespace Smala
   void
   CPPBuilder::self_set_property (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     SelfAssignNode *node = (SelfAssignNode*)n;
     std::string prop_name = node->get_path()->get_subpath_list().at(0)->get_subpath();
     std::string found = m_parent_list.back ()->get_symbol (prop_name);
@@ -1761,6 +1803,7 @@ namespace Smala
   void
   CPPBuilder::merge (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string left = build_find (n->left_arg (), false);
@@ -1773,6 +1816,7 @@ namespace Smala
   void
   CPPBuilder::remove (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string left = build_find (n->left_arg (), false);
@@ -1784,6 +1828,7 @@ namespace Smala
   void
   CPPBuilder::move (std::ostream &os, Node *node, const string &c)
   {
+    emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     indent (os);
     std::string last;
@@ -1804,6 +1849,7 @@ namespace Smala
   void
   CPPBuilder::add_child (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     indent (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (!node->name().empty() && !node->keep_name ()) {
@@ -1823,6 +1869,7 @@ namespace Smala
   void
   CPPBuilder::build_end_add_child (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     os << ";\n";
     indent (os);
     os << m_parent_list.back ()->name () << "->add_child (" << m_cur_building_name;
@@ -1838,6 +1885,7 @@ namespace Smala
   CPPBuilder::fetch_add_child (std::ostream &os, const std::string &parent,
                                const std::string &child, const std::string &name)
   {
+    emit_compiler_info(os);
     if (parent == m_null_symbol)
       return;
     indent (os);
@@ -1847,6 +1895,7 @@ namespace Smala
   void
   CPPBuilder::add_children_to (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     std::string s = build_find (node->get_path(), false);
     build_properties (os);
@@ -1886,6 +1935,7 @@ namespace Smala
   void
   CPPBuilder::build_this_node (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     ThisNode* th = dynamic_cast<ThisNode*>(node);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     th->set_build_name (new_name);
@@ -1928,6 +1978,7 @@ namespace Smala
   void
   CPPBuilder::build_define_node (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything
     sym.clear();
@@ -1974,7 +2025,7 @@ namespace Smala
   void
   CPPBuilder::build_main_node (std::ostream &os)
   {
-
+    emit_compiler_info(os);
     /* main */
     os << "int\nmain (int argc, char* argv[]) {\n";
     m_indent = 1;
@@ -2023,6 +2074,7 @@ namespace Smala
   void
   CPPBuilder::build_native_action_component (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     NativeComponentNode* node = dynamic_cast<NativeComponentNode*> (n);
     native_type type = node->get_native_type();
     std::string constructor;
@@ -2077,6 +2129,7 @@ namespace Smala
   void
   CPPBuilder::build_transition_node (std::ostream &os, Node *n)
   {
+    emit_compiler_info(os);
     TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
@@ -2099,6 +2152,7 @@ namespace Smala
   void
   CPPBuilder::build_dash_array (std::ostream &os, DashArrayNode *node)
   {
+    emit_compiler_info(os);
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     if (node->name ().compare ("_") == 0)
@@ -2133,6 +2187,7 @@ namespace Smala
   void
   CPPBuilder::build_smala_native (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     SmalaNative *n = dynamic_cast<SmalaNative*> (node);
 
     std::string src_name = "cpnt_" + std::to_string (m_cpnt_num++);
@@ -2157,7 +2212,7 @@ namespace Smala
 
     m_indent = 1;
 
-    push_ctxt ();
+    push_ctxt (); DBG;
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything
     sym.clear();
@@ -2169,6 +2224,7 @@ namespace Smala
   void
   CPPBuilder::build_end_native (std::ostream &os)
   {
+    pop_ctxt(); DBG;
     os << "}\n\n";
   }
 
@@ -2182,6 +2238,8 @@ namespace Smala
       s.at (i) = std::toupper (s.at (i));
     //os << "#pragma once\n#include <string>\n\n";
     os << "#pragma once\n\n";
+
+    emit_compiler_info(os);
 
     bool set_include = false;
     for (auto def: m_ast.define_node_list ()) {
@@ -2204,6 +2262,7 @@ namespace Smala
   void
   CPPBuilder::build_causal_dep (std::ostream &os, Node* node)
   {
+    emit_compiler_info(os);
     CausalDependencyNode* n = dynamic_cast<CausalDependencyNode*> (node);
     std::string src = build_find (n->src (), true);
     std::string dst = build_find (n->dst (), true);
@@ -2248,6 +2307,7 @@ namespace Smala
   void
   CPPBuilder::print_component_decl (std::ostream &os, const std::string &name)
   {
+    emit_compiler_info(os);
     os << "auto * " << name;
   }
 
@@ -2255,6 +2315,7 @@ namespace Smala
   CPPBuilder::print_component_constructor (std::ostream &os,
                                            const std::string &constructor)
   {
+    emit_compiler_info(os);
     std::map<std::string, std::string>::iterator it;
     it = m_import_types.find (constructor);
     if (it == m_import_types.end ()) {

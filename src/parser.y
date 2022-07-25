@@ -150,6 +150,7 @@
     else
       sym_table_list.push_back (new SymTable (sym_table_list.empty ()? nullptr : sym_table_list.back ()));
   }
+  
   void add_sym (const location& loc, const std::string& key, smala_t type) {
     if (m_in_lambda)
       lambda_sym_table_list.back()->add_sym (loc, key, type);
@@ -540,6 +541,7 @@ new_component
   | fsm
   | native
 
+// FIXME: this should not be called expression, but rather 'coupling' or something else
 expression
   : connector
   | assignment
@@ -1222,6 +1224,7 @@ argument
       }
     }
 
+// FIXME: this should be called expression
 assignment_expression
   : 
   conditional_expression

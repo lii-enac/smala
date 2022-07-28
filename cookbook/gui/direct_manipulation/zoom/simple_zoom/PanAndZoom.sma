@@ -9,7 +9,7 @@ _native_code_
 %}
 
 _define_
-PanAndZoom (Process move, Process press, Process release, Process dwheel) {
+PanAndZoom (Process move, Process press, Process release, Process wheel) {
     // input
 
     // move: e.g., frame.move // unfortunately, we need to know where the cursor is while zooming // FIXME put it in wheel event?..
@@ -35,24 +35,25 @@ PanAndZoom (Process move, Process press, Process release, Process dwheel) {
     // zoom management
 
     // transfer function
-    Double adw (0) // absolute dw
-    Double transf_adw (0) // transfert function of adw    
+    Double abs_dw (0) // absolute dw
+    Double transf_abs_dw (0) // transfert function of adw    
 
-    fabs($dwheel) =:> adw 
-    (0.00303 * adw + 0.00482) * adw + 1.001 =:> transf_adw // polynomial-based transfer function
+    fabs($wheel.dy) =:> abs_dw 
+    (0.00303 * abs_dw + 0.00482) * abs_dw + 1.001 =:> transf_abs_dw // polynomial-based transfer function
     // Pow p (1.01, 0) // exponent-based transfer function
     // adw =:> p.exponent
     // p.result =:> transf_adw
 
     // inversing zoom according to dwheel sign
-    dwheel >= 0 ? transf_adw : 1/transf_adw =:> dzoom
+    wheel.dy >= 0 ? transf_abs_dw : 1/transf_abs_dw =:> dzoom
 
-    // we need to know where the cursor is // FIXME put it in wheel event?..
-    mouseTracking = 1
+
+    // we need to know where the cursor is
     Double last_move_x (0)
     Double last_move_y (0)
-    move.x =:> last_move_x
-    move.y =:> last_move_y
+    wheel.x =:> last_move_x
+    wheel.y =:> last_move_y
+
 
     Double new_zoom (1)
     Double new_xpan (0)

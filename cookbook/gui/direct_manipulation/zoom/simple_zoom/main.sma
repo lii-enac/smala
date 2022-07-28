@@ -25,9 +25,8 @@ Component root {
   Frame frame ("Simple Zoom", 0, 0, 800, 800)
   Exit ex (0, 1)
   frame.close -> ex
-  mouseTracking = 1
-
-  PanAndZoom pz (frame.move, frame.press, frame.release, frame.wheel.dy)
+  
+  PanAndZoom pz (frame.move, frame.press, frame.release, frame.wheel)
 
   Scaling zoom_tr (1,1, 0,0)
   Translation pan_tr (0,0)

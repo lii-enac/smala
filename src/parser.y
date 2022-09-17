@@ -437,14 +437,16 @@ rough_code
     }
 
 body
-  : start_main statement_list
+  : start_main statement_list empty // empty to get the right location for end_main
   {
-    Node *end_main = new Node (@$, END_MAIN);
+    Node *end_main = new Node (@3, END_MAIN);
     end_main->set_user_data (root);
     driver.add_node (end_main);
     driver.end_debug ();
   }
   | define_list
+
+empty:
 
 define_list
   : define

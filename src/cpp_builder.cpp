@@ -2067,6 +2067,7 @@ namespace Smala
     m_indent = 1;
     int size = m_ast.preamble ().use ().size ();
     bool has_display = false;
+  
     /* init modules from use */
     for (int i = 0; i < size; ++i) {
       std::string str = m_ast.preamble ().use ().at (i);
@@ -2097,14 +2098,45 @@ namespace Smala
   void
   CPPBuilder::build_end_main (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     Node* data = (Node*) node->get_user_data ();
     if (data == nullptr)
       return;
     indent (os);
     os << data->build_name () << "->activate ();\n";
     indent (os);
-    os << "MainLoop::instance ().activate ();\n";
+    os << "MainLoop::instance ().activate ();\n\n";
     used_processes["MainLoop"] = true;
+
+
+    emit_compiler_info(os);
+    /* clear modules from use */
+    int size = m_ast.preamble ().use ().size ();
+    bool has_display = false;
+    for (int i = 0; i < size; ++i) {
+      const std::string str = m_ast.preamble ().use ().at (i);
+      if (str == "display") {
+        has_display = true; 
+      }
+    }
+
+    for (int i = size-1; i >= 0; --i) {
+      const std::string str = m_ast.preamble ().use ().at (i);
+      
+      /* add corresponding clear_MODULE */
+      if (str == "core") {
+        indent (os);
+        os << "clear_exec_env ();\n"; // do it after init_core ()
+      }
+
+      indent (os);
+      os << "clear_" << str << " ();\n";
+
+      if (str == "gui" && !has_display) {
+        indent (os);
+        os << "clear_display ();\n"; // do it after clear_gui ()
+      }
+    }
   }
 
   void

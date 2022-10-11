@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/utils/to_string.h" // should be djnn/core/...
+
 // example with user-defined type
 
 struct MyPoint2D {
@@ -15,6 +17,8 @@ operator+(const MyPoint2D& a, const MyPoint2D& b)
 {
   return MyPoint2D{a.x+b.x,a.y+b.y};
 }
+
+inline std::string to_string2 (const MyPoint2D& s) { return djnn::to_string(s.x) + " " + djnn::to_string(s.y); }
 
 // inline
 // ostream&
@@ -47,6 +51,12 @@ inline std::string to_string2 (const meters_per_second_t s) { return to_string(s
 using vector_double = std::valarray<double>; //vector<double>;
 using DoubleArray = TemplateProperty<vector_double>;
 extern vector_double vd_def;
+
+inline std::string to_string2 (const vector_double& v) {
+    std::string res;
+    for (auto val: v) res += to_string(val) + " ";
+    return res;
+}
 
 /*inline
 const vector_double&

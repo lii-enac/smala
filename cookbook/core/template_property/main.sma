@@ -8,8 +8,8 @@ import Module
 _native_code_
 %{
 #include "user_defined_struct.h"
-MyPoint2D pdef{0,0};
-vector_double vd_def;
+MyPoint2D pdef{1,1};
+vector_double vd_def{1,1,1};
 %}
 
 _main_
@@ -27,7 +27,7 @@ Component root
   TemplateProperty of MyPoint2D p1 aka mod.p1 // cast an external property into a TemplateProperty
   TemplateProperty of MyPoint2D p2(pdef)
   p0 + p1 =:> p2
-  //p2 =:> tp.input
+  //to_string2($p2) =:> tp.input
 
   // units
   TemplateProperty of flightLevel_t Altitude(0_ft)
@@ -42,6 +42,7 @@ Component root
   TemplateProperty of vector_double dbb(vd_def)
   TemplateProperty of vector_double dbc(vd_def)
   dba + dbb =:> dbc
+  //to_string2($dbc) =:> tp.input
 
 }
 

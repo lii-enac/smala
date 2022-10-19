@@ -13,6 +13,13 @@ double myfract(double f)
   return f - floor(f);
 }
 
+inline
+int myfloor(double f)
+{
+  return floor(f);
+}
+
+
 %}
 
 _define_
@@ -114,9 +121,27 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
     }
     dzoom -> zseq
 
-    1 + log2($actual_zoom) =:> zoom_level
-
     TextPrinter tp
+
+    Int tmp_zl(1.0)
+    myfloor(1 + log2($actual_zoom)) =:> tmp_zl
+    tmp_zl =?> zoom_level
+    //zoom_level =:> tp.input
+
+    Int xgrid(0)
+    Int tmp_xgrid(0)
+    myfloor ( (xpan) / 256.) =:> tmp_xgrid
+    tmp_xgrid =?> xgrid
+    
+    Int ygrid(0)
+    Int tmp_ygrid(0)
+    myfloor ( (ypan) / 256.) =:> tmp_ygrid
+    tmp_ygrid =?> ygrid
+
+    //"xgrid " + toString(xgrid) =:> tp.input
+    //"ygrid " + toString(ygrid) =:> tp.input
+    
+    
     //xpan =:> tp.input
 
     // pan management
@@ -138,8 +163,8 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
                 //(move.y - ylast) =: dy
                 xpan + dx =: new_xpan
                 ypan + dy =: new_ypan
-                new_xpan % 256 =: new_xpan
-                new_ypan % 256 =: new_ypan
+                //new_xpan % 256 =: new_xpan
+                //new_ypan % 256 =: new_ypan
                 new_xpan =: xpan
                 new_ypan =: ypan
 
@@ -147,6 +172,7 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
                 move.y =: ylast
             }
             move -> seq
+
         }
         idle -> pressing (press)
         pressing -> idle (release)

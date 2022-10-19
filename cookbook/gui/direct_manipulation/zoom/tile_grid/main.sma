@@ -125,7 +125,7 @@ Component root {
       grid.pzg.zoom_level =: prev_zoom_level // update prev
     }
     grid.pzg.xgrid -> {
-      "xgrid changed: " + toString(grid.pzg.xgrid) =: tp.input
+      "xgrid      changed: from " + toString(prev_xgrid) + " to " + toString(grid.pzg.xgrid) =: tp.input
       
       // here should translate
       grid.pzg.xpan % 256 =: grid.pzg.xpan
@@ -135,7 +135,7 @@ Component root {
       grid.pzg.xgrid =: prev_xgrid // update prev
     }
     grid.pzg.ygrid -> {
-      "ygrid changed: " + toString(grid.pzg.ygrid) =: tp.input
+      "ygrid      changed: from " + toString(prev_ygrid) + " to " + toString(grid.pzg.ygrid) =: tp.input
       // here should translate
       grid.pzg.ypan % 256 =: grid.pzg.ypan
       // and change image

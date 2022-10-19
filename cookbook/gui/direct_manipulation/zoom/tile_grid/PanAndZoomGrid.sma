@@ -49,7 +49,9 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
     Double actual_zoom ($zoom)
     Int zoom_level(1)
 
-
+    Double actual_xpan ($xpan)
+    Double actual_ypan ($ypan)
+    
     // zoom management
 
     // transfer function to compute dzoom (i.e. new_zoom / old_zoom)
@@ -112,6 +114,9 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
         xpan + dx =: new_xpan
         ypan + dy =: new_ypan
 
+        actual_xpan + dx =: actual_xpan
+        actual_ypan + dy =: actual_ypan
+
         //new_xpan % 256 =: new_xpan
         //new_ypan % 256 =: new_ypan
 
@@ -130,13 +135,20 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
 
     Int xgrid(0)
     Int tmp_xgrid(0)
-    myfloor ( (xpan) / 256.) =:> tmp_xgrid
+    myfloor ( (actual_xpan) / 256.) =:> tmp_xgrid
     tmp_xgrid =?> xgrid
     
     Int ygrid(0)
     Int tmp_ygrid(0)
-    myfloor ( (ypan) / 256.) =:> tmp_ygrid
+    myfloor ( (actual_ypan) / 256.) =:> tmp_ygrid
     tmp_ygrid =?> ygrid
+
+    Spike left
+    Spike right
+    Spike up
+    Spike down
+
+    
 
     //"xgrid " + toString(xgrid) =:> tp.input
     //"ygrid " + toString(ygrid) =:> tp.input
@@ -163,6 +175,8 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
                 //(move.y - ylast) =: dy
                 xpan + dx =: new_xpan
                 ypan + dy =: new_ypan
+                actual_xpan + dx =: actual_xpan
+                actual_ypan + dy =: actual_ypan
                 //new_xpan % 256 =: new_xpan
                 //new_ypan % 256 =: new_ypan
                 new_xpan =: xpan

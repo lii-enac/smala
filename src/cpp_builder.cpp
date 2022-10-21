@@ -512,10 +512,45 @@ namespace Smala
         }
         break;
       }
-      case TERNARY_OP:
+      case TERNARY_OP: {
         TernaryExprNode *ter = (TernaryExprNode*) e;
         expr += build_expr_rec (ter->get_condition(), undefined_t, build_fake) + " ? " + build_expr_rec (ter->get_left_child (), prod_t, build_fake) + " : " + build_expr_rec (ter->get_right_child(), prod_t, build_fake);
         break;
+      }
+      case ARRAY: {
+        auto *an = dynamic_cast<ArrayVarNode*> (e);
+        assert (an);
+        std::string type;
+        switch (an->get_array_type()) {
+        case DOUBLE:
+          type = "double";
+          break;
+        case INT:
+          type = "int";
+          break;
+        case PROCESS:
+          type = "Process*";
+          break;
+        default:
+          type = "string";
+        }
+
+        expr += "vector<" + type +"> {";
+        std::string pre = "";
+        if (an->get_array_type() != PROCESS) {
+          //for (auto v: an->get_val_array()) {
+          //expr += pre + v;
+          //TODO
+          //}
+        } else {
+          //for (auto v: an->get_process_array()) {
+            //expr += pre + build_path(v);
+        //pre = ", ";
+          //}
+        }
+      expr += "}";
+      }
+      break;
     }
     if (e->is_enclosed_with_parenthesis())
       expr += ")";
@@ -2346,7 +2381,7 @@ namespace Smala
   }
 
   void
-  CPPBuilder::print_type (std::ostream &os, SmalaType type)
+  CPPBuilder::print_type (std::ostream &os, SmalaType type, ExprNode* arg)
   {
     switch (type) {
       case INT: {
@@ -2365,6 +2400,27 @@ namespace Smala
         os << "djnn::NativeCode*";
         break;
       }
+      case ARRAY_T: {
+      auto *a_n = dynamic_cast<ArrayVarNode*> (arg);
+      if (a_n) {
+        std::string type;
+        switch (a_n->get_array_type()) {
+        case DOUBLE:
+          type = "double";
+          break;
+        case INT:
+          type = "int";
+          break;
+        case STRING:
+          type = "string";
+          break;
+        default:
+          type = "Process*";
+        }
+        os << "vector<" << type << ">";
+      }
+      break;
+      }
       case NAME:
       case PROCESS:
       {
@@ -2374,6 +2430,67 @@ namespace Smala
       default:
         break;
     }
+  }
+
+  void 
+  CPPBuilder::print_items_array (std::ostream &os, ArrayItemsNode* n)
+  {
+    std::string pre = "";
+    os << "{";
+    for (auto it: n->get_items()) {
+      os << pre;
+      pre = ", ";
+      switch (it->get_expr_node_type ()) {
+        case LITERAL:
+          os << it->get_val ();
+          break;
+        case PATH_EXPR:
+          os << build_find (it->get_path (), true);
+          break;
+        case ARRAY:
+        {
+          ArrayItemsNode* array = dynamic_cast<ArrayItemsNode*> (it);
+          if (array)
+            print_items_array (os, array);
+          break;
+        }
+        default:;
+      }
+    }
+    os << "}";
+  }
+  void 
+  CPPBuilder::build_array_var (std::ostream &os, ArrayVarNode* a) 
+  {
+    emit_compiler_info(os);
+    indent (os);
+    for (int n = 0; n < a->get_dimension (); n++) {
+      os << "vector< ";
+    }
+    switch (a->get_array_type ()) {
+      case DOUBLE:
+        os << "double";
+        break;
+      case INT:
+        os << "int";
+        break;
+      case STRING:
+        os << "string";
+        break;
+      case PROCESS:
+        os << "Process*";
+        break;
+      default:;
+    }
+    for (int n = 0; n < a->get_dimension (); n++) {
+      os << " >";
+    }
+    std::string new_name = "a_var_" + std::to_string (m_cpnt_num++);
+    if (m_parent_list.back ()->add_entry (a->get_name (), new_name) == 1 && a->duplicate_warning ())
+      print_error_message (error_level::warning, "duplicated name: " + a->get_name (), 0);
+    os << " " << new_name << " = ";
+    print_items_array (os, a->get_array ());
+    os << ";\n";
   }
 
   void

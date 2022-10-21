@@ -25,6 +25,7 @@
 #include "native_collection_action_node.h"
 #include "forevery_node.h"
 #include "causal_dep_node.h"
+#include "expr_node.h"
 
 #include <locale>
 #include <algorithm>
@@ -246,10 +247,15 @@ namespace Smala
           }
           break;
         }
-        case TERNARY_OP:
+        case TERNARY_OP: {
           TernaryExprNode *ter = (TernaryExprNode*) e;
           expr += build_expr (ter->get_condition(), undefined_t, build_fake) + " ? " + build_expr (ter->get_left_child (), prod_t, build_fake) + " : " + build_expr (ter->get_right_child(), prod_t, build_fake);
           break;
+        }
+        case ARRAY: {
+         //TODO
+         break;
+        }
       }
       if (e->is_enclosed_with_parenthesis())
         expr += ")";
@@ -1588,7 +1594,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::print_type (std::ostream &os, SmalaType type)
+  JSBuilder::print_type (std::ostream &os, SmalaType type, ExprNode* arg)
   {
     os << "var";
   }

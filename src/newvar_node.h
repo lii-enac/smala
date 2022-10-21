@@ -23,7 +23,7 @@ namespace Smala
   {
   public:
     NewVarNode (const location& loc);
-    NewVarNode (const location& loc, SmalaType type, const std::string &name, bool keep_name);
+    NewVarNode (const location& loc, SmalaType type, const std::string &name, bool keep_name = false);
     virtual ~NewVarNode ();
 
     std::string& var_name ();

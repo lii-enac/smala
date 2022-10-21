@@ -23,14 +23,14 @@ namespace Smala
   {
   public:
     DashArrayNode (const location& loc) : Node (loc, DASH_ARRAY) {}
-    DashArrayNode (const location& loc, const std::string &name, std::vector<double> pattern) : Node (loc, DASH_ARRAY), _pattern (pattern) {
+    DashArrayNode (const location& loc, const std::string &name, std::vector<std::string> pattern) : Node (loc, DASH_ARRAY), _pattern (pattern) {
       set_name (name);
     }
     virtual ~DashArrayNode () {}
-    std::vector<double>& get_pattern () { return _pattern; }
+    std::vector<std::string>& get_pattern () { return _pattern; }
 
   private:
-    std::vector <double> _pattern;
+    std::vector <std::string> _pattern;
   };
 
 } /* namespace Smala */

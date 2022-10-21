@@ -103,11 +103,13 @@
   vector<BuildNameContext*> name_context_list;
   std::vector<SymTable*> lambda_sym_table_list;
   std::vector<SymTable*> sym_table_list;
-  vector<double> double_array;
+  std::vector<ArrayItemsHolder*> array_items_holder;
+  SmalaType array_type;
   Node *cur_node, *root = nullptr;
   //bool m_in_add_children = false;
   bool m_terminate = false;
   bool m_in_lambda = false;
+  int m_array_level = 0;
   int m_in_add_children = 0;
   bool m_in_arguments = false;
   bool m_in_for = false;
@@ -116,6 +118,7 @@
   int func_num = 0;
   int loc_node_num = 0;
   int m_in_func = 0;
+  int m_array_dimension = 0;
 }
 
 
@@ -299,7 +302,9 @@
 %type <smala_t> type
 %type <Node*> fsm_decl
 %type <string> subname
-%type <string> dash_array_decl
+%type <string> start_array
+%type <string> number
+//%type <string> dash_array_decl
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
 %type <Node*> assignment_sequence
@@ -338,6 +343,7 @@
 %type <ExprNode*> postfix_expression
 %type <ExprNode*> function_call
 %type <ExprNode*> primary_expression
+%type <expr_node_t> array_item
 
 /*
 %left QUESTION_MARK COLON
@@ -540,7 +546,6 @@ statement
 
 new_component
   : simple_process
-  | dash_array
   | fsm
   | native
 
@@ -581,6 +586,7 @@ imperative_assignment
       m_in_imperative = false;
       lexer_expression_mode_off ();
     }
+  | array_var { lexer_expression_mode_off (); }
 
 for_imperative_assignment
   : step { $$ = $1; }
@@ -1000,27 +1006,104 @@ start_add_child
 
 //------------------------------------------------
 
-dash_array
-  : dash_array_decl LP double_array_decl RP
-    {
-      DashArrayNode *node = new DashArrayNode (@$, $1, double_array);
+array_var
+  : start_array array_items
+  {
+   if (!array_items_holder.empty()) {   
+      ArrayItemsHolder* h = array_items_holder.back ();
+      if (h->get_items ().size () != 1 || dynamic_cast<ArrayItemsNode*> (h->get_items ().back ()) == nullptr) {
+        driver.set_error ("Bad array construction");
+      }
+      ArrayItemsNode* it_n = dynamic_cast<ArrayItemsNode*> (h->get_items ().back ());
+      ArrayVarNode *node = new ArrayVarNode (@$, $1, it_n, array_type, m_array_dimension);
+      add_sym (@$, $1, ARRAY_T);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
+      array_items_holder.clear ();
+    }
+    m_array_dimension = 0;
+  }
+
+start_array
+  : type bracket_list NAME SIMPLE_EQ
+  {
+    array_items_holder.clear ();
+    array_items_holder.push_back (new ArrayItemsHolder ());
+    m_array_level = 0;
+    array_type = $1;
+    $$ = $3;
+  }
+
+bracket_list
+  : LB RB { m_array_dimension++; }
+  | bracket_list LB RB { m_array_dimension++; }
+
+array_items
+  : array_item 
+  {
+    m_array_level++;
+    ArrayItemsHolder* h;
+    if (array_items_holder.size () < m_array_level+1) {
+      h = new ArrayItemsHolder ();
+      array_items_holder.push_back (h);
+    } else {
+      h = array_items_holder[m_array_level];
+    }
+    ArrayItemsNode* n = new ArrayItemsNode (@$);
+    h->add_item (n);
+    for (auto it: array_items_holder[m_array_level-1]->get_items ()) {
+      it->set_parent (n);
+      n->add_item (it);
+    }
+    array_items_holder[m_array_level-1]->clear ();
+  }
+  | array_items COMMA array_item
+  {
+    m_array_level++;
+    ArrayItemsHolder* h = array_items_holder[m_array_level];
+    ArrayItemsNode* n = new ArrayItemsNode (@$);
+    h->add_item (n);
+    for (auto it: array_items_holder[m_array_level-1]->get_items ()) {
+      it->set_parent (n);
+      n->add_item (it);
+    }
+    array_items_holder[m_array_level-1]->clear ();
+  }
+
+array_item
+  : LB string_list RB { m_array_level = 0; $$ = LITERAL; }
+  | LB number_list RB { m_array_level = 0; $$ = LITERAL; }
+  | LB process_list RB
+  {
+    m_array_level = 0; 
+    for (auto p: $2) {
+      array_items_holder[0]->add_item (new PathExprNode (@$, p));
+    } 
+    $$ = PATH_EXPR;
+  }
+  | LB array_items RB
+    { 
+      $$ = ARRAY;
     }
 
-dash_array_decl
-  : DASHARRAY NAME
-    {
-      double_array.clear ();
-      $$ = $2;
-      if ($2 != "_")
-        add_sym (@$, $2, PROCESS);
-    }
+string_list
+  : STRING
+  { 
+    array_items_holder[0]->add_item (new ExprNode (@$, $1, LITERAL, STRING));
+  }
+  | string_list COMMA STRING { array_items_holder[0]->add_item (new ExprNode (@$, $3, LITERAL, STRING)); }
 
-double_array_decl
-  : %empty
-  | double_array_decl DOUBLE COMMA { double_array.push_back (std::stof ($2)); }
-  | double_array_decl DOUBLE { double_array.push_back (std::stof ($2)); }
+number_list
+  : number
+  { 
+    array_items_holder[0]->add_item (new ExprNode (@$, $1, LITERAL, array_type));
+  }
+  | number_list COMMA number { array_items_holder[0]->add_item (new ExprNode (@$, $3, LITERAL, array_type)); }
+
+number
+  : INT { $$ = $1; }
+  | DOUBLE { $$ = $1;  }
+
 
 range_list
   : range
@@ -1225,6 +1308,12 @@ argument
       } else {
         $$ = $1;
       }
+    }
+  | array_var
+    {
+      //ArrayExprNode *n = new ArrayExprNode (@$, array_items, array_type, 0);
+      //array_items.clear ();
+      $$ = nullptr;
     }
 
 // FIXME: this should be called expression

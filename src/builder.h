@@ -113,7 +113,8 @@ namespace Smala {
     virtual void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) = 0;
     virtual void print_component_decl (std::ostream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ostream &os, const std::string &constructor) = 0;
-    virtual void print_type (std::ostream &os, SmalaType type) = 0;
+    virtual void print_type (std::ostream &os, SmalaType type, ExprNode* arg = 0) = 0;
+    virtual void build_array_var (std::ostream &os, ArrayVarNode* a) {}
     
     virtual void build_start_if (std::ostream &os, Node* n) = 0;
     virtual void build_start_else (std::ostream &os) { os << "else {\n"; }

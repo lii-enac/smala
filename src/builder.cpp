@@ -129,6 +129,8 @@ namespace Smala
           return is_string (ter->get_left_child ())
               || is_string (ter->get_right_child ());
         }
+      case ARRAY:
+        return false;
       }
     return false;
   }
@@ -174,6 +176,7 @@ namespace Smala
       case LITERAL:
       case PATH_EXPR:
       case STEP:
+      case ARRAY:
         leaves.push_back (n);
         break;
       case FUNCTION:
@@ -308,7 +311,7 @@ namespace Smala
         //build_properties (os); // will be done in build_for
         indent (os);
 
-        print_type (os, n->type ());
+        print_type (os, n->type (), n->get_args().at (0));
         std::string new_name;
         if (n->keep_name ())
           new_name = n->var_name ();
@@ -325,6 +328,9 @@ namespace Smala
               break;
             case PROCESS:
               new_name = "var_" + std::to_string (m_cpnt_num++);
+              break;
+            case ARRAY_T:
+              new_name = "a_var_" + std::to_string (m_cpnt_num++);
               break;
             default:
               new_name =  "";
@@ -642,7 +648,7 @@ namespace Smala
 
         if (!m_in_for)
           indent (os);
-        print_type (os, n->type ());
+        print_type (os, n->type (), n->get_args().at(0));
         std::string new_name;
         if (n->keep_name ())
           new_name = n->var_name ();
@@ -660,6 +666,9 @@ namespace Smala
             case PROCESS:
               new_name = "var_" + std::to_string (m_cpnt_num++);
               break;
+            case ARRAY_T:
+              new_name = "a_var_" + std::to_string (m_cpnt_num++);
+              break;
             default:
               new_name =  "";
           }
@@ -668,6 +677,13 @@ namespace Smala
           print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
         os << " " << new_name << " = " << expr_str;
         end_line(os);
+        break;
+      }
+      case ARRAY_VAR:
+      {
+        ArrayVarNode* array = dynamic_cast<ArrayVarNode*> (node);
+        if (array)
+          build_array_var (os, array);
         break;
       }
       case DASH_ARRAY:

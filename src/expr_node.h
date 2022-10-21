@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "node.h"
-
+#include "path_node.h"
 
 namespace Smala {
 
@@ -31,7 +31,8 @@ namespace Smala {
     FUNCTION,
     UNARY_OP,
     BINARY_OP,
-    TERNARY_OP
+    TERNARY_OP,
+    ARRAY
   } expr_node_t;
 
 class PathNode;
@@ -46,8 +47,9 @@ public:
     void set_expr_type (smala_t type) { m_expr_type = type; }
     void set_enclosed_with_parenthesis (bool v) { m_enclosed_with_parenthesis = v; }
     bool is_enclosed_with_parenthesis () { return m_enclosed_with_parenthesis; }
-    std::string& get_val () { return m_val; }
+    virtual std::string get_val () { return m_val; }
     virtual void update_type () {}
+    virtual void print () { std::cout << m_val; }
 private:
     expr_node_t m_expr_node_type;
     std::string m_val;
@@ -62,6 +64,7 @@ public:
       set_path (path);
     }
     ~PathExprNode () {}
+    void print () override { std::cout << get_path()->build_string_repr (); }
 };
 
 class StepExprNode : public ExprNode
@@ -70,6 +73,7 @@ public:
     StepExprNode (const location &loc, PathNode* path, bool incr, smala_t type = UNDEFINED) : ExprNode (loc, "", STEP, type), m_incr (incr) { set_path (path); }
     ~StepExprNode () {}
     bool is_incr () { return m_incr; }
+    void print () override { std::cout << get_path()->build_string_repr (); }
 private:
     bool m_incr;
 };
@@ -130,4 +134,56 @@ private:
     ExprNode *m_condition, *m_left_child, *m_right_child;
 };
 
+class ArrayItemsNode : public ExprNode {
+public:
+  ArrayItemsNode (const location &loc, ArrayItemsNode* parent = nullptr) :
+    ExprNode (loc, "", ARRAY), m_parent (parent) {}
+  ~ArrayItemsNode () {}
+  ArrayItemsNode* get_parent () { return m_parent; }
+  void set_parent (ArrayItemsNode* parent) { m_parent = parent; }
+  void add_item (ExprNode* n) { m_array.push_back (n); }
+  std::vector<ExprNode*> get_items () { return m_array; }
+  void print () {
+    std::string sep = "";
+    for (auto n : m_array) {
+      std::cout << sep;
+      n->print ();
+      sep = ", ";
+    }
+    std::cout << "\n";
+  }
+private:
+  ArrayItemsNode* m_parent;
+  std::vector<ExprNode*> m_array;
+};
+
+class ArrayItemsHolder
+{
+  public:
+    ArrayItemsHolder () {}
+    ~ArrayItemsHolder () {}
+    void add_item (ExprNode *n) { m_items.push_back (n); }
+    void clear () { m_items.clear (); }
+    std::vector<ExprNode*> get_items () { return m_items; }
+
+  private:
+    std::vector<ExprNode*> m_items;
+};
+
+class ArrayVarNode : public Node
+{
+public:
+  ArrayVarNode (const location &loc, const std::string& name, ArrayItemsNode* items, SmalaType type, int dimension) :
+    Node(loc, ARRAY_VAR), m_array (items), m_type (type), m_dimension (dimension), m_name (name) {}
+  ~ArrayVarNode () {}
+  ArrayItemsNode* get_array () { return m_array; }
+  SmalaType get_array_type () { return m_type; }
+  int get_dimension () { return m_dimension; }
+  const std::string& get_name () { return m_name; }
+private:
+  ArrayItemsNode* m_array;
+  SmalaType m_type;
+  int m_dimension;
+  std::string m_name;
+};
 }

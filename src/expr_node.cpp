@@ -73,5 +73,7 @@ namespace Smala {
       }
       set_expr_type (DOUBLE);
     }
-
+    std::string loc_get_string (double d) { return std::to_string (d); }
+    std::string loc_get_string (int d) { return std::to_string (d); }
+    std::string loc_get_string (std::string d) { return d; }
 }

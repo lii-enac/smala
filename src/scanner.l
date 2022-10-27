@@ -145,7 +145,6 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 "FALSE"               { return Smala::Parser::make_FALSE (yytext, loc); }
 "null"                { return Smala::Parser::make_NULL (loc);}
 "aka"                 { return Smala::Parser::make_AKA (loc); }
-"DashArray"           { return Smala::Parser::make_DASHARRAY (loc); }
 "FSM"                 { return Smala::Parser::make_FSM (loc); }
 "State"               { return Smala::Parser::make_STATE (loc); }
 "Process"             { return Smala::Parser::make_PROCESS (loc); }

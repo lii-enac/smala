@@ -686,11 +686,6 @@ namespace Smala
           build_array_var (os, array);
         break;
       }
-      case DASH_ARRAY:
-      {
-        build_dash_array (os, dynamic_cast<DashArrayNode*> (node));
-        break;
-      }
       case RANGE:
       {
         std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));

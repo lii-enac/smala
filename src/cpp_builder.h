@@ -85,7 +85,6 @@ namespace Smala {
     void build_transition_node (std::ostream &os, Node *ctrl) override;
     void build_range_node (std::ostream &os, Node *node, const string& new_name) override;
     void build_this_node (std::ostream &os, Node *node) override;
-    void build_dash_array (std::ostream &os, DashArrayNode *n) override;
 
     void set_property (std::ostream &os, Node *node) override;
     void self_set_property (std::ostream &os, Node *n) override;

@@ -18,7 +18,6 @@
 #include <sstream>
 #include <vector>
 #include "error_location.h"
-#include "dash_array_node.h"
 #include "ctrl_node.h"
 #include "type_manager.h"
 #include "ast.h"
@@ -135,7 +134,6 @@ namespace Smala {
     virtual void build_range_node (std::ostream &os, Node *node, const string& new_name) = 0; // SwitchRange
     virtual void build_transition_node (std::ostream &os, Node *ctrl) = 0; // FSM transition
     virtual void build_this_node (std::ostream &os, Node *n) = 0;
-    virtual void build_dash_array (std::ostream &os, DashArrayNode *n) {}
 
     virtual void set_property (std::ostream &os, Node *n) = 0;
     virtual void self_set_property (std::ostream &os, Node *n) = 0;

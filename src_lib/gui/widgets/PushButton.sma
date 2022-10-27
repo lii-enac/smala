@@ -44,7 +44,8 @@ PushButton (string _label) inherits IWidget () {
     }
     State selected {
       OutlineColor _ (White)
-      DashArray dash (2.0, 2.0)
+      double[] pattern = [2.0, 2.0]
+      DashArray dash (pattern)
       Rectangle r_dash (3, 3, 94, 34, 3, 3)
       r.width - 6 =:> r_dash.width
       r.height - 6 =:> r_dash.height

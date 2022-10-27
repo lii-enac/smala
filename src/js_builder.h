@@ -75,7 +75,6 @@ namespace Smala {
     //     //os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;
     // }
     void build_simple_control_node (std::ostream &os, NativeExpressionNode *n);
-    void build_dash_array (std::ostream &os, DashArrayNode *n) override;
     void print_native_code (std::ostream &os);
     void print_component_decl (std::ostream &os, const std::string &name) override;
     void print_component_constructor (std::ostream &os, const std::string &constructor) override;

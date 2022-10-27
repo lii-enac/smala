@@ -35,7 +35,6 @@
   #include "causal_dep_node.h"
   #include "path_node.h"
   #include "set_parent_node.h"
-  #include "dash_array_node.h"
   #include "instruction_node.h"
   #include "binary_instruction_node.h"
   #include "smala_native.h"
@@ -275,7 +274,6 @@
 %token NATIVE_CODE "_native_code_"
 %token NATIVE_CODE_T "NativeCode"
 %token <string> CODE "<native code>"
-%token DASHARRAY "DashArray"
 %token <string> INT "<int>"
 %token <string> DOUBLE "<double>"
 %token <string> INT_UNIT "<int_unit>"
@@ -304,7 +302,6 @@
 %type <string> subname
 %type <string> start_array
 %type <string> number
-//%type <string> dash_array_decl
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
 %type <Node*> assignment_sequence

@@ -40,7 +40,6 @@ namespace Smala {
     CAUSAL_DEP,
     CONTAINER,
     CONTROL,
-    DASH_ARRAY,
     DECREMENT,
     END_ADD_CHILD,
     END_ASSIGNMENT,

@@ -22,7 +22,7 @@ namespace Smala
   {
   public:
     CtrlNode (const location& loc);
-    CtrlNode (const location& loc, const std::string &type, const std::string &name, const std::vector< std::pair<SmalaType, std::string> > &arguments);
+    CtrlNode (const location& loc, const std::string &type, const std::string &name, const std::vector< named_parameter_t > &arguments);
     CtrlNode (const location& loc, const std::string &type, const std::string &name, std::string in_act = "true", std::string out_act = "true");
     virtual ~CtrlNode ();
 

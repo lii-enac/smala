@@ -62,8 +62,7 @@
     class Driver;
   }
 
-  typedef pair<Smala::smala_t, string> parameter_t;
-  typedef vector<parameter_t> parameters_t;
+  typedef vector<Smala::named_parameter_t> parameters_t;
   typedef vector<Smala::ExprNode*> expression_t;
   extern void lexer_expression_mode_on();
   extern void lexer_expression_mode_off();
@@ -103,8 +102,8 @@
   std::vector<SymTable*> lambda_sym_table_list;
   std::vector<SymTable*> sym_table_list;
   std::vector<ArrayItemsHolder*> array_items_holder;
-  SmalaType array_type;
   Node *cur_node, *root = nullptr;
+  smala_t m_array_type;
   //bool m_in_add_children = false;
   bool m_terminate = false;
   bool m_in_lambda = false;
@@ -298,9 +297,10 @@
 %type < std::vector<SubPathNode*> > name_or_path
 %type <bool> is_model
 %type <smala_t> type
+%type < Smala::parameter_t > array_type
 %type <Node*> fsm_decl
 %type <string> subname
-%type <string> start_array
+%type < Smala::named_parameter_t > start_array
 %type <string> number
 %type <Node*> state_decl
 %type <Node*> simple_process_decl
@@ -318,7 +318,7 @@
 %type <NativeComponentNode*> lambda
 %type <NativeComponentNode*> start_lambda
 %type < parameters_t > parameters
-%type < parameter_t > parameter
+%type < Smala::named_parameter_t > parameter
 %type < pair <std::string, std::string> > binding_type
 %type < expression_t > non_empty_argument_list
 %type <string> unary_operator
@@ -499,7 +499,7 @@ constructor
       driver.add_define_node (node);
       driver.add_node (node);
       for (auto p: $5) {
-        if (p.first == NATIVE_CODE_T) {
+        if (p.first.first == NATIVE_CODE_T) {
           node->set_include_native (true);
           break;
         }
@@ -513,7 +513,7 @@ constructor
 
 
 parameters
-  : %empty { vector< pair<SmalaType, string> > params; $$ = params; }
+  : %empty { parameters_t params; $$ = params; }
   | parameters parameter COMMA
     {
       $1.push_back ($2);
@@ -526,7 +526,31 @@ parameters
     }
 
 parameter
-  : type NAME { add_sym (@$, $2, $1); $$ = make_pair ($1, $2); }
+  : type NAME { add_sym (@$, $2, $1); Smala::parameter_t param = make_pair($1, 0); $$ = make_pair (param, $2); }
+  | start_array
+    {
+      smala_t type;
+      switch ($1.first.first) {
+        case INT:
+          type = INT_ARRAY;
+          break;
+        case DOUBLE:
+          type =  DOUBLE_ARRAY;
+          break;
+        case STRING:
+          type = STRING_ARRAY;
+          break;
+        case PROCESS:
+          type = PROCESS_ARRAY;
+          break;
+        default:
+          type = UNDEFINED;
+      }
+      add_sym (@$, $1.second, type);
+      Smala::parameter_t param = make_pair(type, m_array_dimension);
+      m_array_dimension = 0;
+      $$ = make_pair (param, $1.second);
+    }
 
 //------------------------------------------------
 
@@ -1004,7 +1028,7 @@ start_add_child
 //------------------------------------------------
 
 array_var
-  : start_array array_items
+  : start_array SIMPLE_EQ array_items
   {
    if (!array_items_holder.empty()) {   
       ArrayItemsHolder* h = array_items_holder.back ();
@@ -1012,8 +1036,8 @@ array_var
         driver.set_error ("Bad array construction");
       }
       ArrayItemsNode* it_n = dynamic_cast<ArrayItemsNode*> (h->get_items ().back ());
-      ArrayVarNode *node = new ArrayVarNode (@$, $1, it_n, array_type, m_array_dimension);
-      add_sym (@$, $1, ARRAY_T);
+      ArrayVarNode *node = new ArrayVarNode (@$, $1.second, it_n, $1.first.first, m_array_dimension);
+      add_sym (@$, $1.second, ARRAY_T);
       driver.add_node (node);
       node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       array_items_holder.clear ();
@@ -1022,13 +1046,19 @@ array_var
   }
 
 start_array
-  : type bracket_list NAME SIMPLE_EQ
+  : array_type NAME
   {
     array_items_holder.clear ();
     array_items_holder.push_back (new ArrayItemsHolder ());
+    $$ = std::make_pair($1, $2);
+  }
+
+array_type
+  : type bracket_list
+  {
     m_array_level = 0;
-    array_type = $1;
-    $$ = $3;
+    m_array_type = $1;
+    $$ = make_pair($1, m_array_dimension);
   }
 
 bracket_list
@@ -1093,9 +1123,9 @@ string_list
 number_list
   : number
   { 
-    array_items_holder[0]->add_item (new ExprNode (@$, $1, LITERAL, array_type));
+    array_items_holder[0]->add_item (new ExprNode (@$, $1, LITERAL, m_array_type));
   }
-  | number_list COMMA number { array_items_holder[0]->add_item (new ExprNode (@$, $3, LITERAL, array_type)); }
+  | number_list COMMA number { array_items_holder[0]->add_item (new ExprNode (@$, $3, LITERAL, m_array_type)); }
 
 number
   : INT { $$ = $1; }

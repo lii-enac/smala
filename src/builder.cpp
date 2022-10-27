@@ -311,7 +311,7 @@ namespace Smala
         //build_properties (os); // will be done in build_for
         indent (os);
 
-        print_type (os, n->type (), n->get_args().at (0));
+        print_type (os, std::make_pair (n->type (), 0), n->get_args().at (0));
         std::string new_name;
         if (n->keep_name ())
           new_name = n->var_name ();
@@ -648,7 +648,7 @@ namespace Smala
 
         if (!m_in_for)
           indent (os);
-        print_type (os, n->type (), n->get_args().at(0));
+        print_type (os, std::make_pair (n->type (), 0), n->get_args().at(0));
         std::string new_name;
         if (n->keep_name ())
           new_name = n->var_name ();

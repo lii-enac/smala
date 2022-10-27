@@ -18,7 +18,7 @@ using namespace Smala;
 
 
 Node::Node (const location& loc, NodeType t, const std::string &value, const std::string &name,
-            const std::vector<std::pair<SmalaType, std::string> > &arguments) :
+            const std::vector< named_parameter_t > &arguments) :
     m_ignore_parent (false),m_djnn_type (value), m_name (name), m_build_name (""), m_args_spec (arguments), m_node_type (
         t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_path (false), m_duplicate_warning (true),
     m_keep_name (false), m_loc(loc), m_is_define_or_main (false), m_include_native (false)
@@ -105,14 +105,14 @@ Node::set_build_name(const std::string &build_name)
   m_build_name = build_name;
 }
 
-std::vector< std::pair<SmalaType, std::string> >
+std::vector< named_parameter_t >
 Node::args () const
 {
   return m_args_spec;
 }
 
 void
-Node::add_args (std::vector< std::pair<SmalaType, std::string> > &args)
+Node::add_args (std::vector< named_parameter_t > &args)
 {
   m_args_spec.insert (m_args_spec.end (), args.begin (), args.end ());
 }

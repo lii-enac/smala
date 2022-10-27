@@ -27,8 +27,11 @@ namespace Smala {
   } instruction_t;
 
   typedef enum SmalaType {
-    BOOL, INT, INT_UNIT, DOUBLE, DOUBLE_UNIT, ARRAY_T, STRING, PROCESS, CAST_STRING, NATIVE_CODE_T, NULL_VALUE, NAME, LOCAL_NAME, VOID, UNDEFINED
+    BOOL, INT, INT_UNIT, INT_ARRAY, DOUBLE, DOUBLE_UNIT, DOUBLE_ARRAY, ARRAY_T, STRING, STRING_ARRAY, PROCESS, PROCESS_ARRAY, CAST_STRING, NATIVE_CODE_T, NULL_VALUE, NAME, LOCAL_NAME, VOID, UNDEFINED
   } smala_t;
+
+  typedef std::pair<Smala::smala_t, int> parameter_t; // type and dimension if it is an array
+  typedef std::pair<parameter_t, std::string> named_parameter_t; //full type and name
 
   enum NodeType
   {
@@ -109,7 +112,7 @@ class Node
 {
 public:
     Node (const location& loc, NodeType type);
-    Node (const location& loc, NodeType type, const std::string &value, const std::string &name, const std::vector< std::pair<SmalaType, std::string> > &arguments);
+    Node (const location& loc, NodeType type, const std::string &value, const std::string &name, const std::vector< named_parameter_t > &arguments);
     Node (const location& loc, NodeType type, const std::string &value, const std::string &name);
     Node (const location& loc, NodeType type, const std::string &value, PathNode* path);
 
@@ -128,8 +131,8 @@ public:
     void set_djnn_type (const std::string& type);
     const std::string& name () const;
     void set_name (const std::string &name);
-    std::vector< std::pair<SmalaType, std::string> > args () const;
-    void add_args (std::vector< std::pair<smala_t, std::string> > &args);
+    std::vector< named_parameter_t > args () const;
+    void add_args (std::vector< named_parameter_t > &args);
     void set_error_location (smala::ErrorLocation *loc);
     smala::ErrorLocation* error_location ();
     bool ignore_parent () { return m_ignore_parent; }
@@ -140,8 +143,8 @@ public:
     void set_duplicate_warning (bool v);
     bool in_expression () { return m_in_expression; }
     void set_in_expression (bool v) { m_in_expression = v; }
-    void set_args_spec (std::vector< std::pair<smala_t, std::string> > args) { m_args_spec = args; }
-    std::vector< std::pair<smala_t, std::string> >& get_args_spec () { return m_args_spec; }
+    void set_args_spec (std::vector< named_parameter_t > args) { m_args_spec = args; }
+    std::vector< named_parameter_t >& get_args_spec () { return m_args_spec; }
     PathNode* get_path () { return m_path; }
     void set_path (PathNode* p) { m_path = p; }
     void set_user_data (user_data_t data) { m_data = data; }
@@ -160,7 +163,7 @@ public:
     std::string m_djnn_type;
     std::string m_name;
     std::string m_build_name;
-    std::vector< std::pair<smala_t, std::string> > m_args_spec;
+    std::vector< named_parameter_t > m_args_spec;
     std::vector<ExprNode*> m_expr_args;
     bool m_duplicate_warning, m_in_expression, m_keep_name;
     smala::ErrorLocation* m_location;

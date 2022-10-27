@@ -2058,13 +2058,13 @@ namespace Smala
     //m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
 
     os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
-    std::vector< std::pair<SmalaType, std::string> > data = node->get_args_spec();
+    std::vector< named_parameter_t > data = node->get_args_spec();
     for (int j = 0; j < data.size (); j++) {
-      std::pair<SmalaType, std::string> arg = data.at (j);
+      named_parameter_t arg = data.at (j);
       os << ", ";
       print_type (os, arg.first);
       std::string new_name;
-      switch (arg.first) {
+      switch (arg.first.first) {
         case INT:
         case BOOL:
           new_name = "i_var_" + std::to_string (m_var_num++);
@@ -2081,6 +2081,12 @@ namespace Smala
         case NAME:
         case PROCESS:
           new_name = "arg_" + std::to_string (m_cpnt_num++);
+          break;
+        case INT_ARRAY:
+        case DOUBLE_ARRAY:
+        case STRING_ARRAY:
+        case PROCESS_ARRAY:
+          new_name = "array_var_" + std::to_string (m_var_num++);
           break;
         default:;
       }
@@ -2322,7 +2328,7 @@ namespace Smala
       os << "djnn::ParentProcess* " << def->name ()
           << " (djnn::ParentProcess*, const djnn::string &";
       for (int j = 0; j < def->args ().size (); j++) {
-        std::pair<SmalaType, std::string> arg = def->args ().at (j);
+        named_parameter_t arg = def->args ().at (j);
         os << ", ";
         print_type (os, arg.first);
       }
@@ -2345,10 +2351,22 @@ namespace Smala
     used_processes["GraphEdgeAdder"] = true;
   }
 
-  void
-  CPPBuilder::print_type (std::ostream &os, SmalaType type, ExprNode* arg)
+  static
+  void print_array_type (std::ostream &os, const std::string& type, int dimensions)
   {
-    switch (type) {
+    for (int n = 0; n < dimensions; n++) {
+      os << "vector< ";
+    }
+    os << type;
+    for (int n = 0; n < dimensions; n++) {
+      os << " >";
+    }
+  }
+
+  void
+  CPPBuilder::print_type (std::ostream &os, parameter_t type, ExprNode* arg)
+  {
+    switch (type.first) {
       case INT: {
         os << "int";
         break;
@@ -2365,31 +2383,30 @@ namespace Smala
         os << "djnn::NativeCode*";
         break;
       }
-      case ARRAY_T: {
-      auto *a_n = dynamic_cast<ArrayVarNode*> (arg);
-      if (a_n) {
-        std::string type;
-        switch (a_n->get_array_type()) {
-        case DOUBLE:
-          type = "double";
-          break;
-        case INT:
-          type = "int";
-          break;
-        case STRING:
-          type = "string";
-          break;
-        default:
-          type = "Process*";
-        }
-        os << "vector<" << type << ">";
-      }
-      break;
-      }
       case NAME:
       case PROCESS:
       {
         os << "djnn::CoreProcess*";
+        break;
+      }
+      case DOUBLE_ARRAY:
+      {
+        print_array_type (os, "double", type.second);
+        break;
+      }
+      case INT_ARRAY:
+      {
+        print_array_type (os, "int", type.second);
+        break;
+      }
+      case STRING_ARRAY:
+      {
+        print_array_type (os, "string", type.second);
+        break;
+      }
+      case PROCESS_ARRAY:
+      {
+        print_array_type (os, "Process*", type.second);
         break;
       }
       default:

@@ -24,7 +24,7 @@ namespace Smala
 
   CtrlNode::CtrlNode (const location& loc,
       const std::string &type, const std::string &name,
-      const std::vector<std::pair<SmalaType, std::string> > &arguments) :
+      const std::vector< named_parameter_t > &arguments) :
       Node (loc, CONTROL, type, name, arguments), m_in (nullptr), m_out (nullptr), m_in_act ("true"), m_out_act ("true")
   {
   }

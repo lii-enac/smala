@@ -64,7 +64,7 @@ namespace Smala {
     void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) override;
     void print_component_decl (std::ostream &os, const std::string &name) override;
     void print_component_constructor (std::ostream &os, const std::string &constructor) override;
-    void print_type (std::ostream &os, SmalaType type, ExprNode* arg = 0) override;
+    void print_type (std::ostream &os, parameter_t type, ExprNode* arg = 0) override;
     void print_items_array (std::ostream &os, ArrayItemsNode* n);
     void build_array_var (std::ostream &os, ArrayVarNode* a) override;
 

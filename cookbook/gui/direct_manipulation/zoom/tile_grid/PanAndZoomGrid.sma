@@ -34,10 +34,11 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
 
     // output // should be connected e.g. to a Translation and a Scaling
 
+    double cell_size = 256.
+
     Double zoom (1)
     Double xpan (0)
     Double ypan (0)
-
 
     // delta output, in case it's useful
 
@@ -135,12 +136,12 @@ PanAndZoomGrid (Process move, Process press, Process release, Process wheel) {
 
     Int xgrid(0)
     Int tmp_xgrid(0)
-    myfloor ( (actual_xpan) / 256.) =:> tmp_xgrid
+    myfloor ( (actual_xpan) / cell_size) =:> tmp_xgrid
     tmp_xgrid =?> xgrid
     
     Int ygrid(0)
     Int tmp_ygrid(0)
-    myfloor ( (actual_ypan) / 256.) =:> tmp_ygrid
+    myfloor ( (actual_ypan) / cell_size) =:> tmp_ygrid
     tmp_ygrid =?> ygrid
 
     Spike left

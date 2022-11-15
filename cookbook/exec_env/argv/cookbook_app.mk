@@ -13,5 +13,5 @@
 
 objs_cookbook_app := main.o
 
-djnn_libs_cookbook_app := exec_env core
+djnn_libs_cookbook_app := gui display exec_env core
 #smala_libs_cookbook_app := smala

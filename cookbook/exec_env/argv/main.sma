@@ -1,4 +1,5 @@
 use core
+use gui
 
 _native_code_
 %{
@@ -22,4 +23,7 @@ init (int argc, char** argv)
 _main_
 Component root {
     init (argc, argv)
+    Frame f ("argv", 0, 0, 500, 500)
+    Exit ex (0, 1)
+    f.close -> ex
 }

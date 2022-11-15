@@ -50,6 +50,9 @@
     Int unselect (#0A0A0A)
 
     OutlineWidth _ (4)
+    Spike rm_all
+    ProcessCollector collection
+    
     List rectangles {
       Component _ {
         FillColor _ (#FF0000)
@@ -72,8 +75,6 @@
     StandAlonePushButton dec ("Decrease", 150, 150)
     StandAlonePushButton clear ("Clear", 250, 150)
 
-    Spike rm_all
-    ProcessCollector collection
     for r : rectangles {
       addChildrenTo r {
         FSM fsm {

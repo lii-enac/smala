@@ -62,6 +62,21 @@ fn_init(Process src, Process data)
   }
 }
 
+_action_
+fn_l_ask (Process src, Process data)
+{
+  p = getRef (&data.ask_selection)
+  for c : data.fsm.unfolded.items {
+    if (&c != &p) {
+      notify c.unselect
+    }
+    if (&p != 0) {
+      notify p.select
+    }
+  }
+  notify data.fold
+}
+
 _define_
 DropDownMenu (double _x, double _y)
 {
@@ -84,6 +99,7 @@ DropDownMenu (double _x, double _y)
   Rectangle button (0, 0, 20, 18, 2, 2)
   box.width - 2 =:> button.x
   
+  NativeAction l_ask (fn_l_ask, this, 1)
   List choices
 
   Spike fold
@@ -128,21 +144,13 @@ DropDownMenu (double _x, double _y)
     unfolded->idle (fold)
   }
   
+  
   MaxList sum (fsm.unfolded.items, "width")
   NativeAction init (fn_init, this, 0)
   sum.output + 20 =:> box.width
 
-  ask_selection->l_ask:(this) {
-    p = getRef (&this.ask_selection)
-    for c : this.fsm.unfolded.items {
-      if (&c != &p) {
-        notify c.unselect
-      }
-      if (&p != 0) {
-        notify p.select
-      }
-    }
-    notify this.fold
-  }
-  l_ask~>selected
+  ask_selection->l_ask
+  l_ask ~> selected
+
+  
 }

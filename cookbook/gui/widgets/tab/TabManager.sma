@@ -60,9 +60,9 @@ TabManager () {
 	Double unselected_border_color (55)
 	Double selected_border_color (30)
 
-	List tabs
-
 	Int selected_index (0)
 	NativeAction reorder_tabs (reorder_tabs_action, this, 1)
 	selected_index -> reorder_tabs
+
+	List tabs	
 }

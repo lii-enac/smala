@@ -42,8 +42,8 @@ Slider (Process frame, double _x, double _y) {
 
   Double initWidth (0)
   Double initHeight (0)
-  gslider.shadow.bkg.width =: initWidth
-  gslider.shadow.bkg.height =: initHeight
+  initWidth = gslider.shadow.bkg.width
+  initHeight = gslider.shadow.bkg.height
 
   Double output (0)
   -gobj.t_thumb.ty / 275 =:> output
@@ -55,22 +55,9 @@ Slider (Process frame, double _x, double _y) {
   
   dy > min ? dy : min =:> buff
   buff < max ? buff : max =:> gobj.t_thumb.ty
+  
 
   FSM fsm {
-    State st_exec {
-      FSM exec_fsm {
-        State idle {
-          gobj.t_thumb.ty =: dy
-        }
-        State dragging {
-          Double offset (0)
-          gobj.thumb.press.y - (gobj.scale.sy * dy) =: offset
-          (initHeight /gslider.shadow.bkg.height)  * (frame.move.y - offset) =:> dy
-        }
-        idle->dragging (gobj.thumb.press)
-        dragging->idle (frame.release)
-      }
-    }
     State st_edit {
       shadow << gslider.shadow
       FSM dragUpLeft {
@@ -134,9 +121,23 @@ Slider (Process frame, double _x, double _y) {
         idle->dragging (shadow.middle.press)
         dragging->idle (frame.release)
       }
-
+    }
+    State st_exec {
+      FSM exec_fsm {
+        State idle {
+          gobj.t_thumb.ty =: dy
+        }
+        State dragging {
+          Double offset (0)
+          gobj.thumb.press.y - (gobj.scale.sy * dy) =: offset
+          (initHeight /fsm.st_edit.shadow.bkg.height)  * (frame.move.y - offset) =:> dy
+        }
+        idle->dragging (gobj.thumb.press)
+        dragging->idle (frame.release)
+      }
     }
     st_exec->st_edit (edit)
     st_edit->st_exec (exec)
   }
+  fsm.initial = "st_exec"
 }

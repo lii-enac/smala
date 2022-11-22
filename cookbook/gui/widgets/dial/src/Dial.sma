@@ -40,11 +40,12 @@ Dial (Process frame, double _x, double _y) {
     gdial.axis_mark.cx =:> rot.cx
     gdial.axis_mark.cy =:> rot.cy
   }
+
   Double initWidth (0)
   Double initHeight (0)
-  gdial.shadow.bkg.width =: initWidth
-  gdial.shadow.bkg.height =: initHeight
-  
+  initWidth = gdial.shadow.bkg.width
+  initHeight = gdial.shadow.bkg.height
+
   FSM fsm {
     State st_exec {
       input * 360 =:> gobj.rot.a

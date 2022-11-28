@@ -575,7 +575,8 @@ disable_cookbook_apps ?= \
 	gui/physics \
 	gui/graphics/video \
 	comms/ros2 \
-	core/bidi
+	core/bidi \
+	gui/direct_manipulation/rotate_resize
 
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))
 
@@ -619,7 +620,7 @@ $(build_dir)/%.html: %.sma $(smalac)
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
-	$(smalac) -g $<
+	$(smalac) $(SMAFLAGS) $<
 	@mv $*.cpp $(build_dir)/$(*D)
 	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 

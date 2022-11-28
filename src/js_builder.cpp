@@ -68,7 +68,7 @@ namespace Smala
 
   int
   JSBuilder::build (const Ast &ast, const std::string &builddir,
-                     const std::string &prefix, bool debug)
+                     const std::string &prefix, bool debug, bool cleaner)
   {
     m_indent = 0;
     m_cpnt_num = 0;

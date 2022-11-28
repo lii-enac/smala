@@ -33,7 +33,9 @@ namespace Smala
       if (str.size() > 4 && str.compare (str.size () - 4, 4, ".sma") == 0) {
         m_filenames.push_back (str);
       } else if (str.compare ("-g") == 0) {
-         _debug = true;
+        _debug = true;
+      } else if (str.compare ("-gen-cleaner") == 0) {
+        _cleaner = true;
       } else if (str.compare ("-lang=js") == 0) {
           _lang = JS;
       } else if (str.compare ("-o") == 0) {
@@ -90,6 +92,7 @@ namespace Smala
     std::cout << "USAGE: smala " <<  "<filenames> [options]\n";
     std::cout << "Options:\n";
     std::cout << "  -g \t enable debug\n";
+    std::cout << "  -gen-cleaner \t enable cleaner generator\n";
     std::cout << "  -lang=<cpp|js> \t change the target language\n";
   }
 } /* namespace Smala */

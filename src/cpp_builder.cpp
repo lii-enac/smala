@@ -125,8 +125,9 @@ namespace Smala
 
   int
   CPPBuilder::build (const Ast &ast, const std::string &builddir,
-                     const std::string &prefix, bool debug)
+                     const std::string &prefix, bool debug, bool cleaner)
   {
+    m_cleaner = cleaner;
     m_indent = 0;
     m_cpnt_num = 0;
     m_var_num = 0;
@@ -2149,33 +2150,39 @@ namespace Smala
     os << "MainLoop::instance ().activate ();\n\n";
     used_processes["MainLoop"] = true;
 
-
-    emit_compiler_info(os);
-    /* clear modules from use */
-    int size = m_ast.preamble ().use ().size ();
-    bool has_display = false;
-    for (int i = 0; i < size; ++i) {
-      const std::string str = m_ast.preamble ().use ().at (i);
-      if (str == "display") {
-        has_display = true; 
-      }
-    }
-
-    for (int i = size-1; i >= 0; --i) {
-      const std::string str = m_ast.preamble ().use ().at (i);
-      
-      /* add corresponding clear_MODULE */
-      if (str == "core") {
-        indent (os);
-        os << "clear_exec_env ();\n"; // do it after init_core ()
-      }
-
+    if (m_cleaner) {
       indent (os);
-      os << "clear_" << str << " ();\n";
+      os << data->build_name () << "->deactivate ();\n";
+      indent (os);
+      os << "delete " << data->build_name () << ";\n";
 
-      if (str == "gui" && !has_display) {
+      emit_compiler_info(os);
+      /* clear modules from use */
+      int size = m_ast.preamble ().use ().size ();
+      bool has_display = false;
+      for (int i = 0; i < size; ++i) {
+        const std::string str = m_ast.preamble ().use ().at (i);
+        if (str == "display") {
+          has_display = true; 
+        }
+      }
+
+      for (int i = size-1; i >= 0; --i) {
+        const std::string str = m_ast.preamble ().use ().at (i);
+        
+        /* add corresponding clear_MODULE */
+        if (str == "core") {
+          indent (os);
+          os << "clear_exec_env ();\n"; // do it after init_core ()
+        }
+
         indent (os);
-        os << "clear_display ();\n"; // do it after clear_gui ()
+        os << "clear_" << str << " ();\n";
+
+        if (str == "gui" && !has_display) {
+          indent (os);
+          os << "clear_display ();\n"; // do it after clear_gui ()
+        }
       }
     }
   }

@@ -23,7 +23,7 @@ namespace Smala {
   public:
     JSBuilder ();
     virtual ~JSBuilder ();
-    int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
+    int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug, bool cleaner = false) override;
   private:
     void build_define (const std::string &prefix);
     void build_use (std::ostream &os, std::string use) override;

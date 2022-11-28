@@ -28,7 +28,7 @@ namespace Smala {
     virtual void push_ctxt (const string& parent_name = string()) override;
     virtual void pop_ctxt () override;
     
-    int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug) override;
+    int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug, bool cleaner) override;
   private:
     void build_header (const std::string &prefix);
 
@@ -109,6 +109,7 @@ namespace Smala {
 
   private:
     bool m_display_initialized;
+    bool m_cleaner;
     int m_expr_in, m_expr_out; // are we in an expression or not?
     std::map<std::string, std::string> m_import_types;
 

@@ -13,6 +13,7 @@ smala_path ?= ../smala
 
 #CXXFLAGS += -DNO_ROS -DNO_LEMON
 
+SMAFLAGS += -g #-gen-cleaner
 CXXFLAGS += -g #-Wall
 
 #CXXFLAGS += -fsanitize=address -O1

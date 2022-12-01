@@ -156,6 +156,10 @@ CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)
+LDFLAGS_SC += $(LDFLAGS_COMMON)
+
+CXXFLAGS_CK += $(CXXFLAGS_COMMON) $(djnn_cflags)
+LDFLAGS_CK += $(LDFLAGS_COMMON)
 
 # -----------------------------------
 ifeq ($(os),Linux)
@@ -854,7 +858,7 @@ endif
 ifeq ($(os),Darwin)
 #https://brew.sh/
 pkgcmd := brew install
-pkgdeps += rtmidi nlohmann-json
+pkgdeps += rtmidi nlohmann_json
 endif
 
 ifeq ($(os),MinGW)

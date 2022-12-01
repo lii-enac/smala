@@ -150,10 +150,9 @@ djnn_libs_SL := $(djnn_libs)
 
 # ----------------------------------
 
-CFLAGS_COMMON += -g -MMD
+CFLAGS_COMMON += -MMD
 CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
 
-CXXFLAGS_CK += $(CXXFLAGS_COMMON) $(djnn_cflags)
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)

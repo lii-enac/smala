@@ -46,16 +46,3 @@ debugger := gdb
 lib_suffix =.dll
 DYNLIB = -shared
 endif
-
-
-linker ?= $(compiler)
-
-ifeq ($(linker),mold)
-ifeq ($(os),Darwin)
-CXXLD := ld64.mold
-DYNLIB =-L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/
-else
-CXXLD := mold
-endif
-DYNLIB += -dylib -lc++ -lc
-endif

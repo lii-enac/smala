@@ -65,6 +65,20 @@ endif
 
 CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
+CXXLD ?= $(CXX)
+
+
+linker ?= $(compiler)
+
+ifeq ($(linker),mold)
+ifeq ($(os),Darwin)
+CXXLD := ld64.mold
+LDFLAGS += -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/
+else
+CXXLD := mold
+endif
+LDFLAGS += -dylib -lc++ -lc
+endif
 
 ifeq ($(cross_prefix),em)
 os := em

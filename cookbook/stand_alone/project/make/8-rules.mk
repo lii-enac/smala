@@ -11,11 +11,11 @@ $(exe): LIBS += $(app_libs)
 $(exe): $(objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(LD) $^ -o $@ $(LDFLAGS) $(LIBS)
+	$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
 else
 	@$(call rule_message,linking to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(LD) $^ -o $@ $(LDFLAGS) $(LIBS)
+	@$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
 endif
 
 # .sma to .cpp, .c etc

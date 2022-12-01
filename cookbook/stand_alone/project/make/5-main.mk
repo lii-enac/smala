@@ -67,7 +67,7 @@ CC := $(cross_prefix)cc
 CXX := $(cross_prefix)++
 CXXLD ?= $(CXX)
 
-
+# -- linker
 linker ?= $(compiler)
 
 ifeq ($(linker),mold)
@@ -80,6 +80,14 @@ endif
 LDFLAGS += -dylib -lc++ -lc
 endif
 
+# -- pkg management
+ifneq ($(pkg),)
+#$1_lib_pkgpath = $$(subst $$() $$(),:,$$(lib_pkgpath))
+CXXFLAGS += $(shell env PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --cflags $(pkg))
+LIBS += $(shell env PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --libs $(pkg))
+endif
+
+# -- em
 ifeq ($(cross_prefix),em)
 os := em
 EXE := .html

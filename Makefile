@@ -604,7 +604,7 @@ $(app_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF) $(CXX
 stand_alone_dir ?= ../stand_alone
 stand_alone:
 	mkdir $(stand_alone_dir)
-	cp -r cookbook/stand_alone/* $(stand_alone_dir)
+	cp -r cookbook/stand_alone/. $(stand_alone_dir)
 
 # ---------------------------------------
 # rules

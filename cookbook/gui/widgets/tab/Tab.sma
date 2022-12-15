@@ -10,7 +10,7 @@ _define_
 Tab (Process frame, Process tabManager, string _label, int _index) {
   /* -------- Graphic components --------- */
   FillColor foreground_color (250, 250, 250)
-  g_tab = loadFromXML ("img/tab.svg")
+  g_tab = load_from_XML ("img/tab.svg")
 
   Component label_box {
     Translation pos ((_index - 1) * 160, 0)

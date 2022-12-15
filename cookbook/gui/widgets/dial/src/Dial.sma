@@ -23,7 +23,7 @@ Dial (Process frame, double _x, double _y) {
   x aka t.tx
   y aka t.ty
 
-  gdial = loadFromXML ("img/dial.svg")
+  gdial = load_from_XML ("img/dial.svg")
 
   /*---- interface -----*/
   Double input (0)

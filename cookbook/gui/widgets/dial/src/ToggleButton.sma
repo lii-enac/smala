@@ -31,7 +31,7 @@ ToggleButton (Process frame, string l, double _x, double _y) {
   String label (l)
  /*--- end interface ---*/
 
-  gbutton = loadFromXML ("img/button.svg")
+  gbutton = load_from_XML ("img/button.svg")
   FSM fsm {
     State idle {
       r << gbutton.idle

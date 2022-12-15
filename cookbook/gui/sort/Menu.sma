@@ -16,7 +16,7 @@ Menu (Process f, Process list_item, int init_x, int init_y, int _width)
   String selected ("")
 
   /* graphics */
-  graphics = loadFromXML ("img/menu.svg")
+  graphics = load_from_XML ("img/menu.svg")
   bkg << graphics.layer1.bkg
   Component selected_item {
    RectangleClip clip (0, 0, 0, 0)

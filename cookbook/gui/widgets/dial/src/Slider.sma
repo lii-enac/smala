@@ -24,7 +24,7 @@ Slider (Process frame, double _x, double _y) {
   x aka t.tx
   y aka t.ty
 
-  gslider = loadFromXML ("img/slider.svg")
+  gslider = load_from_XML ("img/slider.svg")
 
   /*----- interface -----*/
   Double input (0)

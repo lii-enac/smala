@@ -27,7 +27,7 @@ Component root {
 	Frame f ("Smala Clock by J.-L. Vinot", 0, 0, 600, 700)
 	Exit ex (0, 1)
 	f.close -> ex
-	gui = loadFromXML ("img/Clock5.svg")
+	gui = load_from_XML_once ("img/Clock5.svg")
 		
 	/* create and adapt a background shape */
 	back << gui.horloge.back

@@ -45,7 +45,7 @@ use gui
   dolly2 << clone (&dolly1.circ1)
 
   /* test with SVG */
-  svg = loadFromXML ("img/aircraft.svg")
+  svg = load_from_XML_once ("img/aircraft.svg")
 
   Translation t3 (400, -300)
   Group aircraft {  

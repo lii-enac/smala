@@ -34,7 +34,7 @@ Component root
   f.height =:> recf.height
 
   Component menu {
-    svg = loadFromXML ("menu.svg")
+    svg = laod_from_XML_once ("menu.svg")
     Translation pos_menu (-140, 0)
     full << svg.layer1
     add aka full.add

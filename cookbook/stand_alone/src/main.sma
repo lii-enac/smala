@@ -48,7 +48,7 @@ Component root {
 
   // loading a resource
   string path = "res/simple.svg"
-  svg = loadFromXML (path)
+  svg = load_from_XML (path)
   //dump svg
   Translation _(200,0)
   t << svg

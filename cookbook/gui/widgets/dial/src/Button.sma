@@ -31,7 +31,7 @@ Button (Process frame, string l, double _x, double _y) {
   /*--- end interface ---*/
 
   /*----- graphics and behavior-----*/
-  gbutton = loadFromXML ("img/button.svg")
+  gbutton = load_from_XML ("img/button.svg")
 
   FSM fsm {
     State idle {

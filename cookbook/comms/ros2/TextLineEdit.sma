@@ -21,7 +21,7 @@
   String _default_text (default_text)
   String validated_text ("")
   Translation pos (x, y)
-  svg = loadFromXML ("drawing.svg")
+  svg = load_from_XML ("drawing.svg")
   bkg << svg.layer1.text\-edit.bkg
   clear << svg.layer1.text\-edit.clear
   RectangleClip clip (1, 1, 180, 18)

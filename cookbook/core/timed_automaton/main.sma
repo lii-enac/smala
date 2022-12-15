@@ -39,7 +39,7 @@ Component root {
 	StandAlonePushButton rc ("Reset Clock", 210, 30)
 	
 	/** Graphics **/
-	gui = loadFromXML("graphics.svg")
+	gui = load_from_XML_once ("graphics.svg")
 	Translation pos (100, 130)
 	Scaling sc (2, 2, 0, 0)
 	fsm_ui << gui.layer1.fsm

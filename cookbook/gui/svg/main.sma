@@ -12,7 +12,7 @@ Component root {
 
   // see the screenshots of the illustrator SVG export dialog boxes 
   string path = "http://smala.io/button.svg"
-  svg = loadFromXML (path)
+  svg = load_from_XML_once (path)
   //dump svg
 
   t << svg

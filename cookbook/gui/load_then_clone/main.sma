@@ -29,7 +29,6 @@ use gui
 
   // OR to load only once (without clone) 
   svg_once = load_from_XML_once ("img/aircraft.svg")
-  // svg_once = loadFromXML ("img/aircraft.svg")
   aircraft_once << svg_once.background
   label_once << svg_once.label
 

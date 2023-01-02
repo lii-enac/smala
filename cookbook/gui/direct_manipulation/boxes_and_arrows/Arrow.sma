@@ -153,11 +153,17 @@ set_double (Process *p, double v) {
         std::cout << "fail to cast double property\n";
     }
 }
+
+void print_source (Process *p)
+{
+    std::cout << "new arrow src: " << p << "\n";
+}
 %}
 
 _define_
 Arrow (Process _src) {
     int arrow_size = get_arrow_size()
+    print_source (_src)
     OutlineWidth _ (2)
     OutlineColor _ (#AFAFAF)
 
@@ -169,8 +175,9 @@ Arrow (Process _src) {
     Circle start_circle (_src.x + _src.width/2, $_src.y, 5)
     NoFill _
     Path path {
-        PathMove _ (_src.x + _src.width/2, $_src.y)
-        PathCubic _ ($_src.x + _src.width/2, 0, -($_src.x + _src.width/2), 0, 5, 5)
+        //PathMove _ (src.x + src.width/2, $src.y)
+        PathMove _ ($GenericMouse.x, $GenericMouse.y)
+        PathCubic _ ($GenericMouse.x, 0, 0, $GenericMouse.y, 5, 5)
     }
 
     path.items.[1].{x,y} =:> start_circle.{cx,cy}

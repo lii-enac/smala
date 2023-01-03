@@ -10,7 +10,7 @@ Slider (Process frame, double _x, double _y) {
   x aka t.tx
   y aka t.ty
 
-  gslider = loadFromXML ("img/slider.svg")
+  gslider = load_from_XML ("img/slider.svg")
 
   Component gobj {
     bkg << gslider.layer1.bkg

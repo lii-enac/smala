@@ -858,7 +858,7 @@ endif
 ifeq ($(os),Darwin)
 #https://brew.sh/
 pkgcmd := brew install
-pkgdeps += rtmidi nlohmann_json
+pkgdeps += rtmidi nlohmann-json
 endif
 
 ifeq ($(os),MinGW)

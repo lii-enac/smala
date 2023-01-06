@@ -154,16 +154,11 @@ set_double (Process *p, double v) {
     }
 }
 
-void print_source (Process *p)
-{
-    std::cout << "new arrow src: " << p << "\n";
-}
 %}
 
 _define_
 Arrow (Process _src) {
     int arrow_size = get_arrow_size()
-    print_source (_src)
     OutlineWidth _ (2)
     OutlineColor _ (#AFAFAF)
 

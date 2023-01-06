@@ -13,7 +13,11 @@ djnn_path = ../djnn-cpp
 cookbook_app_for_make_test := button
 cookbook_apps_extra :=
 
-SMAFLAGS += #-g #-gen-cleaner
+#smala flags
+#SMAFLAGS += -g #-gen-cleaner
+
+#C++ flags 
+#CFLAGS_COMMON += -g
 
 # cross-compile support
 #cross_prefix := em

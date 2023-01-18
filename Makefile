@@ -787,7 +787,7 @@ deb:
 #	cd "build/deb" ; lintian smala_$(MAJOR).$(MINOR).$(MINOR2).deb
 
 MINOR3 = $(shell echo `date +%j`)
-deb_git_prefix_version = build/deb/djnn-cpp_$(MAJOR).$(MINOR).$(MINOR2).$(MINOR3)
+deb_git_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2).$(MINOR3)
 deb_git_prefix = $(deb_git_prefix_version)/usr
 deb_git:
 	make -j6  install PREFIX=$(deb_git_prefix)

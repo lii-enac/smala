@@ -770,7 +770,7 @@ install_brew: djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 #		sudo dpkg -r smala
 deb_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2)
 deb_prefix = $(deb_prefix_version)/usr
-deb:	
+deb:
 	make -j6  install PREFIX=$(deb_prefix)
 	test -d $(deb_prefix_version)/DEBIAN || mkdir -p $(deb_prefix_version)/DEBIAN
 	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' distrib/deb/control > $(deb_prefix_version)/DEBIAN/control
@@ -785,7 +785,21 @@ deb:
 	cd "build/deb" ; fakeroot dpkg-deb --build smala_$(MAJOR).$(MINOR).$(MINOR2)
 # check integrity of the build package. We still have error
 #	cd "build/deb" ; lintian smala_$(MAJOR).$(MINOR).$(MINOR2).deb
-.PHONY: deb
+
+MINOR3 = $(shell echo `date +%j`)
+deb_git_prefix_version = build/deb/djnn-cpp_$(MAJOR).$(MINOR).$(MINOR2).$(MINOR3)
+deb_git_prefix = $(deb_git_prefix_version)/usr
+deb_git:
+	make -j6  install PREFIX=$(deb_git_prefix)
+	test -d $(deb_git_prefix_version)/DEBIAN || mkdir -p $(deb_git_prefix_version)/DEBIAN
+	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2).$(MINOR3),' distrib/deb/control > $(deb_git_prefix_version)/DEBIAN/control
+	cp distrib/deb/triggers $(deb_git_prefix_version)/DEBIAN/triggers
+	cd $(deb_git_prefix)/lib ; strip --strip-debug --strip-unneeded *.so
+	cd $(deb_git_prefix)/bin ; strip --strip-debug --strip-unneeded *
+	cd "build/deb" ; fakeroot dpkg-deb --build smala_$(MAJOR).$(MINOR).$(MINOR2).$(MINOR3)
+
+.PHONY: deb deb_git
+
 
 #pkg
 

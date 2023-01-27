@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
 
 
+## [1.19.0] - 2023-01-26
+### compliant with djnn-cpp [1.19.0]
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+    - use of the new z_order.
+    - NEW lib widget and cookbook: ListViewer
+    - NEW support double unit
+    - NEW cookbooks: template_property, double_array, load_then_clone, boxes_and_arrows, multi_layers
+    - NEW Added a smala compilation flag -gen-cleaner to generate memory cleaner at the end of generated code
+    - NEW Added $SMAFLAG in config.default.mk to use option: -g, -gen-cleaner
+    - NEW support for Mold
+    - NEW added deb_git target for daily deb packaging
+### Changed
+    - Fixed cook
+    - Improved Stand_alone
+    - Improved cookbook: boxes, simple_zoom, tile_grid, argv, Dial, tab, layout
+    - Improved lib widget: Checkbox, HSlider, VSlider, UITextField, PushButton, standAloneComboBox, DropDownMenu
+    - Improved Cpp Builder
+    - Improved Makefile
+### Deprecated
+    - replaced deprecated loadFromXML by either load_from_XML or load_from_XML_once
 
 ## [1.18.0] - 2022-06-09
 ### compliant with djnn-cpp [1.18.0]

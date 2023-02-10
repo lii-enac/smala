@@ -17,7 +17,7 @@ use base
 
 import clamp
 
-// paging up and down regularly while the user holds a press
+// paging up and down repeatidly while the user holds a press
 
 _define_
 paging(Process model, Process f) {
@@ -35,7 +35,7 @@ paging(Process model, Process f) {
         : -dv < mindv ? dv : -mindv
                     =:> dvclamped
 
-    // when dv changes, performs an incr operation on the model...
+    // when dv changes, perform an incr operation on the model
     Incr incr_low  (0)
     Incr incr_high (0)
 
@@ -47,14 +47,16 @@ paging(Process model, Process f) {
     
           dvclamped =:> incr_low.delta, incr_high.delta
     
-    // ... and repeats it as long as the component is activated
+    // ... and repeat it as long as the component is activated
     FSM fsm {
         State idle
         State veryfirst {
-            Clock clock (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!
-            clock.tick -> incr_low, incr_high
+            // we need to activate incr_low and incr_high a first time
+            Timer t (0) // FIXME should be spike ? // more research needed on state machine modularity // with an alias ?!
+            t.end -> incr_low, incr_high
             //Spike s
             //s -> incr_low, incr_high
+            //notify s
         }
         State first {
             Clock clock (250)
@@ -64,12 +66,15 @@ paging(Process model, Process f) {
             Clock clock (80)
             clock.tick -> incr_low, incr_high
         }
-        veryfirst -> first (veryfirst.clock.tick)
-        //veryfirst -> first (veryfirst.s)
+        veryfirst -> first (veryfirst.t.end)
+        //veryfirst -> first (veryfirst)
         first -> others (first.clock.tick)
-        //first -> veryfirst (f.release)
    }
-   //fsm.state =:> tp.input
+   
    this  -> fsm.veryfirst
    this !-> fsm.idle
+
+//    TextPrinter tp
+//    fsm.state =:> tp.input
+   
 }

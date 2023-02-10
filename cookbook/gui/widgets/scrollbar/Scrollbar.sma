@@ -12,20 +12,25 @@
  *
  */
 
-// MDPC scrollbar
+// MDPC(ti) scrollbar
 
-// M = model - the abstract data, here two values in range [0;1]
-// D = display view - what the user actually sees
-// P = picking view - what the user actually manipulates, without seeing it
-// C = controller - manages interactive state and _triggers_ the translation of user's actions into model operations
+// M = model - the abstraction, here two values (low,hi) in range [0;1], and operations (add to low and hi, including negative deltas)
+// D = display view - what the user actually sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
+// P = picking view - what the user actually manipulates, without seeing it:   |O|**|    |@@@@@|8| (left arrow, left-to-thumb, thumb, right-to-thumb, right arrow)
+// C = controller - manages the interactive state and _triggers_ the translation of user's actions into model operations
 // transform = transforms the model into the display and the picking views
-// inverse transform = inverse-transforms user's actions and translates into model operations
+// inverse transform = inverse-transforms user's actions and translates them into model operations
+
+// with this architecture, the scrollbar can be arbitrarily transformed:
+// translated, scaled by any amount, 90° rotation from vertical to horizontal, or any rotation.
+// thanks to the picking view and the inverse transform the controller code is simple and independent of the transform
 
 // see:
 // Conversy, S., Barboni, E., Navarre, D., Palanque, P. Improving modularity of interactive software with the MDPC architecture. IFIP EIS 2007.
 // 	     http://dx.doi.org/10.1007/978-3-540-92698-6_20
 // Conversy, S. Improving Usability of Interactive Graphics Specification and Implementation with Picking Views and Inverse Transformations. In IEEE VL/HCC 2011.
 // 	     http://dx.doi.org/10.1109/VLHCC.2011.6070392
+
 
 use core
 use base
@@ -41,8 +46,9 @@ import inverse_transform
 
 _define_
 Scrollbar(Process f) {
+
   // ---------------
-  // model
+  // Model
   Component model {
     Double low  (0.75)
     Double high (0.9)
@@ -58,8 +64,9 @@ Scrollbar(Process f) {
   Incr incr_low  (0)
   Incr incr_high (0)
 
+
   // -----------------
-  // transform
+  // Transform
   Component transform {
     Double tx (200)
     Double ty (100)
@@ -83,8 +90,9 @@ Scrollbar(Process f) {
   transform.ty  =:> tr.ty
   transform.s   =:> sc.sy
 
+
   // -----------------
-  // display view
+  // Display view
   Double width (100)
   Double arrow_height(100)
 
@@ -104,7 +112,7 @@ Scrollbar(Process f) {
     Rectangle   thumb (0,0,1,1,0,0)      // =
 
     // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
-    // transformation of model into display view for background and thumb
+    // transforms the model into a display view (background + arrows + thumb)
 
                                          width =:> more_arrow.width, bg.width, thumb.width, less_arrow.width
                                              0 =:> more_arrow.x, bg.x, thumb.x, less_arrow.x
@@ -121,9 +129,10 @@ Scrollbar(Process f) {
 
   }
 
+
   // -----------------
-  // picking view
-  Int xoffset(300)
+  // Picking view
+  Int xoffset(300) // display the picking view 300 pixels to the right of the display view for demonstration purpose
 
   // a picking view has a state that depends on the status of the interaction (see controller)
   Switch picking_view (initial) {
@@ -143,8 +152,8 @@ Scrollbar(Process f) {
       FillColor _ (255,0,255)//purple
       Rectangle thumb (0,0,1,1,0,0)       // =
      
-      // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar picking layout
-      // transformation of model into picking view for background and thumb     
+      // 'one-way constraint' or data-flow of position/size of each zone for a classical scrollbar picking layout in idle state
+      // transforms the model into a picking view (background + arrows + thumb)     
 
                                          width =:> more_arrow.width, more_bg.width, thumb.width, less_bg.width, less_arrow.width
                                    0 + xoffset =:> more_arrow.x,     more_bg.x,     thumb.x,     less_bg.x,     less_arrow.x
@@ -163,8 +172,8 @@ Scrollbar(Process f) {
     }
 
     Component hyst {
-      // the hysteresis circle is in screen space, so we should inverse graphical transform
-      // should be LoadIdentity() it would be more efficient and onpar with the semantics
+      // the hysteresis circle is in screen space, so we inverse the graphical transform
+      // should be LoadIdentity() it would be more efficient and on par with the semantics
       Scaling     sc(1,1, 0,0)
       Translation tr(0,0)
       Rotation    rot(0,0,0)
@@ -179,26 +188,26 @@ Scrollbar(Process f) {
     }
 
     Component dragging {
-    
+      // vv maybe useless since we use a transformed analytical computation anyway
       FillOpacity _(0.5)
-      FillColor _ (0,255,0) // g
+      FillColor _ (0,255,0) // green
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
-      FillColor _ (0,255,255) // c
+      FillColor _ (0,255,255) // cyan
       Rectangle dragging_zone (0,0,1,1,0,0)  // || (=)
-      FillColor _ (255,0,0) // r
+      FillColor _ (255,0,0) // red
       Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
 
       Double pick_offset_in_model (0)
-      Double zero_in_model (0)   // does not work very well
+      Double zero_in_model (0)   // does not work very well (?)
       Double win_height_in_model (0) // idem
       
       // pick_offset in model coordinates
-      inverse_transform _(transform, picking_view.hyst.c.cx, picking_view.hyst.c.cy, pick_offset_in_model)
+      inverse_transform _ (transform, picking_view.hyst.c.cx, picking_view.hyst.c.cy, pick_offset_in_model)
       Double zero(0)
-      inverse_transform _(transform, zero, zero, zero_in_model) // FIXME? not working as planned
-      inverse_transform _(transform, f.height, f.height, win_height_in_model) // FIXME? not working as planned
+      inverse_transform _ (transform, zero, zero, zero_in_model) // FIXME? not working as planned
+      inverse_transform _ (transform, f.height, f.height, win_height_in_model) // FIXME? not working as planned
      
-      // 'one-way constraint' or data-flow of position/size for a regular scrollbar picking layout
+      // 'one-way constraint' or data-flow of position/size for a classical scrollbar picking layout in dragging state
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
                                        xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
@@ -212,6 +221,8 @@ Scrollbar(Process f) {
          1 - picking_view.initial.thumb.height =:> dragging_zone.height
         dragging_zone.y + dragging_zone.height =:> lower_limit.y
 	         win_height_in_model - lower_limit.y =:> lower_limit.height
+      
+      // ^^ maybe useless since we use a transformed analytical computation anyway
 
       // transform boundaries to test position of cursor
       /*Double pick_offset_rel (0)
@@ -232,17 +243,17 @@ Scrollbar(Process f) {
       Double cursor_in_model (0)
       inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
 
-      Bool higher(0)
+      Bool higher (0)
       cursor_in_model > dragging_zone.y + dragging_zone.height =:> higher
-      Bool lower(0)
+      Bool lower (0)
       cursor_in_model < dragging_zone.y =:> lower
-      TextPrinter tp
-      "lower " + lower + " higher " + higher =:> tp.input
+      //TextPrinter tp
+      //"lower " + lower + " higher " + higher =:> tp.input
     } 
   }
 
   // -----------------
-  // controller = management of interactive state with an FSM
+  // Controller == management of interactive state alone, with an FSM
 
   DoubleProperty lastv (0)
 
@@ -320,8 +331,9 @@ Scrollbar(Process f) {
       }
     }
 
-    // transitions
-                                                                                //   UAN User-Action Notation https://www.semanticscholar.org/paper/The-UAN%3A-A-User-Oriented-Representation-for-Direct-Hartson-Siochi/97a593273fca9460ce05f32031896b752de4dcb9/figure/16
+    // transitions                                                              //  UAN User-Action Notation https://www.semanticscholar.org/paper/The-UAN%3A-A-User-Oriented-Representation-for-Direct-Hartson-Siochi/97a593273fca9460ce05f32031896b752de4dcb9/figure/16
+
+    // lining/paging                                                            
              idle -> onelining_up   (picking_view.initial.more_arrow.press)     //  [^]v
              idle -> onelining_down (picking_view.initial.less_arrow.press)     //  [v]v
 
@@ -344,18 +356,19 @@ Scrollbar(Process f) {
      paging_still -> idle           (f.release)                                 //  ^
       paging_down -> idle           (f.release)                                 //  ^
 
+    // dragging
              idle -> waiting_hyst   (picking_view.initial.thumb.press)          //  [=]v 
      waiting_hyst -> idle           (f.release)                                 //  ^
      waiting_hyst -> dragging       (picking_view.hyst.c.leave)                 //  [o]~   // FIXME does not work with fast movements
 
-         //dragging -> dragging       (f.move)                                  //  ~    // in state
          dragging -> idle           (f.release)                                 //  ^
 
-         dragging -> in_upper_zone  (picking_view.dragging.upper_limit.enter)   // ~[-]   // FIXME no message/warning when path is erroneous
-    in_upper_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]
+         // with analytical computation (see below an alternative version with picking views)
+         dragging -> in_upper_zone  (picking_view.dragging.lower.true)          // ~[-]   // strange should be "higher" ?!
+    in_upper_zone -> dragging       (picking_view.dragging.lower.false)         // ~[=]
 
-         dragging -> in_lower_zone  (picking_view.dragging.lower_limit.enter)   // ~[_]
-    in_lower_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]
+         dragging -> in_lower_zone  (picking_view.dragging.higher.true)         // ~[_]   // strange should be "lower" ?!
+    in_lower_zone -> dragging       (picking_view.dragging.higher.false)        // ~[=]
 
     in_lower_zone -> idle           (f.release)                                 //  ^
     in_upper_zone -> idle           (f.release)                                 //  ^
@@ -363,28 +376,9 @@ Scrollbar(Process f) {
 }
 
 
-     /*
-      Rectangle r(0,0,0,0,0,0)
-      r.press -> fc 
-      m aka r.inverted_matrix
-      //Homography _(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1)
-      Homography h
-      m.m11 =: h.m11
-      m.m12 =: h.m12
-      m.m13 =: h.m13
-      m.m14 =: h.m14
-      m.m21 =: h.m21
-      m.m22 =: h.m22
-      m.m23 =: h.m23
-      m.m24 =: h.m24
-      m.m31 =: h.m31
-      m.m32 =: h.m32
-      m.m33 =: h.m33
-      m.m34 =: h.m34
-      m.m41 =: h.m41
-      m.m42 =: h.m42
-      m.m43 =: h.m43
-      m.m44 =: h.m44
+    // with picking view, but would require infinitely extending picking zones :-/
+    //      dragging -> in_upper_zone  (picking_view.dragging.upper_limit.enter)   // ~[-]   // FIXME no message/warning when path is erroneous
+    // in_upper_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]
 
-      //m.m11 =:> tp.input
-      */
+    //      dragging -> in_lower_zone  (picking_view.dragging.lower_limit.enter)   // ~[_]
+    // in_lower_zone -> dragging       (picking_view.dragging.dragging_zone.enter) // ~[=]

@@ -5,18 +5,17 @@
             "includePath": [
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/build/src",
+                "${workspaceFolder}/build/cookbook/**",
                 "${workspaceFolder}/../djnn-cpp/src",
                 "${workspaceFolder}/cookbook/comms/ros2",
-                "/usr/local/include",
-                "/opt/**",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/**"
             ],
-            "compilerPath": "/usr/bin/clang",
+            //"compilerPath": "/usr/bin/clang",
             "defines": [],
             "macFrameworkPath": [],
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            //"intelliSenseMode": "clang-x64"
         }
     ],
     "version": 4

@@ -22,7 +22,7 @@ endif
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	@$(smalac) -cpp $^ -builddir $(build_dir)
+	$(smalac) -cpp $^ -builddir $(build_dir)
 else
 	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)

@@ -12,14 +12,19 @@
  *
  */
 
-// MDPC(ti) scrollbar
+// MDPC scrollbar, or
+// M(t)DP(i)C scrollbar
+// MDPC is a model for interactive graphical objects, which can be considered as a refinement of MVC
+// It is notoriously difficult to cleanly separate the View and the controller in MVC (see https://www.oracle.com/java/technologies/a-swing-architecture.html)
+// "We quickly discovered that this split didn't work well in practical terms because the view and controller parts of a component required a tight coupling (for example, it was very difficult to write a generic controller that didn't know specifics about the view). So we collapsed these two entities into a single UI (user-interface) object,"
+// With MDPC, we apply the "separation of concerns" down to the MVC Controller, which enables to cleanly separate the View and the Controller
 
-// M = model - the abstraction, here two values (low,hi) in range [0;1], and operations (add to low and hi, including negative deltas)
+// M = model - the abstraction. Here two values (low,hi) in range [0;1], and two operations (add to low and hi, including negative deltas)
+// transform = transforms the model into the display and the picking views
 // D = display view - what the user actually sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
 // P = picking view - what the user actually manipulates, without seeing it:   |O|**|    |@@@@@|8| (left arrow, left-to-thumb, thumb, right-to-thumb, right arrow)
-// C = controller - manages the interactive state and _triggers_ the translation of user's actions into model operations
-// transform = transforms the model into the display and the picking views
-// inverse transform = inverse-transforms user's actions and translates them into model operations
+// inverse transform = inverse-transforms user's actions in the screen coordinate system into the model coordinate system
+// C = controller - manages the interactive state, translates them into model operations by relying on the inverse transform, triggers the operations
 
 // with this architecture, the scrollbar can be arbitrarily transformed:
 // translated, scaled by any amount, 90° rotation from vertical to horizontal, or any rotation.
@@ -188,7 +193,7 @@ Scrollbar(Process f) {
     }
 
     Component dragging {
-      // vv maybe useless since we use a transformed analytical computation anyway
+      // vv maybe useless since we use a transformed analytical computation anyway, keep it for explanation/debugging purpose
       FillOpacity _(0.5)
       FillColor _ (0,255,0) // green
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
@@ -222,24 +227,16 @@ Scrollbar(Process f) {
         dragging_zone.y + dragging_zone.height =:> lower_limit.y
 	         win_height_in_model - lower_limit.y =:> lower_limit.height
       
-      // ^^ maybe useless since we use a transformed analytical computation anyway
+      // ^^ maybe useless since we use a transformed analytical computation anyway, keep it for explanation/debugging purpose
+      
+      // A picking view would require that the upper and lower zone fill-up the entire screen
+      // this is both inefficient (fill-rate!!), but also requires to compute coordinates according to the current transformation...
+      
 
-      // transform boundaries to test position of cursor
-      /*Double pick_offset_rel (0)
-      pick_offset_in_model - zero_in_model =:> pick_offset_rel
-      Double cursor_in_model (0)
-      inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
-      Bool delta(0)
-      cursor_in_model - pick_offset_rel =:> delta
-      Bool higher(0)
-      delta > 1 =:> higher
-      Bool lower(0)
-      delta < 0 =:> lower
-      //"--" =:> tp.input
-      TextPrinter tp
-      "higher " + toString(higher) + " " + toString(delta) =:> tp.input
-      "lower " + toString(lower) + " " + toString(delta) =:> tp.input*/
-
+      // transformed analytical computation
+      // ...so use a transformed analytical computation instead
+      // this computes the position of the initial press in the model coordinate system and assess if it's between the boundaries
+      
       Double cursor_in_model (0)
       inverse_transform _(transform, f.move.x, f.move.y, cursor_in_model)
 
@@ -247,13 +244,17 @@ Scrollbar(Process f) {
       cursor_in_model > dragging_zone.y + dragging_zone.height =:> higher
       Bool lower (0)
       cursor_in_model < dragging_zone.y =:> lower
+      
+      //Bool inside (0) // don't use it for now, to keep "compatibility/similarity" with picking view code
+      //!higher && !lower =:> inside
+      
       //TextPrinter tp
-      //"lower " + lower + " higher " + higher =:> tp.input
+      //"inside " + inside + " lower " + lower + " higher " + higher =:> tp.input
     } 
   }
 
   // -----------------
-  // Controller == management of interactive state alone, with an FSM
+  // Controller == management of interactive state, with an FSM
 
   DoubleProperty lastv (0)
 
@@ -293,6 +294,7 @@ Scrollbar(Process f) {
       f.press.x =: picking_view.hyst.c.cx
       f.press.y =: picking_view.hyst.c.cy
 
+      // initialize inverse transform from user actions to model operations
       inverse_transform iv(transform, f.press.x, f.press.y, lastv)
     }
 
@@ -309,7 +311,7 @@ Scrollbar(Process f) {
         - (v - lastv) =: dv
         // remember last pos
         v =: lastv
-        // apply to model
+        // transform actions into operations on the model, and apply them
         dv + model.low  =: model.low
         dv + model.high =: model.high
       }
@@ -330,6 +332,7 @@ Scrollbar(Process f) {
         model.delta =: model.high
       }
     }
+
 
     // transitions                                                              //  UAN User-Action Notation https://www.semanticscholar.org/paper/The-UAN%3A-A-User-Oriented-Representation-for-Direct-Hartson-Siochi/97a593273fca9460ce05f32031896b752de4dcb9/figure/16
 

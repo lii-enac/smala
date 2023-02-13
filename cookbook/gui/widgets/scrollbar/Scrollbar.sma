@@ -14,16 +14,17 @@
 
 // MDPC scrollbar, or
 // M(t)DP(i)C scrollbar
-// MDPC is a model for interactive graphical objects, which can be considered as a refinement of MVC
-// It is notoriously difficult to cleanly separate the View and the controller in MVC (see https://www.oracle.com/java/technologies/a-swing-architecture.html)
-// "We quickly discovered that this split didn't work well in practical terms because the view and controller parts of a component required a tight coupling (for example, it was very difficult to write a generic controller that didn't know specifics about the view). So we collapsed these two entities into a single UI (user-interface) object,"
-// With MDPC, we apply the "separation of concerns" down to the MVC Controller, which enables to cleanly separate the View and the Controller
+// MDPC is a model for interactive graphical objects, which can be considered as a refinement of MVC.
+// With MVC, it is notoriously difficult to cleanly separate the View and the controller (see https://www.oracle.com/java/technologies/a-swing-architecture.html)
+//  "We quickly discovered that this split didn't work well in practical terms because the view and controller parts of a component required a tight coupling (for example, it was very difficult to write a generic controller that didn't know specifics about the view). So we collapsed these two entities into a single UI (user-interface) object,"
+// With MDPC, we apply the "separation of concerns" down to the MVC Controller, which enables designers to cleanly separate the View and the Controller
+// MDPC could have been named MtDPiC:
 
-// M = model - the abstraction. Here two values (low,hi) in range [0;1], and two operations (add to low and hi, including negative deltas)
-// transform = transforms the model into the display and the picking views
+// M = model - the abstraction. Here two values (low,hi) in range [0;1], and two operations (add to low and hi, including negative deltas). An _illustration_ of the Model is: 0--|--|---1
+// t = transform - transforms the model into the display and the picking views
 // D = display view - what the user actually sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
 // P = picking view - what the user actually manipulates, without seeing it:   |O|**|    |@@@@@|8| (left arrow, left-to-thumb, thumb, right-to-thumb, right arrow)
-// inverse transform = inverse-transforms user's actions in the screen coordinate system into the model coordinate system
+// i = inverse transform - inverse-transforms user's actions in the screen coordinate system into the model coordinate system
 // C = controller - manages the interactive state, translates them into model operations by relying on the inverse transform, triggers the operations
 
 // with this architecture, the scrollbar can be arbitrarily transformed:
@@ -72,6 +73,8 @@ Scrollbar(Process f) {
 
   // -----------------
   // Transform
+
+  // The 'model' of the transform: a translation, a scaling, and a rotation  
   Component transform {
     Double tx (200)
     Double ty (100)
@@ -85,7 +88,7 @@ Scrollbar(Process f) {
     sin(0.01745329251 * transform.rot) =:> sina
   }
 
-  // graphical transform
+  // the transform implemented as a graphical transform to generate de Display and Picking views
   Rotation    rot(0,0,0)
   Translation tr(0,0)
   Scaling     sc(1,1, 0,0)
@@ -103,6 +106,8 @@ Scrollbar(Process f) {
 
   NoOutline _
 
+  // the display view is the same regardless of the status of the interaction
+  // it's thus a single Component
   Component display_view {
     
     FillColor   _ (255,255,255) // white
@@ -139,7 +144,8 @@ Scrollbar(Process f) {
   // Picking view
   Int xoffset(300) // display the picking view 300 pixels to the right of the display view for demonstration purpose
 
-  // a picking view has a state that depends on the status of the interaction (see controller)
+  // the picking view has a state that depends on the status of the interaction (see controller)
+  // so let's make it a Switch
   Switch picking_view (initial) {
 
     Component initial {
@@ -252,6 +258,7 @@ Scrollbar(Process f) {
       //"inside " + inside + " lower " + lower + " higher " + higher =:> tp.input
     } 
   }
+
 
   // -----------------
   // Controller == management of interactive state, with an FSM

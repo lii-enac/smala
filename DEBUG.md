@@ -19,6 +19,11 @@ You can use several option to debug on smala :
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US  = 1000 // microsecond
   _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 1|0 // will display only the targeted process or full_stack (O)
 
+## paintevent and Layer recomputation
+
+  _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0|1
+  _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 0|1
+
 ## example : 
 
 _main_

@@ -21,15 +21,15 @@
 // MDPC could have been named MtDPiC:
 
 // M = model - the abstraction. Here two values (low,hi) in range [0;1], and two operations (add to low and hi, including negative deltas). An _illustration_ of the Model is: 0--|--|---1
-// t = transform - transforms the model into the display and the picking views
-// D = display view - what the user actually sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
-// P = picking view - what the user actually manipulates, without seeing it:   |O|**|    |@@@@@|8| (left arrow, left-to-thumb, thumb, right-to-thumb, right arrow)
-// i = inverse transform - inverse-transforms user's actions in the screen coordinate system into the model coordinate system
-// C = controller - manages the interactive state, translates them into model operations by relying on the inverse transform, triggers the operations
+// t = transform - transforms the model into the display and the picking views. Typically a scaling that maps [0;1] to [min;max], a translation to place the scrollbar on the screen, and an orientation to select horizontal or vertical.
+// D = display view - what the user sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
+// P = picking view - what the user actually manipulates, without seeing it:   |O|**|@@@|$$$$$|8| (0:left arrow, *:left-to-thumb, @:thumb, $:right-to-thumb, 8:right arrow)
+// i = inverse transform - inverse-transforms user's actions back from the screen coordinates into the model coordinates
+// C = controller - manages the interactive state, translates them into model operations by relying on the inverse transform, triggers the model operations
 
 // with this architecture, the scrollbar can be arbitrarily transformed:
-// translated, scaled by any amount, 90° rotation from vertical to horizontal, or any rotation.
-// thanks to the picking view and the inverse transform the controller code is simple and independent of the transform
+// scaled by any amount, translated in any place, 90° rotation from vertical to horizontal, or any rotation (as in the example).
+// thanks to the picking view and the inverse transform the controller code is simple and independent of the transform.
 
 // see:
 // Conversy, S., Barboni, E., Navarre, D., Palanque, P. Improving modularity of interactive software with the MDPC architecture. IFIP EIS 2007.
@@ -84,8 +84,8 @@ Scrollbar(Process f) {
     // impl
     Double sina (0)
     Double cosa (0)
-    cos(0.01745329251 * transform.rot) =:> cosa
-    sin(0.01745329251 * transform.rot) =:> sina
+    cos(transform.rot * 3.1415 / 180.) =:> cosa
+    sin(transform.rot * 3.1415 / 180.) =:> sina
   }
 
   // the transform implemented as a graphical transform to generate de Display and Picking views

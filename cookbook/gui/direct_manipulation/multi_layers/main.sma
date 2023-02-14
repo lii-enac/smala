@@ -22,29 +22,33 @@ use gui
 _main_
 Component root {
 
-  _DEBUG_SEE_COLOR_PICKING_VIEW = 1
+  // _DEBUG_SEE_COLOR_PICKING_VIEW = 0
+  // _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0
+  _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 1
 
   Frame f ("3 layers", 0, 0, 600, 600)
   Exit ex (0, 1)
   f.close -> ex
 
-  // Layer BigL {
-
-  //Component LRed {
-  Layer LRed (0, 0, 300, 300) {
+  Layer LRed (0, 0, 0, 0) {
     Translation _ (0, 0)
     FillColor _ (Red)
-    Rectangle r_red (10, 10, 280, 280, 0, 0)
+    Rectangle r_red (10, 10, 280 , 280, 0, 0)
+    FillColor _ (Orange)
+    Circle r_orange (0, 0, 60)
+    r_red.width =:> r_orange.cx
+    r_red.height =:> r_orange.cy
 
     r_red.press -> (r_red) {
       r_red.width = r_red.width - 5
       r_red.height = r_red.height - 5
     }
   }
-
-  //Component LGreen {
+  f.width / 2 =: LRed.w
+  f.height/ 2 =: LRed.h
+  
   Layer LGreen (0, 300, 300, 300) {
-    Translation _ (0, 300)
+    Translation t (0, 300)
     FillColor _ (Green)
     Rectangle r_green (10, 10, 280, 280, 0, 0)
 
@@ -53,10 +57,9 @@ Component root {
       r_green.height = r_green.height - 5
     }
   }
-
-  //Component LBlue {
+  
   Layer LBlue (300, 0, 300, 300) {
-    Translation _ (300, 0)
+    Translation t (300, 0)
     FillColor _ (Blue)
     Rectangle r_blue (10, 10, 280, 280, 0, 0)
 
@@ -66,24 +69,22 @@ Component root {
     }
   }
 
-  //Component Clock {
-  Layer Lclock (300, 300, 300, 300) {
-    Translation _ (300, 300)
+  Layer LBlack (300, 300, 300, 300) {
+    Translation t (300, 300)
     OutlineColor _ (Red)
     NoFill _
-    Rectangle r_clock (10, 10, 280, 280, 0, 0)
+    Rectangle r_Black (10, 10, 280, 280, 0, 0)
+  }
 
+  Component c_clock {
     WallClock wc
     FillColor _ (White)
-    Text text_clock (50, 50, "default")
+    Text text_clock (350, 350, "default")
     wc.state_text =:> text_clock.text
+
+    Text text_expl (350, 400, "Clock should not damage Layers")
     
     Clock clock_trigger (250)
     clock_trigger.tick -> wc.state_text
-
   }
-
-  //} Layer BigL
-
-
 }

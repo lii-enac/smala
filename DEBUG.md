@@ -24,6 +24,10 @@ You can use several option to debug on smala :
   _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0|1
   _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 0|1
 
+## display the tree structure of component's destruction to see on which component destruction warning appears
+
+  _DEBUG_SEE_COMPONENTS_DESTRUCTION_TREE = 0|1
+
 ## example : 
 
 _main_

@@ -76,10 +76,10 @@ Scrollbar(Process f) {
 
   // The 'model' of the transform: a translation, a scaling, and a rotation  
   Component transform {
-    Double tx (200)
-    Double ty (100)
-    Double  s (100)
-    Double rot (10)
+    Double tx (0)
+    Double ty (0)
+    Double  s (1)
+    Double rot (0)
 
     // impl
     Double sina (0)
@@ -88,21 +88,24 @@ Scrollbar(Process f) {
     sin(transform.rot * 3.1415 / 180.) =:> sina
   }
 
-  // the transform implemented as a graphical transform to generate de Display and Picking views
+  Double width (10)
+  Double arrow_height(10)
+
+  // the transform implemented as a graphical transform to generate the Display and Picking views
   Rotation    rot(0,0,0)
   Translation tr(0,0)
   Scaling     sc(1,1, 0,0)
-  
+  //Rotation    rot(0,0,0)
+
   transform.rot =:> rot.a
-  transform.tx  =:> tr.tx
-  transform.ty  =:> tr.ty
+  transform.tx  =:> tr.tx, rot.cx
+  transform.ty  =:> tr.ty, rot.cy
   transform.s   =:> sc.sy
 
 
   // -----------------
   // Display view
-  Double width (100)
-  Double arrow_height(100)
+
 
   NoOutline _
 
@@ -111,11 +114,11 @@ Scrollbar(Process f) {
   Component display_view {
     
     FillColor   _ (255,255,255) // white
-    Rectangle   more_arrow (0,0,1,1,0,0) // ^
+    Rectangle   more_arrow_bg (0,0,1,1,0,0) // ^
     FillColor   _ (200,200,200) // gray
     Rectangle   bg (0,0,1,1,0,0)        // []
     FillColor   _ (255,255,255) // white
-    Rectangle   less_arrow (0,0,1,1,0,0) // v
+    Rectangle   less_arrow_bg (0,0,1,1,0,0) // v
 
     // thumb on top
     FillColor   _ (150,150,255) // grayblue
@@ -124,15 +127,15 @@ Scrollbar(Process f) {
     // 'one-way constraint' or data-flow of position/size of each zone for a regular scrollbar display layout
     // transforms the model into a display view (background + arrows + thumb)
 
-                                         width =:> more_arrow.width, bg.width, thumb.width, less_arrow.width
-                                             0 =:> more_arrow.x, bg.x, thumb.x, less_arrow.x
+                                         width =:> more_arrow_bg.width, bg.width, thumb.width, less_arrow_bg.width
+                                  0 - width/2  =:> more_arrow_bg.x, bg.x, thumb.x, less_arrow_bg.x
 
-                                             0 =:> more_arrow.y 
-                    arrow_height / transform.s =:> more_arrow.height
-              more_arrow.y + more_arrow.height =:> bg.y
+                                             0 =:> more_arrow_bg.y 
+                    arrow_height / transform.s =:> more_arrow_bg.height
+              more_arrow_bg.y + more_arrow_bg.height =:> bg.y
                                              1 =:> bg.height
-                              bg.y + bg.height =:> less_arrow.y
-                    arrow_height / transform.s =:> less_arrow.height
+                              bg.y + bg.height =:> less_arrow_bg.y
+                    arrow_height / transform.s =:> less_arrow_bg.height
 
                          (1-model.high) + bg.y =:> thumb.y
                                    model.delta =:> thumb.height
@@ -142,7 +145,7 @@ Scrollbar(Process f) {
 
   // -----------------
   // Picking view
-  Int xoffset(300) // display the picking view 300 pixels to the right of the display view for demonstration purpose
+  Int pick_xoffset(0) // display the picking view to the right of the display view by xoffset for demonstration purpose
 
   // the picking view has a state that depends on the status of the interaction (see controller)
   // so let's make it a Switch
@@ -150,24 +153,29 @@ Scrollbar(Process f) {
 
     Component initial {
 
-      FillColor _ (0,255,0)//green
+      NoFill _
+      NoOutline _
+      PickFill _
+      NoPickOutline _
+      
+      //FillColor _ (0,255,0)//green
       Rectangle more_arrow (0,0,1,1,0,0)  // ^
-      FillColor _ (0,255,255)//cyan
+      //FillColor _ (0,255,255)//cyan
       Rectangle more_bg (0,0,1,1,0,0)     // ||
-      FillColor _ (255,255,0)//yellow
+      //FillColor _ (255,255,0)//yellow
       Rectangle less_bg (0,0,1,1,0,0)     // ||
-      FillColor _ (255,0,0)//red
+      //FillColor _ (255,0,0)//red
       Rectangle less_arrow (0,0,1,1,0,0)  // v
 
       // thumb on top
-      FillColor _ (255,0,255)//purple
+      //FillColor _ (255,0,255)//purple
       Rectangle thumb (0,0,1,1,0,0)       // =
      
       // 'one-way constraint' or data-flow of position/size of each zone for a classical scrollbar picking layout in idle state
       // transforms the model into a picking view (background + arrows + thumb)     
 
                                          width =:> more_arrow.width, more_bg.width, thumb.width, less_bg.width, less_arrow.width
-                                   0 + xoffset =:> more_arrow.x,     more_bg.x,     thumb.x,     less_bg.x,     less_arrow.x
+                    0 - width/2 + pick_xoffset =:> more_arrow.x,     more_bg.x,     thumb.x,     less_bg.x,     less_arrow.x
 
                                              0 =:> more_arrow.y    // ^
                     arrow_height / transform.s =:> more_arrow.height
@@ -185,6 +193,7 @@ Scrollbar(Process f) {
     Component hyst {
       // the hysteresis circle is in screen space, so we inverse the graphical transform
       // should be LoadIdentity() it would be more efficient and on par with the semantics
+      //Rotation    rot(0,0,0)
       Scaling     sc(1,1, 0,0)
       Translation tr(0,0)
       Rotation    rot(0,0,0)
@@ -194,18 +203,32 @@ Scrollbar(Process f) {
        -transform.ty  =:> tr.ty
       1/transform.s   =:> sc.sy
 
-      FillColor fc (255, 0, 0)
+        transform.tx  =:> rot.cx
+        transform.ty  =:> rot.cy
+
+      NoFill _
+      NoOutline _
+      PickFill _
+      NoPickOutline _
+
+      //FillColor fc (255, 255, 0)
       Circle    c (0,0, 5)                   // °
     }
 
     Component dragging {
       // vv maybe useless since we use a transformed analytical computation anyway, keep it for explanation/debugging purpose
-      FillOpacity _(0.5)
-      FillColor _ (0,255,0) // green
+      //FillOpacity _(0.5)
+
+      NoFill _
+      NoOutline _
+      PickFill _
+      NoPickOutline _
+
+      //FillColor _ (0,255,0) // green
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
-      FillColor _ (0,255,255) // cyan
+      //FillColor _ (0,255,255) // cyan
       Rectangle dragging_zone (0,0,1,1,0,0)  // || (=)
-      FillColor _ (255,0,0) // red
+      //FillColor _ (255,0,0) // red
       Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
 
       Double pick_offset_in_model (0)
@@ -220,7 +243,7 @@ Scrollbar(Process f) {
      
       // 'one-way constraint' or data-flow of position/size for a classical scrollbar picking layout in dragging state
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
-                                       xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
+                    0 - width/2 + pick_xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
                                  zero_in_model =:> upper_limit.y
 

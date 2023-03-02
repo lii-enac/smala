@@ -28,6 +28,11 @@ You can use several option to debug on smala :
 
   _DEBUG_SEE_COMPONENTS_DESTRUCTION_TREE = 0|1
 
+##  disable touch event  (especially for macos trackpad)
+
+  _DEBUG_NO_TOUCH_EVENT = 0|1
+
+
 ## example : 
 
 _main_

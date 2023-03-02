@@ -21,11 +21,15 @@ import gui.widgets.IWidget
 _define_
 PushButton (string _label) inherits IWidget () {
   /*----- interface -----*/
-  Spike click
-  Spike release
-  Spike select
+  Spike click   // FIXME? should be past simple: 'clicked', or better: 'triggered' ("less" linked to the particular interaction that triggered it)
+  Spike release // FIXME? should be past simple: 'released'
+  Spike select  // _no_ FIXME: this is one is an action(?)
+  // Spike trigger // action: should animate a triggering
+  // Spike silent_trigger // action: should trigger with no animation
+
   /*----- interface -----*/
 
+  Int disabled_color (#959595)
   Int idle_color (#323232)
   Int pressed_color (#959595)
   Int text_color (#ffffff)
@@ -42,6 +46,9 @@ PushButton (string _label) inherits IWidget () {
     State idle {
       idle_color =: fc.value
     }
+    State disabled {
+      disabled_color =: fc.value
+    }
     State selected {
       OutlineColor _ (White)
       double[] pattern = [2.0, 2.0]
@@ -57,6 +64,12 @@ PushButton (string _label) inherits IWidget () {
     State out {
       idle_color =: fc.value
     }
+    disabled -> idle     (this.enable,  this.enabled)
+        idle -> disabled (this.disable, this.disabled)
+    selected -> disabled (this.disable, this.disabled)
+     pressed -> disabled (this.disable, this.disabled)
+         out -> disabled (this.disable, this.disabled)
+
     idle->pressed (r.press)
     idle->selected (select)
     selected->pressed (r.press)

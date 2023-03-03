@@ -24,9 +24,11 @@ You can use several option to debug on smala :
   _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0|1
   _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 0|1
 
-## display the tree structure of component's destruction to see on which component destruction warning appears
+## display info on destrcutions
+## level 1: display execution graph infos on coupling in the warnings
+## level 2: display the tree structure of component's destruction
 
-  _DEBUG_SEE_COMPONENTS_DESTRUCTION_TREE = 0|1
+  _DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 0|1|2
 
 ##  disable touch event  (especially for macos trackpad)
 

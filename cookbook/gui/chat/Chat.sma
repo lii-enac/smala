@@ -20,7 +20,8 @@ Chat (double _x, double _y, Process frame) {
     //RectangleClip cpr_(0,0,800,800) // does not really work in a responsive interface...
     Translation pos (_x, _y)
     FillColor _(White)
-    Rectangle bg_dial (0, 0, 400, 486)
+    Rectangle bg_dial (0, 0, 390, 486)
+    Rectangle _ (390, 0, 10, 486)
     Component sub {
         RectangleClip clip (0, 0, 300, 350)
         bg_dial.{x,y,width} =:> clip.{x,y,width}
@@ -33,7 +34,7 @@ Chat (double _x, double _y, Process frame) {
 
     Scrollbar sb (400, 0, bg_dial, frame)
     bg_dial.height - 36 =:> sb.height
-    bg_dial.width - 7 =:> sb.x
+    bg_dial.width + 5 =:> sb.x
     MyTextField edit (0, 520, 400)
     
     bg_dial.height - 13 =:> edit.y
@@ -41,10 +42,11 @@ Chat (double _x, double _y, Process frame) {
     send.initial_state = "disabled"
     edit.width - 24 =:> send.x
     edit.y + 2 =:> send.y
-    bg_dial.width =:> edit.width
+    bg_dial.width + 10 =:> edit.width
     toString(edit.field.content.text) != "" -> send.enable
     toString(edit.field.content.text) == "" -> send.disable
-
+    0 =: sb.model.low
+    1 =: sb.model.high
     /*
     conversation aka this.main_box.items.[1].items.[1]
     conversation_tr aka this.main_box.items.[1].items.[1].g.tr
@@ -73,7 +75,7 @@ Chat (double _x, double _y, Process frame) {
     toString(edit.field.content.text) == "" -> send.disable
     */
     addChildrenTo this.conversation {
-        Bubble b ("initial commit", 0, 0, 0)
+        Bubble b ("initial commit", 0, 0, bg_dial)
         //b.ui.text = 
         //b.v_alignment = 2 // FIXME does not seem to be working
     }
@@ -86,7 +88,7 @@ Chat (double _x, double _y, Process frame) {
 
         addChildrenTo this.conversation {
             string txt = toString(this.edit.field.content.text)
-            Bubble b (txt, 0, y, 1)
+            Bubble b (txt, y, 1, this.bg_dial)
             //b.ui.text = 
             //b.v_alignment = 2 // FIXME does not seem to be working
         }

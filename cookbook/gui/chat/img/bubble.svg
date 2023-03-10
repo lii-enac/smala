@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="150"
+   height="150"
+   viewBox="0 0 150 150"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
+   sodipodi:docname="bubble.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     showguides="true"
+     inkscape:zoom="4"
+     inkscape:cx="63.875"
+     inkscape:cy="4.25"
+     inkscape:window-width="1647"
+     inkscape:window-height="1212"
+     inkscape:window-x="327"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1">
+    <sodipodi:guide
+       position="51.618795,106"
+       orientation="0,-1"
+       id="guide3843"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="bubble">
+      <rect
+         style="fill:#6f9bad;fill-opacity:1;stroke-linecap:round;stroke-linejoin:round"
+         id="main_rect"
+         width="100"
+         height="30"
+         x="8.2101364"
+         y="14"
+         ry="15" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:1.25;font-family:B612;-inkscape-font-specification:B612;fill:#ffffff;fill-opacity:1"
+         x="18.210136"
+         y="35.6735"
+         id="content">Test</text>
+      <path
+         style="fill:#6f9bad;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 8.210136,29 c 0,8.190952 -3.7164489,11.419387 -8.210136,15 5.5407419,0 10.519614,0 14.677723,-4.604865"
+         id="left_arrow"
+         sodipodi:nodetypes="ccc" />
+      <path
+         style="fill:#6f9bad;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 6.46758,29 c 0,8.190952 3.71645,11.419387 8.21014,15 C 9.13698,44 4.15811,44 0,39.395135"
+         id="right_arrow"
+         sodipodi:nodetypes="ccc" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:B612;-inkscape-font-specification:B612"
+       x="10"
+       y="9.585"
+       id="time">09:55</text>
+  </g>
+</svg>

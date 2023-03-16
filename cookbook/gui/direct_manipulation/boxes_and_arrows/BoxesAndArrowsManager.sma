@@ -37,6 +37,7 @@ BoxesAndArrowsManager (Process _gui)
   Spike cancel
   cancel->(this) {
     arrow = getRef (this.cur_arrow)
+    setRef (this.cur_arrow, null)
     if (&arrow != null) {
       delete arrow
     }

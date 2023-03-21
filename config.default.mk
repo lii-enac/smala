@@ -18,6 +18,15 @@ cookbook_apps_extra :=
 
 #C++ flags 
 #CFLAGS_COMMON += -g
+#LDFLAGS_COMMON +=
+
+#Sanitizer 
+#CFLAGS_COMMON += -fsanitize=thread -O1
+#LDFLAGS_COMMON += -fsanitize=thread
+#CFLAGS_COMMON += -fsanitize=address -O1
+#LDFLAGS_COMMON += -fsanitize=address
+#CFLAGS_COMMON += -fsanitize=memory -O1
+#LDFLAGS_COMMON += -fsanitize=memory
 
 # cross-compile support
 #cross_prefix := em

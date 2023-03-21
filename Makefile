@@ -245,16 +245,6 @@ endif
 YACC ?= bison
 LEX ?= flex
 
-
-#CFLAGS += -fsanitize=thread -O1
-#LDFLAGS += -fsanitize=thread
-
-#CFLAGS += -fsanitize=address -O1
-#LDFLAGS += -fsanitize=address
-
-#CFLAGS += -fsanitize=memory -O1
-#LDFLAGS += -fsanitize=memory
-
 # -----------
 # smalac
 

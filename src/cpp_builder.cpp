@@ -1691,7 +1691,7 @@ namespace Smala
           os << new_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_name << "));\n";
           m_indent -= 1;
           indent (os);
-          os << new_name << "->schedule_delete ();\n";
+          os << new_name << "->schedule_deletion ();\n";
           indent (os);
           os << new_name << " = nullptr;\n";
           m_indent -= 1;
@@ -1730,7 +1730,7 @@ namespace Smala
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
           indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
           indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_child_name << "));\n";
-          indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_delete ();\n";
+          indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_deletion ();\n";
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << " = nullptr;\n";
           indent (os); indent (os); indent (os); os << "}\n";
           /* end replicate of DELETE */

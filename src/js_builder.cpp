@@ -1139,7 +1139,7 @@ namespace Smala
         indent (os);
         os << "remove_child (get_parent (" << new_name << "), " << new_name << ");\n";
         indent (os); indent (os);
-        os << "schedule_delete (" << new_name << ");\n";
+        os << "schedule_deletion (" << new_name << ");\n";
         indent (os); indent (os);
         os << new_name << " = null;\n";
         indent (os);

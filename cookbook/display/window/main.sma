@@ -24,22 +24,31 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-  FillColor w (White)
-  Text txt (100, 300, "Click anywhere on the Window to modify background opacity and color")
-  FillColor g (0, 255, 0)
-  Rectangle r (10, 10, 50, 50)
-  FillColor g (255, 0, 0)
-  Circle  c (60, 60, 30)
 
-  // init the background_opacity and color before the frame activation
-  f.background_opacity = 0.5
-  // f.background_color.r = 0
-  // f.background_color.g = 0
-  // f.background_color.b = 0
- 
-  f.press.x / 900 => f.background_opacity
-  (f.press.x / 900) * 255 =>  f.background_color.b
+  // important note: 
+  // for a full transparent frame you HAVE to set f.frameless = 1
+  f.frameless = 1
+  f.background_opacity = 0.3
+  f.background_color.r = 0
+  f.background_color.g = 0
+  f.background_color.b = 255
 
-  Timer t(2000)
-  t.end -> { 900 =: f.width }
+  //then not transparent component
+  Component rect_close {
+    FillColor _ (Red)
+    Rectangle r (0, 0, 20, 20)
+  }
+  rect_close.r.press -> ex
+
+  Component Group {
+    Translation _ (100, 100)
+    FillColor w (White)
+    Text txt (0, 30, "for a full transparent frame you HAVE to set f.frameless = 1")
+    FillColor g (0, 255, 0)
+    Rectangle r (0, 60, 50, 50)
+    FillColor g (255, 0, 0)
+    Circle  c (60, 80, 30)
+  }
+
+  
 }

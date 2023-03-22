@@ -42,7 +42,7 @@ cpp_action(Process *p)
     VideoCapture cap;
     
     // open the default camera using default API
-    // cap.open(0);
+    cap.open(0);
     
     // OR advance usage: select any API backend
     // int deviceID = 0;             // 0 = open default camera
@@ -51,12 +51,12 @@ cpp_action(Process *p)
     // cap.open(deviceID, apiID);
     
     // OR remote stream
-    string url =
-        "rtsp://rtsp.stream/pattern"
+    //string url =
+        //"rtsp://rtsp.stream/pattern"
         //"rtsp://rtsp.stream/movie"
         //"rtsp://admin:123456@192.168.1.216/H264?ch=1&subtype=0"
-    ;
-    cap.open(url);
+    //;
+    //cap.open(url);
 
     // check if we succeeded
     if (!cap.isOpened()) {

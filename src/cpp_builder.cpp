@@ -1505,7 +1505,7 @@ namespace Smala
     vector<string> tmpl_types;
 
     struct_stream << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
-    struct_stream << "\t" << native_name_struct << R"( (ParentProcess *p, const djnn::string &n, bool string_setter, bool isModel)
+    struct_stream << "\t" << native_name_struct << R"( (CoreProcess *p, const djnn::string &n, bool string_setter, bool isModel)
       : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
@@ -1688,7 +1688,7 @@ namespace Smala
           os << "if (" << new_name << "->get_parent ())\n";
           m_indent += 1;
           indent (os);
-          os << new_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_name << "));\n";
+          os << new_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_name << "));\n";
           m_indent -= 1;
           indent (os);
           os << new_name << "->schedule_deletion ();\n";
@@ -1729,7 +1729,7 @@ namespace Smala
           indent (os); indent (os); indent (os); os << "if (" << new_child_name << ") {\n";
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
           indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
-          indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<FatChildProcess*>(" << new_child_name << "));\n";
+          indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_child_name << "));\n";
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_deletion ();\n";
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << " = nullptr;\n";
           indent (os); indent (os); indent (os); os << "}\n";
@@ -1852,7 +1852,7 @@ namespace Smala
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << whatever_name << "\", ";
-    os << "dynamic_cast<FatChildProcess*>(" << arg << "));\n";
+    os << "dynamic_cast<CoreProcess*>(" << arg << "));\n";
     indent (os);
     os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
         << "->find_child ( \"" << whatever_name + "\");\n";
@@ -1884,7 +1884,7 @@ namespace Smala
     std::string right = build_find (n->right_arg (), false);
     build_properties (os);
     indent (os);
-    os << left << "->remove_child ( dynamic_cast<FatChildProcess*>(" << right << "));\n";
+    os << left << "->remove_child ( dynamic_cast<CoreProcess*>(" << right << "));\n";
   }
 
   void
@@ -1899,12 +1899,12 @@ namespace Smala
       std::string last = build_find (n->right_arg (), false);
       build_properties (os);
       indent (os);
-      os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
+      os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*>(" << left << "), "
               << c << ", " << last << ");\n";
     }
     else {
       indent (os);
-      os << left << "->get_parent ()->move_child (dynamic_cast<FatChildProcess*>(" << left << "), "
+      os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*>(" << left << "), "
         << c << ", nullptr);\n";
     }
   }
@@ -1951,7 +1951,7 @@ namespace Smala
     if (parent == m_null_symbol)
       return;
     indent (os);
-    os << parent << "->add_child (dynamic_cast<FatChildProcess*>(" << child << "), \"" << name << "\");\n";
+    os << parent << "->add_child (dynamic_cast<CoreProcess*>(" << child << "), \"" << name << "\");\n";
   }
 
   void
@@ -2058,7 +2058,7 @@ namespace Smala
     
     //m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
 
-    os << "ParentProcess*\n" << node->name () << " (ParentProcess *p, const string &n";
+    os << "CoreProcess*\n" << node->name () << " (CoreProcess *p, const string &n";
     std::vector< named_parameter_t > data = node->get_args_spec();
     for (int j = 0; j < data.size (); j++) {
       named_parameter_t arg = data.at (j);
@@ -2332,8 +2332,8 @@ namespace Smala
         os << "#include \"core/control/native_action.h\"\n\n";
         set_include = true;
       }
-      os << "djnn::ParentProcess* " << def->name ()
-          << " (djnn::ParentProcess*, const djnn::string &";
+      os << "djnn::CoreProcess* " << def->name ()
+          << " (djnn::CoreProcess*, const djnn::string &";
       for (int j = 0; j < def->args ().size (); j++) {
         named_parameter_t arg = def->args ().at (j);
         os << ", ";

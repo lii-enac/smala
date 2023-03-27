@@ -989,7 +989,7 @@ namespace Smala
 
     os << "\n";
     os << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
-    os << "\t" << native_name_struct << R"( (ParentProcess *p, const std::string &n, bool string_setter, bool isModel)
+    os << "\t" << native_name_struct << R"( (CoreProcess *p, const std::string &n, bool string_setter, bool isModel)
       : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
     {
       set_is_model (isModel);
@@ -1537,8 +1537,8 @@ namespace Smala
     os << "#pragma once\n#include <string>\n\n";
     for (int i = 0; i < m_ast.define_node_list ().size (); i++) {
       Node *def = m_ast.define_node_list ().at (i);
-      os << "djnn::ParentProcess* " << def->name ()
-          << " (djnn::ParentProcess*, const std::string &";
+      os << "djnn::CoreProcess* " << def->name ()
+          << " (djnn::CoreProcess*, const std::string &";
       for (int j = 0; j < def->args ().size (); j++) {
         std::pair<SmalaType, std::string> arg = def->args ().at (j);
         os << ", ";

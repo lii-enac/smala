@@ -17,7 +17,7 @@ using namespace djnn;
 class RosSubscriber : public FatProcess, public ExternalSource
   {
   public:
-    RosSubscriber (ParentProcess* parent, const string& n, const string& topic_name);
+    RosSubscriber (CoreProcess* parent, const string& n, const string& topic_name);
     ~RosSubscriber() {}
 
     void impl_activate () override;

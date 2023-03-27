@@ -13,7 +13,7 @@
 #include "core/utils/error.h"
 
 namespace djnn {
-    JSONSaxParser::JSONSaxParser (ParentProcess * parent, const std::string& name, const std::string& xpath)
+    JSONSaxParser::JSONSaxParser (CoreProcess * parent, const std::string& name, const std::string& xpath)
     : FatProcess (name), _absolute (false)
     {
         assert(!xpath.empty());
@@ -63,7 +63,7 @@ namespace djnn {
         finalize_construction (parent, name); // no, we are not regular processes
     }
 
-    FatChildProcess*
+    CoreProcess*
     JSONSaxParser::find_child_impl (const std::string& s)
     {
         //std::cerr << "find " << s << std::endl;
@@ -336,7 +336,7 @@ namespace djnn {
 /*class UndelayedSpike : public FatProcess
 {
     public:
-    UndelayedSpike (ParentProcess * parent, const std::string& name)  : FatProcess (name) { set_is_model (true); finalize_construction (parent, name); }
+    UndelayedSpike (CoreProcess * parent, const std::string& name)  : FatProcess (name) { set_is_model (true); finalize_construction (parent, name); }
     virtual ~UndelayedSpike () {}
     void post_activate () override { post_activate_auto_deactivate (); }
     void impl_activate () override {

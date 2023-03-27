@@ -8,7 +8,7 @@ using std::placeholders::_1;
 
 using namespace djnn;
 
-RosSubscriber::RosSubscriber (ParentProcess* parent, const string& n, const string& topic_name) :
+RosSubscriber::RosSubscriber (CoreProcess* parent, const string& n, const string& topic_name) :
   FatProcess (n),
   ExternalSource (n),
   _topic_name (topic_name),

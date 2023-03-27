@@ -22,14 +22,14 @@ class RosPublisher : public FatProcess, public ExternalSource
     class SendMsgAction : public Action
     {
     public:
-      SendMsgAction (ParentProcess* parent, const string& name) :
+      SendMsgAction (CoreProcess* parent, const string& name) :
         Action (parent, name) {};
     
       virtual ~SendMsgAction () {}
       void impl_activate () override { ((RosPublisher*)get_parent())->send_msg (); }
     };
   public:
-    RosPublisher (ParentProcess* parent, const string& n, const string& topic_name);
+    RosPublisher (CoreProcess* parent, const string& n, const string& topic_name);
     ~RosPublisher() {}
 
     void impl_activate () override;

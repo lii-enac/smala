@@ -2,7 +2,7 @@
 
 using namespace djnn;
 
-RosPublisher::RosPublisher (ParentProcess* parent, const string& n, const string& topic_name) :
+RosPublisher::RosPublisher (CoreProcess* parent, const string& n, const string& topic_name) :
   FatProcess (n),
   ExternalSource (n),
   _msg (this, "message", ""),

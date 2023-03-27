@@ -27,7 +27,7 @@ struct json_sax {
 namespace djnn {
     class JSONSaxParser : public FatProcess, public json_sax {
     public:
-        JSONSaxParser (ParentProcess * parent, const std::string& name, const std::string& xpath);
+        JSONSaxParser (CoreProcess * parent, const std::string& name, const std::string& xpath);
         void parse (const std::string& input);
 
         virtual bool start_object(std::size_t elements) override;
@@ -40,7 +40,7 @@ namespace djnn {
 
         void impl_activate () override {}
         void impl_deactivate () override {}
-        virtual FatChildProcess* find_child_impl (const std::string&) override;
+        virtual CoreProcess* find_child_impl (const std::string&) override;
     private:
         // void activate (const std::string&);
         // void activate_double (const std::string&, double val);

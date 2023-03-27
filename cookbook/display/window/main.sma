@@ -45,9 +45,20 @@ Component root {
     FillColor w (White)
     Text txt (0, 30, "for a full transparent frame you HAVE to set f.frameless = 1")
     FillColor g (0, 255, 0)
-    Rectangle r (0, 60, 50, 50)
-    FillColor g (255, 0, 0)
-    Circle  c (60, 80, 30)
+    Rectangle r (0, 60, 100, 100)
+    
+
+    FSM fsm {
+      State idle {
+      }
+      State circle {
+        FillColor g (Yellow)
+        Circle  c (200, 200, 50)
+      }
+
+      idle -> circle (r.press)
+      circle -> idle (r.release)
+    }
   }
 
   

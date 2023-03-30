@@ -52,15 +52,15 @@
          style="fill:#6f9bad;fill-opacity:1;stroke-linecap:round;stroke-linejoin:round"
          id="main_rect"
          width="100"
-         height="30"
+         height="20"
          x="8.2101364"
          y="14"
-         ry="15" />
+         ry="5" />
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:1.25;font-family:B612;-inkscape-font-specification:B612;fill:#ffffff;fill-opacity:1"
+         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:1.25;font-family:B612;-inkscape-font-specification:B612;fill:#ffffff;fill-opacity:1"
          x="18.210136"
-         y="35.6735"
+         y="30.6735"
          id="content">Test</text>
       <path
          style="fill:#6f9bad;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -75,7 +75,7 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;font-family:B612;-inkscape-font-specification:B612"
+       style="font-size:8px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:B612;-inkscape-font-specification:B612"
        x="10"
        y="9.585"
        id="time">09:55</text>

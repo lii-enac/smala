@@ -15,9 +15,9 @@
 // MDPC scrollbar, or
 // M(t)DP(i)C scrollbar
 // MDPC is a model for interactive graphical objects, which can be considered as a refinement of MVC.
-// With MVC, it is notoriously difficult to cleanly separate the View and the controller (see https://www.oracle.com/java/technologies/a-swing-architecture.html)
+// With MVC, it is notoriously difficult to cleanly separate the View and the Controller (see https://www.oracle.com/java/technologies/a-swing-architecture.html)
 //  "We quickly discovered that this split didn't work well in practical terms because the view and controller parts of a component required a tight coupling (for example, it was very difficult to write a generic controller that didn't know specifics about the view). So we collapsed these two entities into a single UI (user-interface) object,"
-// With MDPC, we apply the "separation of concerns" down to the MVC Controller, which enables designers to cleanly separate the View and the Controller
+// With MDPC, we applied the "separation of concerns" down to the MVC Controller, which enables designers to cleanly separate the View and the Controller
 // MDPC could have been named MtDPiC:
 
 // M = model - the abstraction. Here two values (low,hi) in range [0;1], and two operations (add to low and hi, including negative deltas). An _illustration_ of the Model is: 0--|--|---1
@@ -25,11 +25,11 @@
 // D = display view - what the user sees, for a horizontal scrollbar: |<|==|    |=====|>| (left arrow, bg, thumb on top of the bg, right arrow)
 // P = picking view - what the user actually manipulates, without seeing it:   |O|**|@@@|$$$$$|8| (0:left arrow, *:left-to-thumb, @:thumb, $:right-to-thumb, 8:right arrow)
 // i = inverse transform - inverse-transforms user's actions back from the screen coordinates into the model coordinates
-// C = controller - manages the interactive state, translates them into model operations by relying on the inverse transform, triggers the model operations
+// C = controller - manages the interactive state, translates user's actions into model operations by relying on the inverse transform, triggers the model operations
 
 // with this architecture, the scrollbar can be arbitrarily transformed:
 // scaled by any amount, translated in any place, 90° rotation from vertical to horizontal, or any rotation (as in the example).
-// thanks to the picking view and the inverse transform the controller code is simple and independent of the transform.
+// thanks to the picking view and the inverse transform the controller code is simple and independent of the transform (e.g. it's the same for the horizontal and vertical scrollbar)
 
 // see:
 // Conversy, S., Barboni, E., Navarre, D., Palanque, P. Improving modularity of interactive software with the MDPC architecture. IFIP EIS 2007.
@@ -177,17 +177,17 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
       PickFill _
       NoPickOutline _
       
-      //FillColor _ (0,255,0)//green
+      FillColor _ (0,255,0) //green
       Rectangle more_arrow (0,0,1,1,0,0)  // ^
-      //FillColor _ (0,255,255)//cyan
+      FillColor _ (0,255,255) //cyan
       Rectangle more_bg (0,0,1,1,0,0)     // ||
-      //FillColor _ (255,255,0)//yellow
+      FillColor _ (255,255,0) //yellow
       Rectangle less_bg (0,0,1,1,0,0)     // ||
-      //FillColor _ (255,0,0)//red
+      FillColor _ (255,0,0) //red
       Rectangle less_arrow (0,0,1,1,0,0)  // v
 
       // thumb on top
-      //FillColor _ (255,0,255)//purple
+      FillColor _ (255,0,255) //purple
       Rectangle thumb (0,0,1,1,0,0)       // =
      
       // 'one-way constraint' or data-flow of position/size of each zone for a classical scrollbar picking layout in idle state
@@ -196,16 +196,16 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
                                          width =:> more_arrow.width, more_bg.width, thumb.width, less_bg.width, less_arrow.width
                     0 - width/2 + pick_xoffset =:> more_arrow.x,     more_bg.x,     thumb.x,     less_bg.x,     less_arrow.x
 
-                                             0 =:> more_arrow.y    // ^
-                    arrow_height / transform.s =:> more_arrow.height
-              more_arrow.y + more_arrow.height =:> more_bg.y       // ||
-                              (1 - model.high) =:> more_bg.height  // ||
-                 more_bg.y +    more_bg.height =:> thumb.y         // =
-                                   model.delta =:> thumb.height    // =
-                   thumb.y +      thumb.height =:> less_bg.y       // ||
-                                     model.low =:> less_bg.height  // ||
-                 less_bg.y +    less_bg.height =:> less_arrow.y    // v 
-                    arrow_height / transform.s =:> less_arrow.height             
+                                             0 =:> more_arrow.y
+                    arrow_height / transform.s =:> more_arrow.height // ^
+              more_arrow.y + more_arrow.height =:> more_bg.y
+                              (1 - model.high) =:> more_bg.height    // ||
+                 more_bg.y +    more_bg.height =:> thumb.y           //
+                                   model.delta =:> thumb.height      // =
+                   thumb.y +      thumb.height =:> less_bg.y         //
+                                     model.low =:> less_bg.height    // ||
+                 less_bg.y +    less_bg.height =:> less_arrow.y      //
+                    arrow_height / transform.s =:> less_arrow.height // v            
             
     }
 
@@ -245,11 +245,11 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
       PickFill _
       NoPickOutline _
 
-      //FillColor _ (0,255,0) // green
+      FillColor _ (0,255,0) // green
       Rectangle upper_limit (0,0,1,1,0,0)    // || (!)
-      //FillColor _ (0,255,255) // cyan
+      FillColor _ (0,255,255) // cyan
       Rectangle dragging_zone (0,0,1,1,0,0)  // || (=)
-      //FillColor _ (255,0,0) // red
+      FillColor _ (255,0,0) // red
       Rectangle lower_limit (0,0,1,1,0,0)    // || (!)
 
       Double pick_offset_in_model (0)
@@ -313,6 +313,31 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
 
     State idle {
       "initial" =: picking_view.state
+      Double dv (0)
+      Double fakex(0)
+      Double fakey(0)
+      frame.wheel.dy / transform.s => dv
+      dv<0 ?
+        (-dv < (model.low) ? dv : -model.low)
+        : (dv < (1-model.high) ? dv : 1-model.high) =:> fakex
+
+      //inverse_transform iv(transform, fakex, fakey, dv)
+      //TextPrinter tp2
+      AssignmentSequence asw(0) {
+        //"asw" =: tp2.input
+        //dv + model.low  =: model.low
+        //dv + model.high =: model.high
+        //dv<0 ? (-dv > (model.low) ? dv : -model.low) + model.low =: model.low
+        //dv>0 ? (dv < (1-model.high) ? dv : 1-model.high) + model.high =: model.high
+        fakex + model.low =: model.low
+        fakex + model.high =: model.high
+      }
+
+      frame.wheel -> asw
+      //TextPrinter tp
+      //fakey =:> tp.input
+      //"dw dv " + toString(dv) =:> tp.input
+
     }
 
     State onelining_up {
@@ -355,7 +380,6 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
       // inverse transform from user actions to model operations
       Double dv (0)
       Double v (0)
-      
       AssignmentSequence as(0) {
         // compute inverse and delta
         inverse_transform iv(transform, frame.move.x, frame.move.y, v)
@@ -367,7 +391,9 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
         dv + model.high =: model.high
       }
       frame.move -> as
-      
+      //TextPrinter tp
+      //frame.move.y => tp.input
+      //"movey " + toString(dv) => tp.input
     }
     
     State in_upper_zone {

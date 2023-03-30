@@ -18,8 +18,8 @@ Bubble (string _label, double _y, int sent, Process container) {
   Component timestamp {
     FillColor _ (#595959)
     time << svg.layer1.time
+    bg.x + bg.width - 25 =:> time.x
     bg.y + bg.height - 4 =:> time.y
-    bg.x + bg.width - 40 =:> time.x
     WallClock wc // Probably to much here a simple function call should be enough
     "%H:%M" =: wc.format
     wc.state_text =: time.text
@@ -27,12 +27,12 @@ Bubble (string _label, double _y, int sent, Process container) {
   Component corner {
     if (sent == 1) {
       14 =: content.x
-      left << svg.layer1.bubble.left_arrow
+      //left << svg.layer1.bubble.left_arrow
     } else {
       Translation pos_right (0, 0)
       bg.width + 2 =:> pos_right.tx
-      right << svg.layer1.bubble.right_arrow
-      #AD8089 =: bg.fill.value, right.fill.value
+      // right << svg.layer1.bubble.right_arrow
+      #AD8089 =: bg.fill.value //, right.fill.value
       container.width - bg.width - 14 =:> global_position.tx
     }
   }

@@ -20,7 +20,7 @@ use base
 
 _define_
 paging(Process model) {
-    Double dv (0) // amount of paging in model unit, must be flowed-in by the client
+    Double dv (0) // amount of paging in model unit (usually between 0 and 1), must be flowed-in by the client
 
     Double dvclamped (0)
     Double maxdv(0)
@@ -52,10 +52,10 @@ paging(Process model) {
             Clock clock (250)
             clock.tick -> incr_low, incr_high
         }
-        State others {
+        State next_ones {
             Clock clock (80)
             clock.tick -> incr_low, incr_high
         }
-        first -> others (first.clock.tick)
+        first -> next_ones (first.clock.tick)
    }
 }

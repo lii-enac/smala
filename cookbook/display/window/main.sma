@@ -20,7 +20,7 @@ use gui
 
 _main_
 Component root {
-  Frame f ("transparent windows", 0, 0, 600, 600)
+  Frame f ("transparent windows", 0, 0, 800, 600)
   Exit ex (0, 1)
   f.close -> ex
 
@@ -40,12 +40,25 @@ Component root {
   }
   rect_close.r.press -> ex
 
+  Component Explanation {
+    Translation _ (100, 10)
+    FillColor _ (Black)
+    FillOpacity _ (0.8)
+    Rectangle _ (0, 0, $f.width - 200 , 120, 0, 0)
+    FillColor w (White)
+    Text l1 (10, 20,  "note:")
+    Text l2 (10, 40,  "- For a transparent window you HAVE to set f.frameless = 1")
+    Text l3 (10, 60,  "- All transparent windows will be set  \"On Top\" of all other windows")
+    Text l4 (10, 80,  "- Windows: only fully transparent windows are available BUT you CAN click through the window")
+    Text l5 (10, 100, "- Linux/macos: opacity and color on transparency are available BUT you CAN'T click through the window")
+  }
+
   Component Group {
     Translation _ (100, 100)
-    FillColor w (White)
-    Text txt (0, 30, "for a full transparent frame you HAVE to set f.frameless = 1")
     FillColor g (0, 255, 0)
     Rectangle r (0, 60, 100, 100)
+    FillColor _ (Black)
+    Text _ (10, 80, "Click me")
     
 
     FSM fsm {

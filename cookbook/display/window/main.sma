@@ -20,7 +20,7 @@ use gui
 
 _main_
 Component root {
-  Frame f ("transparent windows", 0, 0, 800, 600)
+  Frame f ("transparent windows", 0, 0, 1000, 600)
   Exit ex (0, 1)
   f.close -> ex
 
@@ -28,7 +28,7 @@ Component root {
   // important note: 
   // for a full transparent frame you HAVE to set f.frameless = 1
   f.frameless = 1
-  f.background_opacity = 0.3
+  f.background_opacity = 0.1
   f.background_color.r = 0
   f.background_color.g = 0
   f.background_color.b = 255

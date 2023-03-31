@@ -31,14 +31,14 @@ Chat (double _x, double _y, double _width, double _height, Process frame) {
     Double width(_width)
     Double height(_height)
 
-    Translation pos (_x, _y)
+    //Translation pos (_x, _y)
     FillColor _(White)
     Rectangle bg_dial (0, 0, 390, 486)
-    Rectangle _ (390, 0, 10, 486)
+    //FillColor _(Green)
+    //Rectangle _ (390, 0, 10, 486)
     Component sub {
         RectangleClip clip (0, 0, 300, 350)
-        bg_dial.{x,y,width} =:> clip.{x,y,width}
-        bg_dial.height - 26 =:> clip.height
+        Translation oppy (0,0)
         Translation conversation_tr (0, 0)
         List conversation
     }
@@ -46,31 +46,41 @@ Chat (double _x, double _y, double _width, double _height, Process frame) {
     conversation_tr aka sub.conversation_tr
 
     Scrollbar sb (400, 0, bg_dial, frame)
-    bg_dial.height - 36 =:> sb.height
-    bg_dial.width + 5 =:> sb.x
     MyTextField edit (0, 520, 400)
-    
-    bg_dial.height - 13 =:> edit.y
+
     Button send ("send", 420, 519)
     send.initial_state = "disabled"
-    edit.width - 24 =:> send.x
-    edit.y + 2 =:> send.y
+    
+    // layout
+    x =:> bg_dial.x, edit.x
+    y =:> bg_dial.y
+
+    width - 10 =:> bg_dial.width
+    height - 14 =:> bg_dial.height
+
+    bg_dial.{x,y,width} =:> sub.clip.{x,y,width}
+    bg_dial.height - 26 =:> sub.clip.height
+    y =:> sub.oppy.ty
+
+    x + bg_dial.width + 5 =:> sb.x
+    //y =:> sb.y
+    bg_dial.height - 36 =:> sb.height
+    
     bg_dial.width + 10 =:> edit.width
+    y + bg_dial.height - 13 =:> edit.y
+
+    x + edit.width - 24 =:> send.x
+    edit.y + 2 =:> send.y
+    
     toString(edit.field.content.text) != "" -> send.enable
     toString(edit.field.content.text) == "" -> send.disable
 
-    // Switch templates("enabled") {
-    //     Component enabled
-    //     Component disabled {
-    //         Bubble bubble ("empty", 0,0,0)
-    //     }
-    // }
-    //msg_height aka templates.disabled.bubble.height
+
     int msg_height = 20
     int msg_sep = 5
 
     180 =: sb.transform.rot
-    sb.height + 10 =: sb.y
+    y + sb.height + 10 =: sb.y
     0 =: sb.pick_xoffset
 
     // sb model 0: first message 1:last message

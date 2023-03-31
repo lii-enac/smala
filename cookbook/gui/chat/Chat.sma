@@ -62,8 +62,9 @@ Chat (double _x, double _y, double _width, double _height, Process frame) {
     bg_dial.height - 26 =:> sub.clip.height
     y =:> sub.oppy.ty
 
-    x + bg_dial.width + 5 =:> sb.x
-    //y =:> sb.y
+    x + bg_dial.width /*+ width/2*/ =:> sb.x
+    y + bg_dial.height - 36 + 10 =:> sb.y
+    //10/2 =:> sb.y
     bg_dial.height - 36 =:> sb.height
     
     bg_dial.width + 10 =:> edit.width
@@ -80,7 +81,8 @@ Chat (double _x, double _y, double _width, double _height, Process frame) {
     int msg_sep = 5
 
     180 =: sb.transform.rot
-    y + sb.height + 10 =: sb.y
+    //y + sb.height + 10 =: sb.y
+    //y + 10 =: sb.y
     0 =: sb.pick_xoffset
 
     // sb model 0: first message 1:last message

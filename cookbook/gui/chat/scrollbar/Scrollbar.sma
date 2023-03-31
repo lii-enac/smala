@@ -54,6 +54,9 @@ import inverse_transform
 _define_
 Scrollbar(double _x, double _y, Process container, Process frame) {
 
+  // Double x(0)
+  // Double y(0)
+
   Translation pos (_x, _y)
   x aka pos.tx
   y aka pos.ty
@@ -115,8 +118,10 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
   Scaling     sc(1,1, 0,0)
 
   transform.rot =:> rot.a
-  transform.tx  =:> tr.tx, rot.cx
-  transform.ty  =:> tr.ty, rot.cy
+  transform.tx /*- width/2*/  =:> tr.tx
+  transform.ty /*- height/2*/ =:> tr.ty
+  transform.tx /*- width/2*/  =:> rot.cx
+  transform.ty /*- height/2*/ =:> rot.cy
   transform.s   =:> sc.sy
 
 
@@ -149,7 +154,7 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
                                          width =:> more_arrow_bg.width, bg.width, thumb.width, less_arrow_bg.width
                                    0 - width/2 =:> more_arrow_bg.x, bg.x, thumb.x, less_arrow_bg.x
     //                                       y, height
-                                             0 =:> more_arrow_bg.y 
+                                  0 /*- height/2*/ =:> more_arrow_bg.y 
                     arrow_height / transform.s =:> more_arrow_bg.height
         more_arrow_bg.y + more_arrow_bg.height =:> bg.y
                                              1 =:> bg.height
@@ -263,9 +268,11 @@ Scrollbar(double _x, double _y, Process container, Process frame) {
       inverse_transform _ (transform, container.height, container.height, win_height_in_model) // FIXME? not working as planned
      
       // 'one-way constraint' or data-flow of position/size for a classical scrollbar picking layout in dragging state
+                                          // x, width
                                          width =:> upper_limit.width, dragging_zone.width, lower_limit.width
                     0 - width/2 + pick_xoffset =:> upper_limit.x, dragging_zone.x, lower_limit.x
 
+                                          // y, height
                                  zero_in_model =:> upper_limit.y
 
            picking_view.initial.more_bg.y

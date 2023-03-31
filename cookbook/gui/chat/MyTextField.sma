@@ -70,9 +70,10 @@ MyTextField (double _x, double _y, double _w) {
       Line cursor (0, 0, 0, 15)
       field.cursor_end_x =:> cursor.x1, cursor.x2
       field.cursor_height =:> cursor.y2
-      validate->leave
+      //validate->leave
 
-      GenericKeyboard.key\-pressed => field.key_pressed
+      GenericKeyboard.key\-pressed != DJN_Key_Return -> { GenericKeyboard.key\-pressed =: field.key_pressed }
+      GenericKeyboard.key\-pressed == DJN_Key_Return -> validate
       GenericKeyboard.key\-released => field.key_released
       GenericKeyboard.key\-pressed_text => field.string_input
       GenericKeyboard.key\-pressed == DJN_Key_Tab -> set_text

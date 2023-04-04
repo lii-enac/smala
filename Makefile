@@ -187,7 +187,7 @@ LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
 other_runtime_lib_path := /Users/conversy/recherche/istar/code/misc/MGL/build
-CFLAGS_COMMON += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+#CFLAGS_COMMON += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
 lib_suffix =.dylib

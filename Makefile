@@ -261,7 +261,7 @@ $(build_dir)/src/process_class_path.cpp:
 	@mkdir -p $(dir $@)
 	$(eval tmpfile := $(shell mktemp))
 	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
-	(cd $(djnn_include_path_only) && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_manager.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
+	(cd $(djnn_include_path_only) && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_internal.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
 	awk '{print "{\""$$1"\""",""\""$$2"\"""},"}' $(tmpfile) >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/arithmetic.h     | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/arithmetic.h\"},"}' >> $@
 	grep 'typedef.*[[:alpha:]]*;$$'  $(djnn_include_path_only)/base/math_functions.h | awk '{print $$NF}' | sed "s/;//" | awk '{print "{\""$$1"\",\"base/math_functions.h\"},"}' >> $@

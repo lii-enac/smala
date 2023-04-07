@@ -15,8 +15,12 @@ djnn_libs_cookbook_app := gui display base exec_env core
 #pkg_cookbook_app := opencv
 
 ifeq ($(os),Darwin)
-cflags_cookbook_app := $(shell env PKG_CONFIG_PATH=/opt/homebrew/opt/opencv\@3/lib/pkgconfig pkg-config --cflags opencv)
-libs_cookbook_app := $(shell env PKG_CONFIG_PATH=/opt/homebrew/opt/opencv\@3/lib/pkgconfig pkg-config --libs opencv)
+# for M1
+# cflags_cookbook_app := $(shell env PKG_CONFIG_PATH=/opt/homebrew/opt/opencv\@3/lib/pkgconfig pkg-config --cflags opencv)
+# libs_cookbook_app := $(shell env PKG_CONFIG_PATH=/opt/homebrew/opt/opencv\@3/lib/pkgconfig pkg-config --libs opencv)
+# for Intel
+# cflags_cookbook_app := $(shell env PKG_CONFIG_PATH=/usr/local/lib/pkgconfig pkg-config --cflags opencv4)
+# libs_cookbook_app := $(shell env PKG_CONFIG_PATH=/usr/local/lib/pkgconfig pkg-config --libs opencv4)
 endif
 
 #install opencv with : sudo apt install libopencv-dev

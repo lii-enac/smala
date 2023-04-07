@@ -32,6 +32,7 @@ _native_code_
 #include <opencv2/imgproc.hpp>
 
 #include <iostream>
+
 using namespace std;
 using namespace cv;
 
@@ -56,18 +57,23 @@ cpp_action(Process *p)
         //"rtsp://rtsp.stream/movie"
         //"rtsp://admin:123456@192.168.1.216/H264?ch=1&subtype=0"
     //;
+    
+    // OR using OBS studio for local stream
+    //string url = 
+        //"udp://127.0.0.1:8081"; 
+        //"udp://10.0.0.39:8081";
     //cap.open(url);
 
     // check if we succeeded
     if (!cap.isOpened()) {
-        cerr << "ERROR! Unable to open camera\n";
+        cerr << "ERROR! Unable to open camera or stream\n";
         return;
     }
 
     auto w = cap.get(CAP_PROP_FRAME_WIDTH);
     auto h = cap.get(CAP_PROP_FRAME_HEIGHT);
     auto format = cap.get(CAP_PROP_CODEC_PIXEL_FORMAT);
-    //std::cerr << format << __FL__;
+    std::cerr << "Infos: " << w << " - " << h << " ---- " << format << __FL__;
     string frame_data;
     frame_data.reserve(w*h*3);
 
@@ -109,23 +115,43 @@ cpp_action(Process *p)
         GRAPH_EXEC;
         release_exclusive_access(DBG_REL);
     }
-    
 }
-
 %}
 
 _main_
 Component root
 {
-    Frame f ("my frame", 0, 0, 800, 800)
+    Frame f ("my frame", 0, 0, 1280, 720)
     Exit ex (0, 1)
     f.close -> ex
     //mouseTracking = 1
 
-    Scaling _(0.5,0.5,0,0) // Retina :-/
-    DataImage im(0,0,0,0)
-    NativeAsyncAction na(cpp_action, root, 0)
+    Group video {
+        // is_hdpi ?
+        Scaling _(0.5,0.5,0,0) // Retina :-/
+    
+        DataImage im(0, 0, 0, 0)
+        NativeAsyncAction na(cpp_action, root, 0)
+    }
 
-    FillColor _(255,0,0)
-    Circle _(100,100,50)
+    Component Group {
+        Translation _ (100, 100)
+        FillColor g (0, 255, 0)
+        Rectangle r (0, 60, 100, 100)
+        FillColor _ (Black)
+        Text _ (10, 80, "Click me")
+        
+
+        FSM fsm {
+            State idle {
+            }
+            State circle {
+                FillColor g (Yellow)
+                Circle  c (200, 200, 50)
+            }
+
+            idle -> circle (r.press)
+            circle -> idle (r.release)
+        }
+    }
 }

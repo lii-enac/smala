@@ -39,8 +39,8 @@ namespace Smala
   public:
     SubPathNode (const location& loc): Node (loc, SUBPATH), m_expr (nullptr), m_path (""), m_type (ITEM), m_cast (NO_CAST) {}
     SubPathNode (const location& loc, const std::string &path, subpath_type type, cast_type cast = NO_CAST): Node (loc, SUBPATH), m_expr (nullptr), m_path (path), m_type (type), m_cast (cast) {}
-    SubPathNode (const location& loc, ExprNode* n): Node (loc, SUBPATH), m_path (""), m_expr (n), m_type (EXPR), m_cast (NO_CAST) {}
-    SubPathNode (const location& loc, const std::vector<PathNode*> path_list): Node (loc, SUBPATH), m_expr (), m_path (""), m_path_list (path_list), m_type (PATH_LIST), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, ExprNode* n): Node (loc, SUBPATH), m_expr (n), m_path (""), m_type (EXPR), m_cast (NO_CAST) {}
+    SubPathNode (const location& loc, const std::vector<PathNode*> path_list): Node (loc, SUBPATH), m_expr (), m_path_list (path_list), m_path (""), m_type (PATH_LIST), m_cast (NO_CAST) {}
     virtual ~SubPathNode () {}
 
     const std::string& get_subpath () const { return m_path; }

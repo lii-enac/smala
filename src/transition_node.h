@@ -33,9 +33,9 @@ namespace Smala
     PathNode* get_action () { return m_action; }
 
   private:
+    std::string m_src, m_dst;
     PathNode *m_trigger;
     PathNode *m_action;
-    std::string m_src, m_dst;
   };
 
 } /* namespace Smala */

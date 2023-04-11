@@ -151,6 +151,7 @@ djnn_libs_SL := $(djnn_libs)
 # ----------------------------------
 
 CFLAGS_COMMON += -MMD
+CFLAGS_COMMON += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
 CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
 
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
@@ -180,7 +181,7 @@ brew_prefix := $(shell brew --prefix)
 else
 brew_prefix := $(HOMEBREW_PREFIX)
 endif
-YACC := $(brew_prefix)/opt/bison/bin/bison -d
+YACC := $(brew_prefix)/opt/bison/bin/bison -d -Wno-conflicts-sr
 LEX := $(brew_prefix)/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
@@ -197,7 +198,7 @@ endif
 ifeq ($(os),MinGW)
 compiler ?= gnu
 CFLAGS_COMMON += -fpic
-YACC = bison -d -W
+YACC = bison -d -Wno-conflicts-sr
 LD_LIBRARY_PATH=PATH
 debugger := gdb
 lib_suffix =.dll
@@ -350,7 +351,7 @@ endif
 
 $(build_dir)/%.cpp $(build_dir)/%.hpp: %.y
 	@mkdir -p $(dir $@)
-	$(YACC) -v -o $@ $<
+	$(YACC) -o $@ $<
 
 $(build_dir)/%.cpp: %.l
 	@mkdir -p $(dir $@)
@@ -362,6 +363,7 @@ $(build_dir)/%.cpp: %.l
 
 $(build_dir)/src/scanner.o: CXXFLAGS += -Dregister=""
 $(build_dir)/src/location.hh: $(build_dir)/src/parser.cpp
+$(build_dir)/src/parser.o: CXXFLAGS_COMMON += -Wno-unused-but-set-variable
 
 # for initial make -j
 # find build -name "*.d" | xargs grep -s "parser.hpp" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
@@ -533,6 +535,7 @@ $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
+	@#$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) `env PKG_CONFIG_PATH=$$(djnn_lib_path)/.. pkg-config --libs --static djnn-cpp`
 
 $$(notdir $1)_objs: $$($1_app_objs)
 

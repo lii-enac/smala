@@ -19,9 +19,28 @@ using namespace Smala;
 
 Node::Node (const location& loc, NodeType t, const std::string &value, const std::string &name,
             const std::vector< named_parameter_t > &arguments) :
-    m_ignore_parent (false),m_djnn_type (value), m_name (name), m_build_name (""), m_args_spec (arguments), m_node_type (
-        t), m_in_expression (false), m_location (nullptr), m_parent (nullptr), m_path (nullptr), m_has_path (false), m_duplicate_warning (true),
-    m_keep_name (false), m_loc(loc), m_is_define_or_main (false), m_include_native (false)
+    m_loc(loc),
+    m_node_type (t),
+    m_name (name), 
+    m_args_spec (arguments),
+    
+    m_build_name (""),
+    m_keep_name (false),
+
+    m_parent (nullptr),
+    m_ignore_parent (false),
+
+    m_has_path (false),
+    m_path (nullptr),
+    m_djnn_type (value),
+
+    m_in_expression (false),
+    m_is_define_or_main (false),
+    m_include_native (false),
+
+    m_location (nullptr),
+    m_duplicate_warning (true)
+    
 {
 }
 

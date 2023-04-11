@@ -16,8 +16,8 @@
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "3.0"
 %defines
-%define parser_class_name { Parser }
-//%define api.parser.class { Parser }
+//%define parser_class_name { Parser }
+%define api.parser.class { Parser }
 
 %define api.token.constructor
 %define api.value.type variant
@@ -107,7 +107,7 @@
   //bool m_in_add_children = false;
   bool m_terminate = false;
   bool m_in_lambda = false;
-  int m_array_level = 0;
+  size_t m_array_level = 0;
   int m_in_add_children = 0;
   bool m_in_arguments = false;
   bool m_in_for = false;
@@ -449,7 +449,7 @@ body
   }
   | define_list
 
-empty:
+empty: %empty
 
 define_list
   : define
@@ -907,7 +907,7 @@ action
     {
       $1[0] = std::toupper ($1[0]);
       InstructionNode *node = new InstructionNode (@$, $1);
-      for (int i = 0; i < $2.size (); ++i) {
+      for (size_t i = 0; i < $2.size (); ++i) {
         node->add_path ($2.at (i));
       }
       driver.add_node (node);
@@ -1224,7 +1224,7 @@ simple_process
     }
   | ACTIVATOR process_list
   {
-    for (int i = 0; i < $2.size (); ++i) {
+    for (size_t i = 0; i < $2.size (); ++i) {
       auto &loc = $2.at(i)->get_location ();
       Node *node = new Node (loc, SIMPLE, "Activator", "_");
       PathExprNode *arg = new PathExprNode ($2.at(i)->get_location (), $2.at(i), PROCESS);
@@ -1580,7 +1580,7 @@ connector
     {
       NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==0, $2==3, true, $2==2 ? false:true);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      for (int i = 0; i < $3.size (); ++i) {
+      for (size_t i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
       }
       driver.add_native_expression (expr_node);
@@ -1596,7 +1596,7 @@ connector_symbol
 binding
   : binding_src binding_type process_list
     {
-      for (int i = 0; i < $3.size (); ++i) {
+      for (size_t i = 0; i < $3.size (); ++i) {
         CtrlNode *node = new CtrlNode (@$, "Binding", "", $2.first, $2.second);
         Node *in = new Node (@$, PATH, "Name", $1);
         node->set_in (in);
@@ -1774,8 +1774,8 @@ assignment
     {
       NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==1, $2==2, false, $4);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
-      for (int i = 0; i < $3.size (); ++i) {
-        Node *out = new Node (@$, PATH, "Name", $3.at (i));
+      for (size_t i = 0; i < $3.size (); ++i) {
+        /*Node *out =*/ new Node (@$, PATH, "Name", $3.at (i));
         expr_node->add_output_node ($3.at (i));
       }
       driver.add_native_expression (expr_node);

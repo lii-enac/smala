@@ -31,8 +31,8 @@ namespace Smala
     bool keep_name () { return m_keep_name; }
 
   private:
-    std::string m_var_name;
     SmalaType m_type;
+    std::string m_var_name;
     bool m_keep_name;
   };
 

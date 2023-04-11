@@ -157,21 +157,31 @@ public:
     void set_include_native (bool v) { m_include_native = v;}
     bool include_native () { return m_include_native;}
  private:
-    bool m_ignore_parent, m_has_path;
+    class location m_loc;
+    NodeType m_node_type;
+    std::string m_name;
+    std::vector< named_parameter_t > m_args_spec;
+
+    std::string m_build_name;
+    bool m_keep_name;
+    
     Node *m_parent;
+    bool m_ignore_parent;
+    
+    bool m_has_path;
     PathNode *m_path;
     std::string m_djnn_type;
-    std::string m_name;
-    std::string m_build_name;
-    std::vector< named_parameter_t > m_args_spec;
+    
     std::vector<ExprNode*> m_expr_args;
-    bool m_duplicate_warning, m_in_expression, m_keep_name;
-    smala::ErrorLocation* m_location;
-    NodeType m_node_type;
-    user_data_t m_data;
-    class location m_loc;
+    
+    bool m_in_expression;
     bool m_is_define_or_main;
     bool m_include_native;
+
+    smala::ErrorLocation* m_location;    
+    bool m_duplicate_warning;
+
+    user_data_t m_data;    
 };
 
 }

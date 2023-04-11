@@ -38,7 +38,7 @@ int main (int argc, const char **argv) {
 	  b = new CPPBuilder ();
 	int error = 0;
 
-	int sz = arg.files().size();
+	//auto sz = arg.files().size();
 
 	for (auto filename: arg.files()) {
 		ifstream is (filename) ;

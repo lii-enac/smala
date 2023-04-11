@@ -31,8 +31,9 @@ namespace Smala
     Node* third_st () const { return m_third; }
 
   private:
+    Node *m_first;
     ExprNode *m_second;
-    Node *m_first, *m_third;
+    Node *m_third;
   };
 
 } /* namespace Smala */

@@ -306,7 +306,7 @@ namespace Smala
   JSBuilder::build_fake_name (PathNode* n, bool out)
   {
     std::string fake = n->get_subpath_list ().at (0)->get_subpath();
-    for (int i = 1; i < n->get_subpath_list ().size (); i++) {
+    for (size_t i = 1; i < n->get_subpath_list ().size (); i++) {
       if (n->get_subpath_list ().at (i)->get_path_type() == EXPR) {
         if (out)
           fake += ".expr_out" + std::to_string (m_expr_out++);
@@ -332,7 +332,7 @@ namespace Smala
             || n_list.at (1)->get_path_type () == PATH_LIST)) return str;
 
     bool in_path = false;
-    for (int i = 1; i < n_list.size (); i++)
+    for (size_t i = 1; i < n_list.size (); i++)
       {
         if (n_list.at (i)->get_path_type () == WILD_CARD
             || n_list.at (i)->get_path_type () == PATH_LIST) break;
@@ -1082,7 +1082,7 @@ namespace Smala
   JSBuilder::build_instruction (std::ostream &os, Node *node)
   {
     InstructionNode *n = dynamic_cast<InstructionNode*> (node);
-    for (int i = 0; i < n->path_list ().size (); i++) {
+    for (size_t i = 0; i < n->path_list ().size (); i++) {
       std::string arg = build_find (n->path_list ().at (i), false);
       if (arg.empty ()) {
         print_error_message (error_level::error,
@@ -1347,7 +1347,7 @@ namespace Smala
     m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
     os << "function " << node->name () << " (p, n";
     std::vector< named_parameter_t > data = node->get_args_spec();
-    for (int j = 0; j < data.size (); j++) {
+    for (size_t j = 0; j < data.size (); j++) {
       named_parameter_t arg = data.at (j);
       os << ", ";
       //print_type (os, arg.first);

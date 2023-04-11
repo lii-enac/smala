@@ -50,9 +50,9 @@ namespace Smala {
     const std::string& name () const;
     int add_entry (const std::string &key, const std::string &value);
   private:
-    std::map<std::string, std::string> *m_sym_table;
-    BuildNode *m_prev_node;
     std::string m_name;
+    BuildNode *m_prev_node;
+    std::map<std::string, std::string> *m_sym_table;
   };
 
   class Builder
@@ -61,7 +61,7 @@ namespace Smala {
     Builder () :
         m_curloc (nullptr), m_indent (0), m_cpnt_num (0), m_var_num (0), m_error (
             0), m_sym_num (0), m_native_num (0), m_in_for (false), m_in_set_text (false), m_in_set_property(false) , m_in_native_action (false), m_in_static_expr (false), m_in_switch (false),
-            m_after_else (false), m_type_manager (nullptr), m_define_or_main_node (nullptr), m_in_code (false)
+            m_after_else (false), m_in_code (false), m_type_manager (nullptr), m_define_or_main_node (nullptr)
     {
     }
     virtual ~Builder () {};

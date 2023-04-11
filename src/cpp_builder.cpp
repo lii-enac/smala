@@ -663,7 +663,7 @@ namespace Smala
   CPPBuilder::build_fake_name (PathNode* n, bool out)
   {
     std::string fake = n->get_subpath_list ().at (0)->get_subpath();
-    for (int i = 1; i < n->get_subpath_list ().size (); i++) {
+    for (size_t i = 1; i < n->get_subpath_list ().size (); i++) {
       if (n->get_subpath_list ().at (i)->get_path_type() == EXPR) {
         if (out)
           fake += ".expr_out" + std::to_string (m_expr_out++);
@@ -688,7 +688,7 @@ namespace Smala
       return str;
 
     bool in_path = false;
-    for (int i = 1; i < n_list.size (); i++) {
+    for (size_t i = 1; i < n_list.size (); i++) {
       if (n_list.at (i)->get_path_type () == WILD_CARD || n_list.at (i)->get_path_type () == PATH_LIST)
         break;
       if (n_list.at (i)->get_path_type () != EXPR) {
@@ -1625,7 +1625,7 @@ namespace Smala
   {
     emit_compiler_info(os);
     InstructionNode *n = dynamic_cast<InstructionNode*> (node);
-    for (int i = 0; i < n->path_list ().size (); i++) {
+    for (size_t i = 0; i < n->path_list ().size (); i++) {
       std::string arg = build_find (n->path_list ().at (i), false);
       if (arg.empty ()) {
         print_error_message (error_level::error,
@@ -2060,7 +2060,7 @@ namespace Smala
 
     os << "CoreProcess*\n" << node->name () << " (CoreProcess *p, const string &n";
     std::vector< named_parameter_t > data = node->get_args_spec();
-    for (int j = 0; j < data.size (); j++) {
+    for (size_t j = 0; j < data.size (); j++) {
       named_parameter_t arg = data.at (j);
       os << ", ";
       print_type (os, arg.first);
@@ -2319,7 +2319,7 @@ namespace Smala
     std::ofstream os (prefix + ".h");
     std::string s = prefix;
     std::replace (s.begin (), s.end (), '/', '_');
-    for (int i = 0; i < prefix.length (); i++)
+    for (size_t i = 0; i < prefix.length (); i++)
       s.at (i) = std::toupper (s.at (i));
     //os << "#pragma once\n#include <string>\n\n";
     os << "#pragma once\n\n";
@@ -2334,7 +2334,7 @@ namespace Smala
       }
       os << "djnn::CoreProcess* " << def->name ()
           << " (djnn::CoreProcess*, const djnn::string &";
-      for (int j = 0; j < def->args ().size (); j++) {
+      for (size_t j = 0; j < def->args ().size (); j++) {
         named_parameter_t arg = def->args ().at (j);
         os << ", ";
         print_type (os, arg.first);

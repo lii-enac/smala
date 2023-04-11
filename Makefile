@@ -151,9 +151,10 @@ djnn_libs_SL := $(djnn_libs)
 # ----------------------------------
 
 CFLAGS_COMMON += -MMD
-CFLAGS_COMMON += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
+
 CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
 
+CXXFLAGS_SC += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
 # for filesystem.h
 CXXFLAGS_SC += $(djnn_cflags)

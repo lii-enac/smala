@@ -31,7 +31,7 @@ recordSystemTime (Process comp)
                                "avr.",
                                "mai",
                                "juin",
-                               "juil."
+                               "juil.",
                                "aout",
                                "sept.",
                                "oct.",

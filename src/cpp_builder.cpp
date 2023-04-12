@@ -389,7 +389,7 @@ namespace Smala
     emit_compiler_info(os);
     for (auto const & e: m_new_syms_from_build_expr) {
       indent (os);
-      os << "auto * " << e.second << " = dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl; 
+      os << "[[maybe_unused]] auto * " << e.second << " = dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl; 
     }
     m_new_syms_from_build_expr.clear();
   }
@@ -584,7 +584,7 @@ namespace Smala
         auto * tmpl_node = dynamic_cast<TemplatePropertyNode*>(node);
         assert(tmpl_node);
         indent (os);
-        os << "auto * " << var_name << " = dynamic_cast<TemplateProperty<" << tmpl_node->get_template_type_name() << ">*> (" << parent_name << "->find_child(\"" << pn->build_string_repr("/") << "\"));\n";
+        os << "[[maybe_unused]] auto * " << var_name << " = dynamic_cast<TemplateProperty<" << tmpl_node->get_template_type_name() << ">*> (" << parent_name << "->find_child(\"" << pn->build_string_repr("/") << "\"));\n";
         used_processes["TemplateProperty"] = true;
         return;
       } //else ?!
@@ -868,7 +868,7 @@ namespace Smala
     std::string path = build_find (n->get_path (), true);
     build_properties(os);
     indent (os);
-    os << "auto *" << loc_name << " = " << path << ";\n";
+    os << "[[maybe_unused]] auto * " << loc_name << " = " << path << ";\n";
     indent (os);
     os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
     m_indent++;
@@ -1058,7 +1058,7 @@ namespace Smala
           // if it's inside a switch, we should surround it with a component, or find the nearest parent component and put it there
           std::string branch_name = "cpnt_" + std::to_string (m_cpnt_num++);
           indent (os);
-          os << "auto * " << branch_name << " = new Component (" << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
+          os << "[[maybe_unused]] auto * " << branch_name << " = new Component (" << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
           p_name = branch_name;
           used_processes["Component"] = true;
         }
@@ -1081,15 +1081,15 @@ namespace Smala
 
       indent (os);
       if (templated) {
-        //os << "auto * " << new_name << " = new TemplateProperty<decltype(" << arg_node->get_val () << ")> (";
-        os << "auto * " << new_name << " = new TemplateProperty (";
+        //os << "[[maybe_unused]] auto * " << new_name << " = new TemplateProperty<decltype(" << arg_node->get_val () << ")> (";
+        os << "[[maybe_unused]] auto * " << new_name << " = new TemplateProperty (";
         used_processes["TemplateProperty"] = true;
       } else {
         if (arg_node->get_expr_type() == STRING) {
-          os << "TextProperty * " << new_name << " = new TextProperty (";
+          os << "[[maybe_unused]] TextProperty * " << new_name << " = new TextProperty (";
           used_processes["TextProperty"] = true;
         } else {
-          os << "auto * " << new_name << " = new DoubleProperty (";
+          os << "[[maybe_unused]] auto * " << new_name << " = new DoubleProperty (";
           used_processes["DoubleProperty"] = true;
         }
       }
@@ -1113,7 +1113,7 @@ namespace Smala
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
       build_properties(os);
       indent (os);
-      os << "auto * " << new_name << " = new Assignment ( "
+      os << "[[maybe_unused]] auto * " << new_name << " = new Assignment ( "
           << p_name
           << ", "
           << arg << ", "
@@ -1269,7 +1269,7 @@ namespace Smala
               indent (create_temp_properties);
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
-              create_temp_properties << "auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
 
               used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
@@ -1296,7 +1296,7 @@ namespace Smala
               indent (create_temp_properties);
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
-              create_temp_properties << "auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
               used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
               prop_sym[new_param_name] = new_name;
@@ -1334,7 +1334,7 @@ namespace Smala
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
-            create_temp_properties << "auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
+            create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
 
             used_processes["AbstractProperty"] = true;            
             sym[new_param_name] = new_name;
@@ -1362,7 +1362,7 @@ namespace Smala
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
-            create_temp_properties << "auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+            create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
 
             used_processes["AbstractProperty"] = true;
             prop_sym[new_param_name] = new_name;
@@ -1384,7 +1384,7 @@ namespace Smala
     stringstream native_stream;
     emit_compiler_info(native_stream);
     indent (native_stream);
-    native_stream << "auto * " << native_name << " = new " << native_name_struct << "<";
+    native_stream << "[[maybe_unused]] auto * " << native_name << " = new " << native_name_struct << "<";
 
     native_stream << "decltype(";
 
@@ -1678,7 +1678,7 @@ namespace Smala
             in case of modification this code is replicated in DELETE CONTENT
           */
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          os << "auto *" << new_name << " = " << arg << ";\n";
+          os << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
           indent (os);
           os << "if (" << new_name << ") {\n";
           m_indent += 1;
@@ -1725,7 +1725,7 @@ namespace Smala
           indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
           /* replicate of DELETE */
           std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          indent (os); indent (os); indent (os); os << "auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";
+          indent (os); indent (os); indent (os); os << "[[maybe_unused]] auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";
           indent (os); indent (os); indent (os); os << "if (" << new_child_name << ") {\n";
           indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
           indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
@@ -1773,7 +1773,7 @@ namespace Smala
                                    "duplicated name: " + node->name (), 0);
       if (!m_in_for)
         indent (os);
-      os << "auto * " << var_name << " = " << expr_str << ";\n";
+      os << "[[maybe_unused]] auto * " << var_name << " = " << expr_str << ";\n";
       sym[prop_name] = var_name;
       prop_sym[prop_name] = var_name;
     } else {
@@ -1813,7 +1813,7 @@ namespace Smala
 
       string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       indent (os);
-      os << "auto * " << new_name << " = dynamic_cast<AbstractProperty*>(" << prop_name << ");\n";
+      os << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<AbstractProperty*>(" << prop_name << ");\n";
       sym[prop_name] = new_name;
       prop_sym[prop_name] = new_name;
 
@@ -1854,7 +1854,7 @@ namespace Smala
         << whatever_name << "\", ";
     os << "dynamic_cast<CoreProcess*>(" << arg << "));\n";
     indent (os);
-    os << "auto *" << new_name << " = " << m_parent_list.back ()->name ()
+    os << "[[maybe_unused]] auto * " << new_name << " = " << m_parent_list.back ()->name ()
         << "->find_child ( \"" << whatever_name + "\");\n";
     if (m_parent_list.back ()->add_entry (whatever_name, new_name) == 1
         && node->duplicate_warning ())
@@ -1925,7 +1925,7 @@ namespace Smala
     auto expr_str = build_expr (node->get_args().at (0), process_t);
     build_properties (os);
     indent (os);
-    os << "auto * " << new_name << " = " << expr_str;
+    os << "[[maybe_unused]] auto * " << new_name << " = " << expr_str;
   }
 
   void
@@ -1984,7 +1984,7 @@ namespace Smala
 
       emit_compiler_info(os);
       indent (os);
-      os << "auto * " << new_name << " = " << s << ";\n";     
+      os << "[[maybe_unused]] auto * " << new_name << " = " << s << ";\n";     
       indent (os);
       os << "if (" << new_name << " == nullptr)\n";
       m_indent += 1;
@@ -2021,7 +2021,7 @@ namespace Smala
       build_properties(os);
 
       indent (os);
-      os << "auto * " << new_name << " = ";
+      os << "[[maybe_unused]] auto * " << new_name << " = ";
       
       std::string expr =  e->get_val () + " (p, n";
       used_processes[e->get_val ()] = true;
@@ -2031,7 +2031,7 @@ namespace Smala
       os  << expr;
     } else {
       indent (os);
-      os << "auto * " << new_name << " = new Component (p, n);\n";
+      os << "[[maybe_unused]] auto * " << new_name << " = new Component (p, n);\n";
     }
     used_processes["Component"] = true;
 
@@ -2234,7 +2234,7 @@ namespace Smala
     }
 
     indent (os);
-    os << "auto * " << new_name << " = new " << constructor << " (" << p_name
+    os << "[[maybe_unused]] auto * " << new_name << " = new " << constructor << " (" << p_name
         << ", " << name << ", " << function_name << ", ";
     if (type == COLLECTION_ACTION) {
       os << list << ", ";
@@ -2276,8 +2276,8 @@ namespace Smala
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
 
     os << "\nstatic void\n" << n->fct () << " (CoreProcess* c) {\n";
-    os << "\tauto *" << src_name << " = c->get_activation_source ();\n";
-    os << "\tProcess *" << data_name << " = (Process *) get_native_user_data (c);\n";
+    os << "\t[[maybe_unused]] auto * " << src_name << " = c->get_activation_source ();\n";
+    os << "\t[[maybe_unused]] Process * " << data_name << " = (Process *) get_native_user_data (c);\n";
 
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1) {
       print_error_message (error_level::warning,
@@ -2375,25 +2375,25 @@ namespace Smala
   {
     switch (type.first) {
       case INT: {
-        os << "int";
+        os << "[[maybe_unused]] int";
         break;
       }
       case DOUBLE: {
-        os << "double";
+        os << "[[maybe_unused]] double";
         break;
       }
       case STRING: {
-        os << "const djnn::string&";
+        os << "[[maybe_unused]] const djnn::string&";
         break;
       }
       case NATIVE_CODE_T: {
-        os << "djnn::NativeCode*";
+        os << "[[maybe_unused]] djnn::NativeCode*";
         break;
       }
       case NAME:
       case PROCESS:
       {
-        os << "djnn::CoreProcess*";
+        os << "[[maybe_unused]] djnn::CoreProcess*";
         break;
       }
       case DOUBLE_ARRAY:
@@ -2486,7 +2486,7 @@ namespace Smala
   CPPBuilder::print_component_decl (std::ostream &os, const std::string &name)
   {
     //emit_compiler_info(os);
-    os << "auto * " << name;
+    os << "[[maybe_unused]] auto * " << name;
   }
 
   void

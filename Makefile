@@ -70,10 +70,22 @@ endif
 endif
 
 # ---------------------------------------
-# save user-provided CXXFLAGS, and use CXXFLAGS as the utltimate compiler configuration
+# save user-provided CXXFLAGS, and use CXXFLAGS as the ultimate compiler configuration
 
 CXXFLAGS_CFG := $(CXXFLAGS)
 CXXFLAGS :=
+
+ifeq ($(linker),mold)
+ifeq ($(os),Darwin)
+CXXLD_CK ?= ld64.mold
+LDFLAGS += -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/
+LDFLAGS += -dylib -lc++ -lc
+else
+CXXLD_CK ?= mold
+CXXFLAGS += -fPIC
+LDFLAGS += --shared -L/usr/lib/x86_64-linux-gnu
+endif
+endif
 
 
 # ---------------------------------------
@@ -248,6 +260,8 @@ endif
 YACC ?= bison
 LEX ?= flex
 
+CXXLD_CK ?= $(CXX_CK)
+
 # -----------
 # smalac
 
@@ -324,7 +338,7 @@ $(build_dir)/$(smala_lib_dir)/gui/widgets/VBox.o: $(build_dir)/$(smala_lib_dir)/
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
-	$(CXX_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL)
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)
@@ -525,7 +539,7 @@ $1_app_cppflags += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pk
 $1_app_libs += $$(shell env PKG_CONFIG_PATH=$$(PKG_CONFIG_PATH):$$($1_lib_pkgpath) pkg-config --libs $$($1_app_pkg))
 endif
 
-$1_app_link := $$(CXX_CK)
+$1_app_link := $$(CXXLD_CK)
 
 #$$($1_app_objs): $$($1_app_gensrcs)
 $$($1_app_objs): CC = $$(CC_CK)

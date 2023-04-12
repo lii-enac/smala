@@ -22,7 +22,7 @@
  _action_
  list_action (list l, Process c)
  %{
-  Process *data = (Process*) get_native_user_data (c);
+  //Process *data = (Process*) get_native_user_data (c);
   for (auto e: l) {
     double w = ((AbstractProperty*)e->find_child("width"))->get_double_value ();
     ((DoubleProperty*)e->find_child("width"))->set_value (w + 5, true);

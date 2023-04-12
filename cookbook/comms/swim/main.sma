@@ -97,7 +97,7 @@ cpp_action (Process* c)
         using namespace curl;
         // code pasted from postman
         CURL *curl;
-        CURLcode res;
+        //CURLcode res;
         curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
@@ -115,7 +115,7 @@ cpp_action (Process* c)
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
 
             // blocking call
-            res = curl_easy_perform(curl);
+            /*res =*/ curl_easy_perform(curl);
         }
         curl_easy_cleanup(curl);
         if (content.empty()) return;

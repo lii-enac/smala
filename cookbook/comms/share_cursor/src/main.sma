@@ -59,7 +59,7 @@ action_cursor(Process c)
       if (cursor == nullptr)
       {
         cout << "cursor " << remote_uid << " doesn't exist...create it" << endl;
-        auto* cursor = RemoteCursor(remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color);
+        /*auto* cursor =*/ RemoteCursor(remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color);
       }
       else
       {

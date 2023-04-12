@@ -51,7 +51,7 @@ namespace djnn {
         void debug_json_stack ();
         void debug_expecting ();
         bool is_matching ();
-        bool _absolute;
+        //bool _absolute;
         enum sep_t { shallow_sep, deep_sep};
         std::vector<std::string> _xpath_vec;
         std::vector<std::string> _full_xpath_vec;

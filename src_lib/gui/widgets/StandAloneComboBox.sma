@@ -23,10 +23,10 @@ import ComboBoxItem
 
 _native_code_
 %{
-static Process* getParent (Process *p)
-{
-  return p->get_parent ();
-}
+// static Process* getParent (Process *p)
+// {
+//   return p->get_parent ();
+// }
 
 static int has_item (Process *item, Process *list) {
   string str_item = ((djnn::TextProperty*)item)->get_value ();

@@ -14,7 +14,7 @@
 
 namespace djnn {
     JSONSaxParser::JSONSaxParser (CoreProcess * parent, const std::string& name, const std::string& xpath)
-    : FatProcess (name), _absolute (false)
+    : FatProcess (name) //, _absolute (false)
     {
         assert(!xpath.empty());
 

@@ -270,7 +270,7 @@ bin_name := smalac
 smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o driver.o node.o smala_native.o ctrl_node.o \
 	newvar_node.o instruction_node.o binary_instruction_node.o expr_node.o name_context.o \
 	native_expression_node.o native_component_node.o range_node.o set_parent_node.o transition_node.o preamble.o ast.o \
-	js_type_manager.o js_builder.o html_builder.o builder.o cpp_builder.o main.o parser.o scanner.o \
+	js_type_manager.o js_builder.o html_builder.o builder.o cpp_builder.o main.o scanner.o \
 	process_class_path.o
 
 $(build_dir)/src/process_class_path.cpp:
@@ -323,18 +323,23 @@ smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib
 $(smala_lib_objs): CXX = $(CXX_CK)
 $(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -Ibuild/src_lib
 
-$(build_dir)/$(smala_lib_dir)/gui/widgets/ComboBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h $(build_dir)/$(smala_lib_dir)/gui/widgets/ComboBoxItem.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/Label.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/HSlider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/VSlider.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/RadioButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/CheckBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/ToggleButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/PushButton.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/HSpace.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/VSpace.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/HBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
-$(build_dir)/$(smala_lib_dir)/gui/widgets/VBox.o: $(build_dir)/$(smala_lib_dir)/gui/widgets/IWidget.h
+# find build -name "*.d" | xargs grep -s "gui/widgets/IWidget.h" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
+# find build/src_lib -name "*.d" | xargs grep -h build/src_lib | xargs echo
+# find build/src_lib -name "*.d" | xargs grep -h build/src_lib | grep -v cpp
+build/src_lib/gui/widgets/StandAloneComboBox.o: build/src_lib/gui/animation/Animator.h build/src_lib/gui/widgets/IWidget.h build/src_lib/gui/widgets/ComboBoxItem.h
+build/src_lib/gui/widgets/RadioButton.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/Label.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/VSlider.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/HSpace.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/PushButton.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/VBox.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/ToggleButton.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/ComboBox.o: build/src_lib/gui/widgets/IWidget.h build/src_lib/gui/widgets/ComboBoxItem.h
+build/src_lib/gui/widgets/VSpace.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/HBox.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/CheckBox.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/HSlider.o: build/src_lib/gui/widgets/IWidget.h
+build/src_lib/gui/widgets/UITextField.o: build/src_lib/gui/widgets/IWidget.h
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
@@ -364,34 +369,40 @@ endif
 # 	@mkdir -p $(dir $@)
 # 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(build_dir)/%.cpp $(build_dir)/%.hpp: %.y
+#$(build_dir)/%.cpp $(build_dir)/%.hpp: %.y
+#$(build_dir)/src/location.hh: src/parser.y
+#@$(YACC) -o $@ $<
+$(build_dir)/src/parser.cpp $(build_dir)/src/parser.hpp $(build_dir)/src/location.hh: src/parser.y
 	@mkdir -p $(dir $@)
-	$(YACC) -o $@ $<
+	@$(YACC) -o $(build_dir)/src/parser.cpp $<
 
 $(build_dir)/%.cpp: %.l
 	@mkdir -p $(dir $@)
 	$(LEX) -o $@ $<
 
+	
 
 # ------------
 # specific dependencies and peculiarities
 
 $(build_dir)/src/scanner.o: CXXFLAGS += -Dregister=""
-$(build_dir)/src/location.hh: $(build_dir)/src/parser.cpp
+#$(build_dir)/src/location.hh: src/parser.y #$(build_dir)/src/parser.cpp
 $(build_dir)/src/parser.o: CXXFLAGS_COMMON += -Wno-unused-but-set-variable
 
 # for initial make -j
 # find build -name "*.d" | xargs grep -s "parser.hpp" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
-$(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/j_builder.o $(build_dir)/src/builder.o \
-$(build_dir)/src/main.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/c_builder.o $(build_dir)/src/parser.o $(build_dir)/src/driver.o: $(build_dir)/src/parser.hpp
+$(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/builder.o $(build_dir)/src/cpp_builder.o \
+$(build_dir)/src/main.o $(build_dir)/src/parser.o $(build_dir)/src/js_builder.o \
+$(build_dir)/src/driver.o: $(build_dir)/src/parser.hpp
 
 # find build -name "*.d" | xargs grep -s "location.hh" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
-$(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/newvar_node.o $(build_dir)/src/range_node.o\
-$(build_dir)/src/native_expression_node.o $(build_dir)/src/native_component_node.o $(build_dir)/src/builder.o\
-$(build_dir)/src/smala_native.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/preamble.o $(build_dir)/src/instruction_node.o\
-$(build_dir)/src/set_parent_node.o $(build_dir)/src/expr_node.o $(build_dir)/src/name_context.o $(build_dir)/src/main.o\
-$(build_dir)/src/binary_instruction_node.o $(build_dir)/src/parser.o $(build_dir)/src/js_builder.o $(build_dir)/src/driver.o\
-$(build_dir)/src/node.o $(build_dir)/src/ctrl_node.o $(build_dir)/src/transition_node.o: $(build_dir)/src/location.hh
+$(build_dir)/src/scanner.o $(build_dir)/src/ast.o $(build_dir)/src/newvar_node.o $(build_dir)/src/range_node.o \
+$(build_dir)/src/native_expression_node.o $(build_dir)/src/native_component_node.o $(build_dir)/src/builder.o \
+$(build_dir)/src/smala_native.o $(build_dir)/src/cpp_builder.o $(build_dir)/src/preamble.o $(build_dir)/src/instruction_node.o \
+$(build_dir)/src/set_parent_node.o $(build_dir)/src/expr_node.o $(build_dir)/src/name_context.o $(build_dir)/src/main.o \
+$(build_dir)/src/binary_instruction_node.o $(build_dir)/src/js_builder.o $(build_dir)/src/driver.o \
+$(build_dir)/src/node.o $(build_dir)/src/ctrl_node.o $(build_dir)/src/transition_node.o \
+$(build_dir)/src/parser.o: $(build_dir)/src/location.hh
 
 
 # ------------
@@ -606,6 +617,23 @@ $(smala_lib_objs): $(pch_dst)
 
 $(app_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC)
 
+
+# ---------------------------------------
+# generate ninja file from Makefile
+
+make2ninja ?= tools/make2ninja.py
+
+ninja: clear build.ninja
+build.ninja: $(make2ninja)
+	$(MAKE) -Bnd V=max | python3 $(make2ninja) > build.ninja
+.PHONY: build.ninja ninja
+
+$(make2ninja):
+	mkdir -p $(dir $@)
+	curl -O https://raw.githubusercontent.com/conversy/make2ninja/master/make2ninja.py && mv make2ninja.py $(make2ninja)
+ifeq ($(os),Darwin)
+	sed -i '' "s/\'(./\`(./" $@
+endif
 
 # ---------------------------------------
 # stand alone

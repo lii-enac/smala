@@ -19,7 +19,7 @@ import gui.widgets.IWidget
 
 _native_code_
 %{
-#include <iostream>
+#include "core/utils/iostream.h"
 static Process* find_without_warning (Process* p, string path)
 {
   if (p == nullptr)

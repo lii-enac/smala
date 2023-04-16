@@ -185,6 +185,9 @@ namespace Smala
     //os << "using namespace std;\n";
     os << "using namespace djnn;\n\n";
 
+    indent (os);
+    os << "extern \"C\" { int puts(const char *s); } // for print()\n";
+
     int size = m_ast.preamble ().import ().size ();
     for (int i = 0; i < size; ++i) {
       /* add the import name to the possible types */
@@ -801,7 +804,9 @@ namespace Smala
     os << ");\n";
 
     indent (os);
-    os << "std::cout << " << name << ";\n";
+    //os << "djnnstl::cout << " << name << ";\n";
+    os << "puts (" << name << ".c_str());\n";
+
   }
 
   void
@@ -864,7 +869,7 @@ namespace Smala
     std::string list_name = "list_" + std::to_string (m_cpnt_num++);
     std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
     indent (os);
-    os << "std::vector<CoreProcess*> " << list_name << ";\n";
+    os << "djnnstl::vector<CoreProcess*> " << list_name << ";\n";
     std::string path = build_find (n->get_path (), true);
     build_properties(os);
     indent (os);

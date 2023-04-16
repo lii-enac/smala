@@ -443,6 +443,8 @@ $(build_dir)/src/parser.cpp: src/errors.h
 
 compiler ?= llvm
 
+ifneq ($(use_pch),no)
+
 ifeq ($(compiler),llvm)
 pch_ext = .pch
 endif
@@ -490,6 +492,8 @@ $(pch_dst): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DE
 pch: $(pch_dst)
 clean_pch:
 	rm -f $(pch_dst)
+
+endif
 
 # -----------
 # cookbook apps

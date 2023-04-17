@@ -49,6 +49,10 @@ import inverse_transform
 
 // TODO: fix cairo bug with enter/leave when moving shape
 // TODO: make it actually usable
+_native_code_
+%{
+#include <math.h>
+%}
 
 _define_
 Scrollbar(Process f) {

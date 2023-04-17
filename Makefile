@@ -81,12 +81,10 @@ CXXLD_CK ?= ld64.mold
 LDFLAGS += -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/
 LDFLAGS += -dylib -lc++ -lc
 else
-CXXLD_CK ?= mold
-CXXFLAGS += -fPIC
-LDFLAGS += --shared -L/usr/lib/x86_64-linux-gnu
+CXXLD ?= $(CXX) --use-ld=mold
+CXXLD_CK ?= $(CXX) --use-ld=mold
 endif
 endif
-
 
 # ---------------------------------------
 # cross-compile support
@@ -304,7 +302,7 @@ smalac: config.mk $(smalac)
 .PHONY: smalac
 
 $(smalac): $(smalac_objs)
-	$(CXX) $^ -o $@ $(LDFLAGS)
+	$(CXXLD) $^ -o $@ $(LDFLAGS)
 
 $(smalac): CXX = $(CXX_SC)
 $(smalac): LDFLAGS += $(LDFLAGS_SC)

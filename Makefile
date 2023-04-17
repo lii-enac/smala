@@ -86,6 +86,8 @@ CXXLD_CK ?= $(CXX) --use-ld=mold
 endif
 endif
 
+CXXLD ?= $(CXX)
+
 # ---------------------------------------
 # cross-compile support
 

@@ -664,9 +664,10 @@ $(build_dir)/%.html: %.sma $(smalac)
 # .sma to .cpp
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 	@mkdir -p $(dir $@)
-	$(smalac) $(SMAFLAGS) $<
-	@mv $*.cpp $(build_dir)/$(*D)
-	@if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
+	$(smalac) $(SMAFLAGS) -cpp $< -builddir $(build_dir)
+
+# @mv $*.cpp $(build_dir)/$(*D)
+# @if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
 
 # .sma to .cpp, .c etc
 # $(build_dir)/%.cpp $(build_dir)/%.h: %.sma

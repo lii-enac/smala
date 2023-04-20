@@ -171,7 +171,8 @@ namespace Smala
         m_filename = prefix + ".cpp";
     //std::ostream os (prefix + ".cpp");
 
-    
+    emit_compiler_info(os);
+
     if(m_ast.is_main ()) {
         build_use(os, "exec_env");
     }
@@ -257,6 +258,11 @@ namespace Smala
     if (!final_os.good()) {
       std::cerr << "dest file " << m_filename << " not good" << std::endl;
     }
+
+    auto sav_ident = m_indent;
+    m_indent = 0;
+    emit_compiler_info(final_os);
+    m_indent = sav_ident;
     for (auto p: used_processes) {
       extern std::map<std::string, std::string> process_class_path;
       try {
@@ -2114,6 +2120,8 @@ namespace Smala
     m_indent = 1;
     int size = m_ast.preamble ().use ().size ();
     bool has_display = false;
+
+    emit_compiler_info(os);
   
     /* init modules from use */
     for (int i = 0; i < size; ++i) {

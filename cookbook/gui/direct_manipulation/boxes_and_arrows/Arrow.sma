@@ -12,6 +12,8 @@ _native_code_
 #include <vector>
 #include <cmath>
 
+using namespace djnnstl;
+
 static double start_x = 0;
 static double start_y = 0;
 static double end_x = 0;

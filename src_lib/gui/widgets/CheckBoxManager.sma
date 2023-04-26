@@ -1,6 +1,11 @@
 use core
 use base
 
+import core.ontology.process
+import core.tree.container
+import base.process_handler
+
+
 _define_
 CheckBoxManager (Process items, Process init) {
   String value ("")

@@ -17,6 +17,9 @@ use base
 use display
 use gui
 
+import core.control.native_action
+import core.property.int_property
+
 // Define a C++ native action
 _action_
 cpp_action (Process c)

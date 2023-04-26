@@ -113,7 +113,8 @@ namespace Smala {
     int m_expr_in, m_expr_out; // are we in an expression or not?
     std::map<std::string, std::string> m_import_types;
 
-    std::map<std::string,bool> used_processes; // register which component is used, to generate the corrsponding includes
+    std::map<std::string,bool> used_processes; // register which component is used, to generate the corresponding includes
+    std::map<std::string,bool> used_headers;
     
     using sym_t = std::map<std::string, std::string>;
     sym_t sym; // contains aliases and properties created to build the djnn tree, and that can be reused

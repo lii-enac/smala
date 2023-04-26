@@ -16,8 +16,12 @@ use base
 use display
 use gui
 
+import base.process_handler
+
 _native_code_
 %{
+#include "core/tree/list.h"
+
 static int has_view_item (Process *model_item, Process *view_list) {
   //string id_model_item = ((djnn::TextProperty*)xmodel_item->find_child("id"))->get_value ();
   for (auto p : ((djnn::List*)view_list)->children ()) {

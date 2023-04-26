@@ -19,6 +19,12 @@ use display
 use gui
 use comms
 
+import core.control.native_action
+import core.property.text_property
+import core.property.double_property
+import core.property.int_property
+import core.utils.getset
+
 import ShareCursorPosition
 import RemoteCursor
 
@@ -59,16 +65,23 @@ action_cursor(Process c)
       if (cursor == nullptr)
       {
         cout << "cursor " << remote_uid << " doesn't exist...create it" << endl;
-        /*auto* cursor =*/ RemoteCursor(remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color);
+        ///*auto* cursor =*/ RemoteCursor(remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color);
+        RemoteCursor(remote_cursors, remote_uid.c_str(), remote_uid.c_str(), remote_x, remote_y, remote_color);
       }
       else
       {
-        ((DoubleProperty*)cursor->find_child("x"))->set_value(remote_x, true);
-        ((DoubleProperty*)cursor->find_child("y"))->set_value(remote_y, true);
-        
-        if (((IntProperty*)cursor->find_child("color"))->get_value() != remote_color) {
-          ((IntProperty*)cursor->find_child("color"))->set_value(remote_color, true);
+        // ((DoubleProperty*)cursor->find_child("x"))->set_value(remote_x, true);
+        // ((DoubleProperty*)cursor->find_child("y"))->set_value(remote_y, true);
+        // if (((IntProperty*)cursor->find_child("color"))->get_value() != remote_color) {
+        //   ((IntProperty*)cursor->find_child("color"))->set_value(remote_color, true);
+        // }
+        SET_CHILD_VALUE(Double, cursor, x, remote_x, true);
+        SET_CHILD_VALUE(Double, cursor, y, remote_y, true);
+        GET_CHILD_VALUE(color, Int, cursor, color);
+        if (color != remote_color) {
+          SET_CHILD_VALUE(Int, cursor, color, remote_color, true);
         }
+        
       }
     }
     else {

@@ -15,22 +15,27 @@
 use core
 use base
 
+import core.ontology.process
+import core.tree.container
+import base.process_handler
+
 import gui.widgets.IWidget
 
 _native_code_
 %{
 #include "core/utils/iostream.h"
-static Process* find_without_warning (Process* p, string path)
-{
-  if (p == nullptr)
-    return 0;
-  return p->find_child_impl(path);
-}
+
+// static Process* find_without_warning (Process* p, string path)
+// {
+//   if (p == nullptr)
+//     return 0;
+//   return p->find_child_impl(path);
+// }
 
 static void
-check (Process* p, const string& p_name)
+check (Process* p, const djnnstl::string& p_name)
 {
-	if (find_without_warning (p, p_name) == 0) {
+	if (find_optional (p, p_name) == 0) {
 		std::cerr << "Process " << p_name << " not found in VBox initialisation\n";
 		exit (0);
 	}
@@ -142,7 +147,7 @@ VBox (Process container) inherits IWidget ()
   Int cell_width (0)
   Int cell_height (0)
   Int space (5)
-  if (find_without_warning (container, "cell_width")) {
+  if (find_optional (container, "cell_width")) {
     container_width aka container.cell_width
     container_height aka container.cell_height
     set_pos = 0

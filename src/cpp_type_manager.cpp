@@ -23,6 +23,7 @@ namespace Smala {
     type_entry coreGS[] = {
       {"syshook", "(&MainLoop::instance ())"},
       {"mainloop", "(&MainLoop::instance ())"},
+      //{"mainloop", "(djnn_mainloop_instance ())"},
       {"_DEBUG_GRAPH_CYCLE_DETECT", "_DEBUG_GRAPH_CYCLE_DETECT"},
       {"_AUTHORIZE_CYCLE", "_AUTHORIZE_CYCLE"},
       {"_DEBUG_SEE_COLOR_PICKING_VIEW", "_DEBUG_SEE_COLOR_PICKING_VIEW"},

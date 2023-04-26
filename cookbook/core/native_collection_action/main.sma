@@ -17,17 +17,21 @@
  use display
  use gui
 
- import gui.widgets.StandAlonePushButton
+import core.property.double_property
+import base.process_handler
+import core.tree.container
 
- _action_
- list_action (list l, Process c)
- %{
+import gui.widgets.StandAlonePushButton
+
+_action_
+list_action (list l, Process c)
+%{
   //Process *data = (Process*) get_native_user_data (c);
   for (auto e: l) {
     double w = ((AbstractProperty*)e->find_child("width"))->get_double_value ();
     ((DoubleProperty*)e->find_child("width"))->set_value (w + 5, true);
   }
-  %}
+%}
 
 
   _main_

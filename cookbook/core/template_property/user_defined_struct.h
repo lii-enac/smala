@@ -18,7 +18,7 @@ operator+(const MyPoint2D& a, const MyPoint2D& b)
   return MyPoint2D{a.x+b.x,a.y+b.y};
 }
 
-inline std::string to_string2 (const MyPoint2D& s) { return djnn::to_string(s.x) + " " + djnn::to_string(s.y); }
+inline std::string to_string2 (const MyPoint2D& s) { return djnnstl::to_string(s.x) + " " + djnnstl::to_string(s.y); }
 
 // inline
 // ostream&

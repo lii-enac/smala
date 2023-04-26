@@ -22,6 +22,7 @@ _native_code_
 %{
     #include <iostream>
     #include "core/property/template_property_array.h"
+    using namespace djnnstl;
 
     void print_vec (vector< vector < vector <string> > > v) {
         for (auto i: v) {

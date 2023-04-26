@@ -63,6 +63,8 @@ string print_trace(void) {
 }
 */
 
+const bool m_fastcomp = false; // global for now, make it an option later
+
 //#define emit_compiler_info(OS)
 #define emit_compiler_info(OS) { indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n"; }
 
@@ -173,14 +175,23 @@ namespace Smala
 
     emit_compiler_info(os);
 
-    if(m_ast.is_main ()) {
-        build_use(os, "exec_env");
+    if (!m_fastcomp) {
+      if(m_ast.is_main ()) {
+          build_use(os, "exec_env");
+      }
+
+      //if (debug) {
+        os << "#include \"core/utils/error.h\" // for Context class\n";
+        os << "#undef error // avoid name clash with error macro and possible following #include\n";
+        os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
+      //}
+    } else {
+      os << R"(
+int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
+void djnn__warning (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
+int djnn__exit(int ret);// { exit(ret); return 1; }
+)";
     }
-
-    os << "#include \"core/utils/error.h\" // for Context class\n";
-    os << "#undef error // avoid name clash with error macro and possible following #include\n";
-    os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
-
     //os << "namespace djnn { extern void init_exec_env (); extern void clear_exec_env();\n"; // no need to use exec_env in smala program, or should it in main? 
 
     //os << "using namespace std;\n";
@@ -263,17 +274,28 @@ namespace Smala
     m_indent = 0;
     emit_compiler_info(final_os);
     m_indent = sav_ident;
-    for (auto p: used_processes) {
-      extern std::map<std::string, std::string> process_class_path;
-      try {
-        auto include = process_class_path[p.first];
-        if (include != "") {
-          //std::cerr << p.first.c_str() << std::endl;
-          final_os << "#include \"" << include << "\"\n";
+
+    if (m_fastcomp) { 
+      final_os << "#include \"c_api/djnn_c_api.h\"\n";
+    } else {
+      final_os << "#include \"core/utils/containers/string.h\"" << std::endl;
+      final_os << "using djnnstl::string;" << std::endl;
+      final_os << "using djnnstl::to_string;" << std::endl;
+      for (auto p: used_processes) {
+        extern std::map<std::string, std::string> process_class_path;
+        try {
+          auto include = process_class_path[p.first];
+          if (include != "") {
+            //std::cerr << p.first.c_str() << std::endl;
+            final_os << "#include \"" << include << "\"\n";
+          }
+        }
+        catch(std::out_of_range&) {
         }
       }
-      catch(std::out_of_range&) {
-      }
+    }
+    for (auto p: used_headers) {
+      final_os << "#include \"" << p.first << "\"\n";
     }
     final_os << "\n";
 
@@ -297,21 +319,22 @@ namespace Smala
     /*if (use.compare ("core") == 0)
       return;
     else*/
-    if (use.compare ("gui") == 0) {
-      if (!m_display_initialized) {
-        os << "#include \"display/display-dev.h\"\n";
-        //os << "namespace djnn { extern void init_display (); extern void clear_display(); }\n"; 
+    if (!m_fastcomp) {
+      if (use.compare ("gui") == 0) {
+        if (!m_display_initialized) {
+          os << "#include \"display/display-dev.h\"\n";
+          //os << "namespace djnn { extern void init_display (); extern void clear_display(); }\n"; 
+          m_display_initialized = true;
+        }
+      }
+      else
+      if (use.compare ("display") == 0) {
+        if (m_display_initialized)
+          return;
         m_display_initialized = true;
       }
+      os << "#include \"" << use << "/" << use << "-dev.h\"\n";
     }
-    else
-    if (use.compare ("display") == 0) {
-      if (m_display_initialized)
-        return;
-      m_display_initialized = true;
-    }
-    os << "#include \"" << use << "/" << use << "-dev.h\"\n";
-
     
     //os << "namespace djnn { extern void init_" << use << "(); extern void clear_" << use << "(); }\n"; 
   }
@@ -339,7 +362,7 @@ namespace Smala
     os << "{ return p.get_double_value(); }\n\n";
 
     os << "inline\n";
-    os << "const djnn::string& smala_deref(const djnn::string& p)\n";
+    os << "const djnnstl::string& smala_deref(const djnnstl::string& p)\n";
     os << "{ return p; }\n\n";
 
     os << "inline\n";
@@ -398,7 +421,12 @@ namespace Smala
     emit_compiler_info(os);
     for (auto const & e: m_new_syms_from_build_expr) {
       indent (os);
-      os << "[[maybe_unused]] auto * " << e.second << " = dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl; 
+      os << "[[maybe_unused]] auto * " << e.second << " = ";
+      if (!m_fastcomp) {
+        os << "dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl;
+      } else {
+        os << "(" << e.first << ");" << endl;
+      }
     }
     m_new_syms_from_build_expr.clear();
   }
@@ -447,7 +475,11 @@ namespace Smala
           }
         }
         if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
-          expr += "((AbstractProperty*)" + path + ")->get_string_value ()"; // FIXME
+          if (!m_fastcomp) {
+            expr += "((AbstractProperty*)" + path + ")->get_string_value ()"; // FIXME
+          } else {
+            expr += "djnn_get_string_value (" + path + ")"; // FIXME
+          }
           used_processes["AbstractProperty"] = true;
         } else if (m_in_switch || prod_t == process_t || e->get_expr_type() != PROCESS) {
           expr += path;
@@ -468,7 +500,11 @@ namespace Smala
             }
           }
 
-          expr += "get_property_value (" + new_path + ")"; // + print_trace(); // + boost::stacktrace::stacktrace();
+          if (!m_fastcomp) {
+            expr += "get_property_value (" + new_path + ")"; // + print_trace(); // + boost::stacktrace::stacktrace();
+          } else {
+            expr += string("djnn_") + "get_double_value (" + new_path + ")"; // + print_trace(); // + boost::stacktrace::stacktrace();
+          }
         }
         break;
       }
@@ -688,13 +724,19 @@ namespace Smala
   std::string
   CPPBuilder::build_path (PathNode* n)
   {
-    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
-    std::string symbol = n_list.at (0)->get_subpath ();
-    std::string str = m_parent_list.back ()->get_symbol (symbol);
+    const std::vector<SubPathNode*>& n_list = n->get_subpath_list ();
+    const std::string& symbol = n_list.at (0)->get_subpath ();
+    //std::string str = m_parent_list.back ()->get_symbol (symbol);
+    const std::string& parent_symbol = m_parent_list.back ()->get_symbol (symbol);
+    
+
     if (n_list.size () == 1)
-      return str;
+      return parent_symbol;
     if (n_list.size () == 2 && (n_list.at (1)->get_path_type () == WILD_CARD || n_list.at (1)->get_path_type () == PATH_LIST))
-      return str;
+      return parent_symbol;
+
+    std::string str = parent_symbol;
+    //std::cerr << str << std::endl;
 
     bool in_path = false;
     for (size_t i = 1; i < n_list.size (); i++) {
@@ -704,7 +746,11 @@ namespace Smala
         if (in_path)
           str += "/";
         else {
-          str += "->find_child (\"";
+          if (!m_fastcomp) {
+            str += "->find_child (\"";
+          } else {
+            str = string("djnn_find (") + str + ", \"";
+          }
           in_path = true;
         }
         str += n->get_subpath_list ().at (i)->get_subpath ();
@@ -715,7 +761,11 @@ namespace Smala
           if (in_path)
             str += "/";
           else {
-            str += "->find_child (\"";
+            if (!m_fastcomp) {
+              str += "->find_child (\"";
+            } else {
+              str = string("djnn_find (") + str + ", \"";
+            }
             in_path = true;
           }
           str += expr->get_val ();
@@ -724,7 +774,11 @@ namespace Smala
             str += "\")";
             in_path = false;
           }
-          str += "->find_child (";
+          if (!m_fastcomp) {
+            str += "->find_child (";
+          } else {
+            str = string("djnn_find (") + str + ", ";
+          }
           str += build_expr (expr);
           str += ")";
         }
@@ -738,7 +792,7 @@ namespace Smala
   std::string
   CPPBuilder::build_find (PathNode* n, bool ignore_cast)
   {
-    std::vector<SubPathNode*> n_list = n->get_subpath_list ();
+    const std::vector<SubPathNode*>& n_list = n->get_subpath_list ();
     if (n_list.empty ())
       return "";
 
@@ -805,9 +859,11 @@ namespace Smala
     
     std::string name ("var_" + std::to_string (m_var_num++));
     indent (os);
-    os << "djnn::string " << name << " ( ";
+    os << "djnnstl::string " << name << " ( ";
     os << expr_str;
     os << ");\n";
+
+    used_headers["core/utils/containers/string.h"];
 
     indent (os);
     //os << "djnnstl::cout << " << name << ";\n";
@@ -875,11 +931,24 @@ namespace Smala
     std::string list_name = "list_" + std::to_string (m_cpnt_num++);
     std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
     indent (os);
-    os << "djnnstl::vector<CoreProcess*> " << list_name << ";\n";
+    os << "const djnnstl::vector<CoreProcess*>* " << list_name << ";\n";
     std::string path = build_find (n->get_path (), true);
     build_properties(os);
     indent (os);
     os << "[[maybe_unused]] auto * " << loc_name << " = " << path << ";\n";
+    os << "{ auto*&cpn=" << loc_name << "; auto & lst=" << list_name << ";\n";
+    os << R"(
+  if (dynamic_cast<ProcessCollector*> (cpn) != nullptr) {
+		lst = &((ProcessCollector*) cpn)->get_list();
+	} else if (dynamic_cast<Container*> (cpn) != nullptr) {
+		lst = &((Container*) cpn)->children();
+	} else {
+		djnn__error (nullptr, "only Container and ProcessCollector can be used in forevery instruction\n");
+		djnn__exit (0);
+	}
+  }
+  )";
+    /*
     indent (os);
     os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
     m_indent++;
@@ -902,9 +971,10 @@ namespace Smala
     m_indent--;
     indent (os);
     os << "}\n";
+    */
     indent (os);
     std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    os << "for (auto " << var_name << " : " << list_name << ") {\n";
+    os << "for (auto " << var_name << " : *" << list_name << ") {\n";
     m_indent++;
   
     push_ctxt (); //DBG;
@@ -1010,39 +1080,83 @@ namespace Smala
       return;
     }
     indent (os);
-    os << "{ djnn::vector <djnn::string> in_names;\n";
+    if (!m_fastcomp) {
+      os << "{ djnnstl::vector <djnnstl::string> in_names;\n";
+    } else {
+      os << "{ const char* in_names [] = {\n";
+    }
     std::vector<SubPathNode*> subpaths = arg_node->get_path()->get_subpath_list();
     std::string comma = "";
-    for (auto p:subpaths.back()->get_path_list ()) {
+    for (auto p: subpaths.back()->get_path_list ()) {
       indent (os);
-      os << "in_names.push_back (\"";
+      if (!m_fastcomp) {
+        os << "in_names.push_back (\"";
+      } else {
+        os << comma;
+        comma = ",";
+        os << "\"";
+      }
       std::string sep = "";
       for (auto item: p->get_subpath_list()) {
         os << sep << item->get_subpath ();
         sep = "/";
       }
-      os << "\");\n";
+      if (!m_fastcomp) {
+        os << "\");\n";
+      } else {
+        os << "\"" << "\n";
+      }
+    }
+    if (m_fastcomp) {
+      indent (os);
+      os << "};\n";
     }
     m_indent++;
     for (auto e : node->get_output_nodes ()) {
       std::string out_arg = build_find (e, false);
       build_properties(os);
       indent (os);
-      os << "{ djnn::vector <djnn::string> out_names;\n";
+      if (!m_fastcomp) {
+      os << "{ djnnstl::vector <djnnstl::string> out_names;\n";
+      } else {
+        os << "{ const char* out_names [] = {\n";
+      }
       comma = "";
       for (auto p: e->get_subpath_list().back()->get_path_list()) {
         indent (os);
-        os << "out_names.push_back (\"";
+        if (!m_fastcomp) {
+          os << "out_names.push_back (\"";
+        } else {
+          os << comma;
+          comma = ",";
+          os << "\"";
+        }
         std::string sep = "";
         for (auto item: p->get_subpath_list()) {
           os << sep << item->get_subpath ();
           sep = "/";
         }
-        os << "\");\n";
+        if (!m_fastcomp) {
+          os << "\");\n";
+        } else {
+          os << "\"" << "\n";
+        }
       }
       indent (os);
-      os << control_name << " (" << p_name << ", " <<   arg << ", in_names, "
-          << out_arg << ", out_names, " << model << ");\n";
+      if (m_fastcomp) {
+        os << "};\n";
+        indent (os);
+      }
+      
+      os << control_name << " (" << p_name << ", "
+         <<   arg << ", in_names, ";
+      if (m_fastcomp)
+        os << subpaths.back()->get_path_list ().size () << ", ";
+      os << out_arg << ", out_names, ";
+      if (m_fastcomp)
+        os << e->get_subpath_list().back()->get_path_list().size () << ", ";
+      os   << model << ");\n";
+      
       indent (os);
       os << "}\n";
     }
@@ -1069,7 +1183,13 @@ namespace Smala
           // if it's inside a switch, we should surround it with a component, or find the nearest parent component and put it there
           std::string branch_name = "cpnt_" + std::to_string (m_cpnt_num++);
           indent (os);
-          os << "[[maybe_unused]] auto * " << branch_name << " = new Component (" << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
+          os << "[[maybe_unused]] auto * " << branch_name << " = ";
+          if (!m_fastcomp) {
+            os << "new Component (";
+          } else {
+            os << "djnn_" << "new_Component (";
+          }
+          os << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
           p_name = branch_name;
           used_processes["Component"] = true;
         }
@@ -1097,10 +1217,24 @@ namespace Smala
         used_processes["TemplateProperty"] = true;
       } else {
         if (arg_node->get_expr_type() == STRING) {
-          os << "[[maybe_unused]] TextProperty * " << new_name << " = new TextProperty (";
+          if (!m_fastcomp) {
+            os << "[[maybe_unused]] TextProperty * " << new_name << " = ";
+          } else {
+            os << "[[maybe_unused]] auto * " << new_name << " = ";
+          }
+          if (!m_fastcomp) {
+            os << "new TextProperty (";
+          } else {
+            os << "djnn_" << "new_TextProperty (";
+          }
           used_processes["TextProperty"] = true;
         } else {
-          os << "[[maybe_unused]] auto * " << new_name << " = new DoubleProperty (";
+          os << "[[maybe_unused]] auto * " << new_name << " = ";
+          if (!m_fastcomp) {
+            os << "new DoubleProperty (";
+          } else {
+            os << "djnn_" << "new_DoubleProperty (";
+          }
           used_processes["DoubleProperty"] = true;
         }
       }
@@ -1124,7 +1258,13 @@ namespace Smala
       std::string out_arg = build_find (node->get_output_nodes ().at (0), false);
       build_properties(os);
       indent (os);
-      os << "[[maybe_unused]] auto * " << new_name << " = new Assignment ( "
+      os << "[[maybe_unused]] auto * " << new_name << " = ";
+      if (!m_fastcomp) {
+        os << "new Assignment ( ";
+      } else {
+        os << "djnn_" << "new_Assignment ( ";
+      }
+      os
           << p_name
           << ", "
           << arg << ", "
@@ -1146,7 +1286,11 @@ namespace Smala
         string used_process_name;
 
         indent (os);
-        os << "new ";
+        if (!m_fastcomp) {
+          os << "new ";
+        } else {
+          os << "djnn_" << "new_";
+        }
         if (templated) {
           os << "T";
           used_process_name = "T";
@@ -1204,11 +1348,15 @@ namespace Smala
   void
   CPPBuilder::emit_not_a_property (std::ostream &os, const std::string& arg)
   {
-    os << "if (" << arg << "->get_process_type() != PROPERTY_T) {\n";
+    if (!m_fastcomp) {
+      os << "if (" << arg << "->get_process_type() != PROPERTY_T) {\n";
+    } else {
+      os << "if (djnn_get_process_type (" << arg << ") != PROPERTY_T) {\n";
+    }
     indent (os);
     os << "\tdjnn__error (" << arg << ", \"is not a property\\n\");\n";
     indent (os);
-    os << "\texit(0);\n";
+    os << "\tdjnn__exit(0);\n";
     indent (os);
     os << "}\n";
   }
@@ -1270,7 +1418,15 @@ namespace Smala
         } else {
           arg = remove_deref (arg);
           std::string fake_name = build_fake_name (l->get_path (), false);
-          if (arg.find ("->") != std::string::npos) { 
+          const char* str_to_find;
+          if (!m_fastcomp) {
+            str_to_find = "->";
+          } else {
+            str_to_find = "djnn_find";
+          }
+          //if (arg.find ("->") != std::string::npos) {
+          //if (arg.find ("djnn_find") != std::string::npos) {
+          if (arg.find (str_to_find) != std::string::npos) {
             std::string new_param_name = transform_name (fake_name);
             if (prop_sym.find (new_param_name) == prop_sym.end ()) {
               std::string tmpl_class_name = "AbstractProperty*";
@@ -1280,8 +1436,11 @@ namespace Smala
               indent (create_temp_properties);
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
-              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
-
+              if (!m_fastcomp) {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
+              } else {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n\n";
+              }
               used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
               prop_sym[new_param_name] = new_name;
@@ -1307,7 +1466,11 @@ namespace Smala
               indent (create_temp_properties);
               emit_not_a_property (create_temp_properties, arg);
               indent (create_temp_properties);
-              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+              if (!m_fastcomp) {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+              } else {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
+              }
               used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
               prop_sym[new_param_name] = new_name;
@@ -1317,7 +1480,7 @@ namespace Smala
             emit_compiler_info(populate_native_fields);
             indent (populate_native_fields);
             populate_native_fields << native_name << "->" << new_param_name << " = " 
-              <<  new_name << ";\n";    
+              <<  new_name << ";\n";
             if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
               triggers.push_back (new_name);
               tmpl_varnames.push_back(new_name);
@@ -1333,7 +1496,13 @@ namespace Smala
       std::string arg = build_find (e, false);
       build_properties(create_temp_properties);
       if (arg.compare (0, 4, "var_") != 0) {
-        if (arg.find ("->") != std::string::npos) {
+        const char* str_to_find;
+        if (!m_fastcomp) {
+          str_to_find = "->";
+        } else {
+          str_to_find = "djnn_find";
+        }
+        if (arg.find (str_to_find) != std::string::npos) {
           std::string fake_name = build_fake_name (e, true);
           std::string new_param_name = transform_name (fake_name);
 
@@ -1345,7 +1514,11 @@ namespace Smala
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
-            create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
+            if (!m_fastcomp) {
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
+            } else {
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
+            }
 
             used_processes["AbstractProperty"] = true;            
             sym[new_param_name] = new_name;
@@ -1373,7 +1546,11 @@ namespace Smala
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
-            create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+            if (!m_fastcomp) {
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
+            } else {
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
+            }
 
             used_processes["AbstractProperty"] = true;
             prop_sym[new_param_name] = new_name;
@@ -1412,7 +1589,12 @@ namespace Smala
     // now that properties are built, call finalize_construction(), which in turn will call impl_activate()
     emit_compiler_info(populate_native_fields);
     indent (populate_native_fields);
-    populate_native_fields << native_name << "->finalize_construction (" << p_name << ", " << n_expr_name << ");\n";
+    if (!m_fastcomp) {
+      populate_native_fields << native_name << "->finalize_construction (";
+    } else {
+      populate_native_fields << "djnn_" << "finalize_construction (" << native_name << ", ";
+    }
+    populate_native_fields << p_name << ", " << n_expr_name << ");\n";
 
     emit_compiler_info(os);
     os << "// >>\n";
@@ -1433,13 +1615,21 @@ namespace Smala
       emit_compiler_info(os);
       std::string sync_name ("cpnt_" + std::to_string (m_cpnt_num++));
       indent (os);
-      os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name
-          << ", \"sync_"+sync_name+"\", " << new_name << ", \"\"); //FIXME remove Synchronizer\n"; // FIXME
+      if (!m_fastcomp) {
+        os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name;
+      } else {
+        os << "auto * " << sync_name << " = djnn_new_Synchronizer (" << p_name;
+      }
+      os << ", \"sync_"+sync_name+"\", " << new_name << ", \"\"); //FIXME remove Synchronizer\n"; // FIXME
       used_processes["Synchronizer"]=true;
       native_edge_name = sync_name;
       for (auto t : triggers) {
         indent (os);
-        os << sync_name << "->add_source (" << t << ", \"\");\n";
+        if (!m_fastcomp) {
+          os << sync_name << "->add_source (" << t << ", \"\");\n";
+        } else {
+          os << "djnn_synchronizer_add_source (" << sync_name << ", " << t << ", \"\");\n";
+        }
       }
     }
     emit_compiler_info(os);
@@ -1447,7 +1637,11 @@ namespace Smala
       std::string arg = build_find (out, false);
       build_properties(create_temp_properties);
       indent (os);
-      os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
+      if (!m_fastcomp) {
+        os << native_edge_name <<"->add_native_edge (" << new_name << "," ;
+      } else {
+        os << "djnn_add_native_edge (" << native_edge_name << ", " << new_name << ", " ;
+      }
       os << arg << ");\n";
     }
 
@@ -1478,7 +1672,7 @@ namespace Smala
     emit_compiler_info(os);
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
-    os << node->action_name () << " (CoreProcess *" << node->param_name () << ", const vector<CoreProcess*> " << node->list_name() << ")\n"; // FIXME shoudl be a ref
+    os << node->action_name () << " (CoreProcess *" << node->param_name () << ", const djnnstl::vector<CoreProcess*> " << node->list_name() << ")\n"; // FIXME shoudl be a ref
     const std::string code = node->code ();
     if (code[0] != '{') {
       os << "{\n";
@@ -1515,20 +1709,34 @@ namespace Smala
 
     vector<string> tmpl_types;
 
-    struct_stream << "struct " << native_name_struct << " : public NativeExpressionAction {\n";
-    struct_stream << "\t" << native_name_struct << R"( (CoreProcess *p, const djnn::string &n, bool string_setter, bool isModel)
-      : NativeExpressionAction (p, n, isModel), _string_setter (string_setter)
+    struct_stream << "struct " << native_name_struct;
+    if (!m_fastcomp) {
+      struct_stream << " : public NativeExpressionAction {\n";
+      struct_stream << "\t" << native_name_struct << " (djnn::CoreProcess *p, ";
+      struct_stream << "const djnnstl::string &n";
+      struct_stream << ", bool string_setter, bool is_model=false)";
+      struct_stream << R"(
+       : NativeExpressionAction (p, n, string_setter)
     {
-      set_is_model (isModel);
-
+      set_is_model (is_model);
+    }
       // note: finalize_construction will call impl_activate before proper properties are fully built, leading to a crash
       // so delay finalize_construction after building properties
       // finalize_construction (p, n);
+    )";
+    } else {
+      struct_stream << " : public NativeExpressionActionProxy {\n";
+      struct_stream << "\t" << native_name_struct << " (djnn::CoreProcess *p, ";
+      struct_stream << "const char *n";
+      struct_stream << ", bool string_setter, bool is_model=false)";
+      struct_stream << R"(
+      : NativeExpressionActionProxy (p, n, string_setter, is_model) {}
+    )";
     }
-
+    struct_stream << R"(
     bool _string_setter;
-    void impl_deactivate () override {}
     void impl_activate () override;)" << "\n";
+    //struct_stream << "\t" << "void impl_deactivate () override {}\n)";
 
     m_expr_in = m_expr_out = 0;
 
@@ -1579,11 +1787,11 @@ namespace Smala
     }
 
     std::ostringstream struct_template_stream;
-    struct_template_stream << "class ";
+    struct_template_stream << "typename ";
 
     std::copy(std::begin(tmpl_types),
               std::end(tmpl_types),
-              std::experimental::make_ostream_joiner(struct_template_stream, ", class "));
+              std::experimental::make_ostream_joiner(struct_template_stream, ", typename "));
 
     os << "\n\n";
     os << "template <" << struct_template_stream.str() << ">\n";
@@ -1602,7 +1810,13 @@ namespace Smala
     os << ">";
     os << "::impl_activate ()\n{\n";
     for (auto n : node->get_output_nodes ()) {
-      os << "\t" << transform_name (build_fake_name(n, true)) << "->set_value(";
+      os << "\t";
+      if (!m_fastcomp) {
+        os << transform_name (build_fake_name(n, true)) << "->set_value (";
+      } else {
+        os << "djnn_" << "set_value (" <<  transform_name (build_fake_name(n, true)) << ",";
+      }
+
       ExprNode* expr = node->get_expression();
       os << build_expr (expr, undefined_t, true); // this should NOT create a new dynamic_casted property !!!
       os << ", " << !node->is_paused () << ");\n";
@@ -1650,7 +1864,10 @@ namespace Smala
           os << "if (" << arg << ")" << endl ;
           m_indent += 1;
           indent (os);
-          os << arg << "->dump (0);\n";
+          if (!m_fastcomp)
+            os << arg << "->dump (0);\n";
+          else
+            os << "djnn_dump (" << arg << ")\n";
           m_indent -= 1;
           //indent (os);
           //s << "else" << endl ;
@@ -1661,7 +1878,10 @@ namespace Smala
           os << "if (" << arg << ")" << endl ;
           m_indent += 1;
           indent (os);
-          os << arg << "->serialize (\"XML\");\n";
+          if (!m_fastcomp)
+            os << arg << "->serialize (\"XML\");\n";
+          else
+            os << "djnn_serialize (" << arg << ")\n";
           m_indent -= 1;
           //indent (os);
           //os << "else" << endl ;
@@ -1669,19 +1889,40 @@ namespace Smala
           //os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case NOTIFY:
-          os << arg << "->notify_activation ();\n";
+          if (!m_fastcomp)
+            os << arg << "->notify_activation ();\n";
+          else
+            os << "djnn_notify_activation (" << arg << ");\n";
           break;
-        case RUN:
-          if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
-            os << "MainLoop::instance ().activate ();\n";
-          } else
-            os << arg << "->activate ();\n";
+        case RUN: {
+          auto& ml = n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath();
+          if (ml.compare("syshook") == 0 || ml.compare("mainloop") == 0) {
+            if (!m_fastcomp)
+              os << "MainLoop::instance ().activate ();\n";
+            else
+              os << "djnn_activate (djnn_mainloop_instance ()); \n";
+          } else {
+            if (!m_fastcomp)
+              os << arg << "->activate ();\n";
+            else
+              os << "djnn_activate (" << arg << ");\n";
+          }
+          }
           break;
-        case STOP:
-          if (n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath().compare("syshook") == 0) {
-            os << "MainLoop::instance ().deactivate ();\n";
-          } else
-            os << arg << "->deactivate ();\n";
+        case STOP: {
+          auto& ml = n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath();
+          if (ml.compare("syshook") == 0 || ml.compare("mainloop") == 0) {
+            if (!m_fastcomp)
+              os << "MainLoop::instance ().deactivate ();\n";
+            else
+              os << "djnn_deactivate (djnn_mainloop_instance ()); \n";
+          } else {
+            if (!m_fastcomp)
+              os << arg << "->deactivate ();\n";
+            else
+              os << "djnn_deactivate (" << arg << ");\n";
+          }
+          }
           break;
         case DELETE: {
           /* 
@@ -1694,17 +1935,41 @@ namespace Smala
           os << "if (" << new_name << ") {\n";
           m_indent += 1;
           indent (os);
-          os << new_name << "->deactivate ();\n";
+          os << "auto& cpnt = " << new_name << ";\n";
           indent (os);
-          os << "if (" << new_name << "->get_parent ())\n";
-          m_indent += 1;
-          indent (os);
-          os << new_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_name << "));\n";
-          m_indent -= 1;
-          indent (os);
-          os << new_name << "->schedule_deletion ();\n";
-          indent (os);
-          os << new_name << " = nullptr;\n";
+          if (! m_fastcomp) {
+            os << R"(
+      cpnt->deactivate ();
+      if (cpnt->get_parent ())
+        cpnt->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(cpnt));
+      cpnt->schedule_deletion ();
+      cpnt = nullptr;
+    )";
+          } else {
+            os << R"(
+      djnn_deactivate (cpnt);
+      if (djnn_get_parent (cpnt))
+        djnn_remove_child (djnn_get_parent (cpnt), cpnt);
+      djnn_schedule_deletion (cpnt);
+      cpnt = nullptr;
+    )";
+
+          }
+
+
+          // m_indent += 1;
+          // indent (os);
+          // os << new_name << "->deactivate ();\n";
+          // indent (os);
+          // os << "if (" << new_name << "->get_parent ())\n";
+          // m_indent += 1;
+          // indent (os);
+          // os << new_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_name << "));\n";
+          // m_indent -= 1;
+          // indent (os);
+          // os << new_name << "->schedule_deletion ();\n";
+          // indent (os);
+          // os << new_name << " = nullptr;\n";
           m_indent -= 1;
           indent (os);
           os << "}\n";
@@ -1716,7 +1981,7 @@ namespace Smala
           indent (os); os << "if (" << new_layer_name << ") {\n";
           
           indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
-          indent (os); indent (os); os << "exit(0);\n";
+          indent (os); indent (os); os << "djnn__exit(0);\n";
           indent (os); os << "}\n";
           std::string new_container_name ("cpnt_" + std::to_string (m_cpnt_num++));
           indent (os); os << "Container *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
@@ -1749,7 +2014,7 @@ namespace Smala
           indent (os); os << "}\n";
           indent (os); os << "else {\n";
           indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
-          indent (os); indent (os); os << "exit(0);\n";
+          indent (os); indent (os); os << "djnn__exit(0);\n";
           indent (os); os << "}\n";
 
           used_processes["Layer"] = true;
@@ -1792,8 +2057,19 @@ namespace Smala
       build_properties(os);
       if (!m_in_for)
         indent (os);
-      if ( (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0)) {
-        os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << expr_str << ", true)";
+      //std::cerr << prop_name << " " << " " << sizeof("djnn_find (") << " " << prop_name[12] << " " << prop_name.find ("cpnt_", sizeof("djnn_find (")) << std::endl;
+      bool cond;
+      //if (!m_fastcomp) {
+        cond = (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0)) == 0;
+      //} else {
+        cond |= (prop_name.find ("cpnt_", sizeof("djnn_find (")-1) != string::npos) || (prop_name.find ("arg_", sizeof("djnn_find (")-1) != string::npos);
+      //}
+      if (cond) {
+        if (!m_fastcomp) {
+          os << "((AbstractProperty*) "<< prop_name << ")->set_value (" << expr_str << ", true)";
+        } else {
+          os << "djnn_set_value ("<< prop_name << ", " << expr_str << ", true)";
+        }
         if (!m_in_for)
           os << ";\n";
         used_processes["AbstractProperty"] = true;
@@ -1818,29 +2094,63 @@ namespace Smala
     auto expr_str = build_expr (node->get_args().at(0), undefined_t);
     build_properties (os);
 
-    if ( (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0)) {
+    bool cond;
+    if (!m_fastcomp) {
+      cond = (prop_name.find ("cpnt_", 0) == 0) || (prop_name.find ("arg_", 0) == 0);
+    } else {
+      cond = (prop_name.find ("cpnt_", sizeof("djnn_find (")-1) != string::npos) || (prop_name.find ("arg_", sizeof("djnn_find (")-1) != string::npos);
+    }
+    if (cond) {
       used_processes["AbstractProperty"] = true;
       used_processes["TextProperty"] = true;
 
       string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       indent (os);
-      os << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<AbstractProperty*>(" << prop_name << ");\n";
+      os << "[[maybe_unused]] auto * " << new_name << " = ";
+      if (!m_fastcomp) {
+        os << "dynamic_cast<AbstractProperty*>(" << prop_name << ");\n";
+      } else {
+        os << "(" << prop_name << ");\n";
+      }
       sym[prop_name] = new_name;
       prop_sym[prop_name] = new_name;
 
       if (!m_in_for) {
         indent (os);
-        os << "if (" << new_name << "->get_prop_type() == String) {\n";
-        os << "\t\tdjnn_warning (" << prop_name << ", \"invalid operand for String Property\");\n";
+        os << "if (";
+        if (!m_fastcomp) {
+          os << new_name << "->get_prop_type() == String";
+        } else {
+          os << "djnn_get_process_type(" << new_name << " ) == String";
+        }
+        os << ") {\n";
+        os << "\t\tdjnn__warning (" << prop_name << ", \"invalid operand for String Property\");\n";
         os << "\t}";
         os << "else {\n";
-        os << "\t\t" << new_name << "->set_value (";
-        os <<  new_name << "->get_double_value () " << symbol;
+        os << "\t\t";
+        if (!m_fastcomp) {
+        os << new_name << "->set_value (";
+        } else {
+          os << "djnn_set_value (" << new_name ;
+        }
+        if (!m_fastcomp) {
+          os << new_name << "->get_double_value () " << symbol;
+        } else {
+          os << ", djnn_get_double_value (" << new_name << ") " << symbol;
+        }
         os << " " <<  expr_str << ", true);\n";
         os << "\t}";
       } else {
-        os << new_name << "->set_value (";
-        os << new_name << "->get_double_value () " << symbol;
+        if (!m_fastcomp) {
+          os << new_name << "->set_value (";
+        } else {
+          os << "djnn_set_value (" << new_name << ")" ;
+        }
+        if (!m_fastcomp) {
+          os << new_name << "->get_double_value () " << symbol;
+        } else {
+          os << ", djnn_get_double_value (" << new_name << ") " << symbol;
+        }
         os << " " << expr_str << ", true)";
       }
     } else {
@@ -1855,6 +2165,7 @@ namespace Smala
   void
   CPPBuilder::alias (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     std::string arg = build_find (n->right_arg (), false);
     build_properties (os);
@@ -1863,10 +2174,19 @@ namespace Smala
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << whatever_name << "\", ";
-    os << "dynamic_cast<CoreProcess*>(" << arg << "));\n";
+    if (!m_fastcomp) {
+      os << "dynamic_cast<CoreProcess*>(" << arg << "));\n";
+    } else {
+      os << "(" << arg << "));\n";
+    }
     indent (os);
-    os << "[[maybe_unused]] auto * " << new_name << " = " << m_parent_list.back ()->name ()
-        << "->find_child ( \"" << whatever_name + "\");\n";
+    os << "[[maybe_unused]] auto * " << new_name << " = ";
+    if (!m_fastcomp) {
+      os << m_parent_list.back ()->name () << "->find_child (";
+    } else {
+      os << "djnn_find (" << m_parent_list.back ()->name () << ", ";
+    }
+    os << "\"" << whatever_name + "\");\n";
     if (m_parent_list.back ()->add_entry (whatever_name, new_name) == 1
         && node->duplicate_warning ())
       print_error_message (error_level::warning,
@@ -1910,12 +2230,22 @@ namespace Smala
       std::string last = build_find (n->right_arg (), false);
       build_properties (os);
       indent (os);
-      os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*>(" << left << "), "
+      if (!m_fastcomp) {
+        os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*> (";
+      } else {
+        os << "djnn_move_child((djnn_get_parent (" << left << ")), (";
+      }
+      os << left << "), "
               << c << ", " << last << ");\n";
     }
     else {
       indent (os);
-      os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*>(" << left << "), "
+      if (!m_fastcomp) {
+        os << left << "->get_parent ()->move_child (dynamic_cast<CoreProcess*>(";
+      } else {
+        os << "djnn_move_child((djnn_get_parent (" << left << ")), (";
+      }
+      os << left << "), "
         << c << ", nullptr);\n";
     }
   }
@@ -1942,10 +2272,15 @@ namespace Smala
   void
   CPPBuilder::build_end_add_child (std::ostream &os, Node *n)
   {
-    emit_compiler_info(os);
     os << ";\n";
+    emit_compiler_info(os);
     indent (os);
-    os << m_parent_list.back ()->name () << "->add_child (" << m_cur_building_name;
+    if (!m_fastcomp) {
+      os << m_parent_list.back ()->name () << "->add_child (";
+    } else {
+      os << "djnn_add_child (" << m_parent_list.back ()->name () << ", ";
+    }
+    os << m_cur_building_name;
     if (n->keep_name ()) {
       os << ", " << m_parent_list.back ()->get_symbol (n->name());
     } else {
@@ -1962,7 +2297,17 @@ namespace Smala
     if (parent == m_null_symbol)
       return;
     indent (os);
-    os << parent << "->add_child (dynamic_cast<CoreProcess*>(" << child << "), \"" << name << "\");\n";
+    if (!m_fastcomp) {
+      os << parent << "->add_child";
+    } else {
+      os << "djnn_add_child (" << parent << ",";
+    }
+    if (!m_fastcomp) {
+      os << " (dynamic_cast<CoreProcess*>(" << child << ")";
+    } else {
+      os << " (" << child << ")";
+    }
+    os << ", \"" << name << "\");\n";
   }
 
   void
@@ -1979,7 +2324,12 @@ namespace Smala
         build_properties (os);
         emit_compiler_info(os);
         indent (os);
-        os << s << "->add_child (" << child << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
+        if (!m_fastcomp) {
+          os << s << "->add_child (";
+        } else {
+          os << "djnn_add_child (" << s << ", ";
+        }
+        os << child << ",\"" << name->get_subpath_list ().back()->get_subpath () << "\");\n";
       }
       //m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
       push_ctxt (s);
@@ -2000,7 +2350,7 @@ namespace Smala
       os << "if (" << new_name << " == nullptr)\n";
       m_indent += 1;
       indent (os);
-      os << "exit(1);\n";
+      os << "djnn__exit (1);\n";
       m_indent -=1;
       //os << "\tcerr <<  endl << endl << \"ERROR - processing addChildrenTo - the component \\\"\" << \"" << node->name () << "\\\"\" << \" is null or do not exist yet\" << endl << endl;\n";
       //os << "error " ... // djnn-cpp should raise an error
@@ -2042,7 +2392,12 @@ namespace Smala
       os  << expr;
     } else {
       indent (os);
-      os << "[[maybe_unused]] auto * " << new_name << " = new Component (p, n);\n";
+      os << "[[maybe_unused]] auto * " << new_name << " = ";
+      if (!m_fastcomp) {
+        os << "new Component (p, n);\n";
+      } else {
+        os << "djnn_" <<  "new_Component (p, n);\n";
+      }
     }
     used_processes["Component"] = true;
 
@@ -2069,7 +2424,12 @@ namespace Smala
     
     //m_parent_list.push_back (new BuildNode ("", m_parent_list.back ()));
 
-    os << "CoreProcess*\n" << node->name () << " (CoreProcess *p, const string &n";
+    os << "CoreProcess*\n" << node->name () << " (CoreProcess *p, ";
+    if (!m_fastcomp) {
+      os << "const djnnstl::string &n";
+    } else {
+      os << "const char * n";
+    }
     std::vector< named_parameter_t > data = node->get_args_spec();
     for (size_t j = 0; j < data.size (); j++) {
       named_parameter_t arg = data.at (j);
@@ -2136,15 +2496,21 @@ namespace Smala
       }
       if (str == "gui" && !has_display) {
         indent (os);
+        if (m_fastcomp)
+          os << "djnn_";
         os << "init_display ();\n"; // do it before init_gui ()
         has_display = true;
       }
       /* add corresponding init_MODULE */
       indent (os);
+      if (m_fastcomp)
+        os << "djnn_";
       os << "init_" << str << " ();\n";
 
       if (str == "core") {
         indent (os);
+        if (m_fastcomp)
+          os << "djnn_";
         os << "init_exec_env ();\n"; // do it after init_core ()
       }
     }
@@ -2158,16 +2524,30 @@ namespace Smala
     if (data == nullptr)
       return;
     indent (os);
-    os << data->build_name () << "->activate ();\n";
+    if (!m_fastcomp) {
+      os << data->build_name () << "->activate ();\n";
+    } else {
+      os << "djnn_" << "activate (" << data->build_name () << ");\n";
+    }
     indent (os);
-    os << "MainLoop::instance ().activate ();\n\n";
+    if (!m_fastcomp) {
+      os << "MainLoop::instance ().activate ();\n\n";
+    } else {
+      os << "djnn_activate (djnn_mainloop_instance());\n";
+    }
     used_processes["MainLoop"] = true;
 
     if (m_cleaner) {
       indent (os);
-      os << data->build_name () << "->deactivate ();\n";
-      indent (os);
-      os << "delete " << data->build_name () << ";\n";
+      if (!m_fastcomp) {
+        os << data->build_name () << "->deactivate ();\n";
+        indent (os);
+        os << "delete " << data->build_name () << ";\n";
+      } else {
+        os << "djnn_" << "deactivate (" << data->build_name () << ");\n";
+        indent (os);
+        os << "djnn_" << "delete (" << data->build_name () << ");\n";
+      }
 
       emit_compiler_info(os);
       /* clear modules from use */
@@ -2186,14 +2566,20 @@ namespace Smala
         /* add corresponding clear_MODULE */
         if (str == "core") {
           indent (os);
+          if (m_fastcomp)
+            os << "djnn_";
           os << "clear_exec_env ();\n"; // do it after init_core ()
         }
 
         indent (os);
+        if (m_fastcomp)
+          os << "djnn_";
         os << "clear_" << str << " ();\n";
 
         if (str == "gui" && !has_display) {
           indent (os);
+          if (m_fastcomp)
+            os << "djnn_";
           os << "clear_display ();\n"; // do it after clear_gui ()
         }
       }
@@ -2247,7 +2633,13 @@ namespace Smala
     }
 
     indent (os);
-    os << "[[maybe_unused]] auto * " << new_name << " = new " << constructor << " (" << p_name
+    os << "[[maybe_unused]] auto * " << new_name << " = ";
+    if (!m_fastcomp) {
+      os << "new " << constructor;
+    } else {
+      os << "djnn_new_" << constructor;
+    }
+    os << " (" << p_name
         << ", " << name << ", " << function_name << ", ";
     if (type == COLLECTION_ACTION) {
       os << list << ", ";
@@ -2262,7 +2654,12 @@ namespace Smala
     TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);
-    os << "new " << constructor << " (" << m_parent_list.back ()->get_symbol (ctrl->parent ()->name())
+    if (!m_fastcomp) {
+      os << "new " << constructor;
+    } else {
+      os << "djnn_" << "new_" << constructor;
+    }
+    os << " (" << m_parent_list.back ()->get_symbol (ctrl->parent ()->name())
         << ", " << "\"" << ctrl->name () << "\"";
 
     std::string src, dst;
@@ -2289,8 +2686,18 @@ namespace Smala
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
 
     os << "\nstatic void\n" << n->fct () << " (CoreProcess* c) {\n";
-    os << "\t[[maybe_unused]] auto * " << src_name << " = c->get_activation_source ();\n";
-    os << "\t[[maybe_unused]] Process * " << data_name << " = (Process *) get_native_user_data (c);\n";
+    os << "\t[[maybe_unused]] auto * " << src_name << " = ";
+    if (!m_fastcomp) {
+      os << "c->get_activation_source ();\n";
+    } else {
+      os << "djnn_get_activation_source (c);\n";
+    }
+    os << "\t[[maybe_unused]] Process * " << data_name << " = ";
+    if (!m_fastcomp) {
+      os << "(Process *) get_native_user_data (c);\n";
+    } else {
+      os << "(Process*) djnn_get_native_user_data (c);\n";
+    }
 
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1) {
       print_error_message (error_level::warning,
@@ -2346,7 +2753,12 @@ namespace Smala
         set_include = true;
       }
       os << "djnn::CoreProcess* " << def->name ()
-          << " (djnn::CoreProcess*, const djnn::string &";
+          << " (djnn::CoreProcess*, ";
+      if (!m_fastcomp) {
+        os << "const djnnstl::string &";
+      } else {
+        os << "const char*";
+      }
       for (size_t j = 0; j < def->args ().size (); j++) {
         named_parameter_t arg = def->args ().at (j);
         os << ", ";
@@ -2367,19 +2779,30 @@ namespace Smala
     build_properties(os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
     indent (os);
-    os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
+    if (!m_fastcomp) {
+      os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
+    } else {
+      os << "djnn_" << "new_GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
+    }
     used_processes["GraphEdgeAdder"] = true;
   }
 
   static
   void print_array_type (std::ostream &os, const std::string& type, int dimensions)
   {
-    for (int n = 0; n < dimensions; n++) {
-      os << "vector< ";
+    if (!m_fastcomp) {
+      for (int n = 0; n < dimensions; n++) {
+        os << "djnnstl::vector< ";
+      }
+    } else {
+      os << type;
     }
-    os << type;
     for (int n = 0; n < dimensions; n++) {
-      os << " >";
+      if (!m_fastcomp) {
+        os << " >";
+      } else {
+        os << "[]";
+      }
     }
   }
 
@@ -2396,7 +2819,13 @@ namespace Smala
         break;
       }
       case STRING: {
-        os << "[[maybe_unused]] const djnn::string&";
+        if (!m_fastcomp) {
+          os << "[[maybe_unused]] const djnnstl::string&";
+        } else {
+          os << "[[maybe_unused]] const mystring&";
+          //os << "[[maybe_unused]] auto";
+          //os << "[[maybe_unused]] const my_string&";
+        }
         break;
       }
       case NATIVE_CODE_T: {
@@ -2466,8 +2895,10 @@ namespace Smala
   {
     emit_compiler_info(os);
     indent (os);
-    for (int n = 0; n < a->get_dimension (); n++) {
-      os << "vector< ";
+    if (!m_fastcomp) {
+      for (int n = 0; n < a->get_dimension (); n++) {
+        os << "djnnstl::vector< ";
+      }
     }
     switch (a->get_array_type ()) {
       case DOUBLE:
@@ -2484,13 +2915,21 @@ namespace Smala
         break;
       default:;
     }
-    for (int n = 0; n < a->get_dimension (); n++) {
-      os << " >";
+    if (!m_fastcomp) {
+      for (int n = 0; n < a->get_dimension (); n++) {
+        os << " >";
+      }
     }
     std::string new_name = "a_var_" + std::to_string (m_cpnt_num++);
     if (m_parent_list.back ()->add_entry (a->get_name (), new_name) == 1 && a->duplicate_warning ())
       print_error_message (error_level::warning, "duplicated name: " + a->get_name (), 0);
-    os << " " << new_name << " = ";
+    os << " " << new_name;
+    if (m_fastcomp) {
+      for (int n = 0; n < a->get_dimension (); n++) {
+        os << "[]";
+      }
+    }
+    os << " = ";
     print_items_array (os, a->get_array ());
     os << ";\n";
   }
@@ -2510,10 +2949,14 @@ namespace Smala
     std::map<std::string, std::string>::iterator it;
     it = m_import_types.find (constructor);
     if (it == m_import_types.end ()) {
-      os << "new " << constructor;
-      //os << "djnn_new_" << constructor; // c header
+      if (!m_fastcomp) {
+        os << "new " << constructor;
+      } else {
+        os << "djnn_" << "new_" << constructor; // c header
+      }
     }
     else {
+      // it's an import, hence we call a function that creates a Component
       os << constructor;
     }
   }

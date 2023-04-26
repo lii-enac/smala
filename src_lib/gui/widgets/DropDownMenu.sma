@@ -4,6 +4,10 @@ use base
 
 import gui.shape.text
 
+import core.ontology.process
+import core.tree.container
+import base.process_handler
+
 _action_
 fn_init(Process src, Process data)
 {

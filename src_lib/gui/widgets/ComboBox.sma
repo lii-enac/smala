@@ -17,17 +17,26 @@ use display
 use gui
 
 import gui.widgets.IWidget
+import core.ontology.process
+import core.property.text_property
+//import core.tree.list
+import base.process_handler
+
 import ComboBoxItem
 
 _native_code_
 %{
+#include "core/tree/list.h"
+
+//using string = djnnstl::string;
+
 Process* getParent (Process *p)
 {
   return p->get_parent ();
 }
 
 int has_item (Process *item, Process *list) {
-  string str_item = ((djnn::TextProperty*)item)->get_value ();
+  auto & str_item = ((djnn::TextProperty*)item)->get_value ();
   for (auto p : ((djnn::List*)list)->children ()) {
     if (((djnn::TextProperty*)item)->get_value () == ((djnn::TextProperty*)p->find_child("t/text"))->get_value ()) {
       return 1;
@@ -37,7 +46,7 @@ int has_item (Process *item, Process *list) {
 }
 
 int has_str_item (Process *item, Process *list) {
-  string str_item = ((djnn::TextProperty*)item->find_child("t/text"))->get_value ();
+  auto& str_item = ((djnn::TextProperty*)item->find_child("t/text"))->get_value ();
   for (auto p : ((djnn::List*)list)->children ()) {
     if ( ((djnn::TextProperty*)p)->get_value () == str_item) {
       return 1;

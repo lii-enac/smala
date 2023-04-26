@@ -1757,7 +1757,7 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
               struct_stream << "\tdouble ";
               break;
             case STRING:
-              struct_stream << "\tdjnn::string ";
+              struct_stream << "\tdjnnstl::string ";
               break;
             case CAST_STRING:
             case PROCESS:

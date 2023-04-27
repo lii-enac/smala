@@ -1886,9 +1886,11 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         return;
       }
       build_properties(os);
-      indent (os);
+      //indent (os);
       switch (n->type ()) {
         case DUMP:
+          emit_compiler_info(os);
+          indent (os);
           os << "if (" << arg << ")" << endl ;
           m_indent += 1;
           indent (os);
@@ -1903,6 +1905,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           //os << "cout <<  endl << endl << \"warning - dump could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case XMLSERIALIZE:
+          emit_compiler_info(os);
+          indent (os);
           os << "if (" << arg << ")" << endl ;
           m_indent += 1;
           indent (os);
@@ -1917,12 +1921,16 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           //os << "cout <<  endl << endl << \"warning - XMLSerialize could not resolve: \" << " << arg <<  " << endl << endl;" << endl;
           break;
         case NOTIFY:
+          emit_compiler_info(os);
+          indent (os);
           if (!m_fastcomp)
             os << arg << "->notify_activation ();\n";
           else
             os << "djnn_notify_activation (" << arg << ");\n";
           break;
         case RUN: {
+          emit_compiler_info(os);
+          indent (os);
           auto& ml = n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath();
           if (ml.compare("syshook") == 0 || ml.compare("mainloop") == 0) {
             if (!m_fastcomp)
@@ -1938,6 +1946,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           }
           break;
         case STOP: {
+          emit_compiler_info(os);
+          indent (os);
           auto& ml = n->path_list ().at (i)->get_subpath_list().at(0)->get_subpath();
           if (ml.compare("syshook") == 0 || ml.compare("mainloop") == 0) {
             if (!m_fastcomp)
@@ -1957,6 +1967,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
             Be Careful !
             in case of modification this code is replicated in DELETE CONTENT
           */
+          emit_compiler_info(os);
+          indent (os);
           std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
           os << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
           indent (os);
@@ -2004,16 +2016,25 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           }
           break;
         case DELETE_CONTENT: {
+          emit_compiler_info(os);
+          indent (os);
           std::string new_layer_name ("is_layer_" + std::to_string (m_cpnt_num++));
-          os << "Layer *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
-          indent (os); os << "if (" << new_layer_name << ") {\n";
-          
+          if (!m_fastcomp) {
+            os << "auto *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
+            indent (os); os << "if (" << new_layer_name << ") {\n";
+          } else {
+            os << "auto *" << new_layer_name << " = (" << arg << ");\n";
+            indent (os); os << "if (djnn_get_process_type (" << new_layer_name << ") == LAYER_T) {\n";
+          }
+
           indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
           indent (os); indent (os); os << "djnn__exit(0);\n";
           indent (os); os << "}\n";
           std::string new_container_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          indent (os); os << "Container *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
+          indent (os); os << "auto *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
           indent (os); os << "if (" << new_container_name << ") {\n";
+          // indent (os); os << "auto *" << new_container_name << " =  (" << arg << ");\n";
+          // indent (os); os << "if (djnn_get_process_type (" << new_container_name << ") == CONTAINER_T) {\n";
 
           /*
             note:
@@ -2025,8 +2046,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           */
           
           std::string new_container_size (new_container_name + "_size");
-          indent (os); indent (os); os << "int "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
-          indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
+          indent (os); indent (os); os << "size_t "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
+          indent (os); indent (os); os << "for (size_t i = " << new_container_size << " - 1; i >= 0; i--) {\n";
           /* replicate of DELETE */
           std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
           indent (os); indent (os); indent (os); os << "[[maybe_unused]] auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";
@@ -2044,8 +2065,11 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
           indent (os); indent (os); os << "djnn__exit(0);\n";
           indent (os); os << "}\n";
-
-          used_processes["Layer"] = true;
+          
+          //if (!m_fastcomp)
+            used_processes["Container"] = true;
+          if (!m_fastcomp)
+            used_processes["Layer"] = true;
         }
         break;
         case UNKNOWN:

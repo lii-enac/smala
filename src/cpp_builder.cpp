@@ -2121,7 +2121,7 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         if (!m_fastcomp) {
           os << new_name << "->get_prop_type() == String";
         } else {
-          os << "djnn_get_process_type(" << new_name << " ) == String";
+          os << "djnn_get_property_type(" << new_name << " ) == String";
         }
         os << ") {\n";
         os << "\t\tdjnn__warning (" << prop_name << ", \"invalid operand for String Property\");\n";

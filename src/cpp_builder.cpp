@@ -281,6 +281,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       final_os << "#include \"core/utils/containers/string.h\"" << std::endl;
       final_os << "using djnnstl::string;" << std::endl;
       final_os << "using djnnstl::to_string;" << std::endl;
+    }
+    {
       for (auto p: used_processes) {
         extern std::map<std::string, std::string> process_class_path;
         try {
@@ -369,7 +371,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     os << "double smala_deref(double p)\n";
     os << "{ return p; }\n\n";
 
-    used_processes["AbstractProperty"] = true;
+    if (!m_fastcomp)
+      used_processes["AbstractProperty"] = true;
   }
 
   void
@@ -477,10 +480,10 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         if (prod_t == string_t || e->get_expr_type() == CAST_STRING) {
           if (!m_fastcomp) {
             expr += "((AbstractProperty*)" + path + ")->get_string_value ()"; // FIXME
+            used_processes["AbstractProperty"] = true;
           } else {
             expr += "djnn_get_string_value (" + path + ")"; // FIXME
           }
-          used_processes["AbstractProperty"] = true;
         } else if (m_in_switch || prod_t == process_t || e->get_expr_type() != PROCESS) {
           expr += path;
           m_in_switch = false;
@@ -514,7 +517,10 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       }
       case FUNCTION: {
         expr += e->get_val () + " (";
-        used_processes[e->get_val ()] = true;
+        if (!m_fastcomp)
+          used_processes[e->get_val ()] = true;
+        if (e->get_val() == "getRef" || e->get_val() == "setRef")
+          used_processes["RefProperty"] = true;
         std::string sep = "";
         for (auto sub : ((FunctionExprNode*)e)->get_args()) {
           expr += sep + build_expr_rec (sub, prod_t, build_fake);
@@ -662,7 +668,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     print_component_decl (os, var_name);
     os << " = ";
     print_component_constructor (os, constructor);
-    used_processes[constructor] = true;
+    if (!m_fastcomp)
+      used_processes[constructor] = true;
   }
 
   void
@@ -937,7 +944,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     indent (os);
     os << "[[maybe_unused]] auto * " << loc_name << " = " << path << ";\n";
     os << "{ auto*&cpn=" << loc_name << "; auto & lst=" << list_name << ";\n";
-    os << R"(
+    //if (!m_fastcomp)
+      os << R"(
   if (dynamic_cast<ProcessCollector*> (cpn) != nullptr) {
 		lst = &((ProcessCollector*) cpn)->get_list();
 	} else if (dynamic_cast<Container*> (cpn) != nullptr) {
@@ -948,6 +956,18 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
 	}
   }
   )";
+    /*else
+      os << R"(
+  if (djnn_get_process_type (cpn) == PROCESS_COLLECTOR_T) {
+		lst = djnn_get_process_collector_list (cpn); //&((ProcessCollector*) cpn)->get_list();
+	} else if (djnn_get_process_type (cpn) == LIST_T) {
+		lst = djnn_get_children (cpn); //&((Container*) cpn)->children();
+	} else {
+		djnn__error (nullptr, "only Container and ProcessCollector can be used in forevery instruction\n");
+		djnn__exit (0);
+	}
+  }
+  )";*/
     /*
     indent (os);
     os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
@@ -1037,7 +1057,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     if (is_binding) {
       os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" ) << ", " << dst
          << ", " << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
-      used_processes["Binding"];
+      if (!m_fastcomp)
+        used_processes["Binding"];
     } else {
       os << "\"\"" << ", ";
       os << dst << ", \"\"";
@@ -1067,7 +1088,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     std::string arg = build_find (arg_node->get_path (), false);
     build_properties(os);
     std::string control_name = node->is_connector () ? "MultiConnector" : "MultiAssignment";
-    used_processes[control_name] = true;
+    if (!m_fastcomp)
+      used_processes[control_name] = true;
     int model = node->is_connector () ? !node->is_model () : node->is_model ();
     if (arg_node->get_path ()->has_wild_card ()) {
       for (auto e : node->get_output_nodes ()) {
@@ -1191,7 +1213,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           }
           os << p_name << ",\"" <<  branch_name << ",\"); // constant in a component to make Switch* behave as expected\n";
           p_name = branch_name;
-          used_processes["Component"] = true;
+          if (!m_fastcomp)
+            used_processes["Component"] = true;
         }
       }
       
@@ -1227,7 +1250,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           } else {
             os << "djnn_" << "new_TextProperty (";
           }
-          used_processes["TextProperty"] = true;
+          if (!m_fastcomp)
+            used_processes["TextProperty"] = true;
         } else {
           os << "[[maybe_unused]] auto * " << new_name << " = ";
           if (!m_fastcomp) {
@@ -1235,7 +1259,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           } else {
             os << "djnn_" << "new_DoubleProperty (";
           }
-          used_processes["DoubleProperty"] = true;
+          if (!m_fastcomp)
+            used_processes["DoubleProperty"] = true;
         }
       }
 
@@ -1310,7 +1335,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           used_process_name += "Assignment";
         }
 
-        used_processes[used_process_name] = true;
+        if (!m_fastcomp)
+          used_processes[used_process_name] = true;
 
         if (templated) {
           os << "<";
@@ -1441,7 +1467,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
               } else {
                 create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n\n";
               }
-              used_processes["AbstractProperty"] = true;
+              if (!m_fastcomp)
+                used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
               prop_sym[new_param_name] = new_name;
             }
@@ -1471,7 +1498,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
               } else {
                 create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
               }
-              used_processes["AbstractProperty"] = true;
+              if (!m_fastcomp)
+                used_processes["AbstractProperty"] = true;
               sym[new_param_name] = new_name;
               prop_sym[new_param_name] = new_name;
 
@@ -1519,8 +1547,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
             } else {
               create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
             }
-
-            used_processes["AbstractProperty"] = true;            
+            if (!m_fastcomp)
+              used_processes["AbstractProperty"] = true;            
             sym[new_param_name] = new_name;
             prop_sym[new_param_name] = new_name;
           }
@@ -1551,8 +1579,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
             } else {
               create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
             }
-
-            used_processes["AbstractProperty"] = true;
+            if (!m_fastcomp)
+              used_processes["AbstractProperty"] = true;
             prop_sym[new_param_name] = new_name;
           }
           const string& new_name = prop_sym[new_param_name];
@@ -1617,11 +1645,12 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       indent (os);
       if (!m_fastcomp) {
         os << "Synchronizer* " << sync_name << " = new Synchronizer (" << p_name;
+        used_processes["Synchronizer"]=true;
       } else {
         os << "auto * " << sync_name << " = djnn_new_Synchronizer (" << p_name;
       }
       os << ", \"sync_"+sync_name+"\", " << new_name << ", \"\"); //FIXME remove Synchronizer\n"; // FIXME
-      used_processes["Synchronizer"]=true;
+
       native_edge_name = sync_name;
       for (auto t : triggers) {
         indent (os);
@@ -1824,7 +1853,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     indent (os);
     os << "};\n\n";
 
-    used_processes["NativeExpressionAction"] = true;
+    if (!m_fastcomp)
+      used_processes["NativeExpressionAction"] = true;
   }
 
   void
@@ -2072,7 +2102,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         }
         if (!m_in_for)
           os << ";\n";
-        used_processes["AbstractProperty"] = true;
+        if (!m_fastcomp)
+          used_processes["AbstractProperty"] = true;
       } else {
         os << prop_name << " = " << expr_str;
         if (!m_in_for)
@@ -2101,8 +2132,10 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       cond = (prop_name.find ("cpnt_", sizeof("djnn_find (")-1) != string::npos) || (prop_name.find ("arg_", sizeof("djnn_find (")-1) != string::npos);
     }
     if (cond) {
-      used_processes["AbstractProperty"] = true;
-      used_processes["TextProperty"] = true;
+      if (!m_fastcomp) {
+        used_processes["AbstractProperty"] = true;
+        used_processes["TextProperty"] = true;
+      }
 
       string new_name = "cpnt_" + std::to_string (m_cpnt_num++);
       indent (os);
@@ -2385,7 +2418,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       os << "[[maybe_unused]] auto * " << new_name << " = ";
       
       std::string expr =  e->get_val () + " (p, n";
-      used_processes[e->get_val ()] = true;
+      if (!m_fastcomp)
+        used_processes[e->get_val ()] = true;
       expr += args_str;
       expr += ");\n";
 
@@ -2395,11 +2429,11 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       os << "[[maybe_unused]] auto * " << new_name << " = ";
       if (!m_fastcomp) {
         os << "new Component (p, n);\n";
+        used_processes["Component"] = true;
       } else {
         os << "djnn_" <<  "new_Component (p, n);\n";
       }
     }
-    used_processes["Component"] = true;
 
     /* We make the hypothesis that "this" is the first node after _define_ thus
      * the symbols in the sym_table should be the arguments of the function.
@@ -2448,7 +2482,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           new_name = "s_var_" + std::to_string (m_var_num++);
           break;
         case NATIVE_CODE_T:
-          used_processes["NativeCode"] = true;
+          if (!m_fastcomp)
+            used_processes["NativeCode"] = true;
         case LOCAL_NAME:
         case NAME:
         case PROCESS:
@@ -2532,10 +2567,10 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     indent (os);
     if (!m_fastcomp) {
       os << "MainLoop::instance ().activate ();\n\n";
+      used_processes["MainLoop"] = true;
     } else {
       os << "djnn_activate (djnn_mainloop_instance());\n";
     }
-    used_processes["MainLoop"] = true;
 
     if (m_cleaner) {
       indent (os);
@@ -2603,7 +2638,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       case COLLECTION_ACTION:
         constructor = "NativeCollectionAction";
     }
-    used_processes[constructor] = true;
+    if (!m_fastcomp)
+      used_processes[constructor] = true;
     std::string name =
         node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
@@ -2781,10 +2817,10 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
     indent (os);
     if (!m_fastcomp) {
       os << "new GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
+      used_processes["GraphEdgeAdder"] = true;
     } else {
       os << "djnn_" << "new_GraphEdgeAdder (" << p_name << ", \"\", " << src << ", " << dst << ");\n";
     }
-    used_processes["GraphEdgeAdder"] = true;
   }
 
   static

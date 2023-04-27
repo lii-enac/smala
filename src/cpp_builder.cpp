@@ -63,7 +63,7 @@ string print_trace(void) {
 }
 */
 
-const bool m_fastcomp = false; // global for now, make it an option later
+//const bool m_fastcomp = false; // global for now, make it an option later
 
 //#define emit_compiler_info(OS)
 #define emit_compiler_info(OS) { indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n"; }
@@ -127,9 +127,10 @@ namespace Smala
 
   int
   CPPBuilder::build (const Ast &ast, const std::string &builddir,
-                     const std::string &prefix, bool debug, bool cleaner)
+                     const std::string &prefix, bool debug, bool cleaner, bool fastcomp)
   {
     m_cleaner = cleaner;
+    m_fastcomp = fastcomp;
     m_indent = 0;
     m_cpnt_num = 0;
     m_var_num = 0;
@@ -2846,9 +2847,9 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
   }
 
   static
-  void print_array_type (std::ostream &os, const std::string& type, int dimensions)
+  void print_array_type (std::ostream &os, const std::string& type, int dimensions, bool fastcomp)
   {
-    if (!m_fastcomp) {
+    if (!fastcomp) {
       for (int n = 0; n < dimensions; n++) {
         os << "djnnstl::vector< ";
       }
@@ -2856,7 +2857,7 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       os << type;
     }
     for (int n = 0; n < dimensions; n++) {
-      if (!m_fastcomp) {
+      if (!fastcomp) {
         os << " >";
       } else {
         os << "[]";
@@ -2898,22 +2899,22 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
       }
       case DOUBLE_ARRAY:
       {
-        print_array_type (os, "double", type.second);
+        print_array_type (os, "double", type.second, m_fastcomp);
         break;
       }
       case INT_ARRAY:
       {
-        print_array_type (os, "int", type.second);
+        print_array_type (os, "int", type.second, m_fastcomp);
         break;
       }
       case STRING_ARRAY:
       {
-        print_array_type (os, "string", type.second);
+        print_array_type (os, "string", type.second, m_fastcomp);
         break;
       }
       case PROCESS_ARRAY:
       {
-        print_array_type (os, "Process*", type.second);
+        print_array_type (os, "Process*", type.second, m_fastcomp);
         break;
       }
       default:

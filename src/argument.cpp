@@ -36,6 +36,8 @@ namespace Smala
         _debug = true;
       } else if (str.compare ("-gen-cleaner") == 0) {
         _cleaner = true;
+      } else if (str.compare ("-fastcomp") == 0) {
+        _fastcomp = true;
       } else if (str.compare ("-lang=js") == 0) {
           _lang = JS;
       } else if (str.compare ("-o") == 0) {

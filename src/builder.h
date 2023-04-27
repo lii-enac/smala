@@ -65,7 +65,7 @@ namespace Smala {
     {
     }
     virtual ~Builder () {};
-    virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug, bool cleaner = false) = 0;
+    virtual int build (const Ast &ast, const std::string &builddir, const std::string &prefix, bool debug, bool cleaner=false, bool fastcomp=false) = 0;
     const string& filename () const { return m_filename; }
   
   protected:

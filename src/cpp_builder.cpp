@@ -519,8 +519,6 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         expr += e->get_val () + " (";
         if (!m_fastcomp)
           used_processes[e->get_val ()] = true;
-        if (e->get_val() == "getRef" || e->get_val() == "setRef")
-          used_processes["RefProperty"] = true;
         std::string sep = "";
         for (auto sub : ((FunctionExprNode*)e)->get_args()) {
           expr += sep + build_expr_rec (sub, prod_t, build_fake);

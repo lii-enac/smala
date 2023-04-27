@@ -2119,7 +2119,7 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         indent (os);
         os << "if (";
         if (!m_fastcomp) {
-          os << new_name << "->get_prop_type() == String";
+          os << new_name << "->get_property_type() == String";
         } else {
           os << "djnn_get_property_type(" << new_name << " ) == String";
         }

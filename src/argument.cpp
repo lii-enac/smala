@@ -24,7 +24,7 @@ namespace Smala
   }
 
   Argument::Argument (int argc, const char** argv) :
-    _lang (CPP), _debug (false)
+    _lang (CPP), _debug (false), _cleaner (false), _fastcomp (false)
     {
     int i;
     m_program_name = argv[0];

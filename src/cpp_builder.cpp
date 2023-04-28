@@ -2047,8 +2047,8 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
           */
           
           std::string new_container_size (new_container_name + "_size");
-          indent (os); indent (os); os << "size_t "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
-          indent (os); indent (os); os << "for (size_t i = " << new_container_size << " - 1; i >= 0; i--) {\n";
+          indent (os); indent (os); os << "int "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
+          indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
           /* replicate of DELETE */
           std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
           indent (os); indent (os); indent (os); os << "[[maybe_unused]] auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";

@@ -60,14 +60,20 @@ StandAlonePushButton (string _label, double x_, double y_) {
   FontWeight _ (DJN_NORMAL)
   Text thisLabel (10, 10, _label)
   label aka thisLabel.text
-  Double rw(0)
+
+  thisLabel.width + 20 =:> r.width
+  thisLabel.height + 10 =:> r.height
+  r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y
+  r.width / 2.0 =:> thisLabel.x
+
+  /*Double rw(0)
   Double rh(0)
   thisLabel.width + 20 =:> rw 
   thisLabel.height + 10 =:> rh
   rw =?> r.width // FIXME cycle?
   rh =?> r.height // FIXME cycle?
   r.height / 2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =?> thisLabel.y
-  r.width / 2.0 =?> thisLabel.x
+  r.width / 2.0 =?> thisLabel.x*/
 
   width aka r.width
   height aka r.height

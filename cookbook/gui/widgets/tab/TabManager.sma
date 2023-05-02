@@ -27,13 +27,13 @@ reorder_tabs_action (Process c)
 
 	// The old selected tab is at the end of the tabs list,
 	// get it, tell it to unselect itself...
-	sprintf (spec, "%d", tabs_list->size());
+	snprintf (spec, 16, "%d", tabs_list->size());
 	Process *old_selected_tab = (Process*) tabs_list->find_child (spec);
 	Spike *unselect = (Spike*) old_selected_tab->find_child ("unselect");
 	unselect->activate ();
 	// get its original index...
 	int old_selected_index = ((IntProperty*) old_selected_tab->find_child ("index"))->get_value ();
-	sprintf (spec, "<%d", old_selected_index);
+	snprintf (spec, 16,  "<%d", old_selected_index);
 	// ...and move it back to its original place
 	tabs_list->remove_child (old_selected_tab);
 	tabs_list->insert (old_selected_tab, spec);

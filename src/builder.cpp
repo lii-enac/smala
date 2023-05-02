@@ -430,6 +430,14 @@ namespace Smala
         pop_ctxt (); //DBG;
         break;
       }
+      case END_FOR_EVERY:
+      {
+        m_indent--;
+        indent (os);
+        build_end_for_every (os);
+        pop_ctxt (); //DBG;
+        break;
+      }
       
       case BREAK:
       {

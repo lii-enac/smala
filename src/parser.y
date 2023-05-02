@@ -800,7 +800,7 @@ for
   }
   | forevery_loop LCB statement_list RCB
   {
-    Node *n = new Node (@$, END_BLOCK);
+    Node *n = new Node (@$, END_FOR_EVERY);
     driver.add_node (n);
     pop_sym_table ();
   }

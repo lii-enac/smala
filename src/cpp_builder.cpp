@@ -933,74 +933,64 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
   CPPBuilder::build_for_every (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
-    ForEveryNode* n = (ForEveryNode*) node;
-    std::string list_name = "list_" + std::to_string (m_cpnt_num++);
-    std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    indent (os);
-    os << "const djnnstl::vector<CoreProcess*>* " << list_name << ";\n";
-    std::string path = build_find (n->get_path (), true);
-    build_properties(os);
-    indent (os);
-    os << "[[maybe_unused]] auto * " << loc_name << " = " << path << ";\n";
-    os << "{ auto*&cpn=" << loc_name << "; auto & lst=" << list_name << ";\n";
-    //if (!m_fastcomp)
-      os << R"(
-  if (dynamic_cast<ProcessCollector*> (cpn) != nullptr) {
-		lst = &((ProcessCollector*) cpn)->get_list();
-	} else if (dynamic_cast<Container*> (cpn) != nullptr) {
-		lst = &((Container*) cpn)->children();
-	} else {
-		djnn__error (nullptr, "only Container and ProcessCollector can be used in forevery instruction\n");
-		djnn__exit (0);
-	}
-  }
-  )";
-    /*else
-      os << R"(
-  if (djnn_get_process_type (cpn) == PROCESS_COLLECTOR_T) {
-		lst = djnn_get_process_collector_list (cpn); //&((ProcessCollector*) cpn)->get_list();
-	} else if (djnn_get_process_type (cpn) == LIST_T) {
-		lst = djnn_get_children (cpn); //&((Container*) cpn)->children();
-	} else {
-		djnn__error (nullptr, "only Container and ProcessCollector can be used in forevery instruction\n");
-		djnn__exit (0);
-	}
-  }
-  )";*/
-    /*
-    indent (os);
-    os << "if (dynamic_cast<ProcessCollector*> (" << loc_name << ") != nullptr) {\n";
-    m_indent++;
-    indent (os);
-    os << list_name << " = " <<  "((ProcessCollector*) "<< loc_name << ")->get_list();\n";
-    m_indent--;
-    indent (os);
-    os << "} else if (dynamic_cast<Container*> (" << loc_name << ") != nullptr) {\n";
-    m_indent++;
-    indent (os);
-    os << list_name << " = " <<  "((Container*) "<< loc_name << ")->children();\n";
-    m_indent--;
-    indent (os);
-    os << "} else {\n";
-    m_indent++;
-    indent (os);
-    os << "djnn__error (nullptr, \"only Container and ProcessCollector can be used in forevery instruction\\n\");\n";
-    indent (os);
-    os << "exit (0);\n";
-    m_indent--;
-    indent (os);
-    os << "}\n";
-    */
-    indent (os);
-    std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
-    os << "for (auto " << var_name << " : *" << list_name << ") {\n";
-    m_indent++;
-  
-    push_ctxt (); //DBG;
-    m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
 
-    used_processes["ProcessCollector"] = true;
-    used_processes["Container"] = true;
+    if (m_fastcomp) {
+      ForEveryNode* n = (ForEveryNode*) node;
+      std::string path = build_find (n->get_path (), true);
+      indent (os);
+      build_properties(os);
+      std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      os << "djnn_for_every (" << path << ", " << "[&](djnn::CoreProcess* "<< var_name << ")->int {";
+      //indent (os);
+      m_indent++;
+      push_ctxt (); //DBG;
+      m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
+
+      //os << "});";
+    } else {
+      ForEveryNode* n = (ForEveryNode*) node;
+      std::string list_name = "list_" + std::to_string (m_cpnt_num++);
+      std::string loc_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      indent (os);
+      os << "const djnnstl::vector<CoreProcess*>* " << list_name << ";\n";
+      std::string path = build_find (n->get_path (), true);
+      build_properties(os);
+      indent (os);
+      os << "[[maybe_unused]] auto * " << loc_name << " = " << path << ";\n";
+      os << "{ auto*&cpn=" << loc_name << "; auto & lst=" << list_name << ";\n";
+      //if (!m_fastcomp)
+        os << R"(
+    if (dynamic_cast<ProcessCollector*> (cpn) != nullptr) {
+      lst = &((ProcessCollector*) cpn)->get_list();
+    } else if (dynamic_cast<Container*> (cpn) != nullptr) {
+      lst = &((Container*) cpn)->children();
+    } else {
+      djnn__error (nullptr, "only Container and ProcessCollector can be used in forevery instruction\n");
+      djnn__exit (0);
+    }
+    }
+    )";
+      
+      indent (os);
+      std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
+      os << "for (auto " << var_name << " : *" << list_name << ") {\n";
+      m_indent++;
+    
+      push_ctxt (); //DBG;
+      m_parent_list.back ()->add_entry (n->get_new_name (), var_name);
+
+      used_processes["ProcessCollector"] = true;
+      used_processes["Container"] = true;
+    }
+  }
+
+  void
+  CPPBuilder::build_end_for_every (std::ostream &os)
+  {
+    if (!m_fastcomp)
+      os << "}\n";
+    else
+      os << "return 0; });\n";
   }
 
 
@@ -2019,58 +2009,62 @@ int djnn__exit(int ret);// { exit(ret); return 1; }
         case DELETE_CONTENT: {
           emit_compiler_info(os);
           indent (os);
-          std::string new_layer_name ("is_layer_" + std::to_string (m_cpnt_num++));
-          if (!m_fastcomp) {
-            os << "auto *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
-            indent (os); os << "if (" << new_layer_name << ") {\n";
+          if (m_fastcomp) {
+            os << "djnn_delete_content (" << arg << ");\n";
           } else {
-            os << "auto *" << new_layer_name << " = (" << arg << ");\n";
-            indent (os); os << "if (djnn_get_process_type (" << new_layer_name << ") == LAYER_T) {\n";
+            std::string new_layer_name ("is_layer_" + std::to_string (m_cpnt_num++));
+            //if (!m_fastcomp) {
+              os << "auto *" << new_layer_name << " = dynamic_cast<Layer *> (" << arg << ");\n";
+              indent (os); os << "if (" << new_layer_name << ") {\n";
+            // } else {
+            //   os << "auto *" << new_layer_name << " = (" << arg << ");\n";
+            //   indent (os); os << "if (djnn_get_process_type (" << new_layer_name << ") == LAYER_T) {\n";
+            // }
+
+            indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
+            indent (os); indent (os); os << "djnn__exit(0);\n";
+            indent (os); os << "}\n";
+            std::string new_container_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            indent (os); os << "auto *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
+            indent (os); os << "if (" << new_container_name << ") {\n";
+            // indent (os); os << "auto *" << new_container_name << " =  (" << arg << ");\n";
+            // indent (os); os << "if (djnn_get_process_type (" << new_container_name << ") == CONTAINER_T) {\n";
+
+            /*
+              note:
+              We DO NOT use Container->clean_up_content () anymore
+              because the delete in clean_up_content are not scheduled  
+              instead use the same code as DELETE (just above)
+              old code:
+              indent (os); indent (os); os << new_name << "->clean_up_content ();\n";
+            */
+            
+            std::string new_container_size (new_container_name + "_size");
+            indent (os); indent (os); os << "int "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
+            indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
+            /* replicate of DELETE */
+            std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
+            indent (os); indent (os); indent (os); os << "[[maybe_unused]] auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";
+            indent (os); indent (os); indent (os); os << "if (" << new_child_name << ") {\n";
+            indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
+            indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
+            indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_child_name << "));\n";
+            indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_deletion ();\n";
+            indent (os); indent (os); indent (os); indent (os); os << new_child_name << " = nullptr;\n";
+            indent (os); indent (os); indent (os); os << "}\n";
+            /* end replicate of DELETE */
+            indent (os); indent (os); os << "}\n";
+            indent (os); os << "}\n";
+            indent (os); os << "else {\n";
+            indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
+            indent (os); indent (os); os << "djnn__exit(0);\n";
+            indent (os); os << "}\n";
+            
+            //if (!m_fastcomp)
+              used_processes["Container"] = true;
+           // if (!m_fastcomp)
+              used_processes["Layer"] = true;
           }
-
-          indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should not be used on Layer (better use a component inside a Layer\\n\");\n";
-          indent (os); indent (os); os << "djnn__exit(0);\n";
-          indent (os); os << "}\n";
-          std::string new_container_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          indent (os); os << "auto *" << new_container_name << " = dynamic_cast<Container *> (" << arg << ");\n";
-          indent (os); os << "if (" << new_container_name << ") {\n";
-          // indent (os); os << "auto *" << new_container_name << " =  (" << arg << ");\n";
-          // indent (os); os << "if (djnn_get_process_type (" << new_container_name << ") == CONTAINER_T) {\n";
-
-          /*
-            note:
-            We DO NOT use Container->clean_up_content () anymore
-            because the delete in clean_up_content are not scheduled  
-            instead use the same code as DELETE (just above)
-            old code:
-            indent (os); indent (os); os << new_name << "->clean_up_content ();\n";
-          */
-          
-          std::string new_container_size (new_container_name + "_size");
-          indent (os); indent (os); os << "int "<< new_container_size << " = " << new_container_name << "->children ().size ();\n";
-          indent (os); indent (os); os << "for (int i = " << new_container_size << " - 1; i >= 0; i--) {\n";
-          /* replicate of DELETE */
-          std::string new_child_name ("cpnt_" + std::to_string (m_cpnt_num++));
-          indent (os); indent (os); indent (os); os << "[[maybe_unused]] auto * " << new_child_name << " = " << new_container_name << "->children ()[i];\n";
-          indent (os); indent (os); indent (os); os << "if (" << new_child_name << ") {\n";
-          indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->deactivate ();\n";
-          indent (os); indent (os); indent (os); indent (os); os << "if (" << new_child_name << "->get_parent ())\n";
-          indent (os); indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->get_parent ()->remove_child (dynamic_cast<CoreProcess*>(" << new_child_name << "));\n";
-          indent (os); indent (os); indent (os); indent (os); os << new_child_name << "->schedule_deletion ();\n";
-          indent (os); indent (os); indent (os); indent (os); os << new_child_name << " = nullptr;\n";
-          indent (os); indent (os); indent (os); os << "}\n";
-          /* end replicate of DELETE */
-          indent (os); indent (os); os << "}\n";
-          indent (os); os << "}\n";
-          indent (os); os << "else {\n";
-          indent (os); indent (os); os << "puts (\"\\nERROR - delete_content should be used on Containers (except Layer)\\n\");\n";
-          indent (os); indent (os); os << "djnn__exit(0);\n";
-          indent (os); os << "}\n";
-          
-          //if (!m_fastcomp)
-            used_processes["Container"] = true;
-          if (!m_fastcomp)
-            used_processes["Layer"] = true;
         }
         break;
         case UNKNOWN:

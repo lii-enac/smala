@@ -72,6 +72,7 @@ namespace Smala {
     void build_start_else (std::ostream &os) override;
     void build_start_else_if (std::ostream &os) override;
     void build_end_block (std::ostream &os) override;
+    void build_end_for_every (std::ostream &os) override;
 
     void build_for (std::ostream &os, Node *node) override;
     void build_for_every (std::ostream &os, Node *node) override;

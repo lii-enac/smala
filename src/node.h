@@ -50,6 +50,7 @@ namespace Smala {
     END_CONTAINER,
     END_DEFINE,
     END_ELSE,
+    END_FOR_EVERY,
     END_IF,
     END_LOOP,
     END_MAIN,

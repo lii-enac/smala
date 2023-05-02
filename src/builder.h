@@ -119,6 +119,8 @@ namespace Smala {
     virtual void build_start_else (std::ostream &os) { os << "else {\n"; }
     virtual void build_start_else_if (std::ostream &os) { os << "else "; }
     virtual void build_end_block (std::ostream &os) {  os << "}\n"; }
+    virtual void build_end_for_every (std::ostream &os) {  os << "}\n"; }
+    
 
     virtual void build_for (std::ostream &os, Node *node) {}
     virtual void build_for_every (std::ostream &os, Node *node) {}

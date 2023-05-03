@@ -2,7 +2,7 @@
 # ---------------------------------------
 # precompiled headers
 
-ifneq ($(nopch),1)
+ifneq ($(no_pch),yes)
 
 # https://stackoverflow.com/questions/58841/precompiled-headers-with-gcc
 # https://stackoverflow.com/questions/26755219/how-to-use-pch-with-clang
@@ -21,6 +21,7 @@ ifeq ($(compiler),llvm)
 CXXFLAGS_PCH_INC += -include-pch $(pch_dst)$(pch_ext)
 CXXFLAGS_PCH_GEN += -fpch-instantiate-templates -fpch-codegen -fpch-debuginfo
 pch_shared_dst := $(pch_dst:.hpp=.o)
+objs += $(pch_shared_dst)
 endif
 ifeq ($(compiler),gnu)
 # https://stackoverflow.com/a/3164874
@@ -47,24 +48,30 @@ else
 	@$(CXX) -x c++-header $(CXXFLAGS) $(CXXFLAGS_PCH_GEN) $< -o $@
 endif
 
-$(build_dir)/%$(pch_ext): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(djnn_cflags) $(CXXFLAGS_COMMON) $(CXXFLAGS_CK)
+$(build_dir)/%$(pch_ext): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(djnn_cflags) $(smala_cflags)
 
+ifeq ($(compiler),llvm)
 # for llvm -fpch-instantiate-templates -fpch-codegen
 $(build_dir)/%precompiled.o: $(build_dir)/%precompiled.hpp$(pch_ext)
 ifeq ($V,max)
 	$(CXX) -c $< -o $@
 else
-	@$(call rule_message,compiling,$(stylized_target))
+	@$(call rule_message,compiling to,$(stylized_target))
 	@$(CXX) -c $< -o $@
 	@printf "{\"directory\": \"$(root_dir)\", \"command\": \"$(CXX)  -c $< -o $@\", \"file\": \"$<\"}" > $(build_dir)/$*.cccmd.json
+endif
 endif
 
 pch: $(pch_dst)
 clean_pch:
 	rm -f $(pch_dst)
 
+#$(objs): $(pch_dst)$(pch_ext)
+objs_with_pch ?= $(objs)
 
-$(objs): $(pch_dst)$(pch_ext)
+$(objs_with_pch): $(pch_dst)$(pch_ext)
+$(objs_with_pch): CXXFLAGS += $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) 
+
 
 #$(exe) += $(pch_shared_dst)
 #$(exe): $(pch_shared_dst)

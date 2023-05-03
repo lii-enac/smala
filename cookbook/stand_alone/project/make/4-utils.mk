@@ -7,10 +7,9 @@ rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2
 rwildcardmul = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
 
 # join https://stackoverflow.com/a/9551487
-# space :=
-# space +=
-# join-with = $(subst $(space),$1,$(strip $2))
-join-with = $(subst $(eval) ,$1,$(strip $2))
+space :=
+space +=
+join-with = $(subst $(space),$1,$(strip $2))
 
 
 # ---------------------------------------
@@ -51,13 +50,16 @@ endif
 # ---------------------------------------
 # generate ninja file from Makefile
 
-ninja: build.ninja
-build.ninja: make2ninja.py
-	make -nd V=max test | python3 make2ninja.py > build.ninja
+make2ninja ?= tools/make2ninja.py
+
+ninja: clear build.ninja
+build.ninja: $(make2ninja)
+	$(MAKE) -Bnd V=max test | python3 $(make2ninja) > build.ninja
 .PHONY: build.ninja ninja
 
-make2ninja.py:
-	curl -O https://raw.githubusercontent.com/conversy/make2ninja/90e939a539a081b44c9bdc2bef70e6908e7a645a/make2ninja.py
+$(make2ninja):
+	mkdir -p $(dir $@)
+	curl -O https://raw.githubusercontent.com/conversy/make2ninja/master/make2ninja.py && mv make2ninja.py $(make2ninja)
 ifeq ($(os),Darwin)
-	sed -i '' "s/\'(./\`(./" make2ninja.py
+	sed -i '' "s/\'(./\`(./" $@
 endif

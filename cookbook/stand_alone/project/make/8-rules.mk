@@ -1,10 +1,8 @@
 
 #----------------------------
 
-$(objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir) -I$(build_dir)/lib\
-	$(CXXFLAGS_COMMON) $(CXXFLAGS_CK)
+$(objs): CXXFLAGS += $(CXXFLAGS_CFG) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
 	
-
 $(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
 $(exe): LIBS += $(app_libs)
 
@@ -22,11 +20,11 @@ endif
 $(build_dir)/%.cpp $(build_dir)/%.h: %.sma
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(smalac) -cpp $^ -builddir $(build_dir)
+	$(smalac) $(SMAFLAGS) -cpp $^ -builddir $(build_dir)
 else
 	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(smalac) -cpp $^ -builddir $(build_dir)
+	@$(smalac) $(SMAFLAGS) -cpp $^ -builddir $(build_dir)
 endif
 
 
@@ -54,6 +52,11 @@ else
 endif
 
 deps := $(objs:.o=.d)
+
 ifneq ($(nodeps),1)
 -include $(deps)
+endif
+
+ifeq ($(keep_intermediate),yes)
+.SECONDARY:
 endif

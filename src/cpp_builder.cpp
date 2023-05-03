@@ -349,14 +349,24 @@ namespace Smala
   CPPBuilder::build_import (std::ostream &os, Node *n)
   {
     emit_compiler_info(os);
-    os << "#include \"";
+    string path = "";
     auto sep = "/";
     auto *sep_2 ="";
     for (auto sub : n->get_path()->get_subpath_list()) {
-      os << sep_2 << sub->get_subpath();
+      path += sep_2 + sub->get_subpath();
       sep_2 = sep;
     }
-    os << ".h\"\n";
+    if (!m_fastcomp) {
+      os << "#include \"";
+      os << path;
+      os << ".h\"\n";
+    } else {
+      os << "#if __has_include (\"" << path << "_decl.h\")\n";
+      os << "#include \"" << path << "_decl.h\"\n";
+      os << "#else\n";
+      os << "#include \"" << path << ".h\"\n";
+      os << "#endif\n";
+    }
   }
 
   void

@@ -24,8 +24,14 @@ help:
 	@echo "button_test: will build button cookbook app and launch it (works with all cookbook apps: $(cookbook_apps))"
 	@echo "experiment make -j !!"
 
-config.mk:
+
+config:
 	cp config.default.mk config.mk
+
+# does not work anymore
+# config.mk:
+# 	cp config.default.mk config.mk
+
 include config.default.mk
 -include config.mk
 

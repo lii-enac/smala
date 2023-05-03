@@ -187,19 +187,22 @@ namespace Smala
         os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
       //}
     } else {
-      os << R"(
-int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
-void djnn__warning (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
-int djnn__exit(int ret);// { exit(ret); return 1; }
-)";
+//       os << R"(
+// int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
+// void djnn__warning (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
+// int djnn__exit(int ret);// { exit(ret); return 1; }
+// )";
     }
     //os << "namespace djnn { extern void init_exec_env (); extern void clear_exec_env();\n"; // no need to use exec_env in smala program, or should it in main? 
 
+    indent (os);
+    os << "extern \"C\" { int puts(const char *s); } // for print()\n";
+
+    indent (os);
     //os << "using namespace std;\n";
     os << "using namespace djnn;\n\n";
 
-    indent (os);
-    os << "extern \"C\" { int puts(const char *s); } // for print()\n";
+
 
     int size = m_ast.preamble ().import ().size ();
     for (int i = 0; i < size; ++i) {

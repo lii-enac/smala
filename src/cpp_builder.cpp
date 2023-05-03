@@ -182,11 +182,11 @@ namespace Smala
           build_use(os, "exec_env");
       }
 
-      if (debug) {
+      //if (debug) {
         os << "#include \"core/utils/error.h\" // for Context class\n";
         os << "#undef error // avoid name clash with error macro and possible following #include\n";
         os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
-      }
+      //}
     } else {
 //       os << R"(
 // int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);

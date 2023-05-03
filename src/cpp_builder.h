@@ -105,13 +105,14 @@ namespace Smala {
     std::string build_fake_name (PathNode* n, bool out);
     std::string build_find (PathNode* n, bool ignore_cast);
     std::string build_path (PathNode* n);
-    void set_location (std::ostream &os, Node *n, bool debug=false) override { if (debug) os << "\n#line " << n->get_location().begin.line << std::endl; }
+    void set_location (std::ostream &os, Node *n, bool debug=false) override { if (m_debug) os << "\n#line " << n->get_location().begin.line << std::endl; }
     void end_line (std::ostream &os) override { os << ";\n"; }
 
   private:
     bool m_display_initialized;
     bool m_cleaner;
     bool m_fastcomp;
+    bool m_debug;
     int m_expr_in, m_expr_out; // are we in an expression or not?
     std::map<std::string, std::string> m_import_types;
 

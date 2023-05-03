@@ -380,7 +380,7 @@ import
 native_code
   : native_action
   | smala_action
-  | rough_code
+  | raw_code
 
 native_action
   : NATIVE_ACTION NAME LP "Component" NAME RP CODE
@@ -432,7 +432,7 @@ smala_native_start
       add_sym (@$, user_data_name, PROCESS);
     }
 
-rough_code
+raw_code
   : NATIVE_CODE CODE
     {
       string str = $2.substr (2, $2.length () - 4);

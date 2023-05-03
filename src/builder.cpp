@@ -27,6 +27,8 @@
 #include "expr_node.h"
 #include "range_node.h"
 
+#define emit_compiler_info(OS) { indent(OS); OS << "// code emited by " << __PRETTY_FUNCTION__ << ":" << __FILE__ << ":" << __LINE__ << "\n"; }
+
 namespace Smala
 {
   BuildNode::BuildNode (const std::string &name, BuildNode *prev_node) :
@@ -241,7 +243,9 @@ namespace Smala
       switch (cur_node->node_type ()) {
         case NATIVE_CODE:
           {
-            set_location (os, cur_node);
+            set_location (os, cur_node, debug);
+            emit_compiler_info (os);
+            //if (debug) os << "\n#line " << cur_node->get_location().begin.line << " \"" << filename().substr(0, filename().length()-4) << ".sma\"" << std::endl;
             NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
             os << n->code () << std::endl;
             break;
@@ -261,18 +265,21 @@ namespace Smala
       switch (cur_node->node_type ()) {
         case NATIVE_ACTION:
           {
-            set_location (os, cur_node);
+            emit_compiler_info (os);
+            set_location (os, cur_node, debug);
             build_native_action (os, cur_node);
             break;
           }
         case NATIVE_COLLECTION_ACTION:
           {
-            set_location (os, cur_node);
+            emit_compiler_info (os);
+            set_location (os, cur_node, debug);
             build_native_collection_action (os, cur_node);
             break;
           }
         case NATIVE_CODE: break; // already handled above
         default:
+          //emit_compiler_info (os);
           build_node (os, cur_node);
         }
     }
@@ -637,6 +644,7 @@ namespace Smala
       }
       case NATIVE_CODE:
       {
+        emit_compiler_info (os);
         NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (node);
         os << n->code () << std::endl;
         break;

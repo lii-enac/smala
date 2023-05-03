@@ -131,6 +131,7 @@ namespace Smala
   {
     m_cleaner = cleaner;
     m_fastcomp = fastcomp;
+    m_debug = debug;
     m_indent = 0;
     m_cpnt_num = 0;
     m_var_num = 0;
@@ -212,7 +213,7 @@ namespace Smala
       m_import_types.insert (std::pair<std::string, std::string> (name, name));
     }
     if(debug)
-      os << "\n#line 1" << " \"" << m_filename << "\"" << std::endl;
+      os << "\n#line 1" << " \"" << prefix << ".sma\"" << std::endl;
     build_preamble (os, debug);
 
     size = m_ast.node_list ().size ();
@@ -1683,8 +1684,9 @@ namespace Smala
   CPPBuilder::build_native_action (std::ostream &os, Node *n)
   {
     emit_compiler_info(os);
+    set_location (os, n, m_debug);
     NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
-    os << "void\n";
+    os << "void ";
     os << node->action_name () << " (CoreProcess *" << node->param_name () << ")\n";
     const std::string code = node->code ();
     if (code[0] != '{') {

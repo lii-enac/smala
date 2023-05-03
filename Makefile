@@ -12,10 +12,12 @@
 #		Mathieu Poirier	  <mathieu.poirier@enac.fr>
 #
 
-default: config.mk smalac
+default: smalac
+# config.mk # does not work anymore
 .PHONY: default
 
-all: config.mk smalac smala_lib cookbook_apps test_apps
+all: smalac smala_lib cookbook_apps test_apps
+# config.mk # does not work anymore
 .PHONY: all
 
 help:
@@ -25,12 +27,8 @@ help:
 	@echo "experiment make -j !!"
 
 
-config:
+config.mk config:
 	cp config.default.mk config.mk
-
-# does not work anymore
-# config.mk:
-# 	cp config.default.mk config.mk
 
 include config.default.mk
 -include config.mk

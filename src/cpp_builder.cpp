@@ -182,11 +182,11 @@ namespace Smala
           build_use(os, "exec_env");
       }
 
-      //if (debug) {
+      if (debug) {
         os << "#include \"core/utils/error.h\" // for Context class\n";
         os << "#undef error // avoid name clash with error macro and possible following #include\n";
         os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
-      //}
+      }
     } else {
 //       os << R"(
 // int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
@@ -2809,8 +2809,11 @@ namespace Smala
     std::replace (s.begin (), s.end (), '/', '_');
     for (size_t i = 0; i < prefix.length (); i++)
       s.at (i) = std::toupper (s.at (i));
-    //os << "#pragma once\n#include <string>\n\n";
+    
     os << "#pragma once\n\n";
+    //os << "#pragma once\n#include <string>\n\n";
+    if (m_fastcomp)
+      os << "#include \"c_api/djnn_c_api.h\" // for my_string\n"; 
 
     emit_compiler_info(os);
 
@@ -2830,7 +2833,10 @@ namespace Smala
       for (size_t j = 0; j < def->args ().size (); j++) {
         named_parameter_t arg = def->args ().at (j);
         os << ", ";
-        print_type (os, arg.first);
+        // if (m_fastcomp && arg.first.first == STRING) {
+        //     os << "const char*";
+        // } else 
+          print_type (os, arg.first);
       }
       os << ");\n";
     }

@@ -26,10 +26,9 @@ endif
 ifneq ($(djnn_cpp_path),)
 djnn_cflags := -I$(djnn_cpp_path)/src
 djnn_lib_path := $(djnn_cpp_path)/build/lib
-djnn_libs ?= core exec_env base display comms gui input animation utils files audio
-djnn_ldflags = -L$(djnn_lib_path) # $(addprefix -ldjnn-,$(djnn_libs))
+djnn_modules ?= core exec_env base display comms gui input animation utils files audio
+djnn_ldflags = -L$(djnn_lib_path)
 endif
-#djnn_ldflags += -L$(smala_lib_dir) -lsmala
 
 ifneq ($(smala_path),)
 smalac := $(smala_path)/build/smalac
@@ -168,14 +167,14 @@ objs_other := $(addprefix $(build_dir)/,$(objs_other))
 
 objs += $(objs_sma) $(objs_other)
 
-gensrcs := $(objs_sma:.o=.cpp)
-#$(objs_sma): $(gensrcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
+gen_srcs := $(objs_sma:.o=.cpp)
+#$(objs_sma): $(gen_srcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
 
 
 ifeq ($(cross_prefix),em)
-app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,$(djnn_libs)))
+app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,$(djnn_modules)))
 else
-app_libs := $(addprefix -ldjnn-,$(djnn_libs))
+app_libs := $(addprefix -ldjnn-,$(djnn_modules))
 endif
 
 
@@ -185,7 +184,7 @@ endif
 distclean clear:
 	rm -rf build .ninja_log
 clean:
-	rm -f $(gensrcs) $(objs) $(deps)
+	rm -f $(gen_srcs) $(objs) $(deps)
 .PHONY: clean clear distclean
 
 foo:

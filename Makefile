@@ -160,7 +160,8 @@ else
 djnn_cflags = -I$(djnn_path)/src
 djnn_ldflags = -L$(djnn_path)/build/lib
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
-djnn_ldlibs = -ldjnn-animation -ldjnn-comms -ldjnn-gui  -ldjnn-display -ldjnn-input -ldjnn-files -ldjnn-utils -ldjnn-base -ldjnn-exec_env -ldjnn-core
+djnn_modules ?= animation comms gui display input files utils base exec_env core
+djnn_ldlibs = $(addprefix -ldjnn-,$(djnn_modules))
 djnn_libs = $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path = $(djnn_path)/build/lib
 djnn_include_path_only = $(djnn_path)/src

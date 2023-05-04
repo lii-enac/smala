@@ -186,8 +186,10 @@ namespace Smala
         os << "#include \"core/utils/error.h\" // for Context class\n";
         os << "#undef error // avoid name clash with error macro and possible following #include\n";
         os << "#undef warning // avoid name clash with error macro and possible following #include\n\n";
+        os << "#define __SMALA_FASTCOMP__ 0\n";
       //}
     } else {
+        os << "#define __SMALA_FASTCOMP__ 1\n";
 //       os << R"(
 // int djnn__error (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);
 // void djnn__warning (const djnn::CoreProcess *p, const char* msg, const char* ctxinfo=nullptr);

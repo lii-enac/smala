@@ -956,7 +956,7 @@ namespace Smala
       indent (os);
       build_properties(os);
       std::string var_name = "cpnt_" + std::to_string (m_cpnt_num++);
-      os << "djnn_for_every (" << path << ", " << "[&](djnn::CoreProcess* "<< var_name << ")->int {";
+      os << "djnn_for_every (" << path << ", " << "[&](djnn::CoreProcess* "<< var_name << ")->void {";
       //indent (os);
       m_indent++;
       push_ctxt (); //DBG;
@@ -1003,12 +1003,12 @@ namespace Smala
   void
   CPPBuilder::build_end_for_every (std::ostream &os)
   {
+    emit_compiler_info(os);
     if (!m_fastcomp)
       os << "}\n";
     else
-      os << "return 0; });\n";
+      os << "});\n";
   }
-
 
   void
   CPPBuilder::build_control_node (std::ostream &os, Node *node)

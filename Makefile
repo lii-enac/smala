@@ -358,8 +358,6 @@ smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)
 
 lib: smala_lib
-clean_lib:
-	rm -f $(smala_lib) $(smala_lib_objs)
 
 ifeq ($(keep_intermediate),yes)
 .SECONDARY:

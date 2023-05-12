@@ -123,6 +123,54 @@ namespace Smala
       m_template_props = m_template_props_stack.back ();
   }
 
+  void
+  CPPBuilder::emit_debug_location (std::ostream &os, Node* node)
+  {
+    if (m_debug) {
+      const location & loc = node->get_location();
+      if (loc.begin.line != last_loc.begin.line) {
+        auto * f = loc.begin.filename;
+        os << "\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
+        switch (node->node_type()) {
+          case END_MAIN:
+          case END_DEFINE:
+          case END_NATIVE:
+          case START_ELSEIF:
+          case START_ELSE:
+            m_in_code = false;
+            break;
+          default: break;
+        }
+        // if (node->node_type () == START_ELSEIF || node->node_type () == START_ELSE)
+        //   m_in_code = false;
+        if (m_in_code) {
+            os << "Context::instance()->parser_info(" 
+                << loc.begin.line << ", "
+                << loc.begin.column << ", "
+                << loc.end.line << ", "
+                << loc.end.column << ", "
+                << "\"" << (f?*f:std::string("")) << "\""
+                << ");"
+                << std::endl;
+        }
+        switch (node->node_type()) {
+          case START_MAIN:
+          case START_DEFINE:
+          case SMALA_NATIVE:
+          case START_IF:
+          case END_BLOCK:
+            m_in_code = true;
+            break;
+          default: break;
+        }
+        // if (node->node_type () == START_IF || node->node_type () == END_BLOCK) {
+        //   m_in_code = true;
+        // }
+        last_loc = loc;
+      }
+    }
+  }
+
   
 
   int
@@ -219,46 +267,16 @@ namespace Smala
     build_preamble (os, debug);
 
     size = m_ast.node_list ().size ();
-    location last_loc;
 
     for (int i = 0; i < size; ++i) {
       Node * node = m_ast.node_list ().at (i);
       
-      if(debug) {
-        const location & loc = node->get_location();
-        if(loc.begin.line != last_loc.begin.line) {
-          auto * f = node->get_location().begin.filename;
-          os << "\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
-          if (node->node_type () == START_ELSEIF || node->node_type () == START_ELSE)
-            m_in_code = false;
-          if (m_in_code) {
-              os << "Context::instance()->parser_info(" 
-                 << node->get_location().begin.line << ", "
-                 << node->get_location().begin.column << ", "
-                 << node->get_location().end.line << ", "
-                 << node->get_location().end.column << ", "
-                 << "\"" << (f?*f:std::string("")) << "\""
-                 << ");"
-                 << std::endl;
-          }
-          if (node->node_type () == START_IF || node->node_type () == END_BLOCK) {
-            m_in_code = true;
-          }
-          last_loc = loc;
-        }
-      }
+      //emit_debug_location (os, node);
 
       build_node (os, node);
 
       if (node->is_define_or_main()) {
         m_define_or_main_node = node;
-      }
-
-      if(debug) {
-        if (node->node_type()==START_MAIN || node->node_type()==START_DEFINE)
-          m_in_code = true;
-        if (node->node_type()==END_MAIN || node->node_type()==END_DEFINE)
-          m_in_code = false;
       }
 
     }
@@ -1690,7 +1708,7 @@ namespace Smala
     NativeActionNode *node = dynamic_cast<NativeActionNode*> (n);
     os << "void ";
     os << node->action_name () << " (CoreProcess *" << node->param_name () << ")\n";
-    const std::string code = node->code ();
+    const std::string& code = node->code ();
     if (code[0] != '{') {
       os << "{\n";
     }
@@ -1708,7 +1726,7 @@ namespace Smala
     NativeCollectionActionNode *node = dynamic_cast<NativeCollectionActionNode*> (n);
     os << "static void\n";
     os << node->action_name () << " (CoreProcess *" << node->param_name () << ", const djnnstl::vector<CoreProcess*> " << node->list_name() << ")\n"; // FIXME shoudl be a ref
-    const std::string code = node->code ();
+    const std::string& code  = node->code ();
     if (code[0] != '{') {
       os << "{\n";
     }

@@ -245,7 +245,6 @@ namespace Smala
           {
             set_location (os, cur_node, debug);
             emit_compiler_info (os);
-            //if (debug) os << "\n#line " << cur_node->get_location().begin.line << " \"" << filename().substr(0, filename().length()-4) << ".sma\"" << std::endl;
             NativeCodeNode *n = dynamic_cast<NativeCodeNode*> (cur_node);
             os << n->code () << std::endl;
             break;
@@ -365,6 +364,7 @@ namespace Smala
   Builder::build_node (std::ostream &os, Node *node)
   {
     m_curloc = node->error_location ();
+    emit_debug_location (os, node);
     switch (node->node_type ())
       {
       case START_MAIN:

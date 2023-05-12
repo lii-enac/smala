@@ -164,6 +164,7 @@ namespace Smala {
     std::string get_constructor (const std::string &type);
     bool is_string (ExprNode *e);
     bool has_complex_term (PathNode *n);
+    virtual void emit_debug_location (std::ostream &os, Node* node) {}
 
     
   };

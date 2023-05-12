@@ -108,6 +108,8 @@ namespace Smala {
     void set_location (std::ostream &os, Node *n, bool debug=false) override { if (m_debug) os << "\n#line " << n->get_location().begin.line << std::endl; }
     void end_line (std::ostream &os) override { os << ";\n"; }
 
+    void emit_debug_location (std::ostream &os, Node* node) override;
+
   private:
     bool m_display_initialized;
     bool m_cleaner;
@@ -127,6 +129,8 @@ namespace Smala {
     sym_t m_new_syms_from_build_expr; // this contains newly dynamic_cast'ed properties while building expressions
     std::map<std::string, bool> m_template_props;
     std::vector<std::map<std::string, bool>> m_template_props_stack;
+
+    location last_loc; // for debug info
   };
 
 } /* namespace Smala */

@@ -17,8 +17,8 @@ You can use several option to debug on smala :
 
   _DEBUG_SEE_ACTIVATION_SEQUENCE = 0|1
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US  = 1000 // microsecond
-  _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 1|0 // will display only the targeted process or full_stack (O)
-
+  _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 0|1 // will display only the targeted process or full_stack (O)
+  _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = "file.sma:lineno" // display sequence from a specific debug info : file.sma:lineno
 ## paintevent and Layer recomputation
 
   _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0|1
@@ -44,6 +44,7 @@ Component root {
   _DEBUG_GRAPH_CYCLE_DETECT = 1;
   _DEBUG_SEE_ACTIVATION_SEQUENCE = 1
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US  = 1000
+  _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = "main.sma:30" // for exemple
   _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 1
   
   Frame f ("App", 0, 0, 600, 600)

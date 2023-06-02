@@ -15,6 +15,7 @@ cookbook_apps_extra :=
 
 #smala flags
 #SMAFLAGS += -g #-gen-cleaner
+#-g for text in debug_info
 
 #C++ flags 
 #CFLAGS_COMMON += -g
@@ -35,3 +36,4 @@ cookbook_apps_extra :=
 # emscripten ext libs
 #em_ext_libs_path := ../djnn-emscripten-ext-libs
 
+#keep_intermediate = yes

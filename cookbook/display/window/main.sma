@@ -28,7 +28,7 @@ Component root {
   // important note: 
   // for a full transparent frame you HAVE to set f.frameless = 1
   f.frameless = 1
-  f.background_opacity = 0.1
+  f.background_opacity = 0.2
   f.background_color.r = 0
   f.background_color.g = 0
   f.background_color.b = 255
@@ -74,5 +74,24 @@ Component root {
     }
   }
 
-  
+  Component Group2 {
+    Translation _ (400, 100)
+    FillColor g (White)
+    Rectangle r2 (0, 60, 120, 40)
+    
+    FSM fsm {
+      State idle {
+        FillColor _ (Red)
+        Text _ (10, 80, "Red background")
+        #0000FF =: f.background_color.value 
+      }
+      State changed {
+        FillColor _ (Blue)
+        Text _ (10, 80, "Blue background")
+        #FF0000 =: f.background_color.value
+      }
+      idle -> changed (r2.press)
+      changed -> idle (r2.press)
+    }
+  }
 }

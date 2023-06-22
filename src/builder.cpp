@@ -364,13 +364,13 @@ namespace Smala
   Builder::build_node (std::ostream &os, Node *node)
   {
     m_curloc = node->error_location ();
-    emit_debug_location (os, node);
+    //emit_debug_location (os, node);
     switch (node->node_type ())
       {
       case START_MAIN:
       {
         push_ctxt (); //DBG;
-        build_main_node (os);
+        build_main_node (os, node);
         break;
       }
       case END_MAIN:

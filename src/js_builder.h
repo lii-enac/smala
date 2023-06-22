@@ -59,7 +59,7 @@ namespace Smala {
     void build_native_expression (std::ostream &os, Node *n) override;
     void emit_not_a_property (std::ostream &os, const std::string& arg, const std::string& e);
     void build_native_expression_node (std::ostream &os, Node *n) override;
-    void build_main_node (std::ostream &os) override;
+    void build_main_node (std::ostream &os, Node *node) override;
     void build_end_main (std::ostream &os, Node *node) override;
     void build_this_node (std::ostream &os, Node *node) override;
     void build_define_node (std::ostream &os, Node *node) override;
@@ -69,7 +69,7 @@ namespace Smala {
     void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) override;
     void build_component_arguments (std::ostream &os, std::string &p_name, std::string &name, Node* n) override;
     void build_range_node (std::ostream &os, Node *node, const string& new_name) override;
-    void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor) override;
+    void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor, Node*) override;
     // void build_new_line (std::ostream &os, NewLineNode *n) override {
     //     //Builder::build_new_line (os, n);
     //     //os << "Context::instance()->new_line(" << n->_line_number << ", \"" << n->_filename << "\");" << std::endl;

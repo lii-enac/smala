@@ -91,7 +91,7 @@ namespace Smala {
     virtual void build_define_node (std::ostream &os, Node *node) = 0;
     virtual void build_end_define (std::ostream &os, Node *node) = 0;
     
-    virtual void build_main_node (std::ostream &os) = 0;
+    virtual void build_main_node (std::ostream &os, Node *node) = 0;
     virtual void build_end_main (std::ostream &os, Node *node) = 0;
 
     void build_node (std::ostream &os, Node *node);
@@ -108,7 +108,7 @@ namespace Smala {
     virtual void build_causal_dep (std::ostream &os, Node* node) = 0;
 
     virtual void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) = 0;
-    virtual void print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor) = 0;
+    virtual void print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor, Node*) = 0;
     virtual void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) = 0;
     virtual void print_component_decl (std::ostream &os, const std::string &name) = 0;
     virtual void print_component_constructor (std::ostream &os, const std::string &constructor) = 0;

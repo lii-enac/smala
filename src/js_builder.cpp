@@ -266,7 +266,7 @@ namespace Smala
   void
   JSBuilder::build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* node)
   {
-    print_start_component (os, var_name, constructor);
+    print_start_component (os, var_name, constructor, node);
     build_component_arguments (os, parent_name, child_name, node);
   }
 
@@ -287,7 +287,7 @@ namespace Smala
     std::string name = node->name ().empty () ? m_null_string : "\"" + node->name () + "\"";
     indent (os);
     std::string p_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
-    print_start_component (os, new_name, "SwitchRangeBranch");
+    print_start_component (os, new_name, "SwitchRangeBranch", node);
     os << " (" << p_name << ", " << name << ", ";
     os << " (" << p_name << ", " << name << ", " << build_expr (n->lower_arg());
     os << ", " << n->left_open () << ", " << build_expr (n->upper_arg());
@@ -295,7 +295,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::print_start_component (std::ostream &os, const std::string &name, const std::string &constructor)
+  JSBuilder::print_start_component (std::ostream &os, const std::string &name, const std::string &constructor, Node*)
   {
     print_component_decl (os, name);
     os << " = ";
@@ -532,7 +532,7 @@ namespace Smala
     if (_is_var) {
       src_name = "cpnt_" + std::to_string (m_cpnt_num++);
       indent (os);
-      print_start_component (os, src_name, get_constructor ("Double"));
+      print_start_component (os, src_name, get_constructor ("Double"), node);
       os << "(" << node->parent ()->build_name () << ", " << m_null_string
                 << ", " << src << ");\n";
     }
@@ -1380,7 +1380,7 @@ namespace Smala
   }
 
   void
-  JSBuilder::build_main_node (std::ostream &os)
+  JSBuilder::build_main_node (std::ostream &os, Node *node)
   {
 
     /* main */

@@ -128,9 +128,9 @@ namespace Smala
   {
     if (m_debug) {
       const location & loc = node->get_location();
-      if (loc.begin.line != last_loc.begin.line) {
+      //if (loc.begin.line != last_loc.begin.line) {
         auto * f = loc.begin.filename;
-        os << "\n#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
+        //os << std::endl;
         switch (node->node_type()) {
           case END_MAIN:
           case END_DEFINE:
@@ -167,7 +167,9 @@ namespace Smala
         //   m_in_code = true;
         // }
         last_loc = loc;
-      }
+        os << "#line " << node->get_location().begin.line << std::endl; //" \"" <<  (f?*f:std::string("")) << "\"" << std::endl;
+        
+      //}
     }
   }
 
@@ -683,7 +685,7 @@ namespace Smala
 
     // emit something like "auto * var_name = constructor"
     //indent (os);
-    print_start_component (os, var_name, constructor);
+    print_start_component (os, var_name, constructor, node);
 
     // emit arguments
     os << " (" << parent_name << ", " << child_name;
@@ -694,9 +696,11 @@ namespace Smala
     
 
   void
-  CPPBuilder::print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor)
+  CPPBuilder::print_start_component (std::ostream &os, const std::string &var_name, const std::string &constructor, Node* node)
   {
     emit_compiler_info(os);
+    indent (os);
+    emit_debug_location (os, node);
     indent (os);
     print_component_decl (os, var_name);
     os << " = ";
@@ -738,7 +742,7 @@ namespace Smala
 
     emit_compiler_info(os);
     indent (os);
-    print_start_component (os, new_name, "SwitchRangeBranch");
+    print_start_component (os, new_name, "SwitchRangeBranch", node);
     os << " (" << p_name << ", " << name << ", " << lower_str;
     os << ", " << n->left_open () << ", " << upper_str;
     os << ", " << n->right_open () << ");\n";
@@ -1043,7 +1047,7 @@ namespace Smala
     if (_is_var) {
       src_name = "cpnt_" + std::to_string (m_cpnt_num++);
       indent (os);
-      print_start_component (os, src_name, get_constructor ("Double"));
+      print_start_component (os, src_name, get_constructor ("Double"), node);
       os << "(" << node->parent ()->build_name () << ", " << m_null_string
                 << ", " << src << ");\n";
     }
@@ -1215,6 +1219,8 @@ namespace Smala
                                          NativeExpressionNode *node)
   {
     emit_compiler_info(os);
+    indent (os);
+    emit_debug_location (os, node);
     std::string p_name =
         node->parent () == nullptr ? m_null_symbol : node->parent ()->build_name ();
     ExprNode *arg_node = node->get_expression ();
@@ -2251,11 +2257,14 @@ namespace Smala
   CPPBuilder::alias (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
+    //emit_debug_location (os, node);
     BinaryInstructionNode *n = dynamic_cast<BinaryInstructionNode*> (node);
     std::string arg = build_find (n->right_arg (), false);
     build_properties (os);
     std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
     const std::string& whatever_name = n->left_arg ()->get_subpath_list().at(0)->get_subpath();
+    indent (os);
+    emit_debug_location (os, node);
     indent (os);
     os << "alias (" << m_parent_list.back ()->name () << ", \""
         << whatever_name << "\", ";
@@ -2501,6 +2510,8 @@ namespace Smala
   CPPBuilder::build_define_node (std::ostream &os, Node *node)
   { //DBG;
     emit_compiler_info(os);
+    emit_debug_location (os, node);
+    indent (os);
 
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything
@@ -2559,9 +2570,10 @@ namespace Smala
   }
 
   void
-  CPPBuilder::build_main_node (std::ostream &os)
+  CPPBuilder::build_main_node (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
+    emit_debug_location (os, node);
     /* main */
     os << "int\nmain (int argc, char* argv[]) {\n";
     m_indent = 1;
@@ -2607,6 +2619,8 @@ namespace Smala
   CPPBuilder::build_end_main (std::ostream &os, Node *node)
   {
     emit_compiler_info(os);
+    emit_debug_location (os, node);
+    indent (os);
     Node* data = (Node*) node->get_user_data ();
     if (data == nullptr)
       return;

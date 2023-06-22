@@ -42,7 +42,7 @@ namespace Smala {
     void build_define_node (std::ostream &os, Node *node) override;
     void build_end_define (std::ostream &os, Node *node) override;
 
-    void build_main_node (std::ostream &os) override;
+    void build_main_node (std::ostream &os, Node *node) override;
     void build_end_main (std::ostream &os, Node *node) override;
 
     std::string build_expr (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false) override;
@@ -60,7 +60,7 @@ namespace Smala {
     void build_causal_dep (std::ostream &os, Node* node) override;
 
     void build_component (std::ostream &os, const std::string &var_name, const std::string &constructor, std::string &parent_name, std::string &child_name, Node* n) override;
-    void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor) override;
+    void print_start_component (std::ostream &os, const std::string &name, const std::string &constructor, Node*) override;
     void build_component_arguments (std::ostream &os, std::string &parent_name, std::string &child_name, Node* n) override;
     void print_component_decl (std::ostream &os, const std::string &name) override;
     void print_component_constructor (std::ostream &os, const std::string &constructor) override;

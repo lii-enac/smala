@@ -2509,9 +2509,10 @@ namespace Smala
   void
   CPPBuilder::build_define_node (std::ostream &os, Node *node)
   { //DBG;
+    os << "\n";
     emit_compiler_info(os);
-    emit_debug_location (os, node);
-    indent (os);
+    //emit_debug_location (os, node);
+    //indent (os);
 
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything

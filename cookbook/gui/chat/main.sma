@@ -18,5 +18,7 @@ Component root {
     Chat chat (0, 0, 200, 300, f)
     //f.{width, height} =:> chat.{width, height}
 
-    _DEBUG_GRAPH_CYCLE_DETECT = 1
+    // _DEBUG_GRAPH_CYCLE_DETECT = 1
+    // _DEBUG_SEE_ACTIVATION_SEQUENCE = 1
+    // _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = "paging.sma:56"
 }

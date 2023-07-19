@@ -20,6 +20,9 @@ use gui
 
 _main_
 Component root {
+
+  //_DEBUG_GRAPH_CYCLE_DETECT = 1
+
   Frame f ("paused_control", 0, 0, 500, 600)
   Exit ex (0, 1)
   f.close -> ex
@@ -34,7 +37,7 @@ Component root {
   // sequence of assignments to activate on mouse press
   // (0 = lazy mode -> not activated when instanciated)
   AssignmentSequence seq (0) {
-    t_prev.text :: t_prev_prev.text // paused assignment
+    t_prev.text =: t_prev_prev.text 
     t_cur.text =: t_prev.text       // assignment with propagation
   }
   f.press -> seq

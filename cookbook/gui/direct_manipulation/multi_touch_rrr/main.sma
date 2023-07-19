@@ -6,6 +6,9 @@ use gui
 _main_
 Component root
 {
+  //activate touches
+  _DEBUG_NO_TOUCH_EVENT = 0
+
 	Frame f ("my frame", 0, 0, 1000, 1000)
   Exit ex (0, 1)
   f.close -> ex

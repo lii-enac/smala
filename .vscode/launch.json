@@ -10,6 +10,7 @@
 
     "version": "0.2.0",
     "configurations": [
+    
     {
         "name": "(lldb) smala - cookbook",
         //"type": "cppdbg",
@@ -17,18 +18,22 @@
         "request": "launch",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/pick_fill/pick_fill_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
+        "program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/zoom/tile_grid/tile_grid_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/layer/layer_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/fitts_law/fitts_law_app",
-        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/dynamic_rectangle/dynamic_rectangle_app",
+        //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/dynamic_rectangle/dynamic_rectangle_app",
+        //"program": "${workspaceFolder}/build/cookbook/gui/chat/chat_app",
         "args": ["\"\""],
         //"stopOnEntry": true,
         //"cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/pick_fill", // path to cookbook file
-        "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/dynamic_rectangle", // path to cookbook file
+        //"cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/dynamic_rectangle", // path to cookbook file
         //"cwd": "${workspaceFolder}/cookbook/gui/layer", // path to cookbook file
+        //"cwd": "${workspaceFolder}/cookbook/gui/chat", // path to cookbook file
+        "cwd": "${workspaceFolder}/cookbook/gui/svg",
         //"cwd": "${workspaceFolder}",
         //"sourceMap": { ".": "${workspaceFolder}/cookbook/gui/fitts_law"},
-        "sourceMap": { ".": "${workspaceFolder}/djnn-cpp"},
+        //"sourceMap": { ".": "${workspaceFolder}/djnn-cpp"},
         //"preRunCommands": ["breakpoint set -f /Users/conversy/recherche/istar/code/djnn/smala/build/cookbook/gui/direct_manipulation/simplest/simplest.cpp -l 42"],
         //"preLaunchTask": "app",
         //"externalConsole": false,
@@ -51,7 +56,8 @@
         // },
         "env":
                 {
-                    //"DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/",//:/Users/conversy/recherche/istar/code/misc/MGL/build",
+                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/",//:/Users/conversy/recherche/istar/code/misc/MGL/build",
+                    //"METAL_DEVICE_WRAPPER_TYPE":"1"
                     //"PATH": "${PATH}:${workspaceFolder}/../djnn-cpp/build/lib"
                 }
                 // ,

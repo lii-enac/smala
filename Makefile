@@ -894,6 +894,10 @@ clean_not_deps:
 
 clean_cookbook cookbook_clean:
 	rm -rf $(build_dir)/cookbook
+clean_lib lib_clean:
+	@#rm -rf $(build_dir)/$(src_lib)
+	rm -f $(smala_lib) $(smala_lib_objs)
+
 .PHONY: clean_cookbook cookbook_clean
 
 clean_test test_clean:

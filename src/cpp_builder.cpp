@@ -2511,8 +2511,6 @@ namespace Smala
   { //DBG;
     os << "\n";
     emit_compiler_info(os);
-    //emit_debug_location (os, node);
-    //indent (os);
 
     // since we start a new cpp function, all of our previously created variables are not valid anymore
     // so clear everything
@@ -2567,6 +2565,7 @@ namespace Smala
                              "duplicated name: " + arg.second, 0);
     }
     os << ")\n{\n";
+    emit_debug_location (os, node);
     m_indent++;
   }
 

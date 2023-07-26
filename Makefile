@@ -777,8 +777,8 @@ sublime_home = "$(HOME)/Library/Application Support/Sublime Text/Packages/User"
 endif
 
 ifeq ($(os),MinGW)
-vscode_home = $(USERPROFILE)/.vscode/extensions
-sublime_home = "/c/Users/$(USERPROFILE)/AppData/Roaming/Sublime Text 3/Packages/User"
+vscode_home = $(shell cygpath -u "$(USERPROFILE)/.vscode/extensions")
+sublime_home = $(shell cygpath -u "$(USERPROFILE)/AppData/Roaming/Sublime Text 3/Packages/User")
 endif
 
 install_editor_modes:

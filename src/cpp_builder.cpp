@@ -751,6 +751,8 @@ namespace Smala
   std::string
   CPPBuilder::build_fake_name (PathNode* n, bool out)
   {
+    m_expr_in = m_expr_out = 0;
+    
     std::string fake = n->get_subpath_list ().at (0)->get_subpath();
     for (size_t i = 1; i < n->get_subpath_list ().size (); i++) {
       if (n->get_subpath_list ().at (i)->get_path_type() == EXPR) {

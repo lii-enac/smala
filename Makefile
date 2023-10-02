@@ -352,7 +352,8 @@ build/src_lib/gui/widgets/UITextField.o: build/src_lib/gui/widgets/IWidget.h
 
 $(smala_lib): $(smala_lib_objs) 
 	@mkdir -p $(dir $@)
-	$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	mv $(notdir $@) $@
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)

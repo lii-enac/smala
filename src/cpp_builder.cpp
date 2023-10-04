@@ -464,6 +464,7 @@ namespace Smala
       os << "[[maybe_unused]] auto * " << e.second << " = ";
       if (!m_fastcomp) {
         os << "dynamic_cast<AbstractProperty*> (" << e.first << ");" << endl;
+        used_processes["AbstractProperty"] = true;
       } else {
         os << "(" << e.first << ");" << endl;
       }

@@ -1,16 +1,19 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac/djnn-cpp
-
+smala is strongly linked to djnn-cpp developpement : <https://github.com/lii-enac/djnn-cpp>
 
 ## [1.19.0] - 2023-01-26
+
 ### compliant with djnn-cpp [1.19.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - use of the new z_order.
     - NEW lib widget and cookbook: ListViewer
     - NEW support double unit
@@ -19,21 +22,28 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
     - NEW Added $SMAFLAG in config.default.mk to use option: -g, -gen-cleaner
     - NEW support for Mold
     - NEW added deb_git target for daily deb packaging
+
 ### Changed
+
     - Fixed cook
     - Improved Stand_alone
     - Improved cookbook: boxes, simple_zoom, tile_grid, argv, Dial, tab, layout
     - Improved lib widget: Checkbox, HSlider, VSlider, UITextField, PushButton, standAloneComboBox, DropDownMenu
     - Improved Cpp Builder
     - Improved Makefile
+
 ### Deprecated
+
     - replaced deprecated loadFromXML by either load_from_XML or load_from_XML_once
 
 ## [1.18.0] - 2022-06-09
+
 ### compliant with djnn-cpp [1.18.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - Improve Smala syntax editor mode for vscode : please update using editor_mode/vscode/README.md
     - New cookbook recipes : handpick, console
     - NEW cookbook recipes : bidi (experimental), ROS2 communication (disable by default), video (stream, rtsp - disable by default)
@@ -46,6 +56,7 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
     - NEW widgets: UITextField, StandAloneSlider, StandAlonePushButton, StandAloneToggleButton, StandAlonecomboBox, HSpace, VSpace
 
 ### Changed
+
     - Improved delete_content code generator by using scheduled_delete
     - Combobox can have zero items, and it is possible to add items one per one
     - Force to use the pixel unit for font. Allows to have the same rendering on MAC & Linux
@@ -56,13 +67,19 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
     - Improved debug messages.
     - Improved Readme.md
     - Cleaned Code, comments
-### Removed 
+
+### Removed
+
     - REMOVED WidgetContainer widget -- not needed anymore !
 
 ## [1.17.0] - 2022-01-05
+
 ### compliant with djnn-cpp [1.17.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
 ### NEW
+
     - Added support for M1 Macos
     - NEW smala :
         - Added kind of inheritance mechanism between user componant : eq:  Buttons inherits the Widget
@@ -86,10 +103,14 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
         - simple horizontal slider widget
         - Label Widget
         - ComboBox widget
+
 ### Added
+
     - Enabled anonymous insert
     - Added self assignment operators
+
 ### Changed
+
     - Improved cookbook:
         - Layer: padding
         - Dash Array with double
@@ -100,17 +121,23 @@ smala is strongly linked to djnn-cpp developpement : https://github.com/lii-enac
     - Improved compilation dependencies
     - Improved Install.md
     - Cleaned code
+
 ### Fixed
+
     - Fixed cookbooks:
         - Buttons
         - Clock
 
 ## [1.16.0] - 2021-07-28
+
 ### compliant with djnn-cpp [1.&6.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
-note: debut on changelog. This section has to be completed, if we have time. 
+note: debut on changelog. This section has to be completed, if we have time.
+
 ### NEW
+
     - NEW Component : please refer to djnn CHANGELOG
         - SimpleTextEdit, SimpleText
         - DirectoryObserver
@@ -139,12 +166,16 @@ note: debut on changelog. This section has to be completed, if we have time.
         - _DEBUG_SEE_ACTIVATION_SEQUENCE
         - _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US
         - _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED  
+
 ### Changed
+
     - Improved packages dependency 
     _ Improved packages build system
     - Improved lib/widget component :
         - Animator
+
 ### Fixed
+
     - Fixed documentation
     - Fixed pkgconfig file generation
     - Fixed cookbooks :
@@ -164,12 +195,14 @@ note: debut on changelog. This section has to be completed, if we have time.
         - regex
         - Clock
 
-
 ## [1.15.0] - 2021-01-28
+
 ### compliant with djnn-cpp [1.15.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW start working on javascript code generation from smala : javascript builder
         - Improved generic builder.
         - Improved code consistency in smala so in cpp builder.
@@ -182,8 +215,11 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW cookbook recipe: incremental json parsing with djnn concepts
     - NEW cookbook recipe: javascript.
     - NEW Makefile for Stand_Alone with precompiled_header option : use_pch = yes
+
 ### Added
+
 ### Changed
+
     - Fixed all cookbook recipes, app to match the builder changes.
     - Changed smalac: clean, and improve code.
     - Changed smalac: surround simple instruction in switch with component
@@ -192,14 +228,18 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Simplest cookbook recipe is now simpler.
 
 ### Fixed
+
     - Fixed dnd cookbook recipe.
     - Fixed Linux/MacOs/Windows compilation and dependencies in consequences of the work on the headers
 
 ## [1.14.0] - 2020-11-23
+
 ### compliant with djnn-cpp [1.14.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - Package for windows (and Linux) are avaluable on : https://github.com/lii-enac/smala/releases
     - Added SVG recipe, workflow and preferences to use in smala
     - NEW Client/server (TCP/IP) cookbook recipes.
@@ -211,7 +251,9 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW SWIM connection cookbook recipe (aeronautical)
 
 ### Added
+
 ### Changed
+
     - Better debug info - line number fixed - add more parser info to context.
     - Improved Fitts Law recipe.
     - Improved warning on Switch generation
@@ -221,14 +263,18 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Improved emscripten support
 
 ### Fixed
+
     - Fixed context generation for ELSEIF
     - Fixed notification animation
 
 ## [1.13.0] - 2020-10-07
+
 ### compliant with djnn-cpp [1.13.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW native collection component + cookbook 
     - New DropDownMenu recipe in gui widget libsmala
     - NEW "for : "  loop operator (ex: "for r : rectangles")
@@ -247,9 +293,11 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW widget menu fold cookbook recipe
 
 ### Added
+
     - Added cookbook crazyflie recipe
 
 ### Changed
+
     - Added - libsmala - Button interface
     - Simplified async_native recipe
     - Move PanAndZoom into libsmala
@@ -260,52 +308,60 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Changed Static_cast for dynamic_cast in 
 
 ### Removed
+
     - Removed all buildpath reference
     - Removed : mainloop is no more an existing global variable
     - Removed fsm_guard 
     - Commented midi component recipe (not working on Windows)
 
 ### Fixed
+
     - Fixed few bugs in TextLineEdit
     - Fixed the use of wheel->dx, dy
     - Fixed some Linux compilation
     - Fixed Sorter recipe
     - Fixed the use of other_runtime_lib_path in Makefile
 
-
 ## [1.12.0] - skipped
 
-
 ## [1.11.0] - 2020-06-25
+
 ### compliant with djnn-cpp [1.12.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW supopr for the new process from djnn-cpp : totally transparent for end-user
     - NEW Generate .deb package for ubuntu/debian
     - NEW potentionmeter widget component into smalalib
     - NEW cookbook using Async NativeAction
 
 ### Added
+
     - Added cookbook using potentionmeter
 
 ### Changed
+
     - IvyAcess component is now special with special constructor
     - Improved build_find
     - Cleaned code and cookbook
     - Improved button design into smalalib
 
 ### Fixed
+
     - Fixed Pan and zoom cookbook
     - Fixed cookbook midi
     - Fixed a bug in cookbook dock
 
-
 ## [1.10.0] - 2020-05-07
+
 ### compliant with djnn-cpp [1.11.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW MAJOR REFACTORING - see the HowTo below
         - Path as p.1 must be written p.[1]
         - It is now possible to write: p.[<expr>] as 
@@ -346,8 +402,8 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW midi cookbook recipe
     - NEW brew tab for macOs
 
-
 ### Changed
+
     - the use of "$" (get_value() of a int/bool/double property ) has changed. 
             $(expression) is now directly written $expression.
             ex.: $(foo.bar) ==> $foo.bar
@@ -362,38 +418,50 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Cleaned code
 
 ### Deprecated
+
     - (for now) the use a the "dump" function has changed. cannot specify the dump level 
             ex.: dump foo
+
 ### Removed
+
     - AddChild has been remove and replace by : <<
+
 ### Fixed
+
     - Fixed grammar ambiguous rules
 
-
 ## [1.9.0] - 2018-12-17
+
 ### compliant with djnn-cpp [1.10.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW cookbook recipe on crazyflie
     - New cookbook recipe on Regex
 
 ### Added
+
     - Makefile: depend on djnn-cpp pkg-conf
     - Makefile: added "make install" and "make install prefix=" rules
     - Makefile: new tree architecture in build_dir
 
 ### Changed
+
     - Changed find_component -> fond_child
     - Changed cookbook: RefProperty
     - Changed config.default.mk : Please delete your config.mk
     - Cleaned Makefike of any Java legacy and C legacy
 
 ### Deprecated
+
 ### Removed
+
     - Removed useless pinch_zoom cookbook
 
 ### Fixed
+
     - Fixed standalone Makefile
     - Fixed the fake_root
     - Fixed headers generation
@@ -402,10 +470,13 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Fixed some clean rules
 
 ## [1.8.0] - 2020-03-13
+
 ### compliant with djnn-cpp [1.9.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW allow break, continue and return statements
     - NEW the symbol '|->'' for activator :  |-> spike
     - NEW cookbook: layout
@@ -414,27 +485,32 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW root and syshook auto-magically run ! : no need to run root and run syshook at the end
 
 ### Added
+
     - Added 'mspf' child to windows component: millisecond per frame informations
     - Enabled path in move child
     - Adapte to new djnn module: exec_env AND auto-intialize
 
 ### Changed
+
     - Improved editor_mode for SublimeText
     - Improved DoubleClick recipe
     - Improved code
     - Made cookbooks quit on window closing
 
 ### Fixed
+
     - Fixed parenting mechanism in main program as in dynamic program (AddChildrenTo)
     - Fixed HelloIvy cookbook to work on every platform
     - Fixed naming branch in SwitchRange
 
-
 ## [1.7.0] - 2020-01-31
+
 ### compliant with djnn-cpp [1.8.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW cookbook for a simple Menu widget
     - NEW cookbook illustrating the use of a Sorter
     - NEW support for XMLSerialize
@@ -447,6 +523,7 @@ note: debut on changelog. This section has to be completed, if we have time.
     - NEW cookbook for Texture
 
 ### Added
+
     - Enable expressions in bindings
     - Start support for emscripten
     - Manage display module import
@@ -454,9 +531,11 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Added a guard and error message on addChildrenTo (builder)
 
 ### Deprecated
+
     - Deprecated isString to toString
 
 ### Fixed
+
     - Fixed drag_pan_zoom cookbook.
     - Fixed seg_fault in code generation
     - Fixed new compatibility with djnn 1.8.0
@@ -464,39 +543,47 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Fixed Makefile
     - Fixed typo and clean-up code
 
-
 ## [1.6.1] - 2019-11-19 [YANKED]
+
 ### compliant with djnn-cpp [1.7.0]
+
     - Please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### Fixed
+
     - Fixed a bug in path building
     - Fixed typo
 
-
 ## [1.6.0] - 2019-11-18
+
 ### compliant with djnn-cpp [1.7.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - NEW cookbook recipe: text field edit
     - NEW use of djnn constant by using prefix DJN
     - NEW addition of a new way to access children by their index (eg. list)
 
 ### Added
+
     - Added Makefile sanatizer options 
 
 ### Changed
+
     - Replaced delete by schelude_delete (djnn) in cpp_builder code generator
     - Improved README for windows instruction
     - Improved cookbook recipes : sketching, checkbox, fitts_laws
 
-
 ## [1.5.0] - 2019-09-17
+
 ### compliant with djnn-cpp [1.6.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth changes
 
 ### NEW
+
     - New operator: "isString ()"" to help compilator generating string from property 
         eg : isString ( "incr:" + incr.state) => tp.text
     - New operator: "&" to help compiler generate pointer from property
@@ -514,6 +601,7 @@ note: debut on changelog. This section has to be completed, if we have time.
 ### Added
 
 ### Changed
+
     - All arguments in _define_ component definition has to be Process instead of Component
     - refactoring grammar
     - Improved cookbook recipes : bindings, display, sketching_advanced, drag_pan_zoom
@@ -522,17 +610,21 @@ note: debut on changelog. This section has to be completed, if we have time.
     - cleaned code
 
 ### Fixed
+
     - Fixed windows compilation
 
 ### Broken
+
     - cookbook : pinch_zoom, rotate_resize
 
-
 ## [1.4.0] - 2019-06-04
+
 ### compliant with djnn-cpp [1.5.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### NEW
+
     - Added and manage automatically synchronizer 
     - Added new operator for connector with a first copy on activation "=:>""
     - Setting a refproperty will automatically use pointer : ref r (foo), if foo is component will automatically get foo pointer address.
@@ -552,11 +644,13 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Added few tests
 
 ### Added
+
     - Managed switch_list component properly
     - By default initialize display when using gui
     - Improved warning compilation
 
 ### Changed
+
     - "=>" is now a connector component without a first copy on activation, react only on triggering
     - Removed named assignment mechanism ... use AssigmentSequence instead : eg: 
         .notify_selected = index =: tabManager.selected_index : 1 ==>  AssignmentSequence notify_selected (1) { index =: tabManager.selected_index }
@@ -567,21 +661,25 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Update all cookbook with new mechanism : =>, =:> ...
 
 ### Removed
+
     - Removed SetDouble, 
     - Removed named assignment mechanism ... use AssigmentSequence instead
 
 ### Fixed
+
     - Fixed several cookbook recipes using new mechanism
     - Fixed smala parser
     - Fixed compilation issues on Linux platform
     - Fixed a shift/reduce conflict
 
-
 ## [1.3.0] - 2019-04-05
+
 ### compliant with djnn-cpp [1.4.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### New
+
     - NEW display API NEEDED to use Frame component
         eg: use display 
             Frame f ("mywindow")
@@ -599,21 +697,25 @@ note: debut on changelog. This section has to be completed, if we have time.
     - Improved native expressions efficiency
     - Improved Makefile
 
-
 ## [1.2.0] - 2019-03-15
+
 ### compliant with djnn-cpp [1.3.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes 
 
 ### NEW
+
     - NEW cookbook - zoom recipe (frame-centered and mouse-centered)
 
 ### Added
+
     - added NEW smala expressions for "anti-binding": !->, ->!, !->!
         eg: A !-> B when A is desactivated, B is Activated
         eg: A ->! B when A is Activated, B is desactivated
         eg: A !->! B when A is desactivated, B is desactivated
 
 ### Changed
+
     - improved Makefile: clean up and mechanism, allow sub-directories in import
     - improved code generation for: delete
     - improved README.md and INSTALL.md
@@ -622,33 +724,43 @@ note: debut on changelog. This section has to be completed, if we have time.
     - improve Windows (10/8) support
 
 ### Removed
+
     - removed warning on unknown module
 
-
 ## [1.1.1] - 2019-02-04 [YANKED]
+
 ### Added
+
     - CHANGELOG.md
 
-
 ## [1.1.0] - 2019-02-01
+
 ### compliant with djnn-cpp [1.1.0] and [1.2.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
 ### Added
+
     - API - new kind of binding: ->, ->!, !->, !->!
     - API - support for dash-array
     - COOKBOOK - new recipe on binding
 
-
 ## [1.0.0] - 2018-12-17
+
 ### compliant with djnn-cpp [1.0.0]
+
     - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
 
-note: debut on changelog. This section has to be completed, if we have time. 
-### NEW
-### Added
-### Changed
-### Deprecated
-### Removed
-### Fixed
+note: debut on changelog. This section has to be completed, if we have time.
 
+### NEW
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed

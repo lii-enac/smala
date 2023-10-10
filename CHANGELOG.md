@@ -6,6 +6,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : <https://github.com/lii-enac/djnn-cpp>
 
+## [1.20.0] - 2023-10-10
+
+### compliant with djnn-cpp [1.20.0]
+
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+
+    - NEW debug option: _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT 
+    - NEW debug option: _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY
+    - NEW debug option: _DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 0|1|2 to track warning on component destruction
+    - NEW debug option: _DEBUG_NO_TOUCH_EVENT to enable touch events (especially for macos trackpad) default seting: 1
+        - SO we have to activate multitouch to use it
+    - NEW debug option: _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = file.sma:lineno
+    - NEW Cookbook recipe:
+        - Chat
+
+### Added
+
+    - Added support to fast compilation
+
+### Changed
+
+    - Improved cookbook recipes :
+        - scrollbar
+        - multi_layer
+        - window recipe to have transparent frame
+        - video : local camera by default, stream on OBS
+        - tabManager code
+    - Improved config.mk : move sanitizer options into config.default.mk (and so config.mk)
+    - Improve support for mold
+    - Avoid need for iostream with print()
+    - Improved generation of DELETE_CONTENT
+    - Improved code of stand_alone
+
+### Deprecated
+
+    - schedule_delete -> schedule_deletion
+    - in code generation: Parent/FatChildProcess -> CoreProcess
+
+### Fixed
+
+    - Fixed abstract_property.h inclusion
+    - Fixed libsmala install_name
+    - Fixed debug info and line number for native
+    - Fixed standalone push button
+    - Fixed *.mk for the use of V=max
+    - Fixed linux compilation
+    - Fixed editor mode path on windows
+    - Fixed cookbook recipes:
+        - boxes_and_arrows
+        - swim
+        - paused_control
+
 ## [1.19.0] - 2023-01-26
 
 ### compliant with djnn-cpp [1.19.0]

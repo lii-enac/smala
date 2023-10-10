@@ -34,7 +34,7 @@ include config.default.mk
 -include config.mk
 
 MAJOR = 1
-MINOR = 19
+MINOR = 20
 MINOR2 = 0
 
 # remove builtin rules : speed up build process and help debug

@@ -8,7 +8,7 @@ endif
 
 ifeq ($(os),Linux)
 compiler ?= gnu
-CFLAGS_COMMON +=  -fpic
+CFLAGS_COMMON += -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
@@ -29,8 +29,6 @@ LEX := $(brew_prefix)/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
-#other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-other_runtime_lib_path := /Users/conversy/recherche/istar/code/misc/MGL/build
 #CXXFLAGS += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib

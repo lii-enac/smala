@@ -6,20 +6,27 @@
 
 
 ifneq ($(djnn-pkgconf),)
-djnn_cflags := $(shell pkg-config $(djnn_pkgconf) --cflags)
-djnn_ldflags := $(shell pkg-config $(djnn_pkgconf) --libs)
-djnn_lib_path := $(shell pkg-config $(djnn_pkgconf) --libs-only-L)
+pkge := $(shell pkg-config $(djnn-pkgconf) --exists; echo $$?)
+ifeq ($(pkge),0)
+djnn_cflags := $(shell pkg-config $(djnn-pkgconf) --cflags)
+djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
+djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
+endif
+undefine pkge
 endif
 
 ifneq ($(smala-pkgconf),)
 #smalac := "should be in /usr/(local)/bin"
-smala_cflags := $(shell pkg-config $(smala_pkgconf) --cflags)
-smala_ldflags := $(shell pkg-config $(smala_pkgconf) --libs)
-smala_lib_path := $(shell pkg-config $(smala_pkgconf) --libs-only-L)
+pkge := $(shell pkg-config $(smala-pkgconf) --exists; echo $$?)
+ifeq ($(pkge),0)
+smala_cflags := $(shell pkg-config $(smala-pkgconf) --cflags)
+smala_ldflags := $(shell pkg-config $(smala-pkgconf) --libs)
+smala_lib_path := $(shell pkg-config $(smala-pkgconf) --libs-only-L)
 smala_lib_path := $(subst -L, , $(smala_lib_path))
 endif
-
+undefine pkge
+endif
 
 #---- local sources
 
@@ -85,8 +92,8 @@ CXXLD ?= $(CXX)
 
 ifneq ($(pkg),)
 #$1_lib_pkgpath = $$(subst $$() $$(),:,$$(lib_pkgpath))
-CXXFLAGS += $(shell env PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --cflags $(pkg))
-LIBS += $(shell env PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --libs $(pkg))
+CXXFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --cflags $(pkg))
+LIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH):$(pkg_path) pkg-config --libs $(pkg))
 endif
 
 
@@ -120,40 +127,16 @@ LDFLAGS += $(EMFLAGS) \
 
 endif
 
-
 exe := $(exe)$(EXE)
 exe := $(build_dir)/$(exe)
 
 default app: $(exe)
-.PHONY: default app
+#.PHONY: default app
 
 ld_library_path:=$(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 test: $(exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
-test_g: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail)
-test_g_p: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail -p http://proxy.recherche.enac.fr:3128)
-test_o: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m osm)
-test_o_p: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m osm -p http://proxy.recherche.enac.fr:3128)
-
-# Beynes (default): 48.86109526727752 1.8933138875646296
-
-# Esperces: 43.315313261816485 1.404974527891014
-test_g_e: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail -lat 43.315313261816485 -lon 1.404974527891014)
-test_g_p_e: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail -p http://proxy.recherche.enac.fr:3128 -lat 43.315313261816485 -lon 1.404974527891014)
-
-# Caylus: 44.27432196595285 1.729783361205679
-test_g_c: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail -lat 44.27432196595285 -lon 1.729783361205679)
-test_g_p_c: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)" -m geoportail -p http://proxy.recherche.enac.fr:3128 -lat 44.27432196595285 -lon 1.729783361205679)
-
 dbg: $(exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
 .PHONY: test
@@ -162,7 +145,9 @@ LD  = $(CXX)
 
 objs_sma := $(srcs_sma:.sma=.o)
 objs_sma := $(addprefix $(build_dir)/,$(objs_sma))
-objs_other := $(srcs_other:.cpp=.o)
+srcs_other_cpp := $(filter %.cpp,$(srcs_other))
+srcs_other_c := $(filter %.c,$(srcs_other))
+objs_other := $(srcs_other_cpp:.cpp=.o) $(srcs_other_c:.c=.o)
 objs_other := $(addprefix $(build_dir)/,$(objs_other))
 
 objs += $(objs_sma) $(objs_other)
@@ -175,6 +160,8 @@ ifeq ($(cross_prefix),em)
 app_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,$(djnn_modules)))
 else
 app_libs := $(addprefix -ldjnn-,$(djnn_modules))
+#app_libs := $(addsuffix .a,$(addprefix $(djnn_lib_path)/libdjnn-,$(djnn_modules)))
+#app_libs := $(shell PKG_CONFIG_PATH=$(djnn_lib_path)/.. pkg-config --libs --static djnn-cpp)
 endif
 
 
@@ -186,7 +173,3 @@ distclean clear:
 clean:
 	rm -f $(gen_srcs) $(objs) $(deps)
 .PHONY: clean clear distclean
-
-foo:
-	echo $(objs_other)
-

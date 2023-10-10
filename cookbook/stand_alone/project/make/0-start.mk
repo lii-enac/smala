@@ -1,6 +1,5 @@
 redirect: srcs.mk default
-
-.PHONY: redirect config first second
+.PHONY: redirect
 
 # remove builtin rules: speed up build process and help debug
 MAKEFLAGS += --no-builtin-rules

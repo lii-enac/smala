@@ -6,6 +6,7 @@ $(objs): CXXFLAGS += $(CXXFLAGS_CFG) $(djnn_cflags) $(smala_cflags) -I$(src_dir)
 $(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
 $(exe): LIBS += $(app_libs)
 
+
 $(exe): $(objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
@@ -37,6 +38,17 @@ else
 	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
+endif
+
+# from .c user sources
+$(build_dir)/%.o: %.c
+ifeq ($V,max)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+else
+	@$(call rule_message,compiling to,$(stylized_target))
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 endif
 
 

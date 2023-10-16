@@ -18,11 +18,12 @@
         "request": "launch",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/pick_fill/pick_fill_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        "program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
+        //"program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/zoom/tile_grid/tile_grid_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/layer/layer_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/fitts_law/fitts_law_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/dynamic_rectangle/dynamic_rectangle_app",
+        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/zoom/simple_zoom/simple_zoom_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/chat/chat_app",
         "args": ["\"\""],
         //"stopOnEntry": true,
@@ -56,7 +57,7 @@
         // },
         "env":
                 {
-                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/",//:/Users/conversy/recherche/istar/code/misc/MGL/build",
+                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/:/Users/conversy/recherche/istar/code/misc/MGL/build:/Users/conversy/recherche/istar/code/misc/mesa/builddir/src/gallium/targets/osmesa:/Users/conversy/recherche/istar/code/misc/SDL2-2.28.1/local/lib",
                     //"METAL_DEVICE_WRAPPER_TYPE":"1"
                     //"PATH": "${PATH}:${workspaceFolder}/../djnn-cpp/build/lib"
                 }

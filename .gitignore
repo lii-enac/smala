@@ -7,3 +7,10 @@
 /.DS_Store
 /pyautogui/__pycache__
 /pyautogui/results
+/build.ninja
+/tools/make2ninja.py
+/*.diff
+**/MGL.gputrace*
+shader.glsl
+shader.frag.glsl
+shader.vert.glsl

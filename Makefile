@@ -30,6 +30,9 @@ help:
 config.mk config:
 	cp config.default.mk config.mk
 
+config_%:
+	cp project/config/$@.mk config.mk
+
 include config.default.mk
 -include config.mk
 
@@ -141,9 +144,14 @@ CXX_CK := g++
 RANLIB_CK := ranlib
 SIZE_CK ?=
 endif
+
 else
+ifndef CC_CK
 CC_CK := $(CC)
+endif
+ifndef CXX_CK
 CXX_CK := $(CXX)
+endif
 endif
 
 lib_smala_name = libsmala
@@ -173,7 +181,7 @@ djnn_libs_SL := $(djnn_libs)
 
 CFLAGS_COMMON += -MMD
 
-CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
+CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++20
 
 CXXFLAGS_SC += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib
@@ -187,44 +195,67 @@ LDFLAGS_CK += $(LDFLAGS_COMMON)
 # -----------------------------------
 ifeq ($(os),Linux)
 compiler ?= gnu
+linker ?= gnu
 CFLAGS_COMMON +=  -fpic
-YACC = bison -d -W
+YACC ?= bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 lib_suffix =.so
-DYNLIB = -shared
+#DYNLIB ?= -shared
 LDFLAGS_SC += -lstdc++fs
 endif
 
 ifeq ($(os),Darwin)
 compiler ?= llvm
+linker ?= llvm
 ifeq ($(PREFIX),)
 brew_prefix := $(shell brew --prefix)
 else
 brew_prefix := $(HOMEBREW_PREFIX)
 endif
+ifeq ($(origin YACC), default)
 YACC := $(brew_prefix)/opt/bison/bin/bison -d -Wno-conflicts-sr
+endif
+ifeq ($(origin LEX), default)
 LEX := $(brew_prefix)/opt/flex/bin/flex
+endif
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
 #other_runtime_lib_path := /Users/conversy/src-ext/SwiftShader/build
-other_runtime_lib_path := /Users/conversy/recherche/istar/code/misc/MGL/build
+#other_runtime_lib_path += /Users/conversy/recherche/istar/code/misc/MGL/build
+#other_runtime_lib_path += /Users/conversy/recherche/istar/code/misc/mesa/builddir/src/gallium/targets/osmesa
+#other_runtime_lib_path += /Users/conversy/recherche/istar/code/misc/SDL2-2.28.1/local/lib
 #CFLAGS_COMMON += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
-lib_suffix =.dylib
-DYNLIB = -dynamiclib
+#lib_suffix =.dylib
+#DYNLIB ?= -dynamiclib
 endif
 
 ifeq ($(os),MinGW)
 compiler ?= gnu
+linker ?= gnu
 CFLAGS_COMMON += -fpic
-YACC = bison -d -Wno-conflicts-sr
+YACC ?= bison -d -Wno-conflicts-sr
 LD_LIBRARY_PATH=PATH
 debugger := gdb
 lib_suffix =.dll
-DYNLIB = -shared
+#DYNLIB ?= -shared
+endif
+
+LD_LIBRARY_PATH ?= LD_LIBRARY_PATH
+
+ifeq ($(linker),gnu)
+lib_suffix =.so
+DYNLIB ?= -shared
+endif
+ifeq ($(linker),llvm)
+lib_suffix =.dylib
+DYNLIB ?= -dynamiclib
+endif
+ifeq ($(linker),mold)
+DYNLIB ?= -shared
 endif
 
 
@@ -238,7 +269,7 @@ EXE := .html
 launch_cmd := emrun --serve_after_close
 
 #os := em
-DYNLIB=
+#DYNLIB=
 lib_suffix=.bc
 
 EMFLAGS := -Wall -Wno-unused-variable -Oz \
@@ -434,7 +465,8 @@ clean_merr:
 	touch src/errors.h
 .PHONY: clean_merr
 
-$(merr_objs): CXXFLAGS += -std=c++1z 
+$(merr_objs):
+#CXXFLAGS += -std=c++1z 
 
 $(merr): $(merr_objs)
 	$(CXX) $^ -o $@

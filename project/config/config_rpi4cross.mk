@@ -78,14 +78,8 @@ LDFLAGS_CK += \
 	-L$(rpi_sysroot)/usr/lib/gcc/$(isa_os_arch)/$(cc_version) \
     -B$(rpi_sysroot)/usr/lib/gcc/$(isa_os_arch)/$(cc_version)
 
-ifeq ($(linker),gnu)
 LDFLAGS_CK += \
 	-Wl,--no-undefined \
-	-Wl,-rpath-link,$(abspath $(djnn_lib_path)):$(abspath $(build_dir))/lib:$(rpi_sysroot)/lib/$(isa_os_arch):$(rpi_sysroot)/usr/lib/$(isa_os_arch) \
-	-Wl,-rpath,/root/djnn-cpp/build/lib
-endif
-
-#/Users/conversy/recherche/istar/code/misc/rpi_home/sysroot/lib/arm-linux-gnueabihf:/Users/conversy/recherche/istar/code/misc/rpi_home/sysroot/usr/lib/arm-linux-gnueabihf
-#YACC := `brew --prefix`/opt/bison/bin/bison -d -Wno-conflicts-sr -Wno-conflicts-rr
-#LEX := `brew --prefix`/opt/flex/bin/flex
-#$(build_dir)/src/%.o: CXXFLAGS_SC += -I$(shell brew --prefix)/opt/flex/include
+	-Wl,-rpath-link,$(rpi_sysroot)/lib/$(isa_os_arch):$(rpi_sysroot)/usr/lib/$(isa_os_arch) \
+	-Wl,-rpath-link,$(abspath $(djnn_lib_path)):$(abspath $(build_dir))/lib \
+	-Wl,-rpath,/root/djnn-cpp/build/lib:/root/smala/build/lib

@@ -11,70 +11,29 @@
 #		Stéphane Conversy <stephane.conversy@enac.fr>
 #		Mathieu Poirier	  <mathieu.poirier@enac.fr>
 #
+project_dir := project/make
 
-default: smalac
-# config.mk # does not work anymore
-.PHONY: default
+include $(project_dir)/0-start.mk
 
-all: smalac smala_lib cookbook_apps test_apps
-# config.mk # does not work anymore
-.PHONY: all
+# determine host os
+include $(project_dir)/1-os.mk
 
-help:
-	@echo "default: smalac ; all: smalac cookbook"
-	@echo "button: will build button cookbook app (works with all cookbook apps: $(cookbook_apps))"
-	@echo "button_test: will build button cookbook app and launch it (works with all cookbook apps: $(cookbook_apps))"
-	@echo "experiment make -j !!"
+include $(project_dir)/2-config.mk
 
-
-config.mk config:
-	cp config.default.mk config.mk
-
-config_%:
-	cp project/config/$@.mk config.mk
-
-include config.default.mk
+# include user-specified config if present
 -include config.mk
 
-MAJOR = 1
-MINOR = 20
-MINOR2 = 0
+# default config
+#include $(project_dir)/config.default.mk
 
-# remove builtin rules : speed up build process and help debug
-MAKEFLAGS += --no-builtin-rules
-.SUFFIXES:
-
-# ---------------------------------------
 # utils
+include $(project_dir)/4-utils.mk
 
-# https://stackoverflow.com/a/16151140
-uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
+# # main stuff
+# include $(project_dir)/5-main.mk
 
-# recursive wildcard https://stackoverflow.com/a/12959694
-rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
-rwildcardmul = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard $(addsuffix *, $1)),$(call rwildcard,$d/,$2))
+include $(project_dir)/10-end.mk
 
-
-
-# Joins elements of the list in arg 2 with the given separator.
-#   1. Element separator.
-#   2. The list.
-# A literal space.
-#space :=
-#space +=
-#join-with = $(subst $(space),$1,$(strip $2))
-join-with = $(subst $(eval) ,$1,$(strip $2))
-
-# ---------------------------------------
-# os
-
-ifndef os
-os := $(shell uname -s)
-
-ifeq ($(findstring MINGW,$(os)),MINGW)
-os := MinGW
-endif
-endif
 
 # ---------------------------------------
 # save user-provided CXXFLAGS, and use CXXFLAGS as the ultimate compiler configuration
@@ -82,81 +41,25 @@ endif
 CXXFLAGS_CFG := $(CXXFLAGS)
 CXXFLAGS :=
 
-ifeq ($(linker),mold)
-# ifeq ($(os),Darwin)
-# CXXLD := ld64.mold
-# CXXFLAGS += -fPIC
-# LDFLAGS += -L/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/
-# LDFLAGS += -dylib -lc++ -lc
-ifeq ($(compiler),gcc)
-CXXLD ?= $(CXX) --use-ld=mold
-endif
-ifeq ($(compiler),llvm)
-CXXLD ?= $(CXX) -fuse-ld=mold
-endif
-endif
-
 
 CXXLD ?= $(CXX)
 
-# ---------------------------------------
-# cross-compile support
-
-ifdef cross_prefix
-#cross_prefix := c
-#options: c g llvm-g i686-w64-mingw32- arm-none-eabi- em
-#/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-c
-#/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
-ifneq ($(cross_prefix),g)
-CC := $(cross_prefix)$(CC)
-CXX := $(cross_prefix)$(CXX)
-AR := $(cross_prefix)$(AR)
-RANLIB := $(cross_prefix)$(RANLIB)
-SIZE := $(cross_prefix)$(SIZE)
-else
-#temporary covid hack
-CC := gcc
-CXX := g++
-#AR := $(cross_prefix)$(AR)
-RANLIB := ranlib
-SIZE ?=
-endif
-else
+# CXX_SC is the compiler for the smalac compiler
 CXX_SC := $(CXX)
-endif
 
-ifdef cookbook_cross_prefix
-#cross_prefix := c
-#options: c g llvm-g i686-w64-mingw32- arm-none-eabi- em
-#/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-c
-#/usr/local/Cellar/android-ndk/r14/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g
-ifneq ($(cookbook_cross_prefix),g)
-CC_CK := $(cookbook_cross_prefix)$(CC)
-CXX_CK ?= $(cookbook_cross_prefix)$(CXX)
-AR_CK := $(cookbook_cross_prefix)$(AR)
-RANLIB_CK := $(cookbook_cross_prefix)$(RANLIB)
-SIZE_CK := $(cookbook_cross_prefix)$(SIZE)
-else
-#temporary covid hack
-CC_CK := gcc
-CXX_CK := g++
-#AR := $(cross_prefix)$(AR)
-RANLIB_CK := ranlib
-SIZE_CK ?=
-endif
-
-else
+# CC_CK and CXX_CK are the compilers for cookbooks
 ifndef CC_CK
 CC_CK := $(CC)
 endif
 ifndef CXX_CK
 CXX_CK := $(CXX)
 endif
-endif
 
 lib_smala_name = libsmala
 
-ifeq ($(djnn_path),) 
+ifneq ($(djnn-pkgconf),)
+pkgexists := $(shell pkg-config $(djnn-pkgconf) --exists; echo $$?)
+ifeq ($(pkgexists),0)
 djnn_cflags = $(shell pkg-config $(djnn-pkgconf) --cflags)
 djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
@@ -164,6 +67,8 @@ djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path = $(subst -L, , $(djnn_lib_path))
 djnn_include_path_only = $(subst -I, , $(djnn_cflags))
+endif
+#undefine pkgexists
 else
 djnn_cflags = -I$(djnn_path)/src
 djnn_ldflags = -L$(djnn_path)/build/lib
@@ -263,39 +168,6 @@ ifeq ($(cookbook_cross_prefix),arm-none-eabi-)
 CXXFLAGS_CK += -Wno-psabi #https://stackoverflow.com/a/48149400
 endif
 
-ifeq ($(cookbook_cross_prefix),em)
-#os := em
-EXE := .html
-launch_cmd := emrun --serve_after_close
-
-#os := em
-#DYNLIB=
-lib_suffix=.bc
-
-EMFLAGS := -Wall -Wno-unused-variable -Oz \
--s USE_BOOST_HEADERS -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_FREETYPE=1 -s USE_WEBGL2=1 \
--DSDL_DISABLE_IMMINTRIN_H \
--s EXPORT_ALL=1 -s DISABLE_EXCEPTION_CATCHING=0 \
--s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 \
--s ASSERTIONS=2 \
--s ERROR_ON_UNDEFINED_SYMBOLS=0
-
-djnn_libs := $(addsuffix .bc,$(addprefix $(djnn_lib_path)/libdjnn-,animation comms gui display input files utils base exec_env core))
-djnn_libs_SL :=
-
-em_ext_libs_path ?= ../djnn-emscripten-ext-libs
-
-#idn2 expat curl fontconfig unistring psl 
-ext_libs := expat curl
-ext_libs := $(addprefix $(em_ext_libs_path)/lib/lib,$(addsuffix .a, $(ext_libs))) -lopenal
-
-EMCFLAGS += $(EMFLAGS) -I$(em_ext_libs_path)/include -I/usr/local/include #glm
-CFLAGS_CK = $(EMCFLAGS)
-CXXFLAGS_CK += $(EMCFLAGS)
-LDFLAGS_CK += $(EMFLAGS) \
-	$(ext_libs) \
-	--emrun
-endif
 
 YACC ?= bison
 LEX ?= flex
@@ -344,7 +216,15 @@ smalac: config.mk $(smalac)
 .PHONY: smalac
 
 $(smalac): $(smalac_objs)
-	$(CXXLD) $^ -o $@ $(LDFLAGS)
+ifeq ($V,max)
+	@mkdir -p $(dir $@)
+	$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
+else
+	@$(call rule_message,linking to,$(stylized_target))
+	@mkdir -p $(dir $@)
+	@$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
+endif
+#$(CXXLD) $^ -o $@ $(LDFLAGS)
 
 $(smalac): CXX = $(CXX_SC)
 $(smalac): LDFLAGS += $(LDFLAGS_SC)
@@ -381,10 +261,21 @@ build/src_lib/gui/widgets/CheckBox.o: build/src_lib/gui/widgets/IWidget.h
 build/src_lib/gui/widgets/HSlider.o: build/src_lib/gui/widgets/IWidget.h
 build/src_lib/gui/widgets/UITextField.o: build/src_lib/gui/widgets/IWidget.h
 
-$(smala_lib): $(smala_lib_objs) 
+$(smala_lib): $(smala_lib_objs)
+ifeq ($V,max)
 	@mkdir -p $(dir $@)
 	$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
 	mv $(notdir $@) $@
+else
+	@$(call rule_message,linking to,$(stylized_target))
+	@mkdir -p $(dir $@)
+	@$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	@mv $(notdir $@) $@
+endif
+
+#@mkdir -p $(dir $@)
+#$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	
 
 smala_lib: $(smala_lib)
 .PRECIOUS: $(smala_lib_headers)
@@ -399,18 +290,7 @@ endif
 # ------------
 # automatic rules
 
-# $(build_dir)/%.o: %.cpp
-# 	@mkdir -p $(dir $@)
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# # for generated .cpp
-# $(build_dir)/%.o: $(build_dir)/%.cpp
-# 	@mkdir -p $(dir $@)
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-#$(build_dir)/%.cpp $(build_dir)/%.hpp: %.y
-#$(build_dir)/src/location.hh: src/parser.y
-#@$(YACC) -o $@ $<
 $(build_dir)/src/parser.cpp $(build_dir)/src/parser.hpp $(build_dir)/src/location.hh: src/parser.y
 	@mkdir -p $(dir $@)
 	@$(YACC) -o $(build_dir)/src/parser.cpp $<
@@ -474,7 +354,7 @@ $(merr): $(merr_objs)
 $(build_dir)/src/parser.cpp: src/errors.h
 
 
-
+#include project/make/7-pch.mk
 # ---------------------------------------
 # precompiled headers
 
@@ -537,6 +417,8 @@ endif
 
 # -----------
 # cookbook apps
+
+ld_library_path:=$(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 define cookbookapp_makerule
 djnn_libs_cookbook_app :=
@@ -604,17 +486,24 @@ $$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)
+ifeq ($V,max)
+	@mkdir -p $$(dir $$@)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
-	@#$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) `env PKG_CONFIG_PATH=$$(djnn_lib_path)/.. pkg-config --libs --static djnn-cpp`
+else
+	@$(call rule_message,linking to,$$(stylized_target))
+	@mkdir -p $$(dir $$@)
+	@$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
+endif
+#@#$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) `env PKG_CONFIG_PATH=$$(djnn_lib_path)/.. pkg-config --libs --static djnn-cpp`
 
 $$(notdir $1)_objs: $$($1_app_objs)
 
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(ld_library_path):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(abspath $$(djnn_lib_path)):$$(abspath $$(build_dir)/lib):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(ld_library_path):$$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
 	rm -f $$($1_app_exe) $$($1_app_objs) $$($1_app_gensrcs)
@@ -665,19 +554,19 @@ $(app_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_CK) $(CXXFLAGS_PCH_DEF) $(CXX
 # ---------------------------------------
 # generate ninja file from Makefile
 
-make2ninja ?= tools/make2ninja.py
+# make2ninja ?= tools/make2ninja.py
 
-ninja: clear build.ninja
-build.ninja: $(make2ninja)
-	$(MAKE) -Bnd V=max | python3 $(make2ninja) > build.ninja
-.PHONY: build.ninja ninja
+# ninja: clear build.ninja
+# build.ninja: $(make2ninja)
+# 	$(MAKE) -Bnd V=max | python3 $(make2ninja) > build.ninja
+# .PHONY: build.ninja ninja
 
-$(make2ninja):
-	mkdir -p $(dir $@)
-	curl -O https://raw.githubusercontent.com/conversy/make2ninja/master/make2ninja.py && mv make2ninja.py $(make2ninja)
-ifeq ($(os),Darwin)
-	sed -i '' "s/\'(./\`(./" $@
-endif
+# $(make2ninja):
+# 	mkdir -p $(dir $@)
+# 	curl -O https://raw.githubusercontent.com/conversy/make2ninja/master/make2ninja.py && mv make2ninja.py $(make2ninja)
+# ifeq ($(os),Darwin)
+# 	sed -i '' "s/\'(./\`(./" $@
+# endif
 
 # ---------------------------------------
 # stand alone
@@ -686,6 +575,10 @@ stand_alone_dir ?= ../stand_alone
 stand_alone:
 	mkdir $(stand_alone_dir)
 	cp -r cookbook/stand_alone/. $(stand_alone_dir)
+
+
+
+include project/make/8-rules.mk
 
 # ---------------------------------------
 # rules
@@ -701,39 +594,30 @@ $(build_dir)/%.html: %.sma $(smalac)
 	$(smalac) -lang=js $<
 	@mv $*.js $(build_dir)/$(*D)
 
-# .sma to .cpp
-$(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
-	@mkdir -p $(dir $@)
-	$(smalac) $(SMAFLAGS) -cpp $< -builddir $(build_dir)
-
-# @mv $*.cpp $(build_dir)/$(*D)
-# @if [ -f $*.h ]; then mv $*.h $(build_dir)/$(*D); fi;
-
-# .sma to .cpp, .c etc
-# $(build_dir)/%.cpp $(build_dir)/%.h: %.sma
+# # .sma to .cpp
+# $(build_dir)/%.cpp $(build_dir)/%.h: %.sma $(smalac)
 # 	@mkdir -p $(dir $@)
-# 	@echo smalac -cpp $^ -builddir $(dir $@)
-# 	@$(smalac) -cpp $^ -builddir $(dir $@)
+# 	$(smalac) $(SMAFLAGS) -cpp $< -builddir $(build_dir)
 
-# from .c user sources
-$(build_dir)/%.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+# # from .c user sources
+# $(build_dir)/%.o: %.c
+# 	@mkdir -p $(dir $@)
+# 	$(CC) $(CFLAGS) -c $< -o $@
 
-# from .cpp user sources
-$(build_dir)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# # from .cpp user sources
+# $(build_dir)/%.o: %.cpp
+# 	@mkdir -p $(dir $@)
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# for .c generated sources
-$(build_dir)/%.o: $(build_dir)/%.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+# # for .c generated sources
+# $(build_dir)/%.o: $(build_dir)/%.c
+# 	@mkdir -p $(dir $@)
+# 	$(CC) $(CFLAGS) -c $< -o $@
 
-# for .cpp generated sources
-$(build_dir)/%.o: $(build_dir)/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# # for .cpp generated sources
+# $(build_dir)/%.o: $(build_dir)/%.cpp
+# 	@mkdir -p $(dir $@)
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
 # ---------------------------------------
@@ -937,9 +821,9 @@ clean_test test_clean:
 	rm -rf $$(build_dir)/test
 .PHONY: clean_test test_clean
 
-distclean clear clean:
-	rm -rf $(build_dir)
-.PHONY: distclean clear clean
+# distclean clear clean:
+# 	rm -rf $(build_dir)
+# .PHONY: distclean clear clean
 
 
 deps += $(smalac_objs:.o=.d)

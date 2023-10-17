@@ -303,8 +303,6 @@ endif
 
 
 $(build_dir)/src/parser.cpp $(build_dir)/src/parser.hpp $(build_dir)/src/location.hh: src/parser.y
-
-$(build_dir)/src/parser.cpp: src/parser.y
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
 	$(YACC) -o $(build_dir)/src/parser.cpp $<

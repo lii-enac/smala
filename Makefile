@@ -204,6 +204,8 @@ $(build_dir)/src/process_class_path.cpp:
 	printf "{\"AbstractProperty\",\"core/property/abstract_property.h\"},\n" >> $@
 	printf '{"",""}};\n}\n' >> $@
 	rm $(tmpfile)
+
+
 #	cat <<EOT >> $@
 #	#include <map>
 #	EOT
@@ -212,7 +214,7 @@ smalac_objs := $(addprefix $(build_dir)/src/, $(smalac_objs))
 
 smalac := $(build_dir)/$(bin_name)
 
-smalac: config.mk $(smalac)
+smalac: $(smalac)
 .PHONY: smalac
 
 $(smalac): $(smalac_objs)

@@ -186,7 +186,16 @@ smalac_objs := parser.o scanner.o type_manager.o cpp_type_manager.o argument.o d
 	process_class_path.o
 
 $(build_dir)/src/process_class_path.cpp:
+ifeq ($V,max)
 	@mkdir -p $(dir $@)
+	sh tools/make_process_class_path $@ $(djnn_include_path_only)
+else
+	@$(call rule_message,generating,$(stylized_target))
+	@mkdir -p $(dir $@)
+	@sh tools/make_process_class_path $@ $(djnn_include_path_only)
+endif
+
+toto:
 	$(eval tmpfile := $(shell mktemp))
 	printf "#include <map>\n#include <string>\n\nnamespace Smala { std::map<std::string, std::string> process_class_path = {\n" > $@
 	(cd $(djnn_include_path_only) && find * -type f -name "*.h" -not -path "*/ext/*" -not -path "exec_env/time_internal.h" | xargs grep "\s*class " | grep -v ";" | sed -e s/:// | awk '{print $$3," ",$$1}' > $(tmpfile))
@@ -220,11 +229,11 @@ smalac: $(smalac)
 $(smalac): $(smalac_objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
+	$(CXXLD) $^ -o $@ $(LDFLAGS)
 else
 	@$(call rule_message,linking to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)
+	@$(CXXLD) $^ -o $@ $(LDFLAGS)
 endif
 #$(CXXLD) $^ -o $@ $(LDFLAGS)
 
@@ -294,12 +303,26 @@ endif
 
 
 $(build_dir)/src/parser.cpp $(build_dir)/src/parser.hpp $(build_dir)/src/location.hh: src/parser.y
+
+$(build_dir)/src/parser.cpp: src/parser.y
+ifeq ($V,max)
+	@mkdir -p $(dir $@)
+	$(YACC) -o $(build_dir)/src/parser.cpp $<
+else
+	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)
 	@$(YACC) -o $(build_dir)/src/parser.cpp $<
+endif
 
 $(build_dir)/%.cpp: %.l
+ifeq ($V,max)
 	@mkdir -p $(dir $@)
 	$(LEX) -o $@ $<
+else
+	@$(call rule_message,compiling to,$(stylized_target))
+	@mkdir -p $(dir $@)
+	@$(LEX) -o $@ $<
+endif
 
 	
 
@@ -395,7 +418,7 @@ ifeq ($V,max)
 	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 else
 	@$(call rule_message,compiling,$(stylized_target))
-	$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
+	@$(CXX) -x c++-header $(CXXFLAGS) $< -o $@
 endif
 
 ifeq ($(compiler),llvm)
@@ -492,7 +515,7 @@ ifeq ($V,max)
 	@mkdir -p $$(dir $$@)
 	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
 else
-	@$(call rule_message,linking to,$$(stylized_target))
+	@$$(call rule_message,linking to,$$(stylized_target))
 	@mkdir -p $$(dir $$@)
 	@$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
 endif

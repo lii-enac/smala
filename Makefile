@@ -162,11 +162,11 @@ endif
 LD_LIBRARY_PATH ?= LD_LIBRARY_PATH
 
 ifeq ($(linker),gnu)
-lib_suffix =.so
+#lib_suffix =.so
 DYNLIB ?= -shared
 endif
 ifeq ($(linker),llvm)
-lib_suffix =.dylib
+#lib_suffix =.dylib
 DYNLIB ?= -dynamiclib
 endif
 ifeq ($(linker),mold)

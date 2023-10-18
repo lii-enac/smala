@@ -257,6 +257,7 @@ $(smalac_objs): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_SC)
 
 smala_src_lib_dir := src_lib
 smala_dst_lib_dir := $(build_dir)/lib
+smala_lib_header_dir := $(build_dir)/$(smala_src_lib_dir)
 smala_lib := $(smala_dst_lib_dir)/$(lib_smala_name)$(lib_suffix)
 smala_lib_srcs := $(shell find $(smala_src_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
@@ -493,7 +494,7 @@ $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook
 endif
 
 ifneq ($$(smala_libs_cookbook_app),)
-$1_app_cppflags += -I$$(build_dir)/$(smala_lib_dir)
+$1_app_cppflags += -I$(smala_lib_header_dir)
 ifeq ($$(cookbook_cross_prefix),em)
 $1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else

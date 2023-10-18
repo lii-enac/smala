@@ -255,11 +255,14 @@ $(smalac_objs): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_SC)
 # ------------
 # smala lib
 
-smala_lib_dir := src_lib
-smala_lib := $(build_dir)/lib/$(lib_smala_name)$(lib_suffix)
-smala_lib_srcs := $(shell find $(smala_lib_dir) -name "*.sma")
+smala_src_lib_dir := src_lib
+smala_dst_lib_dir := $(build_dir)/lib
+smala_lib := $(smala_dst_lib_dir)/$(lib_smala_name)$(lib_suffix)
+smala_lib_srcs := $(shell find $(smala_src_lib_dir) -name "*.sma")
 smala_lib_objs := $(addprefix $(build_dir)/, $(patsubst %.sma,%.o,$(smala_lib_srcs)))
 smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib_srcs)))
+
+smala_lib_path ?= $(smala_dst_lib_dir)
 
 $(smala_lib_objs): CXX = $(CXX_CK)
 $(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -Ibuild/src_lib

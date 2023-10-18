@@ -1,9 +1,7 @@
 build_dir ?= build
 
 djnn-pkgconf :=
-smala-pkgconf :=
 djnn_cpp_path ?= ../djnn-cpp
-smala_path ?= ../smala
 
 no_pch := yes
 

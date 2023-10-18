@@ -1,33 +1,39 @@
-build_dir ?= build
+build_dir := build
 
-# release and installed (brew, apt, pacman)
-djnn-pkgconf ?= djnn-cpp
-smala-pkgconf ?= smala
-# devel version : djnn-cpp-dev and smala-dev
 
-# or local sources, uncomment _all_ following lines
-# djnn-pkgconf :=
-# smala-pkgconf :=
-# djnn_cpp_path ?= ../djnn-cpp
-# smala_path ?= ../smala
+#devel
+#djnn-pkgconf = djnn-cpp-dev
+#install (github)
+djnn-pkgconf = djnn-cpp
 
-# CXX := clang++-14
-# compiler := llvm
-# linker := mold
-# no_pch = yes
+#or use on local
+djnn_path = ../djnn-cpp
 
-# CXXFLAGS += -O0
-# CXXFLAGS += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
-# CXXFLAGS += -ftime-trace
-# CXXFLAGS += -g
-# CXXFLAGS += -fsanitize=address -O1
-# LDFLAGS += -fsanitize=address
-# CXXFLAGS += -fsanitize=thread -O1
-# LDFLAGS += -fsanitize=thread
 
-# SMAFLAGS += -gen-cleaner
-# SMAFLAGS += -g
-# SMAFLAGS += -fastcomp
-# djnn_modules ?= core exec_env base display gui input animation utils files audio c_api
-keep_intermediate ?= yes
-# nodeps ?= 1
+cookbook_app_for_make_test := button
+cookbook_apps_extra :=
+
+#smala flags
+#SMAFLAGS += -g #-gen-cleaner
+#-g for text in debug_info
+
+#C++ flags 
+#CFLAGS_COMMON += -g
+#LDFLAGS_COMMON +=
+
+#Sanitizer 
+#CFLAGS_COMMON += -fsanitize=thread -O1
+#LDFLAGS_COMMON += -fsanitize=thread
+#CFLAGS_COMMON += -fsanitize=address -O1
+#LDFLAGS_COMMON += -fsanitize=address
+#CFLAGS_COMMON += -fsanitize=memory -O1
+#LDFLAGS_COMMON += -fsanitize=memory
+
+# cross-compile support
+#cross_prefix := em
+#cookbook_cross_prefix := em
+
+# emscripten ext libs
+#em_ext_libs_path := ../djnn-emscripten-ext-libs
+
+#keep_intermediate = yes

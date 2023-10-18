@@ -29,6 +29,9 @@ include $(project_dir)/2-config.mk
 # utils
 include $(project_dir)/4-utils.mk
 
+# # sources
+# include srcs.mk
+
 # # main stuff
 # include $(project_dir)/5-main.mk
 
@@ -68,8 +71,10 @@ djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path = $(subst -L, , $(djnn_lib_path))
 djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 endif
-#undefine pkgexists
-else
+endif
+
+ifneq ($(pkgexists),0)
+ifneq ($(djnn_path),)
 djnn_cflags = -I$(djnn_path)/src
 djnn_ldflags = -L$(djnn_path)/build/lib
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
@@ -78,7 +83,12 @@ djnn_ldlibs = $(addprefix -ldjnn-,$(djnn_modules))
 djnn_libs = $(djnn_ldflags) $(djnn_ldlibs)
 djnn_lib_path = $(djnn_path)/build/lib
 djnn_include_path_only = $(djnn_path)/src
+else
+error no djnn_cpp path declared
 endif
+endif
+
+#undefine pkgexists
 
 djnn_libs_SL := $(djnn_libs)
 

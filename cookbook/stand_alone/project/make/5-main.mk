@@ -13,7 +13,7 @@ djnn_ldflags := $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path := $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 endif
-undefine pkge
+# undefine pkge
 endif
 
 ifneq ($(smala-pkgconf),)
@@ -25,7 +25,7 @@ smala_ldflags := $(shell pkg-config $(smala-pkgconf) --libs)
 smala_lib_path := $(shell pkg-config $(smala-pkgconf) --libs-only-L)
 smala_lib_path := $(subst -L, , $(smala_lib_path))
 endif
-undefine pkge
+# undefine pkge
 endif
 
 #---- local sources

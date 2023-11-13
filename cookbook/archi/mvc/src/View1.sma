@@ -17,20 +17,6 @@ use base
 use gui
 
 _define_
-View1(Process model) {
+View1() {
   Rectangle r (0,0,0,0)
-  model.{x,y,width,height}=:>r.{x,y,width,height}
-  FSM fsm {
-    State idle
-    State drag {
-      Int off_x(0)
-      Int off_y(0)
-      r.press.x - model.x  =: off_x
-      r.press.y - model.y =: off_y
-      r.move.x - off_x =:> model.x
-      r.move.y - off_y =:> model.y
-    }
-    idle->drag(r.press)
-    drag->idle(r.release)
-  }
 }

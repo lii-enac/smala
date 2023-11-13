@@ -22,13 +22,4 @@ Model(int _x, int _y, int _w, int _h)
   Int y (_y)
   Int width (_w)
   Int height (_h)
-  List views
-  Spike about_to_delete
-  about_to_delete->(this) {
-    for item : this.views {
-      view = getRef(item)
-      delete view
-    }
-    delete this
-  }
 }

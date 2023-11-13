@@ -19,6 +19,8 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 import Model
+import Controller1
+import Controller2
 import View1
 import View2
 
@@ -35,6 +37,7 @@ Component root {
   FillColor _ (Red)
   List models
   List views
+  List controllers
 
   Translation pos_buttons(10,0)
   StandAlonePushButton del ("Delete last", 0, 0)
@@ -43,24 +46,35 @@ Component root {
   add.x + add.width + 10 =:> del.x
 
   Int ty(15)
+  Ref to_delete(0)
 
-
-  del.click -> (root) {
-    if (root.models.size > 0) {
-      int sz = root.models.size
-      notify root.models.[sz].about_to_delete
+  del.click -> del_action:(root) {
+    if (root.controllers.size > 0) {
+      int sz = root.controllers.size
+      Process model = &root.controllers.[sz].first.model
+      setRef (root.to_delete, model)
+      notify root.controllers.[sz].first.about_to_delete
+      notify root.controllers.[sz].second.about_to_delete
     }
   }
+  del_action->(root){
+    int sz = root.controllers.size
+    model = getRef(root.to_delete)
+    delete model
+    delete root.controllers.[sz]
+  }
+
   add.click -> (root) {
     Process model = Model (root.models, "", 50, 50, 100, 70)
-    Process v1 = View1 (root.views, "", model) 
-    Process v2 = View2 (root.views, "", model, $root.ty)
-    root.ty += 15
-    addChildrenTo model.views {
-      Ref _(v1)
-      Ref _(v2)
+    Process v1 = View1 (root.views, "") 
+    Process v2 = View2 (root.views, "", $root.ty)
+    Process ctrl = null
+    addChildrenTo root.controllers {
+      Component c
+      ctrl = &c
     }
+    Controller1 (ctrl, "first", model, v1)
+    Controller2 (ctrl, "second", model, v2)
+    root.ty += 15
   }
-
-
 }

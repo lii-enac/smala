@@ -861,7 +861,7 @@ namespace Smala
       return symbol;
     }
     if (str.compare (0, 6, "d_var_") == 0 || str.compare (0, 6, "i_var_") == 0
-        || str.compare (0, 6, "s_var_") == 0 || str.compare (0, 4, "var_") == 0) {
+        || str.compare (0, 6, "s_var_") == 0) {
       return str;
     }
     str = build_path (n);

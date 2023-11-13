@@ -18,5 +18,6 @@ use gui
 
 _define_
 View1() {
+  FillColor fill (Red)
   Rectangle r (0,0,0,0)
 }

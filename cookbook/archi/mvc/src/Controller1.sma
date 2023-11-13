@@ -1,11 +1,15 @@
 use core
 use base
+use gui
+
 _define_
 Controller1(Process _model, Process _view)
 {
   model aka _model
   view aka _view
   
+  Spike about_to_delete
+
   Component control {
     model.{x,y,width,height}=:>view.r.{x,y,width,height}
     FSM fsm {
@@ -21,9 +25,21 @@ Controller1(Process _model, Process _view)
       idle->drag(view.r.press)
       drag->idle(view.r.release)
     }
+
+    FSM color_mngt {
+      State unselected {
+        #FF0000 =: view.fill.value
+      }
+      State selected {
+        #00FF00 =: view.fill.value
+        GenericKeyboard.key\-pressed == DJN_Key_Delete->about_to_delete
+      }
+      unselected->selected(view.r.press)
+      selected->unselected(view.r.press)
+    }
   }
 
-  Spike about_to_delete
+
   about_to_delete->(this) {
     delete this.control
     delete this.view

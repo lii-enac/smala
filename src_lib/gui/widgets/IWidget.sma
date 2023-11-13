@@ -8,8 +8,8 @@ IWidget ()
   Int preferred_height (-1)
   Int min_width (0)
   Int min_height (0)
-  Int max_width (-1)
-  Int max_height (-1)
+  Int max_width (16777215)
+  Int max_height (16777215)
 
   Int h_alignment (1) // 0:left 1:center 2:right
   Int v_alignment (1) // 0:top  1:center 2:bottom

@@ -485,17 +485,20 @@ $1_app_cflags := $$(cflags_cookbook_app)
 $1_app_pkg := $$(pkg_cookbook_app)
 $1_other_runtime_lib_path := $$(other_runtime_lib_path)
 
-ifeq ($$(cookbook_cross_prefix),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app) \
-	--preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir) \
-	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
+#ifeq ($$(cookbook_cross_prefix),em)
+ifeq ($$(os),em)
+$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
+
+#	--preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
+#	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
 else
 $1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 endif
 
 ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$(smala_lib_header_dir)
-ifeq ($$(cookbook_cross_prefix),em)
+#ifeq ($$(cookbook_cross_prefix),em)
+ifeq ($$(os),em)
 $1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))

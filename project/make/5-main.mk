@@ -133,7 +133,8 @@ exe := $(build_dir)/$(exe)
 default app: $(exe)
 #.PHONY: default app
 
-ld_library_path:=$(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
+ld_library_path := $(call join-with,:,$(ld_library_path))
+ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 test: $(exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")

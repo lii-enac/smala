@@ -455,7 +455,8 @@ endif
 # -----------
 # cookbook apps
 
-ld_library_path:=$(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
+ld_library_path := $(call join-with,:,$(ld_library_path))
+ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 define cookbookapp_makerule
 djnn_libs_cookbook_app :=

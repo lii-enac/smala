@@ -37,7 +37,7 @@ Component root {
 
   List models
   List views
-  List controllers
+  List managers
 
   Translation pos_buttons(10,0)
   StandAlonePushButton del ("Delete last", 0, 0)
@@ -48,9 +48,9 @@ Component root {
   Int ty(15)
   
   del.click -> del_action:(root) {
-    if (root.controllers.size > 0) {
-      int sz = root.controllers.size
-      notify root.controllers.[sz].about_to_delete
+    if (root.managers.size > 0) {
+      int sz = root.managers.size
+      notify root.managers.[sz].about_to_delete
     }
   }
 
@@ -58,7 +58,7 @@ Component root {
     Process model = Model (root.models, "", 50, 50, 100, 70)
     Process v1 = View1 (root.views, "") 
     Process v2 = View2 (root.views, "", $root.ty)
-    Process manager = ControlManager(root.controllers, "", model)
+    Process manager = ControlManager(root.managers, "", model)
     Controller1 (manager.controllers, "", model, v1)
     Controller2 (manager.controllers, "", model, v2)
     root.ty += 15

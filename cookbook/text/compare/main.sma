@@ -67,8 +67,9 @@ Component root {
     String _ ("ld !")
     String _ ("lo Wo")
     String _ ("lo WO")
-    String _ ("")  // Warning: empty string returns TRUE
+    String _ ("")  // Empty string returns FALSE
   }
+
 
   int index = 0
   FontWeight _ (50)

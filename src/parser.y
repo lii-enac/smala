@@ -935,7 +935,7 @@ remove
     {
       name_context_list.pop_back ();
       name_context_list.pop_back ();
-      driver.add_node (new BinaryInstructionNode (@$, REMOVE, new PathNode (@2, $2), new PathNode (@4, $4)));
+      driver.add_node (new BinaryInstructionNode (@$, REMOVE, new PathNode (@4, $4), new PathNode (@2, $2)));
     }
 
 native

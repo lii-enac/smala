@@ -399,7 +399,7 @@ namespace Smala
         if (!str.empty ()) return str;
       }
       // if everything fails, print an error message
-      print_error_message (error_level::error, "Symbol not found: " + symbol, 1);
+      print_error_message (error_level::error, "Symbol not found: " + symbol, 1, n);
       return symbol;
     }
     if (str.compare (0, 6, "d_var_") == 0 || str.compare (0, 6, "i_var_") == 0
@@ -546,7 +546,7 @@ namespace Smala
     if (dst.empty ()) {
       print_error_message (error_level::error,
                                "anonymous component in output of control node",
-                               1);
+                               1, node);
     }
 
     if (is_binding) {
@@ -715,7 +715,7 @@ namespace Smala
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
           && node->duplicate_warning ())
         print_error_message (error_level::warning,
-                             "duplicated name: " + node->name (), 0);
+                             "duplicated name: " + node->name (), 0, node);
     } else {
       for (auto e : node->get_output_nodes ()) {
         indent (os);
@@ -911,7 +911,7 @@ namespace Smala
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1
           && node->duplicate_warning ())
         print_error_message (error_level::warning,
-                             "duplicated name: " + node->name (), 0);
+                             "duplicated name: " + node->name (), 0, n);
     }
     std::string native_edge_name = new_name;
     if (node->is_connector ()) {
@@ -1088,7 +1088,7 @@ namespace Smala
       std::string arg = build_find (n->path_list ().at (i), false);
       if (arg.empty ()) {
         print_error_message (error_level::error,
-         "unknown component " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
+         "unknown component " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1, node);
         return;
       }
       indent (os);
@@ -1162,7 +1162,7 @@ namespace Smala
       break;
       case UNKNOWN:
         print_error_message (error_level::error,
-        "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1);
+        "unknown instruction " + n->path_list ().at (i)->get_subpath_list ().at (0)->get_subpath(), 1, node);
         break;
     }
   }
@@ -1182,7 +1182,7 @@ namespace Smala
       if (m_parent_list.back ()->add_entry (prop_name, var_name) == 1
                 && node->duplicate_warning ())
               print_error_message (error_level::warning,
-                                   "duplicated name: " + node->name (), 0);
+                                   "duplicated name: " + node->name (), 0, node);
       os << "var " << var_name << " = " << build_expr (node->get_args().at(0), undefined_t) << ";\n";
     } else {
       prop_name = build_find (node->get_path(), false);
@@ -1218,7 +1218,7 @@ namespace Smala
     if (m_parent_list.back ()->add_entry (n->left_arg ()->get_subpath_list().at(0)->get_subpath(), new_name) == 1
         && node->duplicate_warning ())
       print_error_message (error_level::warning,
-                           "duplicated name: " + n->left_arg ()->get_subpath_list().at(0)->get_subpath(), 0);
+                           "duplicated name: " + n->left_arg ()->get_subpath_list().at(0)->get_subpath(), 0, node);
   }
 
   void
@@ -1266,7 +1266,7 @@ namespace Smala
     if (!node->name().empty() && !node->keep_name ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1) {
         print_error_message (error_level::warning,
-                             "duplicated name: " + node->name (), 0);
+                             "duplicated name: " + node->name (), 0, node);
       }
     }
     m_cur_building_name = new_name;
@@ -1329,7 +1329,7 @@ namespace Smala
     node->set_build_name (new_name);
     if (m_parent_list.back ()->add_entry ("this", new_name) == 1)
       print_error_message (error_level::warning,
-                           "duplicated name: " + node->name (), 0);
+                           "duplicated name: " + node->name (), 0, node);
     indent (os);
     os << "var " << new_name << " = Component  (p, n);\n";
 
@@ -1375,7 +1375,7 @@ namespace Smala
       os << " " << new_name;
       if (m_parent_list.back ()->add_entry (arg.second, new_name) == 1)
         print_error_message (error_level::warning,
-                             "duplicated name: " + arg.second, 0);
+                             "duplicated name: " + arg.second, 0, node);
     }
     os << ")\n{\n";
     m_indent++;
@@ -1460,7 +1460,7 @@ namespace Smala
     if (!node->name ().empty ()) {
       if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1)
         print_error_message (error_level::warning,
-                             "duplicated name: " + node->name (), 0);
+                             "duplicated name: " + node->name (), 0, n);
     }
     indent (os);
     std::string p_name =
@@ -1518,12 +1518,12 @@ namespace Smala
         << " = get_native_user_data (c);\n";
     if (m_parent_list.back ()->add_entry (n->src (), src_name) == 1)
       print_error_message (error_level::warning,
-                           "duplicated name: " + n->src (), 0);
+                           "duplicated name: " + n->src (), 0, node);
     int sz = n->data ()->get_subpath_list ().size();
     std::string user_data_name = sz >= 1 ? n->data ()->get_subpath_list ().at (sz - 1)->get_subpath () : "no_user_data";
     if (m_parent_list.back ()->add_entry (user_data_name, data_name) == 1)
       print_error_message (error_level::warning,
-                           "duplicated name: " + user_data_name, 0);
+                           "duplicated name: " + user_data_name, 0, node);
     m_indent = 1;
   }
 

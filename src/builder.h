@@ -154,7 +154,7 @@ namespace Smala {
     void indent (std::ostream &os);
     virtual void set_location (std::ostream &os, Node *n, bool debug=false) {}
     virtual void end_line (std::ostream &os) = 0;
-    void print_error_message (error_level::level_t level, const std::string& message, int error);
+    void print_error_message (error_level::level_t level, const std::string& message, int error, Node* n);
     
     // scope context
     virtual void push_ctxt (const string& parent_name = string());

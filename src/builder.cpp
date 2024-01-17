@@ -343,7 +343,7 @@ namespace Smala
           }
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
-          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
+          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0, node);
         os << " " << new_name << " = " << expr_str;
         break;
       }
@@ -690,7 +690,7 @@ namespace Smala
           }
         }
         if (m_parent_list.back ()->add_entry (n->var_name (), new_name) == 1 && node->duplicate_warning ())
-          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0);
+          print_error_message (error_level::warning, "duplicated name: " + n->var_name (), 0, node);
         os << " " << new_name << " = " << expr_str;
         end_line(os);
         break;
@@ -708,7 +708,7 @@ namespace Smala
         node->set_build_name (new_name);
         if (node->name ().compare ("_") != 0) {
           if (m_parent_list.back ()->add_entry (node->name (), new_name) == 1 && node->duplicate_warning ())
-                print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+                print_error_message (error_level::warning, "duplicated name: " + node->name (), 0, node);
         }
         build_range_node (os, node, new_name);
         push_ctxt (new_name);
@@ -750,7 +750,7 @@ namespace Smala
     node->set_build_name (var_name);
     if (!node->name ().empty ()) {
       if (m_parent_list.back ()->add_entry (node->name (), var_name) == 1 && node->duplicate_warning ())
-        print_error_message (error_level::warning, "duplicated name: " + node->name (), 0);
+        print_error_message (error_level::warning, "duplicated name: " + node->name (), 0, node);
     }
 
     std::string parent_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
@@ -780,12 +780,19 @@ namespace Smala
   }
 
   void
-  Builder::print_error_message (error_level::level_t level, const std::string& message, int error)
+  Builder::print_error_message (error_level::level_t level, const std::string& message, int error, Node* n)
   {
     const std::string error_level_str[] =
       { "log", "warning", "error" };
     if (m_curloc != nullptr)  {   //TODO investigate why it can be null in lambda expr.
-      std::cerr << m_curloc->file () << ":" << m_curloc->line () << ":" << m_curloc->position () << ": "
+      std::cerr << m_curloc->file () << ":";
+      if (n) {
+        std::cerr << n->get_location().begin.line << ":" << n->get_location().begin.column;
+      }
+      else {
+        std::cerr << m_curloc->line () << ":" << m_curloc->position ();
+       }
+      std::cerr << ": "
         << error_level_str[(int) level] << ": " << message << std::endl;
     }
     m_error |= error;

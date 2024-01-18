@@ -789,9 +789,9 @@ namespace Smala
       if (n) {
         std::cerr << n->get_location().begin.line << ":" << n->get_location().begin.column;
       }
-      else {
-        std::cerr << m_curloc->line () << ":" << m_curloc->position ();
-       }
+      // else {
+      //   std::cerr << m_curloc->line () << ":" << m_curloc->position ();
+      //  }
       std::cerr << ": "
         << error_level_str[(int) level] << ": " << message << std::endl;
     }

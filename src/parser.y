@@ -1975,21 +1975,21 @@ transition
 
 
 void Smala::Parser::error (const location &loc , const string &message) {
-  //smala::ErrorLocation *mloc = driver.location () ;
+  smala::ErrorLocation *mloc = driver.location () ;
   int state = yystack_[0].state ;
 
-  cerr << /*mloc->file () << ":" << mloc->line () <<*/ ": error: ";
+  cerr << mloc->file () << ":" << loc.begin.line << ": error: ";
 
-#define ERR(line, estate, msg) \
-    else if(state==estate) { \
-       cerr << msg << endl;\
+  #define ERR(line, estate, msg) \
+      else if(state==estate) { \
+        cerr <<  msg << endl;\
   }
   
   if(0) ; 
   //ERR(1, "Component", "\"Component\" keyword after a _main_ or _define_")
   #include "errors.h"
   else
-    cerr << "syntax error" << " (" /*<< mloc->line ()*/ << "," << yystack_[0].state << "," << scanner.YYText() <<  ") " << message << endl;
+    cerr << "syntax error" << " (" << loc.begin.line << "," << yystack_[0].state  << ", " << scanner.YYText() <<  ") --  " << message << endl;
 
   driver.set_error ();
 }

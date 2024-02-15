@@ -30,7 +30,6 @@
                            "loadFromXML" "addChild" "addChildrenTo"
                            "find" "clone" "repeat"
                            "setInt" "setDouble" "setBool" "setString" "setRef"
-                           "isString" "doubleToString" "intToString" "stringify"
                         ))
 
          (smala-keywords-regexp (regexp-opt smala-keywords 'words))

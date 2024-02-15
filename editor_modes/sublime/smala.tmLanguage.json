@@ -5,7 +5,7 @@
   ],
   "scope": "source.sma",
   "variables": {
-    "function_sma": "run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|print|toString",
+    "function_sma": "run|stop|delete|notify|merge|dump|with|from|loadFromXML|addChild|addChildrenTo|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|setRef|print|toString",
     "deprecated_sma": "remove"
   },
   "contexts": {

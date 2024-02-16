@@ -480,7 +480,9 @@ ifeq ($$(os),em)
 $1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else
 $1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+ifeq ($(os),Linux)
 $1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux ld
+endif
 endif
 $$($1_app_objs): $$(smala_lib)
 

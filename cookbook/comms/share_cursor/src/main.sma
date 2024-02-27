@@ -19,106 +19,110 @@ use display
 use gui
 use comms
 
-import core.control.native_action
-import core.property.text_property
-import core.property.double_property
-import core.property.int_property
-import core.utils.getset
-
 import ShareCursorPosition
 import RemoteCursor
 
+
 _native_code_
 %{
-  #include <regex>
   #include <iostream>
   using namespace std;
-%}
 
+  string str_ivy_bus = "192.168.1.255:2010";
+  string str_uid = "ENAC LII";
+  string str_color = "0x000000";
+
+  char* getCmdOption(char ** begin, char ** end, const std::string & option)
+  {
+      char ** itr = std::find(begin, end, option);
+      if (itr != end && ++itr != end)
+      {
+          return *itr;
+      }
+      return 0;
+  }
+
+  int init (int argc, char * argv[])
+  {
+    char* ivybus = getCmdOption(argv, argv + argc, "-b");
+    if (ivybus) {
+        str_ivy_bus = string (ivybus);
+        cout << "using ivy bus from cmd line '" << str_ivy_bus << "'" << endl;
+    }
+    else
+        cout << "using default ivy bus '" << str_ivy_bus << "'" << endl;
+
+    char* uid = getCmdOption(argv, argv + argc, "-u");
+    if (uid) {
+        str_uid = string (uid);
+        cout << "using uid from cmd line '" << str_uid << "'" << endl;
+    }
+    else
+        cout << "using default name '" << str_uid << "'" << endl;
+
+    char* color = getCmdOption(argv, argv + argc, "-c");
+    if (color) {
+        str_color = string (color);
+        cout << "using color from cmd line '" << str_color << "'" << endl;
+    }
+    else
+        cout << "using default color '" << str_color << "'" << endl;
+
+    return 0;
+  }
+
+%}
 
 _action_
-action_cursor(Process c)
-%{
-  // Get the source that triggered the native action:
-  Process *src = c->get_activation_source ();
-  string msg_cursor = toString(src);
-
-  // Get the user_data
-  Process *self = (Process*) get_native_user_data (c);
-
-  regex rgx("Uid=([[:print:]]*) Color=(\\d*) X=(\\S*) Y=(\\S*)");
-  smatch match;
-
-  if (std::regex_match(msg_cursor, match, rgx))  
+action_cursor (Process src, Process self)
+{
+  ivy = find (self, "ivybus")
+  if (&ivy != null)
   {
-    string remote_uid = match[1];
-    int remote_color = stoi(match[2]);
-    double remote_x = stod(match[3]);
-    double remote_y = stod(match[4]);
+    string remote_uid = getString (ivy.in.rgx_cursor_moved.[1])
+    int remote_color = stoi (getString (ivy.in.rgx_cursor_moved.[2]))
+    double remote_x = stod (getString (ivy.in.rgx_cursor_moved.[3]))
+    double remote_y = stod (getString (ivy.in.rgx_cursor_moved.[4]))
 
-    //cout << "Uid: " << remote_uid << " -- X: " << remote_x << " -- Y: " << remote_y << endl;
-
-    Process* remote_cursors = self->find_child("remote_cursors");
-    if (remote_cursors != nullptr)
-    {
-      Process* cursor = remote_cursors->find_child(remote_uid);
-      if (cursor == nullptr)
-      {
-        cout << "cursor " << remote_uid << " doesn't exist...create it" << endl;
-        ///*auto* cursor =*/ RemoteCursor(remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color);
-        RemoteCursor(remote_cursors, remote_uid.c_str(), remote_uid.c_str(), remote_x, remote_y, remote_color);
-      }
-      else
-      {
-        // ((DoubleProperty*)cursor->find_child("x"))->set_value(remote_x, true);
-        // ((DoubleProperty*)cursor->find_child("y"))->set_value(remote_y, true);
-        // if (((IntProperty*)cursor->find_child("color"))->get_value() != remote_color) {
-        //   ((IntProperty*)cursor->find_child("color"))->set_value(remote_color, true);
-        // }
-        SET_CHILD_VALUE(Double, cursor, x, remote_x, true);
-        SET_CHILD_VALUE(Double, cursor, y, remote_y, true);
-        GET_CHILD_VALUE(color, Int, cursor, color);
-        if (color != remote_color) {
-          SET_CHILD_VALUE(Int, cursor, color, remote_color, true);
-        }
-        
-      }
+    cursor = find (self, "remote_cursors/" + remote_uid)
+    if (&cursor == null) {
+      print ("Remote cursor '" + ivy.in.rgx_cursor_moved.[1] + "' does NOT exist...create it")
+      remote_cursors = find (self, "remote_cursors")
+      RemoteCursor (remote_cursors, remote_uid, remote_uid, remote_x, remote_y, remote_color)
     }
     else {
-      cerr << "remote_cursors doesn't exist" << endl;
+      //print ("Remote cursor '" + ivy.in.rgx_cursor_moved.[1] + "' EXIST...update it")
+      //if (getInt (cursor.color) != remote_color) {
+      // if (getInt (cursor.fill_c.value) != remote_color) {
+      //   cursor.color = remote_color
+      // }
+      cursor.x = remote_x
+      cursor.y = remote_y
     }
-  }  
-%}
+  }
+}
 
 
 _main_
 Component root {
-  
+  init (argc, argv)
+
   // -------------- Parameters -------------- //
-  // UID of our cursor in remote apps
-  String uid ("ENAC LII")
-  //String uid ("ATCO Tower")
-  //String uid ("ATCO Ground")
-  
-  // Color of our cursor in remote apps
-  //Int color (0) // Black
-  //Int color (0xFF0000) // Red
-  //Int color (0x00FF00) // Green
-  Int color (255) // Int color (0x0000FF) // Blue
-  
-  String bus_ip_and_port ("192.168.1.255:2010")
+  String bus_ip_and_port (str_ivy_bus)
+  String uid (str_uid)
+  Int color (stoi (str_color, 0, 16))
   // -------------- Parameters -------------- //
 
 
-  Frame frame ("Share Cursor - " + uid, 0, 0, 400, 400)
+  Frame frame ("Share Cursor - " + uid + " - " + bus_ip_and_port, 0, 0, 400, 400)
   mouseTracking = 1
 
   Exit exit (0, 1)
   frame.close -> exit
 
   TextPrinter tp
-  "Mouse Cursor: UID = " + uid + " -- color = " + toString(color) + " -- IVY = " + bus_ip_and_port =: tp.input
-  //print ("Mouse Cursor: UID = " + uid + " -- color = " + color + " -- IVY = " + bus_ip_and_port + "\n")
+  "Mouse Cursor: UID = '" + uid + "' -- color = " + toString(color) + " -- IVY = " + bus_ip_and_port =: tp.input
+  //print ("Mouse Cursor: UID = '" + uid + "' -- color = " + color + " -- IVY = " + bus_ip_and_port)
 
 
   // Decoration displayed in background
@@ -142,37 +146,32 @@ Component root {
   // ------- Log Printer to receive a Message in Terminal ---
   LogPrinter lp ("ivy bus in: ")
 
-  IvyAccess ivybus (toString(bus_ip_and_port), "cursors", "READY")
+  IvyAccess ivybus (getString(bus_ip_and_port), "cursors", "READY")
   {
-    //String regex_cursor_moved ("^CursorMoved Uid=([[:print:]]*) Color=(\\d*) X=(\\S*) Y=(\\S*)")
-    String regex_cursor_moved ("^CursorMoved (.*)")
+    String rgx_cursor_moved ("^CursorMoved Uid=([[:print:]]*) Color=(\\d*) X=(\\S*) Y=(\\S*)")
 
-    String regex_cursor_paused ("^CursorPaused Uid=([[:print:]]*)")
+    String rgx_cursor_paused ("^CursorPaused Uid=([[:print:]]*)")
   }
 
   // Create connectors
-  String msg_cursor ("")
-  ivybus.in.regex_cursor_moved.[1] => msg_cursor
+  NativeAction na_cursor (action_cursor, root, 1)
+  ivybus.in.rgx_cursor_moved.[1] -> na_cursor
 
   String cursor_uid_paused ("")
-  ivybus.in.regex_cursor_paused.[1] => cursor_uid_paused
-
-
-  NativeAction na_cursor (action_cursor, root, 1)
-  msg_cursor -> na_cursor
+  ivybus.in.rgx_cursor_paused.[1] => cursor_uid_paused
 
   cursor_uid_paused -> na_cursor_uid_paused: (root) {
-    cursor = find(&root.remote_cursors, toString(root.cursor_uid_paused))
+    cursor = find(&root.remote_cursors, getString(root.cursor_uid_paused))
     if (&cursor != null) {
       notify cursor.pause
     }
     else {
-      print ("Unknown Uid = " + root.cursor_uid_paused + "\n")
+      print ("Unknown Uid = '" + root.cursor_uid_paused + "'\n")
     }
   }
 
 
-  // Allows to share our cursor position (every 250ms) with others apps
-  ShareCursorPosition share (frame, ivybus, toString(uid), $color, 250)
+  // Allows to share our cursor position (every 200ms) with others apps
+  ShareCursorPosition share (frame, ivybus, getString(uid), $color, 200)
 
 }

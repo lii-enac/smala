@@ -26,6 +26,7 @@ import RemoteCursor
 _native_code_
 %{
   #include <iostream>
+  #include <algorithm>
   using namespace std;
 
   string str_ivy_bus = "192.168.1.255:2010";

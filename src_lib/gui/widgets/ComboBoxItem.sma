@@ -6,17 +6,16 @@ _define_
 ComboBoxItem (Process box, Process item, int dx, int dy) {
   Translation pos (dx, dy)
   y aka pos.ty
+  ZOrder z (11)
   Component bg {
     //FillOpacity _ (0.5)
     FillColor fc (White)
     NoOutline _
     Rectangle r (2, - 13, 0, 17, 2, 2)
-    r.z = 11
   }
   //FillColor _ (#8fa4af)
   FillColor tc (#303030)
   Text t (4, 0, toString (item))
-  t.z = 11
   box.width - 6 =:> bg.r.width
   FSM behavior {
     State st_idle {

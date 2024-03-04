@@ -11,7 +11,7 @@
 *    Mathieu Poirier   <mathieu.poirier@enac.fr>
 *
 * note: 
-* you can use "ivyprobe" to send a message to this application : smala (.*)
+* you can use "ivyprobe" to send a message to this application : helloIvy (.*)
 * 
 * note: on Mac 127.0.0.1 do not work correctly --> use 224.1.2.3 for test instead 
 */
@@ -21,6 +21,13 @@ use base
 use display
 use gui
 use comms
+
+_action_
+hook_action_on_die (Process src, Process data)
+{   
+    print ("\n\n helloIvy:  HAHHHAAA I don't WAANNNT to DIE !!!! \n\n")
+}
+
 
 _main_
 Component root {
@@ -49,11 +56,11 @@ Component root {
     /* ------- Log Printer to receive a Message in Terminal ---*/
     LogPrinter lp ("ivybus: ")
 
-    IvyAccess ivybus ("224.1.2.3:2010", "smala", "READY")
+    IvyAccess ivybus ("224.1.2.3:2010", "helloIvy", "READY")
     {
         // define your regexs 
         // better to use (\\S*) than (.*) eq: "pos=(\\S*) alt=(\\S*)"
-        String regex ("smala (.*)")
+        String regex ("helloIvy (.*)")
         //...
     }
 
@@ -68,9 +75,16 @@ Component root {
         State pressed {
             150 =: rectFill.g
             // sending messages
-            "smala Hello" =: ivybus.out
+            "helloIvy Hello you !" =: ivybus.out
         }
         idle -> pressed (sender.press)
         pressed -> idle (sender.release)
     }
+
+    /* --------- on die ------------ */
+    
+	NativeAction na_on_die (hook_action_on_die, root, 1)
+	ivybus.die -> na_on_die
+    na_on_die -> ex
+    // rem: we could also directly call : ivybus.die -> ex to quit without calling the hook
 }

@@ -25,6 +25,7 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  FillColor _ (White)
   Text explain (100, 50, "Press any regular key to display its text value.")
   Text explain2 (100, 64, "Then test the combination ctrl-p (or cmd-p on mac) to display a message.")
   Text explain3 (100, 78, "Finally use ctrl-q (or cmd-q) to quit.")

@@ -3,7 +3,7 @@ src_dir ?= src
 res_dir ?= res
 exe_dir ?= .
 
-exe ?= stand_alone
+exe ?= helloworld
 
 # smala sources
 srcs_sma := $(shell find $(src_dir) -name "*.sma")

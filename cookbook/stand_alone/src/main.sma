@@ -37,7 +37,7 @@ myFunc (Process c)
 
 _main_
 Component root {
-  Frame f ("helloword", 0, 0, 400, 600)
+  Frame f ("helloworld", 0, 0, 400, 600)
   f.background_color.r = 125
   f.background_color.g = 125
   f.background_color.b = 125

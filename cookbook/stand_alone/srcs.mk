@@ -3,7 +3,7 @@ src_dir := src
 res_dir := res
 exe_dir := .
 
-exe := helloword
+exe := helloworld
 
 srcs_sma := src/Button.sma src/main.sma
 # or

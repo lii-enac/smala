@@ -37,19 +37,28 @@ myFunc (Process c)
 
 _main_
 Component root {
-  Frame f ("my frame", 0, 0, 400, 600)
+  Frame f ("helloword", 0, 0, 400, 600)
+  f.background_color.r = 125
+  f.background_color.g = 125
+  f.background_color.b = 125
   Exit ex (0, 1)
   f.close -> ex
 
   NativeAction na (myFunc, 1)
 
-  Button b (f, "myButton", 10, 100)
+  Button b (f, "Click", 10, 100)
   b.click -> na
+
+  mouseTracking = 1
+  FillColor _ (Yellow)
+  Circle c (0, 0, 20)
+  f.move.x => c.cx
+  f.move.y => c.cy
 
   // loading a resource
   string path = "res/simple.svg"
   svg = load_from_XML (path)
   //dump svg
-  Translation _(200,0)
+  Translation _(10,400)
   t << svg
 }

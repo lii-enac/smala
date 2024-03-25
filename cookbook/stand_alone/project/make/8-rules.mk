@@ -1,7 +1,7 @@
 
 #----------------------------
 
-$(objs): CXXFLAGS += $(CXXFLAGS_CFG) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
+$(objs): DJNN_CXXFLAGS += $(CXXFLAGS_CFG) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
 	
 $(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
 $(exe): LIBS += $(app_libs)
@@ -33,11 +33,11 @@ endif
 $(build_dir)/%.o: %.cpp
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(DJNN_CXXFLAGS) -c $< -o $@
 else
 	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(DJNN_CXXFLAGS) -c $< -o $@
 endif
 
 # from .c user sources
@@ -56,11 +56,11 @@ endif
 $(build_dir)/%.o: $(build_dir)/%.cpp
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(DJNN_CXXFLAGS) -c $< -o $@
 else
 	@$(call rule_message,compiling to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(DJNN_CXXFLAGS) -c $< -o $@
 endif
 
 deps := $(objs:.o=.d)

@@ -15,7 +15,7 @@ endif
 
 # external libraries
 ifneq ($(pkdeps),)
-CXXFLAGS += $(shell pkg-config --cflags $(pkdeps))
+DJNN_CXXFLAGS += $(shell pkg-config --cflags $(pkdeps))
 # LDFLAGS +=
 LIBS += $(shell pkg-config --libs $(pkgdeps))
 endif

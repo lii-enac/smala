@@ -11,15 +11,15 @@ smala-pkgconf ?= smala
 # djnn_cpp_path ?= ../djnn-cpp
 # smala_path ?= ../smala
 
-# CXXFLAGS += -Wall
-# CXXFLAGS += -g
-# CXXFLAGS += -O0
+# DJNN_CXXFLAGS += -Wall
+# DJNN_CXXFLAGS += -g
+# DJNN_CXXFLAGS += -O0
 # SMAFLAGS += -g
 # SMAFLAGS += -fastcomp
 
-# CXXFLAGS += -fsanitize=address
+# DJNN_CXXFLAGS += -fsanitize=address
 # LDFLAGS += -fsanitize=address
-# CXXFLAGS += -fsanitize=thread
+# DJNN_CXXFLAGS += -fsanitize=thread
 # LDFLAGS += -fsanitize=thread
 
 # CXX := clang++-14

@@ -16,10 +16,10 @@ srcs_other := src/foo.cpp
 
 # ----- PKGS DEPENDENCIES OR EXTERNAL -----
 
-CXXFLAGS += -std=c++20
+DJNN_CXXFLAGS += -std=c++20
 
 # external libraries
-# CXXFLAGS += $(shell pkg-config --cflags foo)
+# DJNN_CXXFLAGS += $(shell pkg-config --cflags foo)
 # LDFLAGS +=
 # LIBS += $(shell pkg-config --libs foo)
 # 

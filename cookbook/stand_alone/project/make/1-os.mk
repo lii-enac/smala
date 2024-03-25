@@ -29,7 +29,7 @@ LEX := $(brew_prefix)/opt/flex/bin/flex
 LD_LIBRARY_PATH=DYLD_LIBRARY_PATH
 # https://stackoverflow.com/a/33589760
 debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lldb
-#CXXFLAGS += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+#DJNN_CXXFLAGS += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
 lib_suffix =.dylib

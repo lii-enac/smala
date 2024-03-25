@@ -18,7 +18,7 @@ srcs_other := $(shell find $(src_dir) -name "*.cpp")
 # external libraries
 # pkgdeps += curl
 # or
-# CXXFLAGS += $(shell pkg-config --cflags foo)
+# DJNN_CXXFLAGS += $(shell pkg-config --cflags foo)
 
 srcs.mk:
 	cp $(project_dir)/3-srcs.default.mk srcs.mk

@@ -2,7 +2,7 @@ use core
 use base
 
 _define_
-ControlManager(Process _model)
+LifetimeManager(Process _model)
 {
   List controllers
   model aka _model

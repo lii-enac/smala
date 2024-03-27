@@ -2,7 +2,7 @@ use core
 use base
 
 _define_
-Controller2(Process _model, Process _view)
+ControllerText(Process _model, Process _view)
 {
   model aka _model
   view aka _view

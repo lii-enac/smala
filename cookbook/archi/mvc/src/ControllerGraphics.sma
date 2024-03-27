@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-Controller1(Process _model, Process _view)
+ControllerGraphics(Process _model, Process _view)
 {
   model aka _model
   view aka _view

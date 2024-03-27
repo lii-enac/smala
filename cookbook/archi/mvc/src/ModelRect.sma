@@ -16,7 +16,7 @@ use core
 use gui
 
 _define_
-Model(int _x, int _y, int _w, int _h)
+ModelRect(int _x, int _y, int _w, int _h)
 {
   Int x (_x)
   Int y (_y)

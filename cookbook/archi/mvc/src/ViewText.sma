@@ -17,7 +17,7 @@ use base
 use gui
 
 _define_
-View2(int _ty) {
+ViewText(int _ty) {
   Translation pos (0, _ty)
   Text t_x (0, 15, "0")
   x aka t_x.text

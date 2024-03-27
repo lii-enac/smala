@@ -72,3 +72,9 @@ endif
 ifeq ($(keep_intermediate),yes)
 .SECONDARY:
 endif
+
+buildroot:
+	./project/buildroot/make_buildroot.sh install $(original_exe)
+
+burn:
+	./project/buildroot/make_buildroot.sh burn $(original_exe)

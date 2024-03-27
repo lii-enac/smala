@@ -1,0 +1,7 @@
+config BR2_PACKAGE_@TEMPLATE@
+    bool @template@
+    depends on BR2_PACKAGE_SMALA
+    help
+      support for @template@ application
+
+comment "@template@ package needs smala"

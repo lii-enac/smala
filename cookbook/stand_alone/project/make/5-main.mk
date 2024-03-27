@@ -127,6 +127,7 @@ LDFLAGS += $(EMFLAGS) \
 
 endif
 
+original_exe := $(exe)
 exe := $(exe)$(EXE)
 exe := $(build_dir)/$(exe)
 

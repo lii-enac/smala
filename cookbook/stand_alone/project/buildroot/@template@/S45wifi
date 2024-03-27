@@ -1,0 +1,13 @@
+#!/bin/sh
+
+(
+if [ -n "$(/sbin/iwconfig | grep wlan0 )" ]; then
+while [ -z "$(/sbin/iwconfig wlan0 | grep @template@ )" ]; do
+  sleep 3
+  /sbin/ifup wlan0
+  /sbin/iwconfig wlan0 essid @template@
+done;
+else
+echo no wlan0
+fi
+)&

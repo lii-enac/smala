@@ -25,6 +25,7 @@ ControllerText(Process model, Process view)
 
     // update model from interactions on the view
       // view.t_x.wheel.dy -> {      view.t_x.wheel.dy =+: model.x } // FIXME/TODO
+      // view.t_x.wheel.dy =+> model.x // FIXME/TODO
          view.t_x.wheel.dy -> {      view.t_x.wheel.dy +      model.x =: model.x }
          view.t_y.wheel.dy -> {      view.t_y.wheel.dy +      model.y =: model.y }
      view.t_width.wheel.dy -> {  view.t_width.wheel.dy +  model.width =: model.width }

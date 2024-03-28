@@ -140,6 +140,7 @@ ControllerGraphics(Process model, Process _view, Process frame)
       dragging->idle(frame.release)
     }
 
+    /*
     FSM selection {
       State unselected {
         #FF0000 =: view.fill.value
@@ -151,6 +152,7 @@ ControllerGraphics(Process model, Process _view, Process frame)
       unselected->selected(view.r.press)
       selected->unselected(view.r.press)
     }
+    */
   }
 
   about_to_delete->(this) {

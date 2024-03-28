@@ -18,9 +18,10 @@ use base
 use gui
 
 _define_
-ControllerGraphics(Process model, Process view, Process frame)
+ControllerGraphics(Process model, Process _view, Process frame)
 { 
   Spike about_to_delete
+  view aka _view
 
   Component control {
     // update the view whenever the model changes (subject/observer pattern)
@@ -151,7 +152,6 @@ ControllerGraphics(Process model, Process view, Process frame)
       selected->unselected(view.r.press)
     }
   }
-
 
   about_to_delete->(this) {
     delete this.control

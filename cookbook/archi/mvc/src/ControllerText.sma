@@ -17,8 +17,9 @@ use core
 use base
 
 _define_
-ControllerText(Process model, Process view)
+ControllerText(Process model, Process _view)
 {
+  view aka _view
   Component control {
     // update the view whenever the model changes (subject/observer pattern)
     model.{x,y,width,height} =:> view.{x,y,width,height}

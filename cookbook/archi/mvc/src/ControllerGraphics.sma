@@ -26,13 +26,13 @@ ControllerGraphics(Process _model, Process _view)
   Spike about_to_delete
 
   Component control {
-    // update view from model (subject/observer pattern)
+    // update the view whenever the model changes (subject/observer pattern)
     model.{x,y,width,height} =:> view.r.{x,y,width,height}
 
     // update model from interactions on the view
-    FSM fsm {
+    FSM drag {
       State idle
-      State drag {
+      State dragging {
         Int off_x(0)
         Int off_y(0)
         view.r.press.x - model.x =:  off_x
@@ -40,8 +40,8 @@ ControllerGraphics(Process _model, Process _view)
         view.r.move.x  - off_x   =:> model.x
         view.r.move.y  - off_y   =:> model.y
       }
-      idle->drag(view.r.press)
-      drag->idle(view.r.release)
+      idle->dragging(view.r.press)
+      dragging->idle(view.r.release)
     }
 
     FSM selection {

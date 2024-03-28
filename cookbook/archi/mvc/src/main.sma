@@ -59,7 +59,7 @@ Component root {
     Process model = ModelRect (root.models, "", 50, 50, 100, 70)
     Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
     Process v1 = ViewGraphics (root.views, "")
-    ControllerGraphics (lifetime_manager.controllers, "", model, v1)
+    ControllerGraphics (lifetime_manager.controllers, "", model, v1, root.f)
     Process v2 = ViewText (root.views, "", $root.ty)
     ControllerText (lifetime_manager.controllers, "", model, v2)
     root.ty += 15

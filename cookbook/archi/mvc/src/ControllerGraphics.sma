@@ -18,7 +18,7 @@ use base
 use gui
 
 _define_
-ControllerGraphics(Process _model, Process _view)
+ControllerGraphics(Process _model, Process _view, Process frame)
 {
   model aka _model
   view  aka _view
@@ -30,6 +30,61 @@ ControllerGraphics(Process _model, Process _view)
     model.{x,y,width,height} =:> view.r.{x,y,width,height}
 
     // update model from interactions on the view
+
+    // delta helpers
+    Int lastx(0)
+    Int dx(0)
+    frame.move.x -> {
+      frame.move.x - lastx =: dx
+      frame.move.x =: lastx
+    }
+    Int lasty(0)
+    Int dy(0)
+    frame.move.y -> {
+      frame.move.y - lasty =: dy
+      frame.move.y =: lasty
+    }
+
+    // layout queries: where on the rect did the user press?
+    Bool left(0)
+    abs(frame.move.x - model.x) <= 5 =:> left
+    Bool right(0)
+    abs(frame.move.x - (model.x + model.width)) <= 5 =:> right
+    Bool top(0)
+    abs(frame.move.y - model.y) <= 5 =:> top
+    Bool bottom(0)
+    abs(frame.move.y - (model.y + model.height)) <= 5 =:> bottom
+    Bool center(0)
+    not (left || right || bottom || top) =:> center
+
+    Spike left_press    
+    Component loffon { frame.press -> left_press }
+    left.true -> loffon
+    left.false ->! loffon
+
+    Spike right_press    
+    Component roffon { frame.press -> right_press }
+    right.true -> roffon
+    right.false ->! roffon
+
+    Spike top_press    
+    Component toffon { frame.press -> top_press }
+    top.true -> toffon
+    top.false ->! toffon
+
+    Spike bottom_press    
+    Component boffon { frame.press -> bottom_press }
+    bottom.true -> boffon
+    bottom.false ->! boffon
+
+    Spike center_press
+    Component coffon { view.r.press -> center_press }
+    center.true -> coffon
+    center.false ->! coffon
+
+
+    // actual interactions
+
     FSM drag {
       State idle
       State dragging {
@@ -40,8 +95,51 @@ ControllerGraphics(Process _model, Process _view)
         view.r.move.x  - off_x   =:> model.x
         view.r.move.y  - off_y   =:> model.y
       }
-      idle->dragging(view.r.press)
-      dragging->idle(view.r.release)
+      idle->dragging(center_press)
+      dragging->idle(frame.release)
+    }
+
+    FSM drag_left_border {
+      State idle
+      State dragging {
+        frame.move.x -> {
+          model.x + dx =: model.x
+          model.width - dx =: model.width
+        }
+      }
+      idle->dragging(left_press)
+      dragging->idle(frame.release)
+    }
+    FSM drag_right_border {
+      State idle
+      State dragging {
+        frame.move.x -> {
+          model.width + dx =: model.width
+        }
+      }
+      idle->dragging(right_press)
+      dragging->idle(frame.release)
+    }
+    FSM drag_top_border {
+      State idle
+      State dragging {
+        frame.move.y -> {
+          model.y + dy =: model.y
+          model.height - dy =: model.height
+        }
+      }
+      idle->dragging(top_press)
+      dragging->idle(frame.release)
+    }
+    FSM drag_bottom_border {
+      State idle
+      State dragging {
+        frame.move.y -> {
+          model.height + dy =: model.height
+        }
+      }
+      idle->dragging(bottom_press)
+      dragging->idle(frame.release)
     }
 
     FSM selection {

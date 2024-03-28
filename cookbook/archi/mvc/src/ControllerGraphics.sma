@@ -43,7 +43,7 @@ ControllerGraphics(Process model, Process _view, Process frame)
       frame.move.y =: lasty
     }
 
-    // layout queries: where on the rect did the user press?
+    // layout queries: where on the rect did the user press? which border, or center?
     Bool left(0)
     abs(frame.move.x - model.x) <= 5 =:> left
     Bool right(0)
@@ -55,22 +55,23 @@ ControllerGraphics(Process model, Process _view, Process frame)
     Bool center(0)
     not (left || right || bottom || top) =:> center
 
-    Spike left_press    
+    // mini state-machines to synthesize transient events upon press on borders or center
+    Spike left_press
     Component loffon { frame.press -> left_press }
     left.true -> loffon
     left.false ->! loffon
 
-    Spike right_press    
+    Spike right_press
     Component roffon { frame.press -> right_press }
     right.true -> roffon
     right.false ->! roffon
 
-    Spike top_press    
+    Spike top_press
     Component toffon { frame.press -> top_press }
     top.true -> toffon
     top.false ->! toffon
 
-    Spike bottom_press    
+    Spike bottom_press
     Component boffon { frame.press -> bottom_press }
     bottom.true -> boffon
     bottom.false ->! boffon
@@ -86,10 +87,16 @@ ControllerGraphics(Process model, Process _view, Process frame)
     FSM drag {
       State idle
       State dragging {
+        // since we update a value (akin to +=), we cannot use => as this would set up a cycle
+        // first solution: avoid the cycle with a frozen reference value
+
+        // at dragging activation, freeze (=:) the offset between the cursor position and the shape position
         Int off_x(0)
         Int off_y(0)
         view.r.press.x - model.x =:  off_x
         view.r.press.y - model.y =:  off_y
+        
+        // while dragging is active, tie/constrain the model position to the cursor position... minus the offset!
         view.r.move.x  - off_x   =:> model.x
         view.r.move.y  - off_y   =:> model.y
       }
@@ -100,8 +107,10 @@ ControllerGraphics(Process model, Process _view, Process frame)
     FSM drag_left_border {
       State idle
       State dragging {
+        // since we update a value (akin to +=), we cannot use => as this would set up a cycle
+        // second solution: trigger an assignment sequence
         frame.move.x -> {
-          model.x + dx =: model.x
+              model.x + dx =: model.x
           model.width - dx =: model.width
         }
       }
@@ -122,7 +131,7 @@ ControllerGraphics(Process model, Process _view, Process frame)
       State idle
       State dragging {
         frame.move.y -> {
-          model.y + dy =: model.y
+               model.y + dy =: model.y
           model.height - dy =: model.height
         }
       }

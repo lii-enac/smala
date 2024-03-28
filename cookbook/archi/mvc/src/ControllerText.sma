@@ -17,17 +17,14 @@ use core
 use base
 
 _define_
-ControllerText(Process _model, Process _view)
+ControllerText(Process model, Process view)
 {
-  model aka _model
-  view  aka _view
-
   Component control {
     // update the view whenever the model changes (subject/observer pattern)
     model.{x,y,width,height} =:> view.{x,y,width,height}
 
     // update model from interactions on the view
-      // view.t_x.wheel.dy -> {      view.t_x.wheel.dy =+: model.x }
+      // view.t_x.wheel.dy -> {      view.t_x.wheel.dy =+: model.x } // FIXME/TODO
          view.t_x.wheel.dy -> {      view.t_x.wheel.dy +      model.x =: model.x }
          view.t_y.wheel.dy -> {      view.t_y.wheel.dy +      model.y =: model.y }
      view.t_width.wheel.dy -> {  view.t_width.wheel.dy +  model.width =: model.width }

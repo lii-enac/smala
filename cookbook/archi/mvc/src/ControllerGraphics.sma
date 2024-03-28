@@ -18,11 +18,8 @@ use base
 use gui
 
 _define_
-ControllerGraphics(Process _model, Process _view, Process frame)
-{
-  model aka _model
-  view  aka _view
-  
+ControllerGraphics(Process model, Process view, Process frame)
+{ 
   Spike about_to_delete
 
   Component control {

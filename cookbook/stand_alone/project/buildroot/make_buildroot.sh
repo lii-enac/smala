@@ -209,15 +209,17 @@ update() {
     local file_to_check="${target_dir}/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM"
     local remote_root="/"
     local remote_user="root"
-    local file_to_copy="root/ usr/lib/libdjnn* usr/lib/libsmala.so"
 
     if [ -e "${file_to_check}" ]; then
         
-        info_echo "killing app : ${PACKAGENAME}"
+        info_echo "killing all application ..."
         ssh -f ${remote_user}@${DEFAULT_IP} "ka"
         cd ${target_dir}
         info_echo "starting scp from $(pwd) ... to ${remote_user}@${DEFAULT_IP}"
-        scp -rp ${file_to_copy} ${remote_user}@${DEFAULT_IP}:${remote_root}
+        scp -rp root/ ${remote_user}@${DEFAULT_IP}:${remote_root}
+        scp -rp usr/lib/libdjnn* ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/lib/
+        scp -rp usr/lib/libsmala* ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/lib/
+        scp -rp usr/bin/ka ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/bin/
 
     else
         error_echo "you try to scp with the wrong directory : ${target_dir}"

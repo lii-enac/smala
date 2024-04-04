@@ -17,14 +17,14 @@ endef
 
 # install recipe
 define @TEMPLATE@_INSTALL_TARGET_CMDS
-	#Volta
 	$(INSTALL) -D -m 755 $(@D)/build/@template@ $(TARGET_DIR)/root/.
 	# don't forget the ressources
 	cp -r  $(@D)/res $(TARGET_DIR)/root/res
 	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/launch_@template@.sh $(TARGET_DIR)/root/.
-	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/ka $(TARGET_DIR)/usr/bin/.	
+	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/ka $(TARGET_DIR)/usr/bin/.
 endef
 
+BR2_ROOTFS_POST_BUILD_SCRIPT=$(TARGET_DIR)/../../package/@template@/post_@template@_install.sh
 
 $(eval $(generic-package))
 

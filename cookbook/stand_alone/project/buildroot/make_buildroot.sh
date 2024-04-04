@@ -20,6 +20,8 @@ LII_GIT_BRANCH=LII.$BUILDROOT_BRANCH.$BOARD
 PACKAGE_BRANCH=$PACKAGENAME.$BUILDROOT_BRANCH.$BOARD
 PACKAGE_DEFCONFIG=${PACKAGENAME}.${BUILDROOT_BRANCH}.${BOARD}.defconfig
 
+HOME_PROJECT_DIR=`pwd`
+
 # ---- debug config
 
 # echo "-- DEBUG --"
@@ -45,6 +47,7 @@ info_echo() {
 
 # Fonction pour afficher un message jaune
 warning_echo() {
+    echo
     echo -e "${YELLOW}$1${NC}"
 }
 
@@ -106,40 +109,20 @@ configure_make() {
         make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
     else
         echo "${PACKAGE_DEFCONFIG} already exists"
-        read -p "Would you like to replace it and reconfigure, or you could also use 'xconfig' to modify configuration ? (y/N) " -i N answer
-        answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
-        if [ "$answer" = "y" ] || [ "$answer" = "yes" ]; then
-            # Remplacer le fichier de configuration et le configurer à nouveau
-            cd "$HOME_PROJECT_DIR" || exit 1
-            rsync -avh "project/buildroot/${PACKAGE_DEFCONFIG}" "$BUILDROOT_DIR/."
-            cd "$BUILDROOT_DIR" || exit 1
-            make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
-        else
-            warning_echo "Skipping configuration."
-        fi
+        cd "$HOME_PROJECT_DIR" || exit 1
+        rsync -avh "project/buildroot/${PACKAGE_DEFCONFIG}" "$BUILDROOT_DIR/."
+        cd "$BUILDROOT_DIR" || exit 1
+        make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
     fi
 }
 
 launch_make() {
 
-    read -p "Does the package ${PACKAGENAME} need to be updated from Git (y/N)? " -i N answer
-    answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
-    if [ "$answer" = "y" ] || [ "$answer" = "yes" ]; then
-        warning_echo "Cleaning buildroot from new release ..."
-        rm -rf ${BUILDROOT_DIR}/output/build/${PACKAGENAME}*
-        rm -rf ${BUILDROOT_DIR}/dl/${PACKAGENAME}
-    fi
-
-
-    read -p "Are you ready to compile (Y/n)? " -i Y answer
-    answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
-    if [ "$answer" = "y" ] || [ "$answer" = "yes" ]; then
-        info_echo "Starting compilation..."
-    elif [ "$answer" = "n" ] || [ "$answer" = "no" ]; then
-        error_echo "Compilation aborted."
-        exit 1
-    fi
-
+    warning_echo "Cleaning up buildroot package \"${PACKAGENAME}\" for a new release"
+    rm -rf ${BUILDROOT_DIR}/output/build/${PACKAGENAME}*
+    rm -rf ${BUILDROOT_DIR}/dl/${PACKAGENAME}
+    
+    info_echo "Starting compilation..."
     cd $BUILDROOT_DIR
     make
 }
@@ -147,18 +130,12 @@ launch_make() {
 create_package () {
 
     cd ${HOME_PROJECT_DIR}/project/buildroot
-    if [ ! -d ${PACKAGENAME} ]; then
-        ./make_package.sh ${PACKAGENAME}
-    else
-        warning_echo "the directory ${HOME_PROJECT_DIR}/project/buildroot/${PACKAGENAME} already exists"
-    fi
+    ./make_package.sh ${PACKAGENAME}
 
 }
 
 install() {
 
-    HOME_PROJECT_DIR=`pwd`
-    
     echo
     info_echo "------ 1. check and clone buildroot"
     echo
@@ -225,21 +202,39 @@ burn() {
 update() {
     echo
     info_echo "UPDATE with IP=$DEFAULT_IP"
+
+    cd ${HOME_PROJECT_DIR}
+
+    local target_dir="${BUILDROOT_DIR}/output/target"
+    local file_to_check="${target_dir}/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM"
+    local remote_root="/"
+    local remote_user="root"
+    local file_to_copy="root/ usr/lib/libdjnn* usr/lib/libsmala.so"
+
+    if [ -e "${file_to_check}" ]; then
+        
+        info_echo "killing app : ${PACKAGENAME}"
+        ssh -f ${remote_user}@${DEFAULT_IP} "ka"
+        cd ${target_dir}
+        info_echo "starting scp from $(pwd) ... to ${remote_user}@${DEFAULT_IP}"
+        scp -rp ${file_to_copy} ${remote_user}@${DEFAULT_IP}:${remote_root}
+
+    else
+        error_echo "you try to scp with the wrong directory : ${target_dir}"
+        exit 1
+    fi
+
+    info_echo "relaunching application on ${BOARD}"
+    ssh -f ${remote_user}@${DEFAULT_IP} "./launch_${PACKAGENAME}.sh" 
+   
+   cd ${HOME_PROJECT_DIR}
+   exit 0
 }
 
 # ----- Main
 case "$1" in
-    "install")
-        install
-        ;;
-    "burn")
-        burn
-        ;;
-    "update")
-        update
-        ;;
-    *)
-        error_echo "Usage: ./make_buildroot [install|burn] [package_name]"
-        exit 1
-        ;;
+    "install") install ;;
+    "burn") burn ;;
+    "update") update ;;
+    *) error_echo "Usage: ./make_buildroot [install|burn] [package_name]" && exit 1 ;;
 esac

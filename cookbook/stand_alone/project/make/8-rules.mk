@@ -78,3 +78,6 @@ buildroot:
 
 burn:
 	./project/buildroot/make_buildroot.sh burn $(original_exe)
+
+buildroot_update:
+	./project/buildroot/make_buildroot.sh update $(original_exe) 

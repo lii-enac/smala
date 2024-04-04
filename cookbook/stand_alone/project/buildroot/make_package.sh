@@ -25,18 +25,25 @@ echo
 # Fonction pour effectuer les remplacements dans un fichier
 replace_strings() {
     
+    # note :
+    # I have to use a temporary file to be compatible between 'sed' on Linux and Darwin.
+    # alaso I have to keep the permissions
     local file="$1"
-    if [ "$(uname)" == "Linux" ]; then
-        SED_I_OPTION=
-    else
-        #on Darwin need to be defined at ''
-        SED_I_OPTION="''"
-    fi
-    sed -i ${SED_I_OPTION} -e "s/${PATTERN}/${PACKAGENAME}/g" -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g"  -e "s|${PATTERN_GIT_URL}|${GIT_URL}|g" -e "s|${PATTERN_GIT_BRANCH}|${GIT_BRANCH}|g" "$file"
+    local permissions=$(stat -c "%a" "$file")
+    local tmp_file=$(mktemp) #tmp_file unique
+
+    sed -e "s/${PATTERN}/${PACKAGENAME}/g" \
+        -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g" \
+        -e "s|${PATTERN_GIT_URL}|${GIT_URL}|g" \
+        -e "s|${PATTERN_GIT_BRANCH}|${GIT_BRANCH}|g" \
+        "$file" > ${tmp_file}
+
+    chmod ${permissions} ${tmp_file}
+    mv ${tmp_file} ${file}
 }
 
 # Répertoire à scanner
-directory="@template@"
+directory=${PATTERN}
 
 rm -rf "${PACKAGENAME}"
 mkdir -p "${PACKAGENAME}"
@@ -56,16 +63,12 @@ for file in "$directory"/*; do
     fi
 done
 
-filename=${PATTERN}_Config.in
-new_filename=$(echo "$filename" | sed -e "s/${PATTERN}/${PACKAGENAME}/g" -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g")       
-cp "$filename" "$new_filename"
-echo "File copied: $filename -> $new_filename"
-replace_strings "$new_filename"
-echo "Replacements done in $new_filename"
+files=("${PATTERN}_Config.in" "${PATTERN}.2024.02.RPI4.defconfig")
 
-filename=${PATTERN}.2024.02.RPI4.defconfig
-new_filename=$(echo "$filename" | sed -e "s/${PATTERN}/${PACKAGENAME}/g" -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g")       
-cp "$filename" "$new_filename"
-echo "File copied: $filename -> $new_filename"
-replace_strings "$new_filename"
-echo "Replacements done in $new_filename"
+for filename in "${files[@]}"; do
+    new_filename=$(echo "$filename" | sed -e "s/${PATTERN}/${PACKAGENAME}/g" -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g")
+    cp "$filename" "$new_filename"
+    echo "File copied: $filename -> $new_filename"
+    replace_strings "$new_filename"
+    echo "Replacements done in $new_filename"
+done

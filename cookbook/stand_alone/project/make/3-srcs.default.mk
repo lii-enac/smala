@@ -4,6 +4,7 @@ res_dir ?= res
 exe_dir ?= .
 
 exe ?= helloworld
+original_exe := $(exe)
 
 # smala sources
 srcs_sma := $(shell find $(src_dir) -name "*.sma")

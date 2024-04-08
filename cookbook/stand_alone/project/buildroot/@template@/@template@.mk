@@ -19,7 +19,7 @@ endef
 define @TEMPLATE@_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/build/@template@ $(TARGET_DIR)/root/.
 	# don't forget the ressources
-	cp -r  $(@D)/res $(TARGET_DIR)/root/res
+	cp -rp  $(@D)/res $(TARGET_DIR)/root/
 	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/launch_@template@.sh $(TARGET_DIR)/root/.
 	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/ka $(TARGET_DIR)/usr/bin/.
 endef

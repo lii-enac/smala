@@ -212,23 +212,29 @@ update() {
 
     if [ -e "${file_to_check}" ]; then
         
-        info_echo "killing all application ..."
+        info_echo "killing all application"
         ssh -f ${remote_user}@${DEFAULT_IP} "ka"
+        info_echo "cleaning /etc/init.d"
+        ssh -f ${remote_user}@${DEFAULT_IP} "rm -rfv /etc/init.d/S30*"
+        ssh -f ${remote_user}@${DEFAULT_IP} "rm -rfv /etc/init.d/S45wifi"
         cd ${target_dir}
         info_echo "starting scp from $(pwd) ... to ${remote_user}@${DEFAULT_IP}"
         scp -rp root/ ${remote_user}@${DEFAULT_IP}:${remote_root}
         scp -rp usr/lib/libdjnn* ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/lib/
         scp -rp usr/lib/libsmala* ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/lib/
         scp -rp usr/bin/ka ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/bin/
+        scp -rp etc/init.d/S30${PACKAGENAME} ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/init.d/
+        scp -rp etc/init.d/S45wifi ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/init.d/
+        scp -rp etc/hostname ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/
 
     else
         error_echo "you try to scp with the wrong directory : ${target_dir}"
         exit 1
     fi
 
-    info_echo "relaunching application on ${BOARD}"
-    ssh -f ${remote_user}@${DEFAULT_IP} "./launch_${PACKAGENAME}.sh" 
-   
+    info_echo "rebooting for ${PACKAGENAME} application on ${BOARD}"
+    ssh -f ${remote_user}@${DEFAULT_IP} "reboot" 
+
    cd ${HOME_PROJECT_DIR}
    exit 0
 }

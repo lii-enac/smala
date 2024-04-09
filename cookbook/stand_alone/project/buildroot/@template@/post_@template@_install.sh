@@ -13,11 +13,11 @@ echo "install network @template@ interfaces"
 cp -v $PACKAGE_@TEMPLATE@_DIR/interfaces $TARGET_DIR/etc/network/
 
 echo ""
-echo "install Volta init file"
+echo "install @template@ init file"
 cp -v $PACKAGE_@TEMPLATE@_DIR/S30@template@ $TARGET_DIR/etc/init.d/.
 
 echo ""
-echo "install wifi for Volta init file"
+echo "install wifi for @template@ init file"
 cp -v $PACKAGE_@TEMPLATE@_DIR/S45wifi $TARGET_DIR/etc/init.d/.
 
 echo ""

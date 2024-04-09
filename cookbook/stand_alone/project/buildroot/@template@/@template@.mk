@@ -24,7 +24,7 @@ define @TEMPLATE@_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/../../../package/@template@/ka $(TARGET_DIR)/usr/bin/.
 endef
 
-BR2_ROOTFS_POST_BUILD_SCRIPT=$(TARGET_DIR)/../../package/@template@/post_@template@_install.sh
+BR2_ROOTFS_POST_BUILD_SCRIPT+=$(TARGET_DIR)/../../package/@template@/post_@template@_install.sh
 
 $(eval $(generic-package))
 

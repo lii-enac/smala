@@ -59,9 +59,9 @@ error_echo() {
 
 # ----- Functions
 check_and_clone() {
-    if [ -d "$BUILDROOT_DIR" ]; then
+    if [ -d "${BUILDROOT_DIR}" ]; then
         echo "the directory lii_buildroot_$BOARD exist"
-        cd $BUILDROOT_DIR
+        cd ${BUILDROOT_DIR}
         current_branch=$(git rev-parse --abbrev-ref HEAD)
         if [ "$current_branch" != "$PACKAGE_BRANCH" ]; then
             if git show-ref --verify --quiet "refs/heads/$PACKAGE_BRANCH"; then
@@ -69,17 +69,18 @@ check_and_clone() {
                 echo "Switching to branch $PACKAGE_BRANCH"
                 git checkout "$PACKAGE_BRANCH"
             else
-                # Sinon, créer une nouvelle branche
-                echo "Creating branch $PACKAGE_BRANCH"
+                # Sinon, créer une nouvelle branche MAIS depuis ${LII_GIT_BRANCH}
+                git checkout  ${LII_GIT_BRANCH} 
+                warning_echo "Creating branch $PACKAGE_BRANCH from ${LII_GIT_BRANCH}"
                 git checkout -b "$PACKAGE_BRANCH"
             fi
         else
             echo "the branch $PACKAGE_BRANCH exist"
         fi
     else
-        git clone -b "$LII_GIT_BRANCH" --depth 1 $LII_GIT_URL $BUILDROOT_DIR
+        git clone -b "$LII_GIT_BRANCH" --depth 1 $LII_GIT_URL ${BUILDROOT_DIR}
         echo "Clone lii_buildroot_$BOARD"
-        cd $BUILDROOT_DIR
+        cd ${BUILDROOT_DIR}
         echo "Create $PACKAGE_BRANCH branch"
         git checkout -b $PACKAGE_BRANCH
     fi
@@ -87,33 +88,53 @@ check_and_clone() {
 
 rsync_local() {
     
-    cd $HOME_PROJECT_DIR
-    rsync -avh project/buildroot/${PACKAGENAME}_Config.in $BUILDROOT_DIR/package/Config.in
+    cd ${HOME_PROJECT_DIR}
+    rsync -avh project/buildroot/${PACKAGENAME}_Config.in ${BUILDROOT_DIR}/package/Config.in
     if [ $? -ne 0 ]; then
         error_echo "rsync failed."
         exit 0
     fi
-    rsync -avh project/buildroot/$PACKAGENAME $BUILDROOT_DIR/package/.
+    rsync -avh project/buildroot/$PACKAGENAME ${BUILDROOT_DIR}/package/.
     if [ $? -ne 0 ]; then
         error_echo "rsync failed."
         exit 0
-    fi 
+    fi
+    
+    rsync -avh "project/buildroot/${PACKAGE_DEFCONFIG}" "${BUILDROOT_DIR}/."
+    if [ $? -ne 0 ]; then
+        error_echo "rsync failed."
+        exit 0
+    fi
+
+    # save configuration
+    cd ${BUILDROOT_DIR}
+
+    local repertoire="package/toto"
+
+    info_echo "-- git add"
+    # Check if th efile is followed by git
+    if ! git ls-files --error-unmatch ${PACKAGE_DEFCONFIG} >/dev/null 2>&1; then
+        git add ${PACKAGE_DEFCONFIG}
+    fi
+
+    # Check if th efile is followed by git
+    if ! git ls-files --error-unmatch package/${PACKAGENAME} >/dev/null 2>&1; then
+        git add package/${PACKAGENAME}
+    fi
+
+    info_echo "-- git status"
+    git status
+    info_echo "-- git commit -a "
+    git commit -a -m "save ${PACKAGENAME} configuration"
+    info_echo "-- git push "
+    git push origin ${PACKAGE_BRANCH}:${PACKAGE_BRANCH}
+
+    cd ${HOME_PROJECT_DIR}
 }
 
 configure_make() {
-    if [ ! -f "$BUILDROOT_DIR/${PACKAGE_DEFCONFIG}" ]; then
-        # Le fichier de configuration n'existe pas, nous devons le copier et le configurer
-        cd "$HOME_PROJECT_DIR" || exit 1
-        rsync -avh "project/buildroot/${PACKAGE_DEFCONFIG}" "$BUILDROOT_DIR/."
-        cd "$BUILDROOT_DIR" || exit 1
-        make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
-    else
-        echo "${PACKAGE_DEFCONFIG} already exists"
-        cd "$HOME_PROJECT_DIR" || exit 1
-        rsync -avh "project/buildroot/${PACKAGE_DEFCONFIG}" "$BUILDROOT_DIR/."
-        cd "$BUILDROOT_DIR" || exit 1
-        make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
-    fi
+    cd "${BUILDROOT_DIR}" || exit 1
+    make defconfig BR2_DEFCONFIG="${PACKAGE_DEFCONFIG}"
 }
 
 launch_make() {
@@ -123,14 +144,14 @@ launch_make() {
     rm -rf ${BUILDROOT_DIR}/dl/${PACKAGENAME}
     
     info_echo "Starting compilation..."
-    cd $BUILDROOT_DIR
+    cd ${BUILDROOT_DIR}
     make
 }
 
 create_package () {
 
     cd ${HOME_PROJECT_DIR}/project/buildroot
-    ./make_package.sh ${PACKAGENAME}
+    ./make_package.sh ${PACKAGENAME} ${DEFAULT_IP}
 
 }
 
@@ -157,13 +178,13 @@ install() {
     ./LII_install_proxy.sh
     
     echo
-    info_echo "------ 4. RSYNC package : $PACKAGENAME to $BUILDROOT_DIR/$PACKAGE_BRANCH"
+    info_echo "------ 4. RSYNC package : $PACKAGENAME to ${BUILDROOT_DIR}/$PACKAGE_BRANCH"
     echo
     
     rsync_local
     
     echo
-    info_echo "------ 5. configure buildroot with : $BUILDROOT_DIR/${PACKAGE_DEFCONFIG} "
+    info_echo "------ 5. configure buildroot with : ${BUILDROOT_DIR}/${PACKAGE_DEFCONFIG} "
     echo
     
     configure_make
@@ -196,7 +217,7 @@ burn() {
     fi
 
     info_echo  "choose: ${device}"
-    sudo dd if=$BUILDROOT_DIR/output/images/sdcard.img of="$device" bs=4M status=progress
+    sudo dd if=${BUILDROOT_DIR}/output/images/sdcard.img of="$device" bs=4M status=progress
 }
 
 update() {
@@ -225,6 +246,8 @@ update() {
         scp -rp usr/bin/ka ${remote_user}@${DEFAULT_IP}:${remote_root}/usr/bin/
         scp -rp etc/init.d/S30${PACKAGENAME} ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/init.d/
         scp -rp etc/init.d/S45wifi ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/init.d/
+        scp -rp etc/network/interfaces ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/network/
+        scp -rp etc/inittab ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/
         scp -rp etc/hostname ${remote_user}@${DEFAULT_IP}:${remote_root}/etc/
 
     else

@@ -5,21 +5,15 @@ iface lo inet loopback
 
 # for lii network
 auto eth0
-iface eth0 inet dhcp
+iface eth0 inet static
+    address @template_ip@
+    netmask 255.255.255.0
 
-#for @template@ network
-#auto eth0
-#iface eth0 inet static
-#address 192.168.2.100
-#network 192.168.2.0
-#broadcast 192.168.2.255
-#gateway 192.168.2.1
-#netmask 255.255.255.0
-
-allow-hotplug wlan0
-auto wlan0
-iface wlan0 inet dhcp
-wpa-ssid @template@
-wpa-key-mgmt NONE
+# for @template@ network
+# allow-hotplug wlan0
+# auto wlan0
+# iface wlan0 inet dhcp
+# wpa-ssid @template@
+# wpa-key-mgmt @template@
 #wpa-psk NONE
 #wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf

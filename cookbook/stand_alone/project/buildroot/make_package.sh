@@ -4,11 +4,14 @@
 PACKAGENAME=$1
 PACKAGENAME_CAP=$(echo "$PACKAGENAME" | tr '[:lower:]' '[:upper:]')
 
+PACKAGENAME_IP=$2
+
 PATTERN_RADICAL=template
 PATTERN="@${PATTERN_RADICAL}@"
 PATTERN_CAP=$(echo "$PATTERN" | tr '[:lower:]' '[:upper:]')
 PATTERN_GIT_URL="@${PATTERN_RADICAL}_git_url@"
 PATTERN_GIT_BRANCH="@${PATTERN_RADICAL}_git_branch@"
+PATTERN_IP="@${PATTERN_RADICAL}_ip@"
 
 #Obtenir l'URL du dépôt Git
 GIT_URL=$(git remote get-url origin)
@@ -36,6 +39,7 @@ replace_strings() {
         -e "s/${PATTERN_CAP}/${PACKAGENAME_CAP}/g" \
         -e "s|${PATTERN_GIT_URL}|${GIT_URL}|g" \
         -e "s|${PATTERN_GIT_BRANCH}|${GIT_BRANCH}|g" \
+        -e "s|${PATTERN_IP}|${PACKAGENAME_IP=$2}|g" \
         "$file" > ${tmp_file}
 
     chmod ${permissions} ${tmp_file}

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Start volta
+# Start @template@
 #
 
 case "$1" in
@@ -8,7 +8,6 @@ case "$1" in
  	echo "Starting @template@"
 #	modprobe i2c_dev
 	/root/launch_@template@.sh &>/dev/null &
-#	/bin/volta &
 	;;
   stop)
 	echo -n "Stopping @template@"

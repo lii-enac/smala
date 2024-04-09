@@ -31,11 +31,11 @@ using namespace std;
 int main (int argc, const char **argv) {
 	Argument arg (argc, argv);
 	Driver driver (arg.debug());
-	Builder *b;
+	Builder *builder;
 	if (arg.lang () == JS )
-	  b = new JSBuilder ();
+	  builder = new JSBuilder ();
 	else
-	  b = new CPPBuilder ();
+	  builder = new CPPBuilder ();
 	int error = 0;
 
 	//auto sz = arg.files().size();
@@ -64,9 +64,9 @@ int main (int argc, const char **argv) {
 			// else {
 				prefix = filename.substr(0, filename.size() - 4);	
 			// }
-			error |= b->build (driver.ast (), arg.get_option("builddir"), prefix, arg.debug(), arg.cleaner (), arg.fastcomp ());
+			error |= builder->build (driver.ast (), arg.get_option("builddir"), prefix, arg.debug(), arg.cleaner (), arg.fastcomp ());
 			if (error) {
-			  remove (b->filename ().c_str());
+			  remove (builder->filename ().c_str());
 			}
 		} else {
 			std::cerr << "could not open " << filename << std::endl;

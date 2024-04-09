@@ -48,6 +48,7 @@ namespace Smala {
     std::string build_expr (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false) override;
     std::string build_expr_rec (ExprNode *e, expr_production_t prod_t = undefined_t, bool build_fake = false);
     // 'build_expr' might require dynamic_casting of vars. 'build_properties' generates their init code. It should be called wherever 'build_expr' is called.
+    std::string build_property (std::ostream &os, const string&);
     void build_properties (std::ostream &os) override;
 
     void build_native_expression (std::ostream &os, Node *n) override;

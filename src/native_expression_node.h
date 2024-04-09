@@ -23,9 +23,10 @@ namespace Smala
   {
   public:
     NativeExpressionNode (const location& loc);
-    NativeExpressionNode (const location& loc, ExprNode* expression, bool paused, bool lazy, bool is_connector, bool is_model = true);
+    NativeExpressionNode (const location& loc, ExprNode* expression, bool paused, bool lazy, bool is_connector, char op=' ', bool is_model = true);
     virtual ~NativeExpressionNode ();
     void add_output_node (PathNode* output_node);
+    void set_expression (ExprNode*);
     ExprNode* get_expression ();
     std::vector<PathNode*>& get_output_nodes ();
     void set_build_name (const std::string &n) { _build_name = n; }
@@ -34,10 +35,12 @@ namespace Smala
     bool is_paused () { return _paused; }
     bool is_lazy () { return _lazy; }
     bool is_model () { return _is_model; }
+    char op () { return _operator; }
   private:
     ExprNode* _expression;
     std::vector<PathNode*> _output_nodes;
     bool _paused, _lazy, _is_connector, _is_model;
+    char _operator;
     std::string _build_name;
   };
 

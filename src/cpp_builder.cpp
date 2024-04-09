@@ -454,6 +454,21 @@ namespace Smala
   // in 'build_expr', each time there is a need for an AbstractProperty, we push it into m_new_syms_from_build_expr
   // when it's safe to do so (not inside an if () expr for example), we call build_properties()
 
+  std::string
+  CPPBuilder::build_property(std::ostream &os, const string& name)
+  {
+      std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+      indent (os);
+      os << "[[maybe_unused]] auto * " << new_name << " = ";
+      if (!m_fastcomp) {
+        os << "dynamic_cast<AbstractProperty*> (" << name << ");" << endl;
+        used_processes["AbstractProperty"] = true;
+      } else {
+        os << "(" << name << ");" << endl;
+      }
+      return new_name;
+  }
+
   void
   CPPBuilder::build_properties(std::ostream &os)
   {
@@ -1336,8 +1351,45 @@ namespace Smala
         std::string out_arg = build_find (e, false);
         build_properties(os);
 
-        if(!templated)
+        if (!templated)
           templated = (m_template_props.find(arg) != m_template_props.end());
+        
+        if (node->op() != ' ') {
+          //auto out_arg_prop = build_property(os, out_arg);
+
+          std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          os << "[[maybe_unused]] auto * " << new_name << " = ";
+          if (!m_fastcomp) {
+            os << "new "; //Assignment ( ";
+          } else {
+            os << "djnn_" << "new_"; //Assignment ( ";
+          }
+          string operator_name;
+          switch (node->op()) {
+            case '+': operator_name = "OperationConnector"; break;
+            default: break;
+          }
+
+          os << operator_name;
+          os << " (" << p_name << ", \"OpAss\"";
+          //os << ",0,0";
+          os << ", " << out_arg;
+          os << ", 0"; // << (node->is_model() ? "1" : "0");
+          os << ");\n";
+
+          indent(os);
+          os << "new Connector";
+          os << " (" << p_name << ", \"\", ";
+          os << arg << ", ";
+          os << new_name << "->find_child(\"delta\"));";
+
+          if (!m_fastcomp)
+            used_processes[operator_name] = true;
+  
+          os << "\n";
+          arg = new_name+"->find_child(\"delta\")";
+          //arg = out_arg;
+        } else {
 
         //std::cerr << "- " << arg << " " << out_arg << " " << templated << std::endl;
         string used_process_name;
@@ -1377,18 +1429,21 @@ namespace Smala
           os << ">";
         }
 
-        os << " (" << p_name << ", \"\", " <<   arg << ", " // << "\"\","
-                                   << out_arg //<< ", \"\""
-                                   ;
+        os << " (" << p_name << ", \"\", ";
+        os << arg;
+        os << ", "; // << "\"\","
+        os << out_arg //<< ", \"\""
+        ;
         // connectors don't have is_model but copy_on_activation so the meaning of this property is somewhat inverted
         if (!node->is_paused () && !node->is_lazy ()) {
-          if(node->is_connector())
+          if (node->is_connector())
             os << ", " << !node->is_model ();
           else
             os << ", " << node->is_model ();
         }
 
         os << ");\n";
+        }
       }
     }
     build_properties(os);
@@ -1762,7 +1817,7 @@ namespace Smala
     std::string native_name ("nat_" + unique_name + "_" + std::to_string (m_native_num++));
     node->set_build_name (native_name);
 
-    // first pass: generate nat struct
+    // first pass: generate native struct
     std::map<std::string,bool> already_handled;
     std::string native_name_struct = native_name + "_struct";
     std::string native_name_obj = native_name + "_obj";
@@ -1873,15 +1928,45 @@ namespace Smala
     os << "::impl_activate ()\n{\n";
     for (auto n : node->get_output_nodes ()) {
       os << "\t";
-      if (!m_fastcomp) {
-        os << transform_name (build_fake_name(n, true)) << "->set_value (";
-      } else {
-        os << "djnn_" << "set_value (" <<  transform_name (build_fake_name(n, true)) << ",";
-      }
-
+      auto tn = transform_name (build_fake_name(n, true));
+      //std::cerr << tn << std::endl;
+      string res_tn = string("res_") + tn;
+      os << "auto " << res_tn << " = ";
       ExprNode* expr = node->get_expression();
       os << build_expr (expr, undefined_t, true); // this should NOT create a new dynamic_casted property !!!
-      os << ", " << !node->is_paused () << ");\n";
+      os << ";\n";
+
+      if (node->is_lazy()) {
+        indent(os);
+        os << "if (";
+        if (!m_fastcomp) {
+          os << tn << "->get_double_value () != " << res_tn << ") {\n";
+        } else {
+          os << "djnn_" << "get_double_value (" <<  tn << ") != " << res_tn << ") {\n";
+        }
+        indent(os);
+      }
+      indent(os);
+      if (!m_fastcomp) {
+        os << tn << "->set_value (";
+      } else {
+        os << "djnn_" << "set_value (" << tn << ",";
+      }
+      os << res_tn;
+      if (node->op() != ' ') {
+        os << " " << node->op() << " ";
+        if (!m_fastcomp) {
+          os << tn << "->get_double_value ()";
+        } else {
+          os << "djnn_" << "get_double_value (" <<  tn << ")";
+        }
+      }
+      os << ", " << !node->is_paused ();
+      os << ");\n";
+      if (node->is_lazy()) {
+        indent(os);
+        os << "}\n";
+      }
     }
     indent (os);
     os << "};\n\n";

@@ -202,6 +202,10 @@
 %token CAUSAL_DEP "~>"
 %token CONNECTOR "=>"
 %token ASSGNT_CONN "=:>"
+%token PLUS_CONN "+=>"
+%token TIMES_CONN "*=>"
+%token PLUS_ASSGNT_CONN "+=:>"
+%token TIMES_ASSGNT_CONN "*=:>"
 %token PAUSED_CONNECTOR "::>"
 %token LAZY_CONNECTOR "=?>"
 %token ASSIGNMENT "=:"
@@ -290,7 +294,9 @@
 %type <bool> keep
 %type <bool> bracket
 %type < expression_t > arguments
-%type <int> connector_symbol
+//%type <int> connector_symbol
+%type <NativeExpressionNode*> connector_symbol
+//%type <char> arith_connector
 %type <int> assignment_symbol
 %type < expression_t > argument_list
 %type <PathNode*> binding_src
@@ -1578,7 +1584,9 @@ primary_expression
 connector
   : assignment_expression connector_symbol process_list
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==0, $2==3, true, $2==2 ? false:true);
+      //NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==0, $2==3, true, $2>3?$2:' ', $2==2 ? false:true);
+      NativeExpressionNode *expr_node = $2;
+      expr_node->set_expression($1);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (size_t i = 0; i < $3.size (); ++i) {
         expr_node->add_output_node ($3.at (i));
@@ -1588,10 +1596,27 @@ connector
     }
 
 connector_symbol
+  : CONNECTOR { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, ' ', true); }
+  | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, true, false, true, ' ', true); }
+  | LAZY_CONNECTOR { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, true, true, ' ', true); }
+  | ASSGNT_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, ' ', false); }
+  | PLUS_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, '+', true); }
+  | TIMES_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, '*', true); }
+
+/* arith_connector
+  : PLUS { $$='+'; }
+  | TIMES { $$='*'; }
+  | { $$=0; } */
+
+/*connector_symbol
   : CONNECTOR { lexer_expression_mode_off (); $$ = 1; }
   | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = 0; }
   | LAZY_CONNECTOR { lexer_expression_mode_off (); $$ = 3; }
   | ASSGNT_CONN { lexer_expression_mode_off (); $$ = 2; }
+  | PLUS_CONN { lexer_expression_mode_off (); $$ = '+'; }
+  | TIMES_CONN { lexer_expression_mode_off (); $$ = '*'; }*/
+
+
 
 binding
   : binding_src binding_type process_list
@@ -1698,7 +1723,7 @@ binding_src
     if ($1->get_expr_node_type () == PATH_EXPR) {
       $$ = $1->get_path ();
     } else {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, false, true, false);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, false, false, true, ' ', false);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
 
       // build a local bool that will serve as an output for a connector
@@ -1772,7 +1797,7 @@ start_lambda
 assignment
   : assignment_expression assignment_symbol process_list is_model
     {
-      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==1, $2==2, false, $4);
+      NativeExpressionNode *expr_node = new NativeExpressionNode (@$, $1, $2==1, $2==2, false, ' ', $4);
       expr_node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       for (size_t i = 0; i < $3.size (); ++i) {
         /*Node *out =*/ new Node (@$, PATH, "Name", $3.at (i));

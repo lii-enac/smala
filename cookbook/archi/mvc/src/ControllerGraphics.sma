@@ -125,7 +125,7 @@ ControllerGraphics(Process model, Process _view, Process frame)
       idle -> dragging_right (right_press)
       idle -> dragging_top (top_press)
       idle -> dragging_bottom (bottom_press)
-      dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom -> idle (frame.release) // why {} ???
+      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // why {} ???
     }
 
   }

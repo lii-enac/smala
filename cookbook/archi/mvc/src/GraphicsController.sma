@@ -18,7 +18,7 @@ use base
 use gui
 
 _define_
-ControllerGraphics(Process model, Process _view, Process frame)
+GraphicsController(Process model, Process _view, Process frame)
 { 
   Spike about_to_delete
   view aka _view

@@ -18,7 +18,7 @@ use base
 use gui
 
 _define_
-ViewGraphics() {
+GraphicsView() {
   FillColor fill (Red)
   Rectangle r (0,0,0,0)
 }

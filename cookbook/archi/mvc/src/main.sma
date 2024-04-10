@@ -20,11 +20,11 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 
-import ModelRect
-import ControllerGraphics
-import ViewGraphics
-import ControllerText
-import ViewText
+import RectModel
+import GraphicsController
+import GraphicsView
+import TextController
+import TextView
 import LifetimeManager
 
 
@@ -54,15 +54,15 @@ Component root {
   List models
   List views
 
-  Int ty(15)
+  Int text_y(15)
   toolbox.add.click -> (root) {
     Process model = ModelRect (root.models, "", 50, 50, 100, 70)
     Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
-    Process v1 = ViewGraphics (root.views, "")
-    ControllerGraphics (lifetime_manager.controllers, "", model, v1, root.f)
-    Process v2 = ViewText (root.views, "", $root.ty)
-    ControllerText (lifetime_manager.controllers, "", model, v2)
-    root.ty += 15
+    Process v1 = GraphicsView (root.views, "")
+    GraphicsController (lifetime_manager.controllers, "", model, v1, root.f)
+    Process v2 = TextView (root.views, "", $root.text_y)
+    TextController (lifetime_manager.controllers, "", model, v2)
+    root.text_y += 15
   }
 
   toolbox.del.click -> del_action:(root) {

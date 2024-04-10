@@ -58,10 +58,12 @@ Component root {
   toolbox.add.click -> (root) {
     Process model = ModelRect (root.models, "", 50, 50, 100, 70)
     Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
-    Process v1 = GraphicsView (root.views, "")
-    GraphicsController (lifetime_manager.controllers, "", model, v1, root.f)
-    Process v2 = TextView (root.views, "", $root.text_y)
-    TextController (lifetime_manager.controllers, "", model, v2)
+
+    Process gv = GraphicsView (root.views, "")
+    GraphicsController (lifetime_manager.controllers, "", model, gv, root.f)
+
+    Process tv = TextView (root.views, "", $root.text_y)
+    TextController (lifetime_manager.controllers, "", model, tv)
     root.text_y += 15
   }
 

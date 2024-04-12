@@ -39,8 +39,8 @@ GraphicsPickingView() {
   r.height =:> left.height, right.height
 
   r.x =:> left.x
-  r.x + r.width - border =:> right.x
+  r.x + r.width - border*2 =:> right.x
   r.y =:> left.y, right.y
-  r.y + r.height - border =:> bottom.y
+  r.y + r.height - border*2 =:> bottom.y
 
 }

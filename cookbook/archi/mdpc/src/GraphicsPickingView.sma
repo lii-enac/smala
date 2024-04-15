@@ -20,18 +20,37 @@ use gui
 _define_
 GraphicsPickingView() {
   NoFill _
+  //FillColor _(0,255,0)
+  
   NoOutline _
   PickFill _
 
-  Int border (5)
-
-  Rectangle r (0,0,0,0)
+  //FillColor _(255,0,0)
+  Rectangle r (0,0,0,0) // center
+  //FillOpacity _(0.5)
+  //FillColor _(0,255,0)
   Rectangle left (0,0,0,0)
   Rectangle right (0,0,0,0)
   Rectangle top (0,0,0,0)
   Rectangle bottom (0,0,0,0)
 
-  border =:> left.width, right.width, top.height, bottom.height
+  x aka r.x
+  y aka r.y
+  width aka r.width
+  height aka r.height
+
+  Double border (5)
+  Double invtborder (5)
+  // border * 2 =:> invtborder
+  // ScreenToLocal m (r)
+  // border =:> m.inX
+  // border =:> m.inY
+  // //m.outX =:> invtborder
+  // //m.outY =:> mdy
+  // TextPrinter tp
+  // invtborder =:> tp.input
+
+  invtborder =:> left.width, right.width, top.height, bottom.height
 
   r.x =:> top.x, bottom.x
   r.y =:> top.y
@@ -39,8 +58,8 @@ GraphicsPickingView() {
   r.height =:> left.height, right.height
 
   r.x =:> left.x
-  r.x + r.width - border*2 =:> right.x
+  r.x + r.width - invtborder =:> right.x
   r.y =:> left.y, right.y
-  r.y + r.height - border*2 =:> bottom.y
+  r.y + r.height - invtborder =:> bottom.y
 
 }

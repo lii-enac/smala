@@ -21,4 +21,8 @@ _define_
 GraphicsDisplayView() {
   FillColor fill (Red)
   Rectangle r (0,0,0,0)
+  x aka r.x
+  y aka r.y
+  width aka r.width
+  height aka r.height
 }

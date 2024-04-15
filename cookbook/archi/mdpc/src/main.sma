@@ -53,6 +53,13 @@ Component root {
 
   List lifetime_managers
   List models
+  List text_views
+
+  // // transform the views
+  // Translation _(45, 100)
+  // Scaling _(0.5, 0.5, 0, 0)
+  // Rotation _(22.5, 0, 0)
+
   List views
 
   Int text_y(15)
@@ -64,7 +71,7 @@ Component root {
     Process gpv = GraphicsPickingView (root.views, "")
     GraphicsController (lifetime_manager.controllers, "", model, gdv, gpv, root.f)
 
-    Process tv = TextView (root.views, "", $root.text_y)
+    Process tv = TextView (root.text_views, "", $root.text_y)
     TextController (lifetime_manager.controllers, "", model, tv)
     root.text_y += 15
   }

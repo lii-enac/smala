@@ -24,12 +24,11 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
   view aka _display_view
   picking_view aka _picking_view
 
-  //_DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 2
-
   Component control {
     // -- update the views whenever the model changes (subject/observer pattern)
-    model.{x,y,width,height} =:> view.r.{x,y,width,height}
-    model.{x,y,width,height} =:> picking_view.r.{x,y,width,height}
+    // and transform the model into the screen
+    model.{x,y,width,height} =:> view.{x,y,width,height}
+    model.{x,y,width,height} =:> picking_view.{x,y,width,height}
 
     // -- update model from interactions on the view
 
@@ -42,20 +41,16 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
     
     // delta helpers
     Int lastx(0)
-    Int dx(0)
+    Int sdx(0) // screen dx
     px -> {
-      px - lastx =: dx
+      px - lastx =: sdx
               px =: lastx
     }
     Int lasty(0)
-    Int dy(0)
+    Int sdy(0) // screen dy
     py -> {
-      py - lasty =: dy
+      py - lasty =: sdy
               py =: lasty
-    }
-    frame.release -> {
-      0 =: dx
-      0 =: dy
     }
 
     center_press aka picking_view.r.press
@@ -64,33 +59,54 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
     top_press aka picking_view.top.press
     bottom_press aka picking_view.bottom.press
 
+
+    // inverse transform user interaction, from screen to model
+    Double mdx(0) // model dx
+    Double mdy(0) // model dy
+
+    ScreenToLocal m (view.r)
+    px =:> m.inX
+    py =:> m.inY
+    //m.outX =:> mdx
+    //m.outY =:> mdy
+
+    ScreenToLocal m2 (view.r)
+    px-sdx =:> m2.inX
+    py-sdy =:> m2.inY
+
+    m.outX-m2.outX =:> mdx
+    m.outY-m2.outY =:> mdy
+
+    //TextPrinter tp
+    //"px:" + px + " sdx:" + toString(sdx) + " mdx:" + toString(mdx) + " model.x:" + toString(model.x) =:> tp.input
+
     // actual interactions and model updates
     FSM drag {
       State idle
       State dragging_center {
-          dx +=> model.x
-          dy +=> model.y
+          mdx +=> model.x
+          mdy +=> model.y
       }
       State dragging_left {
-          dx +=> model.x
-        - dx +=> model.width
+          mdx +=> model.x
+        - mdx +=> model.width
       }    
       State dragging_right {
-          dx +=> model.width
+          mdx +=> model.width
       }
       State dragging_top {
-          dy +=> model.y
-        - dy +=> model.height
+          mdy +=> model.y
+        - mdy +=> model.height
       }
       State dragging_bottom {
-          dy +=> model.height
+          mdy +=> model.height
       }
       idle -> dragging_center (center_press)
       idle -> dragging_left (left_press)
       idle -> dragging_right (right_press)
       idle -> dragging_top (top_press)
       idle -> dragging_bottom (bottom_press)
-      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // why {} ???
+      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // FIXME: why {} ???
     }
 
   }

@@ -18,8 +18,8 @@ use gui
 _define_
 ModelRect(int _x, int _y, int _w, int _h)
 {
-  Int x (_x)
-  Int y (_y)
-  Int width (_w)
-  Int height (_h)
+  Double x (_x)
+  Double y (_y)
+  Double width (_w)
+  Double height (_h)
 }

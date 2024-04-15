@@ -26,6 +26,9 @@ import RectModel
 import RectViewModel
 import ViewModelManager
 
+import TextsListView
+import RectanglesListView
+
 import GraphicsController
 import GraphicsView
 import TextController
@@ -55,9 +58,20 @@ Component root {
     add.x + add.width + 10 =:> del.x
   }
 
+  Int texts_list_width (250)
 
   ViewModelManager VM_manager ()
   //ModelManager model_manager ()
+
+  TextsListView texts_list_view (VM_manager)
+  texts_list_width =: texts_list_view.width
+
+  RectanglesListView rectangles_list_view (VM_manager)
+  texts_list_width + 4 =: rectangles_list_view.x
+  f.width - rectangles_list_view.x =:> rectangles_list_view.width
+
+  f.height =:> texts_list_view.height, rectangles_list_view.height
+
 
   List lifetime_managers
   List models
@@ -88,4 +102,5 @@ Component root {
     }
   }
   toolbox.del.click -> VM_manager.delete_rectangle
+
 }

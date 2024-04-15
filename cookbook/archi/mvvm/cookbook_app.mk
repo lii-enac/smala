@@ -13,6 +13,7 @@
 
 objs_cookbook_app :=  src/RectModel.o src/ModelManager.o \
  					src/RectViewModel.o src/ViewModelManager.o \
+					src/TextsListView.o src/RectanglesListView.o \
 					src/LifetimeManager.o src/GraphicsView.o src/TextView.o src/TextViewModel.o src/GraphicsController.o src/TextController.o \
 					src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core

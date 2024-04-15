@@ -23,8 +23,6 @@ GraphicsController(Process model, Process _view, Process frame)
   Spike about_to_delete
   view aka _view
 
-  //_DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 2
-
   Component control {
     // -- update the view whenever the model changes (subject/observer pattern)
     model.{x,y,width,height} =:> view.r.{x,y,width,height}
@@ -50,10 +48,6 @@ GraphicsController(Process model, Process _view, Process frame)
     py -> {
       py - lasty =: dy
               py =: lasty
-    }
-    frame.release -> {
-      0 =: dx
-      0 =: dy
     }
 
     Int border(5)
@@ -125,7 +119,7 @@ GraphicsController(Process model, Process _view, Process frame)
       idle -> dragging_right (right_press)
       idle -> dragging_top (top_press)
       idle -> dragging_bottom (bottom_press)
-      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // why {} ???
+      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // FIXME: why {} ???
     }
 
   }

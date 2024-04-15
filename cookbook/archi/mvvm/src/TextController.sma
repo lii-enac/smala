@@ -30,8 +30,8 @@ TextController(Process model, Process _view, Process _view_model)
     // since the view_model acts as a proxy, we must update the model whenever view_model changes
     // this introduces a cycle that we must allow
     _AUTHORIZE_CYCLE = 1
-    // FIXME test if value is the same and do not warn! (would it work? not sure...)
     // FIXME _AUTHORIZE_CYCLE should be limited to this component
+    // FIXME test if value is the same and do not warn! (would it work? not sure...)
     // __AUTHORIZE_IDEMPOTENT_CYCLE = 1
     view_model.{x,y,width,height} =:> model.{x,y,width,height}
 

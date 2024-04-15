@@ -19,8 +19,8 @@ use gui
 
 _define_
 TextViewModel(Process view) {
-  IntProperty x(0)
-  IntProperty y(0)
-  IntProperty width(0)
-  IntProperty height(0)
+  Int x(0)
+  Int y(0)
+  Int width(0)
+  Int height(0)
 }

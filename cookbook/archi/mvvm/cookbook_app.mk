@@ -11,6 +11,9 @@
 #     Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := src/LifetimeManager.o src/RectModel.o src/GraphicsView.o src/TextView.o src/TextViewModel.o src/GraphicsController.o src/TextController.o src/main.o
+objs_cookbook_app :=  src/RectModel.o src/ModelManager.o \
+ 					src/RectViewModel.o src/ViewModelManager.o \
+					src/LifetimeManager.o src/GraphicsView.o src/TextView.o src/TextViewModel.o src/GraphicsController.o src/TextController.o \
+					src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

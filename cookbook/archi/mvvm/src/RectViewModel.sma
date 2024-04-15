@@ -10,18 +10,24 @@
 *  Contributors:
 *    
 *     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Stephane Conversy <stephane.conversy@enac.fr>
 *     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
 *
 */
 
 use core
+use base
 use gui
 
 _define_
-RectModel (int _x, int _y, int _w, int _h)
-{
-  Int x (_x)
-  Int y (_y)
-  Int width (_w)
-  Int height (_h)
+RectViewModel (Process _model) {
+  model aka _model
+
+  Bool is_presssed (false)
+  Bool is_selected (false)
+
+  Double surface_area (0)
+  _model.width * _model.height =:> surface_area
+
+  Spike close
 }

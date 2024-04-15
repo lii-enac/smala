@@ -21,6 +21,11 @@ use gui
 import gui.widgets.StandAlonePushButton
 
 import RectModel
+//import ModelManager
+
+import RectViewModel
+import ViewModelManager
+
 import GraphicsController
 import GraphicsView
 import TextController
@@ -51,24 +56,30 @@ Component root {
   }
 
 
+  ViewModelManager VM_manager ()
+  //ModelManager model_manager ()
+
   List lifetime_managers
   List models
+  List view_models
   List views
-  List viewmodels
 
   Int text_y(15)
   toolbox.add.click -> (root) {
-    Process model = ModelRect (root.models, "", 50, 50, 100, 70)
+    Process model = RectModel (root.models, "", 50, 50, 100, 70)
+    Process view_model = RectViewModel (root.view_models, "", model)
+
     Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
 
     Process gv = GraphicsView (root.views, "")
     GraphicsController (lifetime_manager.controllers, "", model, gv, root.f)
 
     Process tv = TextView (root.views, "", $root.text_y)
-    Process tvm = TextViewModel (root.viewmodels, "", tv)
+    Process tvm = TextViewModel (root.view_models, "", tv)
     TextController (lifetime_manager.controllers, "", model, tv, tvm)
     root.text_y += 15
   }
+  toolbox.add.click -> VM_manager.new_rectangle
 
   toolbox.del.click -> del_action:(root) {
     if (root.lifetime_managers.size > 0) {
@@ -76,4 +87,5 @@ Component root {
       notify root.lifetime_managers.[sz].about_to_delete
     }
   }
+  toolbox.del.click -> VM_manager.delete_rectangle
 }

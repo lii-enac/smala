@@ -131,17 +131,22 @@ original_exe := $(exe)
 exe := $(exe)$(EXE)
 exe := $(build_dir)/$(exe)
 
-default app: $(exe)
+default app: config_test $(exe)
 #.PHONY: default app
 
 ld_library_path := $(call join-with,:,$(ld_library_path))
 ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
-test: $(exe)
+config_test:
+	@if [ ! -f config.mk ]; then \
+		printf "\033[0;31m \n\n The config.mk file does not exist. Please run 'make config' to create it and configure it.\033[0m\n\n" ; exit 1 ; \
+	fi
+
+test: config_test $(exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
 dbg: $(exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
-.PHONY: test
+.PHONY: test config_test
 
 LD  = $(CXX)
 

@@ -27,7 +27,7 @@ TextView (Process _view_model, int _delta_y) {
 
   Text t_x (0, 15, "0")
   //x aka t_x.text
-  "X = " + vm.x =:> t_x.text
+  vm.x =:> t_x.text
 
   Text t_y (15, 15, "0")
   //y aka t_y.text

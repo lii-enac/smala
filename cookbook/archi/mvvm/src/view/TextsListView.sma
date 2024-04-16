@@ -25,15 +25,17 @@ TextsListView (Process _view_model_manager)
 {
   view_model_manager aka _view_model_manager
 
+  Translation pos (0, 0)
+  x aka pos.tx
+  y aka pos.ty
+
   Component bg {
     OutlineColor out_c (#000000)
-    OutlineWidth out_w (1)
+    OutlineWidth out_w (2)
     NoFill _
 
-    Rectangle r (0, 0, 100, 100)
+    Rectangle r (0, 0, 100, 100, 10, 10)
   }
-  x aka bg.r.x
-  y aka bg.r.y
   width aka bg.r.width
   height aka bg.r.height
 
@@ -44,17 +46,13 @@ TextsListView (Process _view_model_manager)
 
   Int delta_y (15)
 
-  // toolbox.add.click -> (root) {
-
-  //   Process tv = TextView (root.views, "", $root.text_y)
-
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$added)
     //view_model = getRef (&src)
     if (&view_model != null) {
-      print ("(TextsList)View view_models_list (avant): " + this.views_list.size + " Vs")
+      print ("(TextsList)View view_models_list added (avant): " + this.views_list.size + " Vs")
       Process view = TextView (this.views_list, "", view_model, $this.delta_y)
-      print ("(TextsList)View view_models_list (apres): " + this.views_list.size + " Vs")
+      print ("(TextsList)View view_models_list added (apres): " + this.views_list.size + " Vs")
 
       this.delta_y += 15
     }
@@ -64,14 +62,14 @@ TextsListView (Process _view_model_manager)
     view_model = getRef (&this.view_model_manager.view_models_list.$removed)
     //view_model = getRef (&src)
     if (&view_model != null) {
-      print ("VM models_list_removed (avant): " + this.views_list.size + " Vs")
+      print ("(TextsList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
       for view : this.views_list {
         if (&view.vm == &view_model) {
           delete view
           break
         }
       }
-      print ("VM models_list_removed (apres): " + this.views_list.size + " Vs")
+      print ("(TextsList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
     }
   }
 

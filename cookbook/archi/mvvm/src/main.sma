@@ -22,21 +22,17 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 
-import RectModel
-//import ModelManager
-
-import RectViewModel
 import ViewModelManager
 
-import TextsListView
-import RectanglesListView
+import view.TextsListView
+import view.RectanglesListView
 
-import GraphicsController
-import GraphicsView
-import TextController
-import TextView
-import TextViewModel
-import LifetimeManager
+// import GraphicsController
+// import GraphicsView
+// import TextController
+// import TextView
+// import TextViewModel
+// import LifetimeManager
 
 
 _main_
@@ -63,7 +59,6 @@ Component root {
   Int texts_list_width (250)
 
   ViewModelManager VM_manager ()
-  //ModelManager model_manager ()
 
   TextsListView texts_list_view (VM_manager)
   texts_list_width =: texts_list_view.width

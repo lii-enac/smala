@@ -18,7 +18,7 @@
 use core
 use base
 
-import RectModel
+import model.RectModel
 
 _define_
 ModelManager ()

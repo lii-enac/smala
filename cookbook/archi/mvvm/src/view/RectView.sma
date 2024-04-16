@@ -20,17 +20,19 @@ use base
 use gui
 
 _define_
-RectanglesListView (Process _view_model_manager)
-{ 
-  view_model_manager aka _view_model_manager
+RectView (Process _view_model) {
+  vm aka _view_model
 
-  OutlineColor out_c (#000000)
-  OutlineWidth out_w (1)
-  NoFill _
+  OutlineColor outline (Black)
+  OutlineWidth w (5)
+  
+  FillColor fill (Red)
 
-  Rectangle bg (0, 0, 100, 100)
-  x aka bg.x
-  y aka bg.y
-  width aka bg.width
-  height aka bg.height
+  Rectangle r (0, 0, 0, 0)
+
+  vm.x =:> r.x
+  vm.y =:> r.y
+  vm.width =:> r.width
+  vm.height =:> r.height
+
 }

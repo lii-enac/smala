@@ -19,7 +19,7 @@ use core
 use base
 
 import ModelManager
-import RectViewModel
+import view_model.RectViewModel
 
 _define_
 ViewModelManager ()

@@ -11,6 +11,8 @@
 *    
 *     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 *     Stephane Conversy <stephane.conversy@enac.fr>
+*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*
 */
 
 use core
@@ -18,16 +20,27 @@ use base
 use gui
 
 _define_
-TextView(int _ty) {
-  Translation pos (0, _ty)
+TextView (Process _view_model, int _delta_y) {
+  vm aka _view_model
+
+  Translation pos (10, _delta_y)
+
   Text t_x (0, 15, "0")
-  x aka t_x.text
+  //x aka t_x.text
+  "X = " + vm.x =:> t_x.text
+
   Text t_y (15, 15, "0")
-  y aka t_y.text
+  //y aka t_y.text
+  vm.y =:> t_y.text
+
   Text t_width (30, 15, "0")
-  width aka t_width.text
+  //width aka t_width.text
+  vm.width =:> t_width.text
+
   Text t_height (45, 15, "0")
-  height aka t_height.text
+  //height aka t_height.text
+  vm.height =:> t_height.text
+
   t_x.x + t_x.width + 5 =:> t_y.x
   t_y.x + t_y.width + 5 =:> t_width.x
   t_width.x + t_width.width + 5 =:> t_height.x

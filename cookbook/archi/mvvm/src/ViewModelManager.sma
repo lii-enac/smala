@@ -43,7 +43,7 @@ ViewModelManager ()
     if (&model != null) {
       print ("VM models_list_added (avant): " + this.view_models_list.size + " VMs")
       Process view_model = RectViewModel (this.view_models_list, "", model)
-      //view_model.is_selected
+      //view_model.is_selected ->
       print ("VM models_list_added (apres): " + this.view_models_list.size + " VMs")
     }
   }

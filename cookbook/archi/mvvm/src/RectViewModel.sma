@@ -23,6 +23,11 @@ _define_
 RectViewModel (Process _model) {
   model aka _model
 
+  Int x ($model.x)
+  Int y ($model.y)
+  Int width ($model.width)
+  Int height ($model.height)
+
   Bool is_presssed (false)
   Bool is_selected (false)
 

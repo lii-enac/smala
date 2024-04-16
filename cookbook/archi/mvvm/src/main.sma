@@ -11,6 +11,8 @@
 *    
 *     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 *     Stephane Conversy <stephane.conversy@enac.fr>
+*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*
 */
 
 use core
@@ -73,34 +75,34 @@ Component root {
   f.height =:> texts_list_view.height, rectangles_list_view.height
 
 
-  List lifetime_managers
-  List models
-  List view_models
-  List views
+  // List lifetime_managers
+  // List models
+  // List view_models
+  // List views
 
-  Int text_y(15)
-  toolbox.add.click -> (root) {
-    Process model = RectModel (root.models, "", 50, 50, 100, 70)
-    Process view_model = RectViewModel (root.view_models, "", model)
+  // Int text_y(15)
+  // toolbox.add.click -> (root) {
+  //   Process model = RectModel (root.models, "", 50, 50, 100, 70)
+  //   Process view_model = RectViewModel (root.view_models, "", model)
 
-    Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
+  //   Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
 
-    Process gv = GraphicsView (root.views, "")
-    GraphicsController (lifetime_manager.controllers, "", model, gv, root.f)
+  //   Process gv = GraphicsView (root.views, "")
+  //   GraphicsController (lifetime_manager.controllers, "", model, gv, root.f)
 
-    Process tv = TextView (root.views, "", $root.text_y)
-    Process tvm = TextViewModel (root.view_models, "", tv)
-    TextController (lifetime_manager.controllers, "", model, tv, tvm)
-    root.text_y += 15
-  }
+  //   Process tv = TextView (root.views, "", $root.text_y)
+  //   Process tvm = TextViewModel (root.view_models, "", tv)
+  //   TextController (lifetime_manager.controllers, "", model, tv, tvm)
+  //   root.text_y += 15
+  // }
   toolbox.add.click -> VM_manager.new_rectangle
 
-  toolbox.del.click -> del_action:(root) {
-    if (root.lifetime_managers.size > 0) {
-      int sz = root.lifetime_managers.size
-      notify root.lifetime_managers.[sz].about_to_delete
-    }
-  }
+  // toolbox.del.click -> del_action:(root) {
+  //   if (root.lifetime_managers.size > 0) {
+  //     int sz = root.lifetime_managers.size
+  //     notify root.lifetime_managers.[sz].about_to_delete
+  //   }
+  // }
   toolbox.del.click -> VM_manager.delete_rectangle
 
 }

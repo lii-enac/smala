@@ -23,16 +23,51 @@ _define_
 RectView (Process _view_model) {
   vm aka _view_model
 
-  OutlineColor outline (Black)
-  OutlineWidth w (5)
-  
-  FillColor fill (Red)
+  //TextPrinter tp
+
+  OutlineColor outline (#888888)
+  OutlineWidth w (10)
+
+  FillColor fill (#FF0000)
 
   Rectangle r (0, 0, 0, 0)
 
+  // update the view whenever the view model changes
   vm.x =:> r.x
   vm.y =:> r.y
   vm.width =:> r.width
   vm.height =:> r.height
+
+
+  Double off_x (0)
+  Double off_y (0)
+
+  FSM fsm {
+    State st_idle {
+      #FF0000 =: fill.value
+    }
+
+    State st_press {
+      #EE0000 =: fill.value
+
+      r.press.x - r.x =: off_x
+      r.press.y - r.y =: off_y
+      //"offset: " + off_x + " - " + off_y =: tp.input
+    }
+
+    State st_dragging {
+      #DD0000 =: fill.value
+
+      r.move.x - off_x =:> vm.x
+      r.move.y - off_y =:> vm.y
+      //"move: " + r.move.x + " - " + r.move.y =: tp.input
+    }
+
+    st_idle -> st_press (r.press)
+    st_press -> st_idle (r.release)
+    st_press -> st_dragging (r.move.x)
+    st_dragging -> st_idle (r.release)
+  }
+  
 
 }

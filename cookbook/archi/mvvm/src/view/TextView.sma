@@ -27,16 +27,26 @@ TextView (Process _view_model, int _delta_y) {
 
   Translation pos (10, _delta_y)
 
+  Component bg {
+    NoFill _
+    OutlineColor oc (#FFFFFF)
+    vm.is_presssed ? #FF0000 : #FFFFFF =:> oc.value
+    OutlineWidth w (2)
+    Rectangle bg (-5, 1, 150, 18)
+  }
+
+  FillColor _ (Black)
+
   Text t_x (0, 15, "0")
   //x aka t_x.text
 
-  Text t_y (15, 15, "0")
+  Text t_y (20, 15, "0")
   //y aka t_y.text
 
-  Text t_width (30, 15, "0")
+  Text t_width (40, 15, "0")
   //width aka t_width.text
 
-  Text t_height (45, 15, "0")
+  Text t_height (60, 15, "0")
   //height aka t_height.text
 
   // Layout

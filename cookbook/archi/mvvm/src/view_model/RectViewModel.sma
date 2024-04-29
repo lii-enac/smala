@@ -31,8 +31,8 @@ RectViewModel (Process _model) {
   Bool is_presssed (false)
   Bool is_selected (false)
 
-  Double surface_area (0)
-  _model.width * _model.height =:> surface_area
+  //Double surface_area (0)
+  //_model.width * _model.height =:> surface_area
 
   Spike close
 }

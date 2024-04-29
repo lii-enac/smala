@@ -45,10 +45,12 @@ RectView (Process _view_model) {
   FSM fsm {
     State st_idle {
       #FF0000 =: fill.value
+      0 =: vm.is_presssed
     }
 
     State st_press {
       #EE0000 =: fill.value
+      1 =: vm.is_presssed
 
       r.press.x - r.x =: off_x
       r.press.y - r.y =: off_y

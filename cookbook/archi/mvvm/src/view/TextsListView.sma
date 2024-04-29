@@ -44,7 +44,7 @@ TextsListView (Process _view_model_manager)
 
   List views_list
 
-  Int delta_y (15)
+  Int delta_y (20)
 
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$added)
@@ -54,7 +54,7 @@ TextsListView (Process _view_model_manager)
       Process view = TextView (this.views_list, "", view_model, $this.delta_y)
       print ("(TextsList)View view_models_list added (apres): " + this.views_list.size + " Vs")
 
-      this.delta_y += 15
+      this.delta_y += 20
     }
   }
 

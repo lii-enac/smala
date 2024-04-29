@@ -61,9 +61,28 @@ TextView (Process _view_model, int _delta_y) {
   vm.height =:> t_height.text
 
   // update view model from interactions on the view
-  vm.x + t_x.wheel.dy => vm.x
-  vm.y + t_y.wheel.dy => vm.y
-  vm.width + t_width.wheel.dy => vm.width
-  vm.height + t_height.wheel.dy => vm.height
+  // NOTE: the following code is commented because binding + assignment are executed
+  // when the view model is updated even if the mouse wheel has not changed !
+  // vm.x + t_x.wheel.dy => vm.x
+  // vm.y + t_y.wheel.dy => vm.y
+  // vm.width + t_width.wheel.dy => vm.width
+  // vm.height + t_height.wheel.dy => vm.height
+
+  // update view model from interactions on the view
+  t_x.wheel.dy -> {
+    vm.x + t_x.wheel.dy =: vm.x
+  }
+
+  t_y.wheel.dy -> {
+    vm.y + t_y.wheel.dy =: vm.y
+  }
+
+  t_width.wheel.dy -> {
+    vm.width + t_width.wheel.dy =: vm.width
+  }
+
+  t_height.wheel.dy -> {
+    vm.height + t_height.wheel.dy =: vm.height
+  }
   
 }

@@ -19,26 +19,31 @@ use core
 use base
 use gui
 
+import Handle
+
 _define_
-RectView (Process _view_model) {
+RectView (Process _view_model, Process _frame) {
   vm aka _view_model
 
   //TextPrinter tp
 
-  OutlineColor outline (#888888)
-  OutlineWidth w (10)
+  int BORDER = 10
 
   FillColor fill (#FF0000)
+
+  Translation pos (0, 0)
 
   Rectangle r (0, 0, 0, 0)
 
   // update the view whenever the view model changes
-  vm.x =:> r.x
-  vm.y =:> r.y
+  //vm.x =:> r.x
+  //vm.y =:> r.y
+  vm.x =:> pos.tx
+  vm.y =:> pos.ty
   vm.width =:> r.width
   vm.height =:> r.height
 
-
+  // Drag from center
   Double off_x (0)
   Double off_y (0)
 
@@ -52,8 +57,10 @@ RectView (Process _view_model) {
       #EE0000 =: fill.value
       1 =: vm.is_presssed
 
-      r.press.x - r.x =: off_x
-      r.press.y - r.y =: off_y
+      //r.press.x - r.x =: off_x
+      //r.press.y - r.y =: off_y
+      r.press.x - pos.tx =: off_x
+      r.press.y - pos.ty =: off_y
       //"offset: " + off_x + " - " + off_y =: tp.input
     }
 
@@ -68,8 +75,47 @@ RectView (Process _view_model) {
     st_idle -> st_press (r.press)
     st_press -> st_idle (r.release)
     st_press -> st_dragging (r.move.x)
+    //st_press -> st_dragging (r.move.y)
     st_dragging -> st_idle (r.release)
   }
   
+  // Drag with handles on borders
+  Handle left (_frame, 0, BORDER, BORDER, 0)
+  Handle top (_frame, BORDER, 0, 0, BORDER)
+  Handle right (_frame, 0, BORDER, BORDER, 0)
+  Handle bottom (_frame, BORDER, 0, 0, BORDER)
+
+  // Update layout of handles
+  vm.height - (2 * BORDER) =:> left.height, right.height
+  vm.width - (2 * BORDER) =:> top.width, bottom.width  
+  vm.width - BORDER =:> right.x
+  vm.height - BORDER =:> bottom.y
+
+
+  // update view model from interactions on the view
+
+  // left.d_x -> {
+  //   vm.x + left.d_x =?: vm.x
+  //   vm.width - left.d_x =?: vm.width
+  // }
+  left.d_x +=> vm.x
+  -left.d_x +=> vm.width
+
+  // top.d_y -> {
+  //   vm.y + top.d_y =?: vm.y
+  //   vm.height - top.d_y =?: vm.height
+  // }
+  top.d_y +=> vm.y
+  -top.d_y +=> vm.height
+
+  // right.d_x -> {
+  //   vm.width + right.d_x =?: vm.width
+  // }
+  right.d_x +=> vm.width
+
+  // bottom.d_y -> {
+  //   vm.height + bottom.d_y =?: vm.height
+  // }
+  bottom.d_y +=> vm.height
 
 }

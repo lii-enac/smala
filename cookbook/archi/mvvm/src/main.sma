@@ -63,7 +63,7 @@ Component root {
   TextsListView texts_list_view (VM_manager)
   texts_list_width =: texts_list_view.width
 
-  RectanglesListView rectangles_list_view (VM_manager)
+  RectanglesListView rectangles_list_view (VM_manager, f)
   texts_list_width + 4 =: rectangles_list_view.x
   f.width - rectangles_list_view.x =:> rectangles_list_view.width
 

@@ -22,9 +22,10 @@ use gui
 import RectView
 
 _define_
-RectanglesListView (Process _view_model_manager)
+RectanglesListView (Process _view_model_manager, Process _frame)
 { 
   view_model_manager aka _view_model_manager
+  frame aka _frame
 
   Translation pos (0, 0)
   x aka pos.tx
@@ -47,7 +48,7 @@ RectanglesListView (Process _view_model_manager)
     //view_model = getRef (&src)
     if (&view_model != null) {
       print ("(RectanglesList)View view_models_list added (avant): " + this.views_list.size + " Vs")
-      Process view = RectView (this.views_list, "", view_model)
+      Process view = RectView (this.views_list, "", view_model, this.frame)
       print ("(RectanglesList)View view_models_list added (apres): " + this.views_list.size + " Vs")
     }
   }

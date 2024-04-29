@@ -20,8 +20,15 @@ use gui
 _define_
 RectModel (int _x, int _y, int _w, int _h)
 {
+  TextPrinter tp
+
   Int x (_x)
   Int y (_y)
   Int width (_w)
   Int height (_h)
+
+  Double surface_area (0)
+  width * height =:> surface_area
+
+  //"Model: surface area = " + surface_area =:> tp.input
 }

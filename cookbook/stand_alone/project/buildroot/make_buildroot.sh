@@ -56,6 +56,9 @@ error_echo() {
     echo -e "${RED}$1${NC}"
 }
 
+check_branch_clone() {
+    git ls-remote --exit-code --heads ${LII_GIT_URL} "$1" &>/dev/null
+}
 
 # ----- Functions
 check_and_clone() {
@@ -78,11 +81,23 @@ check_and_clone() {
             echo "the branch $PACKAGE_BRANCH exist"
         fi
     else
-        git clone -b "$LII_GIT_BRANCH" --depth 1 $LII_GIT_URL ${BUILDROOT_DIR}
-        echo "Clone lii_buildroot_$BOARD"
-        cd ${BUILDROOT_DIR}
-        echo "Create $PACKAGE_BRANCH branch"
-        git checkout -b $PACKAGE_BRANCH
+        # le repertoire lii_buildroot_{BOARD} n'existe pas on essai de clone 
+        # si la branche existe deja on la recupere
+        # sinon on en creer une nouvelle depuis LII_GIT_BRANCH
+        if check_branch_clone ${PACKAGE_BRANCH}; then
+            COMMANDE="git clone -b "$PACKAGE_BRANCH" $LII_GIT_URL ${BUILDROOT_DIR}"
+            info_echo "${COMMANDE}"
+            ${COMMANDE}
+            warning_echo "Clone lii_buildroot_$BOARD/${PACKAGE_BRANCH}"
+        else
+            COMMANDE="git clone -b "$LII_GIT_BRANCH" $LII_GIT_URL ${BUILDROOT_DIR}"
+            info_echo "${COMMANDE}"
+            ${COMMANDE}
+            warning_echo "Clone lii_buildroot_$BOARD"
+            cd ${BUILDROOT_DIR}
+            warning_echo "Create $PACKAGE_BRANCH new branch"
+            git checkout -b $PACKAGE_BRANCH
+        fi
     fi
 }
 

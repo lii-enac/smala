@@ -24,7 +24,6 @@ _define_
 ModelManager ()
 {
   List models_list
-  //ProcessCollector models_list
 
   Spike add_new_rectangle
   Spike delete_last_rectangle

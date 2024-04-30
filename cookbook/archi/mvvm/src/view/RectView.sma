@@ -19,6 +19,7 @@ use core
 use base
 use gui
 
+import gui.widgets.StandAlonePushButton
 import Handle
 
 _define_
@@ -67,6 +68,7 @@ RectView (Process _view_model, Process _frame) {
     State st_dragging {
       #DD0000 =: fill.value
 
+      // update view model from interactions on the view
       r.move.x - off_x =:> vm.x
       r.move.y - off_y =:> vm.y
       //"move: " + r.move.x + " - " + r.move.y =: tp.input
@@ -89,6 +91,11 @@ RectView (Process _view_model, Process _frame) {
   Handle top_right (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
   Handle bottom_right (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
   Handle bottom_left (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
+
+  StandAlonePushButton btn_close ("x", 0, -23)
+  vm.width - 2 =:> btn_close.x
+  btn_close.click -> vm.close
+
 
   // Update layout of handles
   vm.height - (2 * BORDER) =:> left.height, right.height

@@ -21,16 +21,28 @@ use base
 import ModelManager
 import view_model.RectViewModel
 
+
+_action_
+action_close_rectangle (Process src, Process self)
+{
+  view_model = find (&src, "..")
+  if (&view_model != null) {
+    // Could be done in ModelManager
+    // Only remove from list
+    remove view_model.model from self.model_manager.models_list
+  }
+}
+
+
 _define_
 ViewModelManager ()
 {
   List view_models_list
-  //ProcessCollector view_models_list
 
   Ref view_model_to_delete (null)
   Ref model_to_delete (null)
 
-  Ref selected_VM (null)
+  //Ref selected_VM (null)
 
   ModelManager model_manager ()
 
@@ -41,6 +53,9 @@ ViewModelManager ()
 
   delete_rectangle -> model_manager.delete_last_rectangle
 
+  NativeAction na_close_rectangle (action_close_rectangle, this, 1)
+
+
   // When a model is added to the list
   model_manager.models_list.$added -> na_models_list_added:(this) {
     model = getRef (&this.model_manager.models_list.$added)
@@ -48,7 +63,12 @@ ViewModelManager ()
     if (&model != null) {
       print ("VM models_list_added (avant): " + this.view_models_list.size + " VMs")
       Process view_model = RectViewModel (this.view_models_list, "", model)
-      //view_model.is_selected ->
+
+      addChildrenTo this {
+        //view_model.is_selected -> ...
+        //view_model.close -> this.na_close_rectangle
+        this.view_models_list.[this.view_models_list.size].close -> this.na_close_rectangle
+      }
       print ("VM models_list_added (apres): " + this.view_models_list.size + " VMs")
     }
   }

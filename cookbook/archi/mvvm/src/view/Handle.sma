@@ -18,8 +18,9 @@ use base
 use gui
 
 _define_
-Handle (Process _frame, double _x, double _y, double _width, double _height) {
+Handle (Process _frame, Process _is_pressed, double _x, double _y, double _width, double _height) {
   frame aka _frame
+  is_pressed aka _is_pressed
 
   TextPrinter tp
 
@@ -43,12 +44,12 @@ Handle (Process _frame, double _x, double _y, double _width, double _height) {
   FSM fsm {
     State st_idle {
       #888888 =: fill.value
-      //0 =: vm.is_presssed
+      0 =: _is_pressed
     }
 
     State st_press {
       #666666 =: fill.value
-      //1 =: vm.is_presssed
+      1 =: _is_pressed
 
       r.press.x =: previous_move_x
       r.press.y =: previous_move_y

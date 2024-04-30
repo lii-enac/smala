@@ -80,42 +80,49 @@ RectView (Process _view_model, Process _frame) {
   }
   
   // Drag with handles on borders
-  Handle left (_frame, 0, BORDER, BORDER, 0)
-  Handle top (_frame, BORDER, 0, 0, BORDER)
-  Handle right (_frame, 0, BORDER, BORDER, 0)
-  Handle bottom (_frame, BORDER, 0, 0, BORDER)
+  Handle left (_frame, vm.is_presssed, 0, BORDER, BORDER, 0)
+  Handle top (_frame, vm.is_presssed, BORDER, 0, 0, BORDER)
+  Handle right (_frame, vm.is_presssed, 0, BORDER, BORDER, 0)
+  Handle bottom (_frame, vm.is_presssed, BORDER, 0, 0, BORDER)
+
+  Handle top_left (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
+  Handle top_right (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
+  Handle bottom_right (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
+  Handle bottom_left (_frame, vm.is_presssed, 0, 0, BORDER, BORDER)
 
   // Update layout of handles
   vm.height - (2 * BORDER) =:> left.height, right.height
-  vm.width - (2 * BORDER) =:> top.width, bottom.width  
-  vm.width - BORDER =:> right.x
-  vm.height - BORDER =:> bottom.y
+  vm.width - (2 * BORDER) =:> top.width, bottom.width
+  vm.width - BORDER =:> right.x, bottom_right.x, top_right.x
+  vm.height - BORDER =:> bottom.y, bottom_right.y, bottom_left.y
 
 
   // update view model from interactions on the view
 
-  // left.d_x -> {
-  //   vm.x + left.d_x =?: vm.x
-  //   vm.width - left.d_x =?: vm.width
-  // }
   left.d_x +=> vm.x
   -left.d_x +=> vm.width
 
-  // top.d_y -> {
-  //   vm.y + top.d_y =?: vm.y
-  //   vm.height - top.d_y =?: vm.height
-  // }
   top.d_y +=> vm.y
   -top.d_y +=> vm.height
 
-  // right.d_x -> {
-  //   vm.width + right.d_x =?: vm.width
-  // }
   right.d_x +=> vm.width
 
-  // bottom.d_y -> {
-  //   vm.height + bottom.d_y =?: vm.height
-  // }
   bottom.d_y +=> vm.height
+
+  top_left.d_x +=> vm.x
+  -top_left.d_x +=> vm.width
+  top_left.d_y +=> vm.y
+  -top_left.d_y +=> vm.height
+
+  top_right.d_y +=> vm.y
+  -top_right.d_y +=> vm.height
+  top_right.d_x +=> vm.width
+
+  bottom_right.d_x +=> vm.width
+  bottom_right.d_y +=> vm.height
+
+  bottom_left.d_x +=> vm.x
+  -bottom_left.d_x +=> vm.width
+  bottom_left.d_y +=> vm.height
 
 }

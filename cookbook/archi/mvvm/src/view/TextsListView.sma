@@ -20,6 +20,7 @@ use base
 
 import TextView
 
+
 _define_
 TextsListView (Process _view_model_manager)
 {
@@ -46,6 +47,7 @@ TextsListView (Process _view_model_manager)
 
   Int delta_y (20)
 
+  // When a view model is added to the list
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$added)
     //view_model = getRef (&src)
@@ -58,6 +60,7 @@ TextsListView (Process _view_model_manager)
     }
   }
 
+  // When a view model is removed from the list
   view_model_manager.view_models_list.$removed -> na_view_models_list_removed:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$removed)
     //view_model = getRef (&src)
@@ -65,6 +68,7 @@ TextsListView (Process _view_model_manager)
       print ("(TextsList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
       for view : this.views_list {
         if (&view.vm == &view_model) {
+          // Delete the view (and free memory)
           delete view
           break
         }

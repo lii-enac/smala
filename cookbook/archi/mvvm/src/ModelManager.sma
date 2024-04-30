@@ -23,7 +23,6 @@ import model.RectModel
 _define_
 ModelManager ()
 {
-  //Incr incr (0)
   List models_list
   //ProcessCollector models_list
 
@@ -40,7 +39,15 @@ ModelManager ()
     print ("M delete_last_rectangle (avant) " + this.models_list.size + " models")
     if (this.models_list.size > 0) {
       int size = getInt (this.models_list.size)
-      delete this.models_list.[size]
+
+      Process model = &this.models_list.[size]
+
+      // We cannot delete the model yet
+      // Provoke crash (djnn - WARNING: "" -  CouplingProcess::~CouplingProcess - height - _vertex is NOT NULL and it should)
+      //delete model
+
+      // Only remove from list
+      remove model from this.models_list
     }
     print ("M delete_last_rectangle (apres) " + this.models_list.size + " models")
   }

@@ -21,6 +21,7 @@ use gui
 
 import RectView
 
+
 _define_
 RectanglesListView (Process _view_model_manager, Process _frame)
 { 
@@ -43,6 +44,7 @@ RectanglesListView (Process _view_model_manager, Process _frame)
 
   List views_list
 
+  // When a view model is added to the list
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$added)
     //view_model = getRef (&src)
@@ -53,6 +55,7 @@ RectanglesListView (Process _view_model_manager, Process _frame)
     }
   }
 
+  // When a view model is removed from the list
   view_model_manager.view_models_list.$removed -> na_view_models_list_removed:(this) {
     view_model = getRef (&this.view_model_manager.view_models_list.$removed)
     //view_model = getRef (&src)
@@ -60,6 +63,7 @@ RectanglesListView (Process _view_model_manager, Process _frame)
       print ("(RectanglesList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
       for view : this.views_list {
         if (&view.vm == &view_model) {
+          // Delete the view (and free memory)
           delete view
           break
         }

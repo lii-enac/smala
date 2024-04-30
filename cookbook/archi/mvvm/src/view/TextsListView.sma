@@ -74,6 +74,13 @@ TextsListView (Process _view_model_manager)
         }
       }
       print ("(TextsList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
+
+      // Reset y of remaining views
+      this.delta_y = 20
+      for view : this.views_list {
+        view.y = this.delta_y
+        this.delta_y += 20
+      }
     }
   }
 

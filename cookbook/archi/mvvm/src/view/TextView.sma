@@ -26,6 +26,7 @@ TextView (Process _view_model, int _delta_y) {
   //TextPrinter tp
 
   Translation pos (10, _delta_y)
+  y aka pos.ty
 
   Component bg {
     NoFill _

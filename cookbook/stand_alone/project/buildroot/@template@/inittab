@@ -37,7 +37,8 @@ tty1::once:/root/launch_@template@.sh
 
 
 # Stuff to do for the 3-finger salute
-::ctrlaltdel:/sbin/reboot
+#::ctrlaltdel:/sbin/reboot
+::ctrlaltdel:/usr/bin/ka  #kill our app if necesseray
 
 # Stuff to do before rebooting
 ::shutdown:/etc/init.d/rcK

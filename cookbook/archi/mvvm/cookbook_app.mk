@@ -9,10 +9,10 @@
 #   Contributors:
 #     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #     Stephane Conversy <stephane.conversy@enac.fr>
+#     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
 #
 
 
-# src/LifetimeManager.o src/GraphicsView.o src/TextView.o src/TextViewModel.o src/GraphicsController.o src/TextController.o
 objs_cookbook_app :=  src/model/RectModel.o src/ModelManager.o \
  					src/view_model/RectViewModel.o src/ViewModelManager.o \
 					src/view/TextView.o src/view/TextsListView.o \

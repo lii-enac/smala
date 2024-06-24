@@ -11,8 +11,6 @@
 *    
 *     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 *     Stephane Conversy <stephane.conversy@enac.fr>
-*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
-*
 */
 
 use core
@@ -22,10 +20,13 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 
-import ViewModelManager
-
-import view.TextsListView
-import view.RectanglesListView
+import RectModel
+import GraphicsController
+import GraphicsView
+import TextController
+import TextView
+import TextViewModel
+import LifetimeManager
 
 
 _main_
@@ -40,7 +41,6 @@ Component root {
 
   mouseTracking = 1 // for wheel events
 
-  //_DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 2
 
   Component toolbox {
     Translation pos_buttons(10,0)
@@ -50,24 +50,30 @@ Component root {
     add.x + add.width + 10 =:> del.x
   }
 
-  Int texts_list_width (250)
 
-  ViewModelManager VM_manager ()
+  List lifetime_managers
+  List models
+  List views
+  List viewmodels
 
-  // View for list of texts
-  TextsListView texts_list_view (VM_manager)
-  texts_list_width =: texts_list_view.width
+  Int text_y(15)
+  toolbox.add.click -> (root) {
+    Process model = ModelRect (root.models, "", 50, 50, 100, 70)
+    Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
 
-  // View for list of rectangles
-  RectanglesListView rectangles_list_view (VM_manager, f)
-  texts_list_width + 4 =: rectangles_list_view.x
-  f.width - rectangles_list_view.x =:> rectangles_list_view.width
+    Process gv = GraphicsView (root.views, "")
+    GraphicsController (lifetime_manager.controllers, "", model, gv, root.f)
 
-  f.height =:> texts_list_view.height, rectangles_list_view.height
+    Process tv = TextView (root.views, "", $root.text_y)
+    Process tvm = TextViewModel (root.viewmodels, "", tv)
+    TextController (lifetime_manager.controllers, "", model, tv, tvm)
+    root.text_y += 15
+  }
 
-
-  toolbox.add.click -> VM_manager.new_rectangle
-
-  toolbox.del.click -> VM_manager.delete_rectangle
-
+  toolbox.del.click -> del_action:(root) {
+    if (root.lifetime_managers.size > 0) {
+      int sz = root.lifetime_managers.size
+      notify root.lifetime_managers.[sz].about_to_delete
+    }
+  }
 }

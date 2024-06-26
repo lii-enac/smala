@@ -12,6 +12,6 @@
 #		Mathieu Poirier <mathieu.poirier@enac.fr>
 #
 
-objs_cookbook_app := PanAndZoom.o main3.o
+objs_cookbook_app := PanAndZoom.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 #smala_libs_cookbook_app := smala

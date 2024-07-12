@@ -6,6 +6,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : <https://github.com/lii-enac/djnn-cpp>
 
+## [1.21.0] - 2024-07-15
+
+### compliant with djnn-cpp [1.21.0]
+
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+
+    - Layer Rotation: Added rotation support to the Layer recipe in the cookbook.
+    - Layer Customization: Introduced layer_custom to explain how to customize Layer for specific cases.
+    - MVVM Pattern: Introduced a new version of the MVVM pattern with detailed examples.
+    - Buildroot: Added a README for using buildroot in standalone projects.
+
+### Added
+
+    - Cookbook Enhancements:
+        - Implemented new recipe for MVVM.
+        - Added a recipe "ivyDie" to send Ivy's send_die message and modified helloIvy recipe to respond to Ivy's die message.
+        - MVC recipe: Improved the MVC code example by adding separate controllers and renaming variables for clarity.
+        
+    - Standalone Project:
+        - Improved scripts for buildroot and added better user alerts.
+        - Added a CtrlAllSupp script to kill the app executing KA command.
+
+    - Editor Modes: Added the keyword "setRef" to the editor modes.
+
+### Changed
+
+    - Build Scripts: Improved Linux compilation process and fixed typos in various scripts.
+    - Makefile Updates:
+        - Enhanced support for cross-compilation and older compilers.
+        - Improved handling of multiple directories in ld_library_path.
+        - Renamed CXXFLAGS to DJNN_CXXFLAGS for cross-compilation use.
+        - Made smalac independent of config.mk.
+
+### Removed
+
+    - Removed unused classes and attic code from the MVC example.
+
+### Fixed
+
+    - Compilation Issues:
+        - Fixed various compilation issues on Linux/Windows platforms.
+        - Corrected z-order issues in the library.
+        - Addressed typo errors in pkgdeps.mk.
+        - Fixed the use of remove child "from" parent and added it to the Smala VSCode syntax.
+
+    - MVVM and MVC Patterns:
+        - Resolved issues related to view and model updates.
+        - Fixed interaction bugs in the MVC example, including border interactions and selection interaction.
+
+    - Cookbook Fixes:
+        - Corrected compilation errors in the SVG and keyboard color examples.
+        - Fixed picking view in the MDPC example.
+        - Updated transition syntax in the PAC and MVC examples.
+
 ## [1.20.0] - 2023-10-10
 
 ### compliant with djnn-cpp [1.20.0]

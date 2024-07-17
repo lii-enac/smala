@@ -24,6 +24,7 @@ import PanAndZoom
 
 _main_
 Component root {
+
   Frame frame ("layer", 0, 0, 600, 600)
   Exit ex (0, 1)
   frame.close -> ex
@@ -51,10 +52,12 @@ Component root {
 
   Switch sw_control_dy (false) {
     Component true{
-      frame.wheel.dy/100. +=> rot.a
+      frame.wheel.dy/100 +=> rot.a  // macOS
+      // frame.wheel.dy +=> rot.a      // Linux adn windows
     }
     Component false {
-      frame.wheel.dy => fakedy
+      frame.wheel.dy => fakedy  // macOS
+      // frame.wheel.dy * 4 => fakedy  // Linux and Windows
     }
   }
   is_control_key =:> sw_control_dy.state

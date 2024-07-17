@@ -68,7 +68,7 @@ djnn_ldflags = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
 djnn_ldlibs = $(shell pkg-config $(djnn-pkgconf) --libs-only-l)
 djnn_libs = $(shell pkg-config $(djnn-pkgconf) --libs)
 djnn_lib_path = $(shell pkg-config $(djnn-pkgconf) --libs-only-L)
-djnn_lib_path = $(subst -L, , $(djnn_lib_path))
+djnn_lib_path := $(subst -L, , $(djnn_lib_path))
 djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 endif
 endif

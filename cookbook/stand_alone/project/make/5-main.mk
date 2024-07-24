@@ -128,10 +128,9 @@ LDFLAGS += $(EMFLAGS) \
 endif
 
 original_exe := $(exe)
-exe := $(exe)$(EXE)
-exe := $(build_dir)/$(exe)
+full_exe = $(build_dir)/$(exe)$(EXE)
 
-default app: config_test $(exe)
+default app: config_test $(full_exe)
 #.PHONY: default app
 
 ld_library_path := $(call join-with,:,$(ld_library_path))
@@ -143,23 +142,23 @@ config_test:
 	fi
 
 test: config_test $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(full_exe)")
 dbg: $(exe)
-	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(exe)")
+	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(full_exe)")
 .PHONY: test config_test
 
 LD  = $(CXX)
 
-objs_sma := $(srcs_sma:.sma=.o)
-objs_sma := $(addprefix $(build_dir)/,$(objs_sma))
-srcs_other_cpp := $(filter %.cpp,$(srcs_other))
-srcs_other_c := $(filter %.c,$(srcs_other))
-objs_other := $(srcs_other_cpp:.cpp=.o) $(srcs_other_c:.c=.o)
-objs_other := $(addprefix $(build_dir)/,$(objs_other))
+objs_sma_ = $(srcs_sma:.sma=.o)
+objs_sma = $(addprefix $(build_dir)/,$(objs_sma_))
+srcs_other_cpp = $(filter %.cpp,$(srcs_other))
+srcs_other_c = $(filter %.c,$(srcs_other))
+objs_other_ = $(srcs_other_cpp:.cpp=.o) $(srcs_other_c:.c=.o)
+objs_other = $(addprefix $(build_dir)/,$(objs_other_))
 
 objs += $(objs_sma) $(objs_other)
 
-gen_srcs := $(objs_sma:.o=.cpp)
+gen_srcs = $(objs_sma:.o=.cpp)
 #$(objs_sma): $(gen_srcs) # this forces the right language to compile the generated sources, but it will rebuild all sma files
 
 

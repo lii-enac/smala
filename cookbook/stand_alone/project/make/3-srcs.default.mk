@@ -7,12 +7,12 @@ exe ?= helloworld
 original_exe := $(exe)
 
 # smala sources
-srcs_sma := $(shell find $(src_dir) -name "*.sma")
+srcs_sma ?= $(shell find $(src_dir) -name "*.sma")
 # or 
 # srcs_sma ?= src/main.sma
 
 # native sources
-srcs_other := $(shell find $(src_dir) -name "*.cpp")
+srcs_other ?= $(shell find $(src_dir) -name "*.cpp")
 # or
 # srcs_other ?=
 

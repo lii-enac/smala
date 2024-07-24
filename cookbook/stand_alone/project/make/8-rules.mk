@@ -3,11 +3,11 @@
 
 $(objs): DJNN_CXXFLAGS += $(CXXFLAGS_CFG) $(djnn_cflags) $(smala_cflags) -I$(src_dir) -I$(build_dir)/$(src_dir)
 	
-$(exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
-$(exe): LIBS += $(app_libs)
+$(full_exe): LDFLAGS += $(djnn_ldflags) $(smala_ldflags)
+$(full_exe): LIBS += $(app_libs)
 
 
-$(exe): $(objs)
+$(full_exe): $(objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
 	$(CXXLD) $^ -o $@ $(LDFLAGS) $(LIBS)

@@ -160,7 +160,6 @@ Component root {
   Translation t(0,0)
   Circle _(0,0, 50)
 
-  // Clock cl(2000)
   AssignmentSequence do_translate(1) {
     10 + l.bg.t.tx =: l.bg.t.tx
   }

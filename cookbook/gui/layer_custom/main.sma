@@ -2,14 +2,12 @@
 *  djnn Smala compiler
 *
 *  The copyright holders for the contents of this file are:
-*    Ecole Nationale de l'Aviation Civile, France (2020-2021)
+*    Ecole Nationale de l'Aviation Civile, France (2024)
 *  See file "license.terms" for the rights and conditions
 *  defined by copyright holders.
 *
 *
 *  Contributors:
-*    
-*     Stephane Conversy <stephane.conversy@enac.fr>
 *     Mathieu Poirier <mathieu.poirier@enac.fr>
 */
 
@@ -18,7 +16,6 @@ use base
 use display
 use gui
 
-//import gui.interactors.PanAndZoom
 import PanAndZoom
 
 
@@ -28,10 +25,6 @@ Component root {
   Frame frame ("layer", 0, 0, 600, 600)
   Exit ex (0, 1)
   frame.close -> ex
-  // 255 =: frame.background_color.r
-  // 255 =: frame.background_color.g
-  // 255 =: frame.background_color.b
-
   Int fakedy (0)
 
   Bool is_control_key (0)
@@ -39,10 +32,6 @@ Component root {
   GenericKeyboard.key\-released == DJN_Key_Control -> { 0 =: is_control_key }
 
   PanAndZoom pz (frame.move, frame.press, frame.release, fakedy)
-
-  
-  //Image _("mire.png", 1,1, -1,-1)
-  //Image _("parrot.png", 1,10, -1,-1)
 
   Scaling zoom (1,1, 0,0)
   Translation translate (0,0)
@@ -186,13 +175,6 @@ Component root {
         idle -> waiting (do_damage)
         waiting -> idle (waiting.t.end)
       }
-
-
-      //debug
-      // bg.damaged -> (root) {
-      //   print ("==> layer is damaged")
-      // }
-
  }
   FillColor _ (Pink)
   Translation t(0,0)

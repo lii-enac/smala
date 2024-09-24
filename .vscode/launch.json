@@ -23,7 +23,7 @@
         //"program": "${workspaceFolder}/build/cookbook/gui/layer/layer_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/fitts_law/fitts_law_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/dynamic_rectangle/dynamic_rectangle_app",
-        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/zoom/simple_zoom/simple_zoom_app",
+        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/multi_touch/multi_touch_app",
         //"program": "${workspaceFolder}/build/cookbook/gui/chat/chat_app",
         "args": ["\"\""],
         //"stopOnEntry": true,

@@ -9,7 +9,8 @@
 #  	Contributors:
 #  		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #  		Stephane Conversy <stephane.conversy@enac.fr>
+#		Mathieu Poirier <mathieu.poirier@enac.fr>
 #
 
-objs_cookbook_app := multi_touch.o
+objs_cookbook_app := FingerView.o multi_touch.o
 djnn_libs_cookbook_app := gui display base exec_env core 

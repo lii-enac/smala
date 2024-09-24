@@ -40,6 +40,16 @@ You can use several option to debug on smala :
 
   _DEBUG_NO_TOUCH_EVENT = 0|1
 
+## enable stress test
+
+## In graph execution, the vector of edges is not used continuously
+
+## - option 1: The vector is re-shuffled
+
+## - option 2: The vector is reversed
+
+  _DEBUG_ENABLE_STRESS_TEST = 0|1|2
+
 ## example
 
 _main_

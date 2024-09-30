@@ -9,31 +9,23 @@ Component root
   //activate touches
   _DEBUG_NO_TOUCH_EVENT = 0
 
-	Frame f ("my frame", 0, 0, 1000, 1000)
+	Frame f ("Multitouch rrr", 0, 0, 1000, 1000)
   Exit ex (0, 1)
   f.close -> ex
-	FillColor fc(255,0,0)
-  OutlineColor _(0,0,255)
+	
+  OutlineColor _(0,255,255)
 
-  Component tt {
+  Component rrr_rectangle1 {
     Homography h
-    for (int i = 0; i < 15; i++) {
-      Line _ (400, i * 10 + 400, 550, i * 10 + 400)
-      Line _ (i*10 + 400, 400, i*10 + 400, 550)
-    }
-    NoFill _
+    FillColor _ (255, 0, 0)
     Rectangle r (400, 400, 150, 150, 0, 0)
   }
 
-  Component tt2 {
+  Component rrr_rectangle2 {
     Homography h
-    for (int i = 0; i < 15; i++) {
-      Line _ (0, i * 10, 150, i * 10)
-      Line _ (i*10, 0, i*10, 150)
-    }
-    NoFill _
+    FillColor _ (0, 255, 0)
     Rectangle r (0, 0, 150, 150, 0, 0)
   }
-  ScaleRotateTranslate _ (tt.r, tt.h)
-  ScaleRotateTranslate _ (tt2.r, tt2.h)
+  ScaleRotateTranslate _ (rrr_rectangle1.r, rrr_rectangle1.h)
+  ScaleRotateTranslate _ (rrr_rectangle2.r, rrr_rectangle2.h)
 }

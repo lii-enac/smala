@@ -22,6 +22,13 @@ use gui
 
 import FingerView
 
+/* ----- howto deactivate Gesture recogintion
+*  Linux:
+*  - wget "https://extensions.gnome.org/extension-data/disable-gestures-2021verycrazydog.gmail.com.v4.shell-extension.zip"
+*  - gnome-extensions install disable-gestures-2021verycrazydog.gmail.com.v4.shell-extension.zip
+*  - Log out of your session and log back in
+*/
+
 _main_
 Component root
 {

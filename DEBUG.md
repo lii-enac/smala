@@ -36,9 +36,9 @@ You can use several option to debug on smala :
 
   _DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 0|1|2
 
-## disable touch event  (especially for macos trackpad)
+## Enable touch events (they are disabled by default because macOS trackpad events are not well managed and can disrupt development and usability).
 
-  _DEBUG_NO_TOUCH_EVENT = 0|1
+  _ENABLE_TOUCHES = 1|0
 
 ## enable stress test
 

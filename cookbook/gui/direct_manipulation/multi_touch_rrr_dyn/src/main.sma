@@ -24,7 +24,7 @@ _main_
 Component root
 {
   //activate touches
-  _DEBUG_NO_TOUCH_EVENT = 0
+  _ENABLE_TOUCHES = 1
   
   Frame frame ("Multitouch Drag", 0, 1000, 1000, 1000)
   Exit ex (0, 1)

@@ -33,7 +33,7 @@ _main_
 Component root
 {
   //activate touches
-  _DEBUG_NO_TOUCH_EVENT = 0
+  _ENABLE_TOUCHES = 1
 
   Frame f ("multi_touch", 0, 0, 900, 1000)
   Exit ex (0, 1)

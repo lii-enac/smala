@@ -27,6 +27,7 @@ import FingerView
 *  - wget "https://extensions.gnome.org/extension-data/disable-gestures-2021verycrazydog.gmail.com.v4.shell-extension.zip"
 *  - gnome-extensions install disable-gestures-2021verycrazydog.gmail.com.v4.shell-extension.zip
 *  - Log out of your session and log back in
+*  - (sometimes it also needs : gnome-extensions enable disable-gestures-2021@verycrazydog.gmail.com)
 */
 
 _main_

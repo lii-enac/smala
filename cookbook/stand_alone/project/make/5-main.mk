@@ -17,7 +17,7 @@ endif
 endif
 
 ifneq ($(smala-pkgconf),)
-#smalac := "should be in /usr/(local)/bin"
+smalac := smalac #"should be in /usr/(local)/bin"
 pkge := $(shell pkg-config $(smala-pkgconf) --exists; echo $$?)
 ifeq ($(pkge),0)
 smala_cflags := $(shell pkg-config $(smala-pkgconf) --cflags)

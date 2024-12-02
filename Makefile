@@ -655,6 +655,11 @@ else
 # pkg install (brew, deb, arch)
 smala_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
 pkg_config_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
+ifeq ($(os),Linux)
+sed_pkg_config_install_prefix := /usr
+else
+sed_pkg_config_install_prefix := pkg_config_install_prefix
+endif
 endif
 
 pkgconfig_targets = smala-dev.pc smala.pc
@@ -664,7 +669,7 @@ pkgconf: $(pkgconfig_targets)
 
 $(build_dir)/%.pc: distrib/%.pc.in
 	@mkdir -p $(dir $@)
-	@sed -e 's,@PREFIX@,$(pkg_config_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
+	@sed -e 's,@PREFIX@,$(sed_pkg_config_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' $< > $@
 
 
 # -----------
@@ -757,7 +762,7 @@ install_brew: djnn_include_path_only = $(subst -I, , $(djnn_cflags))
 deb_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2)
 deb_prefix = $(deb_prefix_version)/usr
 deb:
-	make -j6  install PREFIX=$(deb_prefix)
+	make -j6 install PREFIX=$(deb_prefix)
 	test -d $(deb_prefix_version)/DEBIAN || mkdir -p $(deb_prefix_version)/DEBIAN
 	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2),' distrib/deb/control > $(deb_prefix_version)/DEBIAN/control
 # cp triggers file
@@ -776,7 +781,7 @@ MINOR3 = $(shell echo `date +%j`)
 deb_git_prefix_version = build/deb/smala_$(MAJOR).$(MINOR).$(MINOR2).$(MINOR3)
 deb_git_prefix = $(deb_git_prefix_version)/usr
 deb_git:
-	make -j6  install PREFIX=$(deb_git_prefix)
+	make -j6 install PREFIX=$(deb_git_prefix)
 	test -d $(deb_git_prefix_version)/DEBIAN || mkdir -p $(deb_git_prefix_version)/DEBIAN
 	sed -e 's,@PREFIX@,$(djnn_install_prefix),; s,@MAJOR@,$(MAJOR),; s,@MINOR@,$(MINOR),; s,@MINOR2@,$(MINOR2).$(MINOR3),' distrib/deb/control > $(deb_git_prefix_version)/DEBIAN/control
 	cp distrib/deb/triggers $(deb_git_prefix_version)/DEBIAN/triggers

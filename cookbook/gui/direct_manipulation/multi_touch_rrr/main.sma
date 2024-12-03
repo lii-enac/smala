@@ -40,21 +40,29 @@ Component root
   OutlineColor _(0,255,255)
 
   Component rrr_rectangle1 {
-    Homography h (1, 0, 0, 400, 0, 1, 0, 400, 0, 0, 1, 0, 0, 0, 0, 1)
+    Homography h (1, 0, 0, 150, 0, 1, 0, 150, 0, 0, 1, 0, 0, 0, 0, 1)
     FillColor _ (255, 0, 0)
-    Rectangle r (0, 0, 150, 150, 0, 0)
+    Rectangle r (0, 0, 200, 200, 0, 0)
     FillColor _ (0, 0, 0)
-    Text _ (10, 20, "2T")
+    Text _ (10, 20, "RRR_2T")
   }
   RRR_2T _ (rrr_rectangle1.r, rrr_rectangle1.h)
 
   Component rrr_rectangle2 {
-    Homography h (1, 0, 0, 200, 0, 1, 0, 200, 0, 0, 1, 0, 0, 0, 0, 1)
+    Homography h (1, 0, 0, 350, 0, 1, 0, 350, 0, 0, 1, 0, 0, 0, 0, 1)
     FillColor _ (0, 255, 0)
-    Rectangle r (0, 0, 150, 150, 0, 0)
+    Rectangle r (0, 0, 200, 200, 0, 0)
     FillColor _ (0, 0, 0)
-    Text _ (10, 20, "MT")
+    Text _ (10, 20, "RRR_MT")
   }
-  
   RRR_MT _ (rrr_rectangle2.r, rrr_rectangle2.h)
+
+  Component rr_rectangle3 {
+    Homography h (1, 0, 0, 550, 0, 1, 0, 550, 0, 0, 1, 0, 0, 0, 0, 1)
+    FillColor _ (0, 0, 255)
+    Rectangle r (0, 0, 200, 200, 0, 0)
+    FillColor _ (0, 0, 0)
+    Text _ (10, 20, "RR_T")
+  }
+  RR_T _ (rr_rectangle3.r, rr_rectangle3.h)
 }

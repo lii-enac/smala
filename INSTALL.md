@@ -35,7 +35,8 @@ open a terminal (a mingw64 one on windows, not an MSYS2 one), cd to the parent o
 git clone https://github.com/lii-enac/smala.git  
 cd smala  
 make install-pkgdeps  
-make -j4  
+make -j8
+make -j8 lib
 ```
 
 3. test it with the following commands:
@@ -47,7 +48,7 @@ make -j simplest_test
 4. try any other cookbook listed in smala/cookbook subdirectories
 
 ```
-make -j pan_and_zoom_test
+make -j drag_pan_zoom_test
 make -j fitts_law_test
 ```
 

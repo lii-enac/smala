@@ -22,6 +22,11 @@ _native_code_
 #include "homog2d.h"
 #include "core/utils/getset.h"
 
+// shortcut to "get double value"
+#define GDV(proc, prop) proc->prop()->get_double_value()
+// shortcut to "set double value"
+#define SDV(proc, prop, v) proc->prop()->set_value((v), true)
+
 void
 cpp_action(Process *p)
 {
@@ -30,22 +35,22 @@ cpp_action(Process *p)
     GET_CHILD_VAR (linter, Line, root, linter);
     GET_CHILD_VAR (c, Circle, root, intercept/c);
 
-    using namespace h2d;
-    Line2d l_(
-        Point2d(l->x1()->get_double_value(), l->y1()->get_double_value()),
-        Point2d(l->x2()->get_double_value(), l->y2()->get_double_value())
-        );
-    Line2d linter_(
-        Point2d(linter->x1()->get_double_value(), linter->y1()->get_double_value()),
-        Point2d(linter->x2()->get_double_value(), linter->y2()->get_double_value())
-        );
-	
     try {
-        auto pt = l_ * linter_;
-        c->cx()->set_value (pt.getX(), true);
-        c->cy()->set_value (pt.getY(), true);
-    } catch (const std::exception& err) {
+        using namespace h2d;
+        Line2d l_(
+            h2d::Point2d(GDV(l, x1), GDV(l, y1)),
+            h2d::Point2d(GDV(l, x2), GDV(l, y2))
+            );
+        Line2d linter_(
+            h2d::Point2d(GDV(linter, x1), GDV(linter, y1)),
+            h2d::Point2d(GDV(linter, x2), GDV(linter, y2))
+            );
 
+        auto pt = l_ * linter_;
+        SDV(c, cx,pt.getX());
+        SDV(c, cy,pt.getY());
+    } catch (const std::runtime_error& err) {
+        // if lines are not well-formed or are parallel
     }
 }
 %}
@@ -56,12 +61,9 @@ Component root
     Frame f ("my frame", 0, 0, 1280, 720)
     Exit ex (0, 1)
     f.close -> ex
-    //mouseTracking = 1
 
     OutlineColor _(255,255,0)
-
     Line l(0,0,500,500)
-
     Line linter(0,0,0,0)
 
     Group intercept {
@@ -73,10 +75,12 @@ Component root
     FSM fsm {
         State idle {
             0 =: linter.x1, linter.y1, linter.x2, linter.y2 // hide the line
+            0 =:  intercept.c.r // hide intersection
         }
         State start {
             f.press.x =: linter.x1, linter.x2
             f.press.y =: linter.y1, linter.y2
+            5 =: intercept.c.r
         }
         State line_resize {
             f.move.x => linter.x2

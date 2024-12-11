@@ -37,18 +37,26 @@ cpp_action(Process *p)
 
     try {
         using namespace h2d;
-        Line2d l_(
+        Segment l_(
             h2d::Point2d(GDV(l, x1), GDV(l, y1)),
             h2d::Point2d(GDV(l, x2), GDV(l, y2))
             );
-        Line2d linter_(
+        Segment linter_(
             h2d::Point2d(GDV(linter, x1), GDV(linter, y1)),
             h2d::Point2d(GDV(linter, x2), GDV(linter, y2))
             );
 
-        auto pt = l_ * linter_;
-        SDV(c, cx,pt.getX());
-        SDV(c, cy,pt.getY());
+        //auto pt = l_ * linter_;
+        auto res = l_.intersects(linter_);
+        if(res()){
+            auto pt = res.get();
+            SDV(c, cx,pt.getX());
+            SDV(c, cy,pt.getY());
+            SDV(c, r,5);
+        }else{
+            SDV(c, r,0);
+        }
+       
     } catch (const std::runtime_error& err) {
         // if lines are not well-formed or are parallel
     }

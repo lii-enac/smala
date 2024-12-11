@@ -72,18 +72,15 @@ Component root
     Spike resizing
     FSM fsm {
         State idle {
-            0 =: linter.x1
-            0 =: linter.y1
-            0 =: linter.x2
-            0 =: linter.y2
+            0 =: linter.x1, linter.y1, linter.x2, linter.y2 // hide the line
         }
         State start {
             f.press.x =: linter.x1, linter.x2
             f.press.y =: linter.y1, linter.y2
         }
         State line_resize {
-            f.move.x =:> linter.x2
-            f.move.y =:> linter.y2
+            f.move.x => linter.x2
+            f.move.y => linter.y2
             f.move -> resizing
         }
         idle -> start (f.press)

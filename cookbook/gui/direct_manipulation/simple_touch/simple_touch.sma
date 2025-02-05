@@ -19,7 +19,10 @@ use gui
 
 _main_
 Component root
-{
+{ 
+  // activate touches
+  _ENABLE_TOUCHES = 1
+
   Frame f ("my frame", 0, 0, 1000, 1000)
   Exit ex (0, 1)
   f.close -> ex
@@ -27,17 +30,18 @@ Component root
   FillColor fc(255,0,0)
   OutlineColor _(0,0,255)
   
+  //a place to temporary keep the active conector
+  Component active_connector
+
   Circle mobile (100, 100, 40)
   mobile.touches.$added-> (root) {
     t = getRef (&root.mobile.touches.$added)
-    addChildrenTo root {
-      Component connector {
-        t.x =:> root.mobile.cx
-        t.y =:> root.mobile.cy
-      }
+    addChildrenTo root.active_connector {
+      t.move.x =:> root.mobile.cx
+      t.move.y =:> root.mobile.cy
     }
   }
   mobile.touches.$removed-> (root) {
-    delete root.connector
+    delete_content root.active_connector
   }
 }

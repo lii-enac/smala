@@ -263,15 +263,26 @@ build/src_lib/gui/widgets/CheckBox.o: build/src_lib/gui/widgets/IWidget.h
 build/src_lib/gui/widgets/HSlider.o: build/src_lib/gui/widgets/IWidget.h
 build/src_lib/gui/widgets/UITextField.o: build/src_lib/gui/widgets/IWidget.h
 
+
+ifeq ($(linker), gnu)
+smala_lib_rpath += -Wl,-rpath-link,$(abspath $(build_dir))/lib
+smala_lib_rpath += -Wl,--no-undefined
+endif
+
+ifeq ($(linker), llvm)
+smala_lib_rpath := -Wl,-install_name,$(abspath $(smala_lib)) -Wl,-current_version,1.0.0 -Wl,-compatibility_version,1.0.0 
+endif
+
+
 $(smala_lib): $(smala_lib_objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(smala_lib_rpath)
 	mv $(notdir $@) $@
 else
 	@$(call rule_message,linking to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL)
+	@$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(smala_lib_rpath)
 	@mv $(notdir $@) $@
 endif
 

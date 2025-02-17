@@ -55,3 +55,32 @@ make -j fitts_law_test
 etc.
 
 5. copy [cookbook/stand_alone](cookbook/stand_alone) somewhere else and start your own project (see [Makefile](cookbook/stand_alone/Makefile) in stand_alone)
+
+6. or try with a small smala program:
+```
+cat <<EOF > test.sma
+use core
+use base
+use display
+use gui
+
+_main_
+Component root {
+  Frame f ("simplest", 0, 0, 600, 600)
+  Translation t(0,0)
+  FillColor _(255,255,0)
+  Circle _(0,0, 50)
+
+  mouseTracking = 1
+  f.move.x =:> t.tx
+  f.move.y =:> t.ty
+}
+EOF
+```
+then:
+```
+smalac test.sma
+c++ -std=c++17 `pkg-config --cflags --libs djnn-cpp`  `pkg-config --cflags --libs smala` test.cpp -o test
+./test
+
+```

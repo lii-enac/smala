@@ -3,7 +3,7 @@ use base
 use gui
 
 _define_
-StandAloneSlider (int _x, int _y, int _width, int _init_val)
+StandAloneSlider (int _x, int _y, int _width, double _init_val)
 {
   Translation pos (_x, _y)
   x aka pos.tx

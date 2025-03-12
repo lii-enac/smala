@@ -25,7 +25,7 @@ TextController(Process model, Process _view)
     model.{x,y,width,height} =:> view.{x,y,width,height}
 
     // update model from interactions on the view
-         view.t_x.wheel.dy +=> model.x // FIXME/TODO
+         view.t_x.wheel.dy +=> model.x
          view.t_y.wheel.dy +=> model.y
      view.t_width.wheel.dy +=> model.width
     view.t_height.wheel.dy +=> model.height

@@ -19,16 +19,25 @@ use gui
 
 _define_
 TextView(int _ty) {
+  // TextView is a textual view of a conceptual rectangle...
+  // It displays the rect 4 properties as 4 texts (for x,y,w and h) on the window
+
   Translation pos (0, _ty)
+
+  // the 4 text graphical objects...
   Text t_x (0, 15, "0")
-  x aka t_x.text
   Text t_y (15, 15, "0")
-  y aka t_y.text
   Text t_width (30, 15, "0")
-  width aka t_width.text
   Text t_height (45, 15, "0")
-  height aka t_height.text
-  t_x.x + t_x.width + 5 =:> t_y.x
-  t_y.x + t_y.width + 5 =:> t_width.x
+
+  // ... laid out horizontally
+  t_x.x     + t_x.width     + 5 =:> t_y.x
+  t_y.x     + t_y.width     + 5 =:> t_width.x
   t_width.x + t_width.width + 5 =:> t_height.x
+
+  // the TextView 'api' changes the textual content of the 4 graphical texts
+  x aka t_x.text
+  y aka t_y.text
+  width aka t_width.text
+  height aka t_height.text
 }

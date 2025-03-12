@@ -25,10 +25,10 @@ RectViewModel (Process _model) {
 
   TextPrinter tp
 
-  Int x ($model.x)
-  Int y ($model.y)
-  Int width ($model.width)
-  Int height ($model.height)
+  Double x ($model.x)
+  Double y ($model.y)
+  Double width ($model.width)
+  Double height ($model.height)
 
   // update our view model if needed
   model.x =?> x

@@ -37,14 +37,14 @@ GraphicsController(Process model, Process _view, Process frame)
     py aka frame.move.y
     
     // delta helpers
-    Int lastx(0)
-    Int dx(0)
+    Double lastx(0)
+    Double dx(0)
     px -> {
       px - lastx =: dx
               px =: lastx
     }
-    Int lasty(0)
-    Int dy(0)
+    Double lasty(0)
+    Double dy(0)
     py -> {
       py - lasty =: dy
               py =: lasty

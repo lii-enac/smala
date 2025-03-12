@@ -38,16 +38,14 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
     //release aka frame.release
     px aka frame.move.x
     py aka frame.move.y
-    
-    // delta helpers
-    Int lastx(0)
-    Int sdx(0) // screen dx
+    Double lastx(0)
+    Double sdx(0) // screen dx
     px -> {
       px - lastx =: sdx
               px =: lastx
     }
-    Int lasty(0)
-    Int sdy(0) // screen dy
+    Double lasty(0)
+    Double sdy(0) // screen dy
     py -> {
       py - lasty =: sdy
               py =: lasty

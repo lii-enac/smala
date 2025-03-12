@@ -18,14 +18,14 @@ use core
 use gui
 
 _define_
-RectModel (int _x, int _y, int _w, int _h)
+RectModel (double _x, double _y, double _w, double _h)
 {
   TextPrinter tp
 
-  Int x (_x)
-  Int y (_y)
-  Int width (_w)
-  Int height (_h)
+  Double x (_x)
+  Double y (_y)
+  Double width (_w)
+  Double height (_h)
 
   Double surface_area (0)
   width * height =:> surface_area

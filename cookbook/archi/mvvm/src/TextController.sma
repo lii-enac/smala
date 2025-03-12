@@ -23,9 +23,8 @@ TextController(Process model, Process _view, Process _view_model)
   view_model aka _view_model
 
   Component control {
-
     // update the view_model whenever the model changes (subject/observer pattern)
-    model.{x,y,width,height} =:> view_model.{x,y,width,height}
+         model.{x,y,width,height} =:> view_model.{x,y,width,height}
 
     // since the view_model acts as a proxy, we must update the model whenever view_model changes
     // this introduces a cycle that we must allow
@@ -37,12 +36,13 @@ TextController(Process model, Process _view, Process _view_model)
 
     // setup a bidirectional connector between the view and the the view_model
     // in this example, it's not strictly necessary, since the view is modified only through interaction
+    // it could be useful if it was possible to edit the text with the keyboard
     // still, this introduces a cycle that we must allow
     _AUTHORIZE_CYCLE = 1
     // FIXME test if value is the same and do not warn! (would it work? not sure...)
     // __AUTHORIZE_IDEMPOTENT_CYCLE = 1
-    view_model.{x,y,width,height} =:> view.{x,y,width,height}
-          view.{x,y,width,height} =:> view_model.{x,y,width,height}
+    view_model.{x,y,width,height} =:> view.{t_x.text,t_y.text,t_width.text,t_height.text}
+    view.{t_x.text,t_y.text,t_width.text,t_height.text} =:> view_model.{x,y,width,height}
 
     // update the view_model from interactions on the view
          view.t_x.wheel.dy +=> view_model.x

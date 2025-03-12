@@ -22,6 +22,7 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 
+import ModelManager
 import ViewModelManager
 
 import view.TextsListView
@@ -42,32 +43,36 @@ Component root {
 
   //_DEBUG_SEE_COMPONENTS_DESTRUCTION_INFO_LEVEL = 2
 
+  // ModelManager creates Model(s), and adds/removes them to a list
+  ModelManager model_manager ()
+
   Component toolbox {
     Translation pos_buttons(10,0)
     StandAlonePushButton del ("Delete last", 0, 0)
     StandAlonePushButton add ("Add Rectangle", 0, 0)
     f.height - 40 =:> pos_buttons.ty
     add.x + add.width + 10 =:> del.x
+    // the toolbox transforms user actions into creation and deletion of models through the Model Manager
+    toolbox.add.click -> model_manager.add_new_rectangle
+    toolbox.del.click -> model_manager.delete_last_rectangle
   }
+
+  // the ViewModelManager observes the ModelManager for Model additions and removals
+  // and adds/removes ViewModel(s) to a list
+  ViewModelManager VM_manager (model_manager)
 
   Int texts_list_width (250)
 
-  ViewModelManager VM_manager ()
-
   // View for list of texts
+  // TextsListView observes the ViewModelManager for ViewModel additions and removals
   TextsListView texts_list_view (VM_manager)
   texts_list_width =: texts_list_view.width
 
   // View for list of rectangles
+  // RectanglesListView observes the ViewModelManager for ViewModel addition and removal
   RectanglesListView rectangles_list_view (VM_manager, f)
   texts_list_width + 4 =: rectangles_list_view.x
+  
   f.width - rectangles_list_view.x =:> rectangles_list_view.width
-
-  f.height =:> texts_list_view.height, rectangles_list_view.height
-
-
-  toolbox.add.click -> VM_manager.new_rectangle
-
-  toolbox.del.click -> VM_manager.delete_rectangle
-
+                          f.height =:> texts_list_view.height, rectangles_list_view.height
 }

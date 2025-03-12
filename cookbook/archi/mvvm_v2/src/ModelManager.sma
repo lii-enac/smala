@@ -20,6 +20,17 @@ use base
 
 import model.RectModel
 
+// _action_
+// action_delete_rectangle (Process src, Process self)
+// {
+//   parent = find (&src, "..")
+//   // parent must have a 'model' child
+//   if (&parent != null) {
+//     // just remove from list
+//     remove parent.model from self.models_list
+//   }
+// }
+
 _define_
 ModelManager ()
 {
@@ -29,25 +40,25 @@ ModelManager ()
   Spike delete_last_rectangle
 
   add_new_rectangle -> na_add_new_rectangle:(this) {
-    print ("M add_new_rectangle (avant) " + this.models_list.size + " models")
+    //print ("M add_new_rectangle (avant) " + this.models_list.size + " models")
     Process model = RectModel (this.models_list, "", 50, 50, 100, 70)
-    print ("M add_new_rectangle (apres) " + this.models_list.size + " models")
+    //print ("M add_new_rectangle (apres) " + this.models_list.size + " models")
   }
 
   delete_last_rectangle -> na_delete_last_rectangle:(this) {
-    print ("M delete_last_rectangle (avant) " + this.models_list.size + " models")
+    //print ("M delete_last_rectangle (avant) " + this.models_list.size + " models")
     if (this.models_list.size > 0) {
       int size = getInt (this.models_list.size)
-
       Process model = &this.models_list.[size]
 
-      // We cannot delete the model yet
-      // Provoke crash (djnn - WARNING: "" -  CouplingProcess::~CouplingProcess - height - _vertex is NOT NULL and it should)
+      // We cannot delete the model yet FIXME
+      // (Provokes crash (djnn - WARNING: "" -  CouplingProcess::~CouplingProcess - height - _vertex is NOT NULL and it should))
       //delete model
-
       // Only remove from list
       remove model from this.models_list
     }
-    print ("M delete_last_rectangle (apres) " + this.models_list.size + " models")
+    //print ("M delete_last_rectangle (apres) " + this.models_list.size + " models")
   }
+
+  // NativeAction na_delete_rectangle (action_delete_rectangle, this, 1)
 }

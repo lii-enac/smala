@@ -75,10 +75,10 @@ RectView (Process _view_model, Process _frame) {
     }
 
     st_idle -> st_press (r.press)
-    st_press -> st_idle (r.release)
-    st_press -> st_dragging (r.move.x)
+    st_press -> st_idle (_frame.release)
+    st_press -> st_dragging (_frame.move.x)
     //st_press -> st_dragging (r.move.y)
-    st_dragging -> st_idle (r.release)
+    st_dragging -> st_idle (_frame.release)
   }
   
   // Drag with handles on borders

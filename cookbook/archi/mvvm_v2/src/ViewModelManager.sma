@@ -15,10 +15,16 @@
 *
 */
 
+
 use core
 use base
 
-import ModelManager
+_native_code_
+%{
+#include <assert.h>
+%}
+
+// import ModelManager
 import view_model.RectViewModel
 
 
@@ -27,99 +33,82 @@ action_close_rectangle (Process src, Process self)
 {
   view_model = find (&src, "..")
   if (&view_model != null) {
-    // Could be done in ModelManager
-    // Only remove from list
+    // just remove from list, deletion will be triggered
     remove view_model.model from self.model_manager.models_list
   }
 }
 
 
 _define_
-ViewModelManager ()
+ViewModelManager (Process model_manager_)
 {
   List view_models_list
-
-  Ref view_model_to_delete (null)
-  Ref model_to_delete (null)
-
-  //Ref selected_VM (null)
-
-  ModelManager model_manager ()
-
-  Spike new_rectangle
-  Spike delete_rectangle
-
-  new_rectangle -> model_manager.add_new_rectangle
-
-  delete_rectangle -> model_manager.delete_last_rectangle
+  model_manager aka model_manager_
 
   NativeAction na_close_rectangle (action_close_rectangle, this, 1)
 
-
   // When a model is added to the list
   model_manager.models_list.$added -> na_models_list_added:(this) {
+    //print ("VM models_list_added (before): " + this.view_models_list.size + " VMs")
     model = getRef (&this.model_manager.models_list.$added)
-    //model = getRef (&src)
-    if (&model != null) {
-      print ("VM models_list_added (avant): " + this.view_models_list.size + " VMs")
-      Process view_model = RectViewModel (this.view_models_list, "", model)
-
-      addChildrenTo this {
-        //view_model.is_selected -> ...
-        //view_model.close -> this.na_close_rectangle
-        this.view_models_list.[this.view_models_list.size].close -> this.na_close_rectangle
-      }
-      print ("VM models_list_added (apres): " + this.view_models_list.size + " VMs")
+    assert (&model != null)
+    Process view_model = RectViewModel (this.view_models_list, "", model)
+    // add a callback to the cross button to allow rectangle deletion
+    addChildrenTo this {
+      //view_model.is_selected -> ...
+      this.view_models_list.[this.view_models_list.size].close -> this.na_close_rectangle
     }
+    //print ("VM models_list_added (after): " + this.view_models_list.size + " VMs")
   }
 
   // When a model is removed from the list
+  Ref view_model_to_delete (null)
+  Ref model_to_delete (null)
+
   model_manager.models_list.$removed -> na_models_list_removed:(this) {
+    //print ("VM models_list_removed (before): " + this.view_models_list.size + " VMs")
     model = getRef (&this.model_manager.models_list.$removed)
-    //model = getRef (&src)
-    if (&model != null) {
-      print ("VM models_list_removed (avant): " + this.view_models_list.size + " VMs")
-      for view_model : this.view_models_list {
-        if (&view_model.model == &model) {
-          // We cannot delete the view model yet
-          //delete view_model
-          // Store references on the model and the VM to delete
-          setRef (this.view_model_to_delete, view_model)
-          setRef (this.model_to_delete, model)
-          
-          // Only remove from list
-          remove view_model from this.view_models_list
-          break
-        }
+    assert (&model != null)
+
+    // find the view_model corresponding to this model
+    Process view_model = null
+    for vm : this.view_models_list {
+      if (&vm.model == &model) {
+        view_model = &vm
+        break
       }
-      print ("VM models_list_removed (apres): " + this.view_models_list.size + " VMs")
     }
+    assert (&view_model != null)
+    
+    // We cannot delete the view_model yet because views still point to them
+    //delete view_model
+    // ...so store references on the model and the view_model to delete later
+    setRef (this.view_model_to_delete, view_model)
+    setRef (this.model_to_delete, model)
+    // ...and just remove it from the list:
+    // this will trigger deletion of views on this view_model
+    remove view_model from this.view_models_list
+    //print ("VM models_list_removed (after): " + this.view_models_list.size + " VMs")
   }
 
-  // All views have been deleted, now we can delete the view model
+  // All views have been deleted, now we can safely delete the view model
   na_models_list_removed -> na_views_have_been_deleted:(this) {
-    print ("all Views have been deleted...we can delete the VM")
+    // print ("all Views have been deleted...we can delete the VM")
     view_model_to_delete = getRef (this.view_model_to_delete)
-    if (&view_model_to_delete != null) {
-      setRef (this.view_model_to_delete, null)
-      // We cannot delete the model yet
-      //delete view_model_to_delete.model
-      
-      // Delete the view model (and free memory)
-      delete view_model_to_delete
-    }
+    assert (&view_model_to_delete != null)
+    setRef (this.view_model_to_delete, null)
+    // We cannot delete the model just yet because view_model still has bindings to it
+    //delete view_model_to_delete.model
+    delete view_model_to_delete
   }
 
-  // View Model has been deleted, now we can delete the model
-  // Could be done in ModelManager
+  // view_model has been deleted, now we can safely delete the model
+  // (could be done in the ModelManager)
   na_views_have_been_deleted -> na_vm_has_been_deleted:(this) {
-    print ("VM has been deleted...we can delete the model")
+    //print ("VM has been deleted...we can delete the model")
     model_to_delete = getRef (this.model_to_delete)
-    if (&model_to_delete != null) {
-      setRef (this.model_to_delete, null)
-
-      // Delete the model (and free memory)
-      delete model_to_delete
-    }
+    assert (&model_to_delete != null)
+    setRef (this.model_to_delete, null)
+    delete model_to_delete
   }
 }

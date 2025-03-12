@@ -21,6 +21,10 @@ use gui
 
 import RectView
 
+_native_code_
+%{
+#include <assert.h>
+%}
 
 _define_
 RectanglesListView (Process _view_model_manager, Process _frame)
@@ -44,31 +48,37 @@ RectanglesListView (Process _view_model_manager, Process _frame)
 
   List views_list
 
-  // When a view model is added to the list
+  // When a ViewModel is added to the list of ViewModels
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
-    view_model = getRef (&this.view_model_manager.view_models_list.$added)
-    //view_model = getRef (&src)
-    if (&view_model != null) {
-      print ("(RectanglesList)View view_models_list added (avant): " + this.views_list.size + " Vs")
-      Process view = RectView (this.views_list, "", view_model, this.frame)
-      print ("(RectanglesList)View view_models_list added (apres): " + this.views_list.size + " Vs")
-    }
+    //print ("(RectanglesList)View view_models_list added (avant): " + this.views_list.size + " Vs")
+    src = &this.view_model_manager.view_models_list.$added
+    view_model = getRef (&src)
+    assert (&view_model != null)
+
+    // create a new View
+    Process view = RectView (this.views_list, "", view_model, this.frame)
+    //print ("(RectanglesList)View view_models_list added (apres): " + this.views_list.size + " Vs")
   }
 
-  // When a view model is removed from the list
+  // When a ViewModel is removed from the list of ViewModels
   view_model_manager.view_models_list.$removed -> na_view_models_list_removed:(this) {
-    view_model = getRef (&this.view_model_manager.view_models_list.$removed)
-    //view_model = getRef (&src)
-    if (&view_model != null) {
-      print ("(RectanglesList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
-      for view : this.views_list {
-        if (&view.vm == &view_model) {
-          // Delete the view (and free memory)
-          delete view
-          break
-        }
+    //print ("(RectanglesList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
+    src = &this.view_model_manager.view_models_list.$removed
+    view_model = getRef (&src)
+    assert (&view_model)
+
+    // find the view corresponding to this view_model
+    Process view = null
+    for v : this.views_list {
+      if (&v.vm == &view_model) {
+        view = &v
+        break
       }
-      print ("(RectanglesList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
     }
+    assert(&view)
+
+    // delete it
+    delete view
+    //print ("(RectanglesList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
   }
 }

@@ -20,6 +20,10 @@ use base
 
 import TextView
 
+_native_code_
+%{
+#include <assert.h>
+%}
 
 _define_
 TextsListView (Process _view_model_manager)
@@ -40,48 +44,63 @@ TextsListView (Process _view_model_manager)
   width aka bg.r.width
   height aka bg.r.height
 
-  Text label (10, 15, "0 rectangles in the model")
-  view_model_manager.model_manager.models_list.size + " rectangles in the model" => label.text
+  Text label (10, 15, "0 rectangle in the model")
+  view_model_manager.model_manager.models_list.size + 
+  (view_model_manager.model_manager.models_list.size <= 1
+    ? " rectangle"
+    : " rectangles")
+    + " in the model" => label.text
 
   List views_list
 
   Int delta_y (20)
 
-  // When a view model is added to the list
+  // When a ViewModel is added to the list of ViewModels
   view_model_manager.view_models_list.$added -> na_view_models_list_added:(this) {
-    view_model = getRef (&this.view_model_manager.view_models_list.$added)
-    //view_model = getRef (&src)
-    if (&view_model != null) {
-      print ("(TextsList)View view_models_list added (avant): " + this.views_list.size + " Vs")
-      Process view = TextView (this.views_list, "", view_model, $this.delta_y)
-      print ("(TextsList)View view_models_list added (apres): " + this.views_list.size + " Vs")
+    //print ("(TextsList)View view_models_list added (avant): " + this.views_list.size + " Vs")
+    src = &this.view_model_manager.view_models_list.$added
+    view_model = getRef (&src)
+    assert (&view_model)
+    
+    // create a new view
+    Process view = TextView (this.views_list, "", view_model, $this.delta_y)
 
-      this.delta_y += 20
-    }
+    // set next position
+    this.delta_y += 20
+    //print ("(TextsList)View view_models_list added (apres): " + this.views_list.size + " Vs")
   }
 
-  // When a view model is removed from the list
+  // When a ViewModel is removed from the list of ViewModels
   view_model_manager.view_models_list.$removed -> na_view_models_list_removed:(this) {
-    view_model = getRef (&this.view_model_manager.view_models_list.$removed)
-    //view_model = getRef (&src)
-    if (&view_model != null) {
-      print ("(TextsList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
-      for view : this.views_list {
-        if (&view.vm == &view_model) {
-          // Delete the view (and free memory)
-          delete view
-          break
-        }
-      }
-      print ("(TextsList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
+    //print ("(TextsList)View view_models_list removed (avant): " + this.views_list.size + " Vs")
+    src = &this.view_model_manager.view_models_list.$removed
+    view_model = getRef (&src)
+    assert (&view_model)
 
+    // find the view corresponding to this view_model
+    Process view = null
+    for v : this.views_list {
+      if (&v.vm == &view_model) {
+        view = &v
+        break
+      }
+    }
+    assert(&view)
+
+    // delete it
+    delete view
+
+    //print ("(TextsList)View view_models_list removed (apres): " + this.views_list.size + " Vs")
+  }
+
+  // then update the y layout
+  na_view_models_list_removed -> (this) {
       // Reset y of remaining views
       this.delta_y = 20
       for view : this.views_list {
         view.y = this.delta_y
         this.delta_y += 20
       }
-    }
   }
 
 }

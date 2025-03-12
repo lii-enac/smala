@@ -1,11 +1,12 @@
 # Comparison of several GUI architectures
+(c) Stéphane Conversy - ENAC
 
 - MVC - Model View Controller
 - PAC - Presentation Abstraction Controller
 - MVVM - Model View ViewModel 
+- MVzmC - Model View/zone/manipulator Controller (TODO) 
 - MDPC - Model DisplayView PickingView (Inverse)Transform Controller
 - MVP - Model View Presenter (TODO)
-- MVzmC - Model ViewZone ViewModel Controller (TODO) 
 
 
 To better see the differences, on macOS:
@@ -33,6 +34,13 @@ https://www.martinfowler.com/eaaDev/uiArchs.html
 
 ### MVC
 
+Reenskaug, Trygve M. MODELS - VIEWS - CONTROLLERS. Xerox PARC technical note December 1979
+https://folk.universitetetioslo.no/trygver/1979/mvc-2/1979-12-MVC.pdf
+
+Reenskaug, Trygve M. THING-MODEL-VIEW-EDITOR an Example from a planning system. Xerox PARC technical note May 1979.
+https://folk.universitetetioslo.no/trygver/1979/mvc-1/1979-05-MVC.pdf
+
+From a historical perspective, by the author, see also:
 Reenskaug, Trygve M. H. MVC. XEROX PARC 1978-79.
 https://folk.universitetetioslo.no/trygver/themes/mvc/mvc-index.html
 
@@ -60,10 +68,15 @@ https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter
 
 John Gossman. Introduction to Model/View/ViewModel pattern for building WPF apps. 2005.
 https://learn.microsoft.com/en-us/archive/blogs/johngossman/introduction-to-modelviewviewmodel-pattern-for-building-wpf-apps
+https://www.cnblogs.com/shenfengok/archive/2011/10/18/2216135.html (for the images)
 
 Josh Smith. Patterns - WPF Apps With The Model-View-ViewModel Design Pattern. 2009. https://learn.microsoft.com/en-us/archive/msdn-magazine/2009/february/patterns-wpf-apps-with-the-model-view-viewmodel-design-pattern
 
 https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel
+
+### MVzmC
+
+Pierre Dragicevic, Jean-Daniel Fekete. Étude d'une Boîte à Outils Multi-Dispositifs. Actes de la onzième conférence francophone sur l'Interaction Homme-Machine (IHM 99), Jocelyne Nanard, Nov 1999, Montpellier, France. pp.55-62. ⟨hal-00908516⟩
 
 ### MDPC
 

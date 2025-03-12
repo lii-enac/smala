@@ -25,7 +25,7 @@ _native_code_
 %}
 
 // import ModelManager
-import view_model.RectViewModel
+import RectViewModel
 
 
 _action_

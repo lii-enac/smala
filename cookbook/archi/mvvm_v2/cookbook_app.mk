@@ -13,10 +13,10 @@
 #
 
 
-objs_cookbook_app :=  src/model/RectModel.o src/ModelManager.o \
- 					src/view_model/RectViewModel.o src/ViewModelManager.o \
-					src/view/TextView.o src/view/TextsListView.o \
-					src/view/Handle.o src/view/RectView.o src/view/RectanglesListView.o \
+objs_cookbook_app :=  src/model/RectModel.o src/model/ModelManager.o \
+ 					src/view_model/RectViewModel.o src/view_model/ViewModelManager.o \
+					src/text_view/TextView.o src/text_view/TextsListView.o \
+					src/rect_view/Handle.o src/rect_view/RectView.o src/rect_view/RectanglesListView.o \
 					src/main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

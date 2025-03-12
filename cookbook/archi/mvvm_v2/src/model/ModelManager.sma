@@ -18,7 +18,7 @@
 use core
 use base
 
-import model.RectModel
+import RectModel
 
 // _action_
 // action_delete_rectangle (Process src, Process self)

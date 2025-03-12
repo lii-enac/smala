@@ -22,11 +22,11 @@ use gui
 
 import gui.widgets.StandAlonePushButton
 
-import ModelManager
-import ViewModelManager
+import model.ModelManager
+import view_model.ViewModelManager
 
-import view.TextsListView
-import view.RectanglesListView
+import text_view.TextsListView
+import rect_view.RectanglesListView
 
 
 _main_

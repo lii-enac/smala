@@ -20,15 +20,13 @@ use gui
 _define_
 GraphicsPickingView() {
   NoFill _
-  //FillColor _(0,255,0)
-  
   NoOutline _
   PickFill _
 
   //FillColor _(255,0,0)
   Rectangle r (0,0,0,0) // center
-  //FillOpacity _(0.5)
-  //FillColor _(0,255,0)
+  // FillOpacity _(0.5)
+  // FillColor _(0,255,0)
   Rectangle left (0,0,0,0)
   Rectangle right (0,0,0,0)
   Rectangle top (0,0,0,0)
@@ -40,26 +38,28 @@ GraphicsPickingView() {
   height aka r.height
 
   Double border (5)
-  Double invtborder (5)
-  // border * 2 =:> invtborder
+  Double invtborder (0)
+
+  border * 2 =:> invtborder // make interactive border zoom-independant
   // ScreenToLocal m (r)
   // border =:> m.inX
+  // m.outX =:> invtborder
   // border =:> m.inY
-  // //m.outX =:> invtborder
-  // //m.outY =:> mdy
+  // sqrt(m.outX*m.outX+m.outY*m.outY) =:> invtborder
+  // m.outY =:> mdy
+  
   // TextPrinter tp
   // invtborder =:> tp.input
 
-  invtborder =:> left.width, right.width, top.height, bottom.height
 
-  r.x =:> top.x, bottom.x
-  r.y =:> top.y
-  r.width =:> top.width, bottom.width
-  r.height =:> left.height, right.height
+                   invtborder =:> top.height, bottom.height, left.width,  right.width
 
-  r.x =:> left.x
-  r.x + r.width - invtborder =:> right.x
-  r.y =:> left.y, right.y
-  r.y + r.height - invtborder =:> bottom.y
+                          r.x =:> top.x,      bottom.x,      left.x
+                          r.y =:> top.y,                     left.y,      right.y
+                      r.width =:> top.width,  bottom.width
+                     r.height =:>                            left.height, right.height
+
+  r.x + r.width  - invtborder =:>                                         right.x
+  r.y + r.height - invtborder =:>             bottom.y
 
 }

@@ -40,7 +40,7 @@ Component root {
   f.background_color.b = 255
 
   mouseTracking = 1 // for wheel events
-
+  //_DEBUG_SEE_COLOR_PICKING_VIEW = 1
 
   Component toolbox {
     Translation pos_buttons(10,0)
@@ -55,16 +55,16 @@ Component root {
   List models
   List text_views
 
-  // // transform the views
-  // Translation _(45, 100)
-  // Scaling _(0.5, 0.5, 0, 0)
-  // Rotation _(22.5, 0, 0)
+  // transform the views (Display and Picking)
+  Translation _(45, 100)
+  Scaling _(0.5, 0.5, 0, 0)
+  Rotation _(22.5, 0, 0)
 
   List views
 
   Int text_y(15)
   toolbox.add.click -> (root) {
-    Process model = ModelRect (root.models, "", 50, 50, 100, 70)
+    Process model = ModelRect (root.models, "", 100, 0, 100, 70)
     Process lifetime_manager = LifetimeManager (root.lifetime_managers, "", model)
 
     Process gdv = GraphicsDisplayView (root.views, "")

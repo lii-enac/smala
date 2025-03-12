@@ -26,16 +26,13 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
 
   Component control {
     // -- update the views whenever the model changes (subject/observer pattern)
-    // and transform the model into the screen
+    // and transform the model into a display and picking views
     model.{x,y,width,height} =:> view.{x,y,width,height}
     model.{x,y,width,height} =:> picking_view.{x,y,width,height}
 
-    // -- update model from interactions on the view
-
-    //press aka frame.press
-    press aka picking_view.r.press
-    move aka frame.move
-    //release aka frame.release
+    // -- transform user actions on the view into operations on the model
+    
+    // delta helpers
     px aka frame.move.x
     py aka frame.move.y
     Double lastx(0)
@@ -51,22 +48,13 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
               py =: lasty
     }
 
-    center_press aka picking_view.r.press
-    left_press aka picking_view.left.press
-    right_press aka picking_view.right.press
-    top_press aka picking_view.top.press
-    bottom_press aka picking_view.bottom.press
-
-
-    // inverse transform user interaction, from screen to model
+    // inverse transform user actions, from screen to model coordinates
     Double mdx(0) // model dx
     Double mdy(0) // model dy
 
     ScreenToLocal m (view.r)
     px =:> m.inX
     py =:> m.inY
-    //m.outX =:> mdx
-    //m.outY =:> mdy
 
     ScreenToLocal m2 (view.r)
     px-sdx =:> m2.inX
@@ -75,29 +63,40 @@ GraphicsController(Process model, Process _display_view, Process _picking_view, 
     m.outX-m2.outX =:> mdx
     m.outY-m2.outY =:> mdy
 
-    //TextPrinter tp
-    //"px:" + px + " sdx:" + toString(sdx) + " mdx:" + toString(mdx) + " model.x:" + toString(model.x) =:> tp.input
+    dx aka mdx
+    dy aka mdy
 
     // actual interactions and model updates
+    press aka picking_view.r.press
+    move aka frame.move
+
+    center_press aka picking_view.r.press
+    left_press aka picking_view.left.press
+    right_press aka picking_view.right.press
+    top_press aka picking_view.top.press
+    bottom_press aka picking_view.bottom.press
+
+    // the FSM manages the interaction state by activating/deactivating dataflows
+    // interactions on picking views manage the FSM transitions
     FSM drag {
       State idle
       State dragging_center {
-          mdx +=> model.x
-          mdy +=> model.y
+          dx +=> model.x
+          dy +=> model.y
       }
       State dragging_left {
-          mdx +=> model.x
-        - mdx +=> model.width
+          dx +=> model.x
+        - dx +=> model.width
       }    
       State dragging_right {
-          mdx +=> model.width
+          dx +=> model.width
       }
       State dragging_top {
-          mdy +=> model.y
-        - mdy +=> model.height
+          dy +=> model.y
+        - dy +=> model.height
       }
       State dragging_bottom {
-          mdy +=> model.height
+          dy +=> model.height
       }
       idle -> dragging_center (center_press)
       idle -> dragging_left (left_press)

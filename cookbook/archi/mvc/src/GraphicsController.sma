@@ -52,7 +52,7 @@ GraphicsController(Process model, Process _view, Process frame)
               py =: lasty
     }
 
-    // query layout of internal views: where on the rect did the user press? which border, or center?
+    // query layout of view internals: where on the rect did the user press? which border, or center?
     Int border(5)
 
     Bool center(0)
@@ -61,10 +61,10 @@ GraphicsController(Process model, Process _view, Process frame)
     Bool top(0)
     Bool bottom(0)
                   
-                     (abs(px - model.x) <= border) =:> left
-     (abs(px - (model.x + model.width)) <= border) =:> right
-                     (abs(py - model.y) <= border) =:> top
-    (abs(py - (model.y + model.height)) <= border) =:> bottom
+                      (abs(px - view.r.x) <= border) =:> left
+     (abs(px - (view.r.x + view.r.width)) <= border) =:> right
+                      (abs(py - view.r.y) <= border) =:> top
+    (abs(py - (view.r.y + view.r.height)) <= border) =:> bottom
               not (left || right || bottom || top) =:> center
 
     // synthesize events upon press on borders or center
@@ -82,16 +82,16 @@ GraphicsController(Process model, Process _view, Process frame)
       State in_top    { press -> top_press }
       State in_bottom { press -> bottom_press }
       
-      idle -> in_center   (center.true)
-      in_center -> idle   (center.false)
-      idle -> in_left  (left.true)
-      in_left -> idle  (left.false)
-      idle -> in_right (right.true)
-      in_right -> idle (right.false)
-      idle -> in_top   (top.true)
-      in_top -> idle   (top.false)
-      idle -> in_bottom   (bottom.true)
-      in_bottom -> idle   (bottom.false)
+      idle -> in_center  (center.true)
+      in_center -> idle  (center.false)
+      idle -> in_left    (left.true)
+      in_left -> idle    (left.false)
+      idle -> in_right   (right.true)
+      in_right -> idle   (right.false)
+      idle -> in_top     (top.true)
+      in_top -> idle     (top.false)
+      idle -> in_bottom  (bottom.true)
+      in_bottom -> idle  (bottom.false)
     }
 
     // control interactions and update model
@@ -118,9 +118,9 @@ GraphicsController(Process model, Process _view, Process frame)
           dy +=> model.height
       }
       idle -> dragging_center (center_press)
-      idle -> dragging_left (left_press)
-      idle -> dragging_right (right_press)
-      idle -> dragging_top (top_press)
+      idle -> dragging_left   (left_press)
+      idle -> dragging_right  (right_press)
+      idle -> dragging_top    (top_press)
       idle -> dragging_bottom (bottom_press)
       { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (release) // FIXME: why {} ???
     }

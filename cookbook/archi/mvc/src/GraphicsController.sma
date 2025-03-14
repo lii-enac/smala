@@ -9,8 +9,8 @@
 *
 *  Contributors:
 *    
-*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 *     Stephane Conversy <stephane.conversy@enac.fr>
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 */
 
 use core
@@ -24,19 +24,21 @@ GraphicsController(Process model, Process _view, Process frame)
   view aka _view
 
   Component control {
-    // -- update the view whenever the model changes (subject/observer pattern)
+    // -- observe the model and update the view whenever the model changes (subject/observer pattern)
+    // 'src =:> dst' setups a data-flow: it both observes the src and updates the dst
     model.{x,y,width,height} =:> view.r.{x,y,width,height}
+
 
     // -- update model from interactions on the view
 
-    //press aka frame.press
+    // abstract events away 
     press aka view.r.press
     move aka frame.move
-    //release aka frame.release
+    release aka frame.release
     px aka frame.move.x
     py aka frame.move.y
     
-    // delta helpers
+    // move delta helpers // FIXME should be in move?
     Double lastx(0)
     Double dx(0)
     px -> {
@@ -50,15 +52,14 @@ GraphicsController(Process model, Process _view, Process frame)
               py =: lasty
     }
 
+    // query layout of internal views: where on the rect did the user press? which border, or center?
     Int border(5)
 
-    // layout queries: where on the rect did the user press? which border, or center?
     Bool center(0)
     Bool left(0)
     Bool right(0)
     Bool top(0)
     Bool bottom(0)
-    
                   
                      (abs(px - model.x) <= border) =:> left
      (abs(px - (model.x + model.width)) <= border) =:> right
@@ -66,7 +67,7 @@ GraphicsController(Process model, Process _view, Process frame)
     (abs(py - (model.y + model.height)) <= border) =:> bottom
               not (left || right || bottom || top) =:> center
 
-    // mini state-machines to synthesize transient events upon press on borders or center
+    // synthesize events upon press on borders or center
     Spike center_press
     Spike left_press
     Spike right_press
@@ -93,7 +94,9 @@ GraphicsController(Process model, Process _view, Process frame)
       in_bottom -> idle   (bottom.false)
     }
 
-    // actual interactions and model updates
+    // control interactions and update model
+    // 'control' means: 'control the state of the interaction' (the FSM) and 'activate data-flows' (inside states)
+    // 'update' is implemented with an addition connector '+=>'
     FSM drag {
       State idle
       State dragging_center {
@@ -119,7 +122,7 @@ GraphicsController(Process model, Process _view, Process frame)
       idle -> dragging_right (right_press)
       idle -> dragging_top (top_press)
       idle -> dragging_bottom (bottom_press)
-      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (frame.release) // FIXME: why {} ???
+      { dragging_center, dragging_left, dragging_right, dragging_top, dragging_bottom } -> idle (release) // FIXME: why {} ???
     }
 
   }

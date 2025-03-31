@@ -38,6 +38,9 @@ cpp_action(Process *p)
     GET_CHILD_VAR (cinter, Circle, root, cinter);
     GET_CHILD_VAR (c1, Circle, root, intercept/c1);
     GET_CHILD_VAR (c2, Circle, root, intercept/c2);
+    GET_CHILD_VAR (normal, Line, root, normal/n);
+    GET_CHILD_VAR (text_normal, Text, root, normal/text);
+    GET_CHILD_VAR (c_normal, Circle, root, normal/c);
 
     try {
 
@@ -52,7 +55,7 @@ cpp_action(Process *p)
         h2d::Circle circle_ = h2d::Circle (center, GDV(cinter, r));
 
         auto res = l_.intersects(circle_); // get () will return a vector : https://github.com/skramm/homog2d/blob/master/docs/homog2d_manual.md
-
+        
         if(res()){
             if (res.get().size () >= 1) {
                 auto pt = res.get()[0];
@@ -75,7 +78,29 @@ cpp_action(Process *p)
             SDV(c1, r,0);
             SDV(c2, r,0);
         }
-       
+
+        // example of getOrthoSegment : https://github.com/skramm/homog2d/blob/master/misc/showcase/showcase8.cpp
+        auto distTo = l_.distTo (center);
+        SDV(text_normal, text, distTo);
+
+        Line2d line_ = l_.getLine();
+        auto seg_orth = line_.getOrthogSegment( center );
+
+        SDV(normal, x1, seg_orth.getPts().first.getX ());
+        SDV(normal, y1, seg_orth.getPts().first.getY ());
+        SDV(normal, x2, seg_orth.getPts().second.getX ());
+        SDV(normal, y2, seg_orth.getPts().second.getY ());
+        // which point of the ortho in on the segment
+        auto distTo_check = l_.distTo (seg_orth.getPts().first);
+        if (distTo_check < 1e-10) {
+            SDV(c_normal, cx, seg_orth.getPts().first.getX ());
+            SDV(c_normal, cy, seg_orth.getPts().first.getY ());
+        }
+        else {  
+            SDV(c_normal, cx, seg_orth.getPts().second.getX ());
+            SDV(c_normal, cy, seg_orth.getPts().second.getY ());
+        }
+               
     } catch (const std::runtime_error& err) {
         // if lines are not well-formed or are parallel
     }
@@ -91,6 +116,7 @@ Component root
 
     OutlineColor _(255,255,0)
     Line l(0,0,500,500)
+    FillColor _ (45, 45, 45)
     Circle cinter(0,0,50)
 
     Group intercept {
@@ -99,22 +125,36 @@ Component root
         Circle c2 (0,0,5)
     }
 
+    Component normal {
+        FillColor _ (White)
+        OutlineColor _ (White)
+        Line n (0, 0, 0, 0)
+        Text text (0, 0, "toto")
+        FillColor _ (0,0,255)
+        Circle c (0, 0, 5)
+    }
+
     Spike resizing
     FSM fsm {
         State idle {
-            -100 =:  cinter.cx, cinter.cy // hide the circle
+            -100 =:  cinter.cx, cinter.cy
+            -100 =:  normal.text.x, normal.text.y, normal.c.cx, normal.c.cy// hide elements
+            -100 =: intercept.c1.cx, intercept.c1.cy, intercept.c2.cx, intercept.c2.cy
             0 =:  intercept.c1.r // hide intersection
             0 =:  intercept.c2.r // hide intersection
+            0 =: normal.n.x1, normal.n.y1, normal.n.x2, normal.n.y2
+            0 =: normal.c.r 
         }
         State start {
-            f.press.x =: cinter.cx //, linter.x2
-            f.press.y =: cinter.cy //, linter.y2
+            f.press.x =: cinter.cx, normal.text.x
+            f.press.y =: cinter.cy, normal.text.y
             5 =: intercept.c1.r
             5 =: intercept.c2.r
+            5 =: normal.c.r
         }
         State line_resize {
-            f.move.x => cinter.cx
-            f.move.y => cinter.cy
+            f.move.x => cinter.cx, normal.text.x
+            f.move.y => cinter.cy, normal.text.y
             f.move -> resizing
         }
         idle -> start (f.press)

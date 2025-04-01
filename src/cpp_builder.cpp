@@ -942,7 +942,6 @@ namespace Smala
 
     indent (os);
     os << "while (" << expr_str << ") {";
-    os << ") {\n";
     push_ctxt (); //DBG;
     m_indent++;
   }

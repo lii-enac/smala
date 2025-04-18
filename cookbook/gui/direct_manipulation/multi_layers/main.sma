@@ -44,8 +44,8 @@ Component root {
       r_red.height = r_red.height - 5
     }
   }
-  f.width / 2 =: LRed.w
-  f.height/ 2 =: LRed.h
+  f.width / 2 =: LRed.width
+  f.height/ 2 =: LRed.height
   
   Layer LGreen (0, 300, 300, 300) {
     Translation t (0, 300)

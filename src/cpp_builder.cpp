@@ -1764,6 +1764,13 @@ namespace Smala
   }
 
   void
+  CPPBuilder::set_location (std::ostream &os, Node *n, bool debug)
+  {
+    if (m_debug) os << "\n#line " << n->get_location().begin.line << std::endl;
+  }
+    
+
+  void
   CPPBuilder::build_native_action (std::ostream &os, Node *n)
   {
     emit_compiler_info(os);

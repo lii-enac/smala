@@ -106,7 +106,7 @@ namespace Smala {
     std::string build_fake_name (PathNode* n, bool out);
     std::string build_find (PathNode* n, bool ignore_cast);
     std::string build_path (PathNode* n);
-    void set_location (std::ostream &os, Node *n, bool debug=false) override { if (m_debug) os << "\n#line " << n->get_location().begin.line << std::endl; }
+    void set_location (std::ostream &os, Node *n, bool debug=false) override;
     void end_line (std::ostream &os) override { os << ";\n"; }
 
     void emit_debug_location (std::ostream &os, Node* node) override;

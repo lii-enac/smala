@@ -1115,6 +1115,8 @@ namespace Smala
       {
         // is_model...
         os << ", " << node->args ().at (0).second;
+        if (!m_fastcomp)
+          used_processes["Assignment"];
       }
       
     }

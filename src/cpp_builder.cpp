@@ -1093,17 +1093,49 @@ namespace Smala
       node->set_name (m_null_string);
     }
 
-    print_component_constructor (os, constructor);
-    os << " (" << node->parent ()->build_name () << ", " << node->name ();
-    os << ", " << src << ", ";
+    #if 0 // not working yet
+    if (node->djnn_type ().compare ("MultiBinding") == 0) {
+      os << "MultiBinding (";
+      os << node->parent ()->build_name ();
+      //os << ", " << src; // << node->name ();
+      os << ", " << node->parent ()->build_name ();
+      os << ", {";
+      for (auto * n: ctrl->get_input_nodes ()) {
+        os << "\"" << n->build_string_repr () << "\", ";
+      }
+      os << "}, ";
+      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
+      //os << ", " << dst;
+      os << ", " << node->parent ()->build_name ();
+      os << ", {";
+      for (auto * n: ctrl->get_output_nodes ()) {
+        os << "\"" << n->build_string_repr () << "\", ";
+      }
+      os << "}, ";
+      os << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
+      os << ");\n";
+      if (!m_fastcomp)
+        used_processes["Binding"];
+      
+      return;
+    }
+    #endif
     
     bool is_binding = node->djnn_type ().compare ("Binding") == 0;
     if (is_binding) {
-      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" ) << ", " << dst
-         << ", " << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
+      print_component_constructor (os, constructor);
+      os << " (" << node->parent ()->build_name () << ", " << node->name ();
+      os << ", " << src << ", ";
+      os << (ctrl->get_in_act () == "true" ? "ACTIVATION" : "DEACTIVATION" )
+         << ", " << dst << ", "
+         << (ctrl->get_out_act () == "true" ? "ACTIVATION" : "DEACTIVATION" );
       if (!m_fastcomp)
         used_processes["Binding"];
-    } else {
+    }
+    else {
+      print_component_constructor (os, constructor);
+      os << " (" << node->parent ()->build_name () << ", " << node->name ();
+      os << ", " << src << ", ";
       os << "\"\"" << ", ";
       os << dst << ", \"\"";
 

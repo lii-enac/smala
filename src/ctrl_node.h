@@ -33,6 +33,8 @@ namespace Smala
 
     void add_output_node (PathNode *n) { m_vout.push_back (n); }
     std::vector<PathNode*>& get_output_nodes () { return m_vout; }
+    void add_input_node (PathNode *n) { m_vin.push_back (n); }
+    std::vector<PathNode*>& get_input_nodes () { return m_vin; }
     std::string& get_in_act () { return m_in_act; }
     std::string& get_out_act () { return m_out_act; }
 
@@ -40,7 +42,7 @@ namespace Smala
     Node *m_in;
     Node *m_out;
     std::string m_in_act, m_out_act;
-    std::vector<PathNode*> m_vout;
+    std::vector<PathNode*> m_vin, m_vout;
   };
 
 } /* namespace Smala */

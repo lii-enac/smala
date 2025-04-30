@@ -1631,6 +1631,36 @@ binding
         node->set_parent (parent_list.empty()? nullptr : parent_list.back ());
       }
     }
+  | process_list binding_type process_list
+    {
+      #if 1
+      for (size_t i = 0; i < $1.size (); ++i) {
+        for (size_t j = 0; j < $3.size (); ++j) {
+          CtrlNode *node = new CtrlNode (@$, "Binding", "", $2.first, $2.second);
+          Node *in = new Node (@$, PATH, "Name", $1.at (i));
+          node->set_in (in);
+          Node *out = new Node (@$, PATH, "Name", $3.at (j));
+          node->set_out (out);
+          driver.add_node (node);
+          node->set_parent (parent_list.empty() ? nullptr : parent_list.back ());
+        }
+      }
+      #else // not working yet
+      CtrlNode *node = new CtrlNode (@$, "MultiBinding", "", $2.first, $2.second);
+      Node *in = new Node (@$, PATH, "Name", $1.at (0));
+      node->set_in (in);
+      Node *out = new Node (@$, PATH, "Name", $3.at (0));
+      node->set_out (out);
+      driver.add_node (node);
+      node->set_parent (parent_list.empty() ? nullptr : parent_list.back ());
+      for (size_t i = 0; i < $1.size (); ++i) {
+        node->get_input_nodes().push_back($1.at (i));
+      }
+      for (size_t j = 0; j < $3.size (); ++j) {
+        node->get_output_nodes().push_back($3.at (j));
+      }
+      #endif
+    }
   | binding_src binding_type lambda
     {
       /* first build the NativeACtion Component */

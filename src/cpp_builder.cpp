@@ -1382,8 +1382,10 @@ namespace Smala
           os << arg << ", ";
           os << new_name << "->find_child(\"delta\"));";
 
-          if (!m_fastcomp)
+          if (!m_fastcomp) {
             used_processes[operator_name] = true;
+            used_processes["Connector"] = true;
+          }
   
           os << "\n";
           arg = new_name+"->find_child(\"delta\")";

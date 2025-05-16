@@ -12,21 +12,21 @@ You can use several option to debug on smala :
 
 ## detect cycle in graph and display informations
 
-  _DEBUG_GRAPH_CYCLE_DETECT = 0|1
+  _DEBUG_GRAPH_CYCLE_DETECT = 1|0 (defalult)
 
 ## Activation Sequence
 
 - display order in which component are activated and deactivated by GRAPH_EXEC
 
-  _DEBUG_SEE_ACTIVATION_SEQUENCE = 0|1
+  _DEBUG_SEE_ACTIVATION_SEQUENCE = 1|0 (defalult)
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_TIME_US  = 1000 // microsecond
   _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 0|1 // will display only the targeted process or full_stack (O)
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = "file.sma:lineno" // display sequence from a specific debug info : file.sma:lineno
 
 ## paintevent and Layer recomputation
 
-  _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 0|1
-  _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 0|1
+  _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 1|0 (defalult)
+  _DEBUG_SEE_RECOMPUTE_PIXMAP_ONLY = 1|0 (defalult)
 
 ## display info on destrcutions
 
@@ -38,7 +38,11 @@ You can use several option to debug on smala :
 
 ## Enable touch events (they are disabled by default because macOS trackpad events are not well managed and can disrupt development and usability).
 
-  _ENABLE_TOUCHES = 1|0
+  _ENABLE_TOUCHES = 1|0 (defalult)
+
+## Enable mouse emulation with stylus
+
+  _STYLUS_EMULATE_MOUSE = 1|0 (defalult)
 
 ## enable stress test
 
@@ -70,7 +74,7 @@ Component root {
 
 - explicitly accept cycles in graph without displaying information
 
-  _AUTHORIZE_CYCLE = 0|1
+  _AUTHORIZE_CYCLE = 1|0 (defalult)
 
 ## others tools
 

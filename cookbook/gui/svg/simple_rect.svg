@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg4152"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="button.svg">
+  <rect
+     myattr = "attrValue"
+     ry="5"
+     y="0"
+     x="0"
+     height="50"
+     width="90"
+     id="background"
+     edgeNameFromXPlane="Linear Feature 17_33" 
+     pathLength="9.8638"
+     style="fill:#525252;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</svg>
+<!-- <path bound1="intersection_node_844" bound2="intersection_node_842" d="M 575.9065,269.9232 C 575.8065,269.6100 575.5278,268.6797 575.4365,268.3479" edgeNameFromXPlane="Linear Feature 17_33" id="edge_458" pathLength="9.8638" radius="48.67" slope="0" type="taxiway"/> -->

@@ -67,11 +67,11 @@ Component root {
     R aka box.items.[4]
 
 
-    Int d(0) // duration
-    Int e(0) // elapsed
+    Double d(0) // duration
+    Double e(0) // elapsed
 
-    Clock cl(1000) // timer (there is a Timer Process in djnn, but with a different semantic)
-    cl.tick -> { e + 1 =: e }
+    Clock cl(100) // timer (there is a Timer Process in djnn, but with a different semantic)
+    cl.tick -> { e + 0.1 =: e }
 
     // [7GUIs] a gauge G for the elapsed time e
     d * 10 =:> G.bv.max

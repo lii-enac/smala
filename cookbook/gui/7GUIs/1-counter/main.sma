@@ -1,9 +1,3 @@
-use core
-use base
-use display
-use gui
-
-import gui.widgets.StandAlonePushButton
 
 // [7GUIs] Counter
 // [7GUIs] https://eugenkiss.github.io/7guis/tasks#counter
@@ -18,12 +12,18 @@ import gui.widgets.StandAlonePushButton
 // [7GUIs] Thus, Counter reveals the required scaffolding and how the very basic features work together to build a GUI application.
 // [7GUIs] A good solution will have almost no scaffolding.
 
+use core
+use base
+use display
+use gui
+
+import gui.widgets.StandAlonePushButton
+
 
 _main_
 Component root {
-    Frame f ("mdpc", 0, 0, 600, 600)
-    Exit ex (0, 1)
-    f.close -> ex
+    Frame f ("7GUIs Counter", 0, 0, 600, 600)
+    f.close ->! mainloop 
 
     // [7GUIs] The task is to build a frame containing a label or read-only textfield T and a button B.
 

@@ -66,17 +66,17 @@ Component root {
     S aka box.items.[3]
     R aka box.items.[4]
 
+
     Int d(0) // duration
     Int e(0) // elapsed
 
     Clock cl(1000) // timer (there is a Timer Process in djnn, but with a different semantic)
-    cl.tick -> {
-        e + 1 =: e
-    }
+    cl.tick -> { e + 1 =: e }
 
     // [7GUIs] a gauge G for the elapsed time e
     d * 10 =:> G.bv.max
     e * 10 =:> G.bv.input
+    // here bv is the bounded value of the Gauge
     
     // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
     e =:> L.text
@@ -85,7 +85,7 @@ Component root {
     S.value / 10 =:> d
 
     // [7GUIs] It follows that while moving S the filled amount of G will (usually) change immediately.
-    // see above: d * 10 =:> G.bv.max
+    // see above: d * 10 =:> G.bv.max, which will be triggered when d is modified
 
     // [7GUIs] When e ≥ d is true then the timer stops (and G will be full).
     Bool stop_cond(0)
@@ -95,8 +95,6 @@ Component root {
     stop_cond.false ->  cl 
 
     // [7GUIs] Clicking R will reset e to zero.
-    R.click -> {
-        0 =: e
-    }
+    R.click -> { 0 =: e }
 
 }

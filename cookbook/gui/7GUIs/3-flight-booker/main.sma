@@ -117,10 +117,10 @@ Component root {
     Bool Book_valid(0)
 
     T1.text -> (root) {
-        validate_date(root.T1.text, root.T1_valid)
+        validate_date(root.T1.text, root.T1_valid) // validate_date will set T1_valid
     }
     T2.text -> (root) {
-        validate_date(root.T2.text, root.T2_valid)
+        validate_date(root.T2.text, root.T2_valid) // validate_date will set T2_valid
     }
 
     T1_valid.false -> {

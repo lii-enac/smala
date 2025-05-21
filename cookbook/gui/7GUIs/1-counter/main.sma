@@ -10,6 +10,7 @@
 // [7GUIs] Counter serves as a gentle introduction to the basics of the language, paradigm and toolkit
 // [7GUIs] for one of the simplest GUI applications imaginable.
 // [7GUIs] Thus, Counter reveals the required scaffolding and how the very basic features work together to build a GUI application.
+
 // [7GUIs] A good solution will have almost no scaffolding.
 
 use core
@@ -39,7 +40,7 @@ Component root {
     // solution #1
     Int counter(0)
     count_btn.click -> {
-        counter +1 =: counter
+        counter + 1 =: counter
     }
     counter =:> tf.content.text
 

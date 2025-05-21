@@ -119,9 +119,11 @@ Component root {
     T1.text -> (root) {
         validate_date(root.T1.text, root.T1_valid) // validate_date will set T1_valid
     }
+    T1.text ~> T1_valid // since validate_date modifies T1_valid from T1_text, declare a causal relationship
     T2.text -> (root) {
-        validate_date(root.T2.text, root.T2_valid) // validate_date will set T2_valid
+        validate_date(root.T2.text, root.T2_valid) // idem
     }
+    T2.text ~> T2_valid // idem
 
     T1_valid.false -> {
         #FF0000 =: T1.text_color

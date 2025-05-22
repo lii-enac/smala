@@ -45,6 +45,7 @@ Component root {
     StandAloneSlider radius_slider(0,100,200,10)    // [7GUIs] ...a slider inside that adjusts the diameter of C.
 
     UndoRedoManager undo_redo_manager // FIXME should be provided in smala lib
+    // FIXME are we sure it works? check CreateAction, undo must be repeated multiple times :-/
     undo.click -> undo_redo_manager.undo            // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
     redo.click -> undo_redo_manager.redo            // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
 

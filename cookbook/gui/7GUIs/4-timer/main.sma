@@ -48,7 +48,7 @@ Component root {
     Label _L("empty")
 
     // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
-    HSlider _S(50) // FIXME adjusting does not work?!!!!!!!!
+    HSlider _S(50)
 
     // [7GUIs] a reset button R.
     PushButton _R("Reset")
@@ -67,16 +67,16 @@ Component root {
     R aka box.items.[4]
 
 
-    Double d(0) // duration
-    Double e(0) // elapsed
+    Double d(0) // [7GUIs] ...duration...
+    Double e(0) // [7GUIs] ...elapsed...
 
-    Clock cl(100) // timer (there is a Timer Process in djnn, but with a different semantic)
+    Clock cl(100) // [7GUIs] ...timer...  // (there is a Timer Process in djnn, but with a different semantic)
     cl.tick -> { e + 0.1 =: e }
 
     // [7GUIs] a gauge G for the elapsed time e
+    // here bv is the bounded value of the Gauge
     d * 10 =:> G.bv.max
     e * 10 =:> G.bv.input
-    // here bv is the bounded value of the Gauge
     
     // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
     e =:> L.text
@@ -96,5 +96,4 @@ Component root {
 
     // [7GUIs] Clicking R will reset e to zero.
     R.click -> { 0 =: e }
-
 }

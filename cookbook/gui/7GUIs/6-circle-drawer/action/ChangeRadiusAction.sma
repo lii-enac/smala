@@ -13,16 +13,11 @@ ChangeRadiusAction (Process circle_, int old_radius_, int new_radius_)
     Int old_radius(old_radius_)
     Int new_radius(new_radius_)
     
-    undo ->set_undo: {
+    undo -> {
         old_radius =: circle.c.r
     }
 
-    redo ->set_redo: {
+    redo -> {
         new_radius =: circle.c.r
     }
-
-    // del -> set_del: (this) {
-    //     print  ("ChangeRadiusAction::del")
-    // }
-
 }

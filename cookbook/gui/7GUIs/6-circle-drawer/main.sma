@@ -44,7 +44,7 @@ Component root {
 
     StandAloneSlider radius_slider(0,100,200,10)    // [7GUIs] ...a slider inside that adjusts the diameter of C.
 
-    UndoRedoManager undo_redo_manager
+    UndoRedoManager undo_redo_manager // FIXME should be provided in smala lib
     undo.click -> undo_redo_manager.undo            // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
     redo.click -> undo_redo_manager.redo            // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
 
@@ -61,20 +61,16 @@ Component root {
         Process ca_ = CreateAction (root.undo_redo_manager.actions, "ca_", getRef(root.gcircle_ref_))
     }
 
-    // Bool gcircle_not_null (0)
-    // getRef(&gcircle_ref_) != null =:> gcircle_not_null
-
-    // TODO [7GUIs] Clicking on this entry will open another frame with a slider inside that adjusts the diameter of C.
-    // TODO [7GUIs] Closing this frame will mark the last diameter as significant for the undo/redo history.
-
-    radius_slider.output -> (root) {                // [7GUIs] Changes are applied immediately. 
+    // FIXME should be in another window
+    radius_slider.output -> (root) {                 // [7GUIs] Clicking on this entry will open another frame with a slider inside that adjusts the diameter of C.
         gcircle = getRef(&root.gcircle_ref_)
         if (&gcircle != null) {
-            gcircle.c.r = $root.radius_slider.output
+            gcircle.c.r = $root.radius_slider.output // [7GUIs] Changes are applied immediately. 
         }
     }
 
-    radius_slider.button_fsm.idle -> (root) {
+    // FIXME should be done on 'close', here we do it when the interaction is terminated
+    radius_slider.button_fsm.idle -> (root) {       // TODO [7GUIs] Closing this frame will mark the last diameter as significant for the undo/redo history.
         gcircle = getRef(&root.gcircle_ref_)
         if (&gcircle != null) {
             notify root.undo_redo_manager.removeActionsStartingFromCurrent // FIXME should be done by undo_redo_manager(?)
@@ -82,10 +78,7 @@ Component root {
             // FIXME save old radius before changing it with the slider
             Process ca_ = ChangeRadiusAction (root.undo_redo_manager.actions, "cra_", getRef(root.gcircle_ref_), 10, $gcircle.c.r)
         }
-    }
-
-    
-    
+    }    
 }
 
 

@@ -10,9 +10,7 @@ CreateAction (Process view_)
 
     view aka view_
 
-    Component hidden (1) {
-
-    }
+    Component hidden (1)
 
     undo -> (this) {
         root = find(this, "//")

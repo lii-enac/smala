@@ -1,7 +1,85 @@
 // [7GUIs] Temperature Converter
 // [7GUIs] https://eugenkiss.github.io/7guis/tasks#temp
-
 // [7GUIs] Challenges: bidirectional data flow, user-provided text input.
+
+use core
+use base
+use display
+use gui
+
+import gui.widgets.StandAlonePushButton
+import gui.widgets.UITextField
+import gui.widgets.HBox
+import gui.widgets.Label
+
+
+_main_
+Component root {
+    Frame f ("7GUIs Temperature Converter UNFINISHED", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing
+    f.close ->! mainloop
+
+    UITextField _TC              // [7GUIs] two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
+    Label c_text(" celsius =")
+    Label f_text(" farenheit")
+    UITextField _TF              // [7GUIs] Initially, both TC and TF are empty.
+
+    HBox h(f) {}
+    addChildrenTo h.items {
+        _TC,
+        c_text,
+        _TF,
+        f_text
+    }
+    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible :-/
+    TC aka h.items.[1]
+    TF aka h.items.[3]
+
+    TC.text_color = #FFFFFF
+    TF.text_color = #FFFFFF
+
+
+    Double C(0)
+    Double F(0)
+
+    // The code below could be the most straightforward but it introduces a cycle
+    // (F - 32) * (5/9.) => C        // [7GUIs] C = (F - 32) * (5/9)
+    //  C * (9/5.) + 32 => F         // [7GUIs] F = C * (9/5) + 32
+    // It would be better done this way, but more work needs to be done in the execution engine FIXME
+    
+    // To avoid the cycle, we use a Switch to specify which direction is required according to the user interaction
+    Switch conv_dir (from_C_to_F) {  // [7GUIs] The formula for converting a temperature C in Celsius into a temperature F in Fahrenheit is
+        Component from_F_to_C {
+            (F - 32) * (5/9.) =:> C  // [7GUIs] C = (F - 32) * (5/9)
+        }
+        Component from_C_to_F {      // [7GUIs] and the dual direction is
+            C * (9/5.) + 32 =:> F    // [7GUIs] F = C * (9/5) + 32.
+        }
+    }
+
+    TC.text -> {
+        "from_C_to_F" =: conv_dir.state // [7GUIs] When the user enters a numerical value into TC the corresponding value in TF is automatically updated
+    }
+    TF.text -> {
+        "from_F_to_C" =: conv_dir.state // [7GUIs] and vice versa.
+    }
+
+    // [7GUIs] TODO When the user enters a non-numerical string into TC the value in TF is not updated and vice versa.
+
+    // conv_dir.from_C_to_F ~> C
+    // conv_dir.from_F_to_C ~> F
+
+    TC.text =:> C
+    toString(C) => TC.field.content.text
+
+    TF.text =:> F
+    toString(F) => TF.field.content.text
+
+    // debug
+    // TextPrinter tp
+    // "" + C + " " + F + " " + TF.text + " " + conv_dir.state =:> tp.input
+}
+
+
 
 // [7GUIs] The task is to build a frame containing two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
 // [7GUIs] Initially, both TC and TF are empty.
@@ -21,91 +99,3 @@
 // [7GUIs] It is such a widespread example—sometimes also in the form of a currency converter—that one could give a thousand references.
 // ([SCO]  inc. those of Jef Raskin)
 // [7GUIs] The same is true for the Counter task.
-
-use core
-use base
-use display
-use gui
-
-import gui.widgets.StandAlonePushButton
-import gui.widgets.UITextField
-import gui.widgets.HBox
-import gui.widgets.Label
-
-
-_main_
-Component root {
-    // [7GUIs] The task is to build a frame containing
-    Frame f ("7GUIs Temperature Converter", 0, 0, 600, 600)
-    f.close ->! mainloop
-
-    // [7GUIs] two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
-    // [7GUIs] Initially, both TC and TF are empty.
-
-    UITextField _TC
-    Label c_text(" celsius =")
-    Label f_text(" farenheit")
-    UITextField _TF
-
-    HBox h(f) {}
-    addChildrenTo h.items {
-        _TC,
-        c_text,
-        _TF,
-        f_text
-    }
-    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible :-/
-    TC aka h.items.[1]
-    TF aka h.items.[3]
-
-    TC.text_color = #FFFFFF
-    TF.text_color = #FFFFFF
-
-    // [7GUIs] The formula for converting a temperature C in Celsius into a temperature F in Fahrenheit is
-    // [7GUIs] C = (F - 32) * (5/9)
-    // [7GUIs] and the dual direction is
-    // [7GUIs] F = C * (9/5) + 32.
-
-    Double C(0)
-    Double F(0)
-
-    // The code below could be the most straightforward but it introduces a cycle
-    // (F - 32) * (5/9.) => C
-    //  C * (9/5.) + 32 => F
-    // It would be better done this way, but more work needs to be done in the execution engine FIXME
-    
-    // To avoid the cycle, we use a Switch to specify which direction is required according to the user interaction
-    Switch conv_dir (from_C_to_F) {
-        Component from_F_to_C {
-            (F - 32) * (5/9.) =:> C
-        }
-        Component from_C_to_F {
-            C * (9/5.) + 32 =:> F
-        }
-    }
-
-
-    // [7GUIs] When the user enters a numerical value into TC the corresponding value in TF is automatically updated and vice versa.
-    // [7GUIs] When the user enters a non-numerical string into TC the value in TF is not updated and vice versa. FIXME!!
-
-    TC.text -> {
-        "from_C_to_F" =: conv_dir.state
-    }
-    TF.text -> {
-        "from_F_to_C" =: conv_dir.state
-    }
-
-    conv_dir.from_C_to_F ~> C
-    conv_dir.from_F_to_C ~> F
-
-    TC.text =:> C
-    toString(C) => TC.field.content.text
-
-    TF.text =:> F
-    toString(F) => TF.field.content.text
-
-    // debug
-    // TextPrinter tp
-    // "" + C + " " + F + " " + TF.text + " " + conv_dir.state =:> tp.input
-
-}

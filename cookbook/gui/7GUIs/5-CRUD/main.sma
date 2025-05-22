@@ -1,5 +1,6 @@
 // [7GUIs] CRUD
 // [7GUIs] https://eugenkiss.github.io/7guis/tasks#CRUD
+// [7GUIs] Challenges: separating the domain and presentation logic, managing mutation, building a non-trivial layout.
 
 use core
 use base
@@ -72,6 +73,8 @@ Component root {
             // create update delete
         }
     }
+
+    // TODO !!
     
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
@@ -89,8 +92,6 @@ Component root {
 }
 
 
-
-// [7GUIs] Challenges: separating the domain and presentation logic, managing mutation, building a non-trivial layout.
 
 // [7GUIs] The task is to build a frame containing the following elements:
 // [7GUIs] a textfield Tprefix, a pair of textfields Tname and Tsurname, a listbox L,

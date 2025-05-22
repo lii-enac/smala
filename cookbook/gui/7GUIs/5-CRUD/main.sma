@@ -10,12 +10,15 @@ use gui
 import gui.widgets.PushButton
 import gui.widgets.UITextField
 import gui.widgets.VBox
+import gui.widgets.HBox
 import gui.widgets.ComboBox
+import gui.widgets.Label
 
 _native_code_
 %{
+    #include "core/property/text_property.h"
     bool validate_date(Process *tf, Process *b_valid) {
-        auto tf_text = dynamic_cast<TextProperty*> (tf);
+        auto tf_text = dynamic_cast<djnn::TextProperty*> (tf);
         if (tf_text) {
             djnnstl::string s = tf_text ->get_value();
             // TODO
@@ -37,7 +40,7 @@ Component root {
     UITextField T_prefix    // [7GUIs] a textfield Tprefix
     UITextField T_name      // [7GUIs] a pair of textfields Tname and Tsurname,
     UITextField T_surname
-    Listbox L               // [7GUIs] a listbox L,
+    //Listbox L               // [7GUIs] a listbox L,
 
     PushButton BC("Create") // [7GUIs] buttons BC,
     PushButton BU("Update") // [7GUIs] BU and
@@ -48,28 +51,28 @@ Component root {
     Label surname("Surname:")
 
 
-    VBox b_all {
-        HBox filter {
-            VBox _ {
+    VBox b_all(f) {
+        HBox filter(f) {
+            VBox _(f) {
                 // label field
             }
         }
-        HBox data {
-            VBox _ {
-                HBox _ {
+        HBox data(f) {
+            VBox _(f) {
+                HBox _(f) {
                     // list props
-                    VBox props {
-                        HBox name {
+                    VBox props(f) {
+                        HBox name(f) {
                             // label field
                         }
-                        HBox surname {
+                        HBox surname(f) {
                             // label field
                         }
                     }
                 }
             }
         }
-        HBox buttons {
+        HBox buttons(f) {
             // create update delete
         }
     }

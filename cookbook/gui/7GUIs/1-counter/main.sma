@@ -23,10 +23,10 @@ Component root {
 
     // solution #1
     Int counter(0)                            // [7GUIs] Initially, the value in T is “0”
+    counter =:> T.content.text
     B.click -> {                              // [7GUIs] and each click of B
         counter + 1 =: counter                // [7GUIs] increases the value in T by one.
     }
-    counter =:> T.content.text
 
     // // solution #2
     // Incr counter(0)                        // [7GUIs] Initially, the value in T is “0”

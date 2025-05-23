@@ -53,7 +53,7 @@ Component root {
 
     f.background_rect.press -> (root) {             // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
         addChildrenTo root.canvas {
-            // FIXME? cannot create inline component with another, deeper native 
+            // FIXME? cannot create inline component with another, deeper native, the compiler error seems pointless
             CircleItem gcircle (root, $root.f.background_rect.press.x, $root.f.background_rect.press.y) // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
             setRef(root.gcircle_ref_, &gcircle)
         }

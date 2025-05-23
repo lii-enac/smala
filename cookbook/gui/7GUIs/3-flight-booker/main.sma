@@ -35,8 +35,8 @@ Component root {
     f.close ->! mainloop
 
     ComboBox _C                 // [7GUIs] a combobox C
-    UITextField _T1             // [7GUIs] two textfields T1 and T2 representing the start and return date, respectively,
-    UITextField _T2
+    UITextField _T1             // [7GUIs] two textfields T1
+    UITextField _T2             // [7GUIs] and T2 representing the start and return date, respectively,
     PushButton _B("Book")       // [7GUIs] and a button B for submitting the selected flight.
 
     VBox h(f) {}

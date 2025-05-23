@@ -19,8 +19,8 @@ Component root {
     f.close ->! mainloop
 
     UITextField _TC              // [7GUIs] two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
-    Label c_text(" celsius =")
-    Label f_text(" farenheit")
+    Label c_text(" celsius =")   // [7GUIs] (implicit) and...
+    Label f_text(" farenheit")   // [7GUIs] ... two labels
     UITextField _TF              // [7GUIs] Initially, both TC and TF are empty.
 
     HBox h(f) {}
@@ -56,17 +56,14 @@ Component root {
         }
     }
 
-    TC.text -> {
-        "from_C_to_F" =: conv_dir.state // [7GUIs] When the user enters a numerical value into TC the corresponding value in TF is automatically updated
+    TC.text -> {                        // [7GUIs] When the user enters a numerical value into TC
+        "from_C_to_F" =: conv_dir.state // [7GUIs] the corresponding value in TF is automatically updated
     }
-    TF.text -> {
-        "from_F_to_C" =: conv_dir.state // [7GUIs] and vice versa.
+    TF.text -> {                        // [7GUIs] and
+        "from_F_to_C" =: conv_dir.state // [7GUIs] vice versa.
     }
 
     // [7GUIs] TODO When the user enters a non-numerical string into TC the value in TF is not updated and vice versa.
-
-    // conv_dir.from_C_to_F ~> C
-    // conv_dir.from_F_to_C ~> F
 
     TC.text =:> C
     toString(C) => TC.field.content.text

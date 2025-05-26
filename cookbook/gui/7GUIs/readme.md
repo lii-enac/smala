@@ -26,10 +26,10 @@ find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]"
 - TODO
   - validate dates
   - init dates
+  - validation only if T2 is active
   
 - FIXME
   - combobox not inited
-  - validation only if T2 is active
 
 
 ## 4-timer
@@ -42,7 +42,7 @@ find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]"
 
 
 ## 5-CRUD
-*Not working*
+*Not* working
 - TODO
     - ListBox
     - everything
@@ -58,3 +58,23 @@ find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]"
   - undoing creation necessitates multiple triggering
 - IDEAS
   - could we propose a typical ChangePropertyAction that takes a property, an old value and a new value?
+
+
+## 7-cells
+Operations:
+  - click in a cell (say B4), the edit box should move into the cell, enter "=sum(A2:A7"), enter, B4 should display 0
+  - click in cell A3, enter 32, B4 should be updated to 32
+  - click in cell A5, enter 5, B4 should now display 37 
+
+- FIXME
+  - z order, why does the edit box is under the cell boundaries??
+    - we thus have to resize the cell bg...
+  - the status of the interaction goes into limbo sometimes
+  - add 'mean' as a function (and others...)
+  - Bindings could be created in the smala program, not in the C++ formula parsing code
+
+
+## other stuff:
+  - Rename Component into Composite
+  - rename 'Native'/lambda (it's called like that in the parser :-/) into something more appropriate
+  - maybe capture more variables into 'native'

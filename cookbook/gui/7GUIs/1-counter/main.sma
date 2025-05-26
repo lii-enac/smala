@@ -16,9 +16,9 @@ Component root {
     f.close ->! mainloop 
 
     TextField T(0,0, 100, 20)                 // [7GUIs] a label or read-only textfield T and
-    T.text_color = #FFFFFF
+    T.text_color = #FFFFFF                  // FIXME should be a value that enables reading!
     
-    OutlineColor _(255,255,255)
+    OutlineColor _(255,255,255)               // FIXME should be a sensible value
     StandAlonePushButton B("Count", 100, 0)   // [7GUIs] a button B.
 
     // solution #1

@@ -46,7 +46,7 @@ Component root {
     Clock cl(100)           // [7GUIs] ...timer...  // (there is a Timer Process in djnn, but with a different semantic)
     cl.tick -> { e + 0.1 =: e }
 
-    // bv is the bounded value of the Gauge
+    // bv is the bounded value of the Gauge // FIXME? isn't this too dependent on the implementation? or not...
     d * 10 =:> G.bv.max     // [7GUIs] a gauge G for the elapsed time e
     e * 10 =:> G.bv.input
     

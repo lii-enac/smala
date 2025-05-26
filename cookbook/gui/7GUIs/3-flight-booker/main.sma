@@ -19,7 +19,7 @@ _native_code_
         auto tf_text = dynamic_cast<TextProperty*> (tf);
         if (tf_text) {
             djnnstl::string s = tf_text ->get_value();
-            // TODO
+            // TODO, with regexp?
         }
         return true;
     }

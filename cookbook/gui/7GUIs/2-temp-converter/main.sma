@@ -34,7 +34,7 @@ Component root {
     TC aka h.items.[1]
     TF aka h.items.[3]
 
-    TC.text_color = #FFFFFF
+    TC.text_color = #FFFFFF     // FIXME should be a value that enables reading!
     TF.text_color = #FFFFFF
 
 

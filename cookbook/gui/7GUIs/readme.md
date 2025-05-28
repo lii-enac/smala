@@ -69,9 +69,12 @@ Operations:
 - FIXME
   - z order, why does the edit box is under the cell boundaries??
     - we thus have to resize the cell bg...
+  - coordinates of text, edit box etc. makes it difficult to display things on top of other ones
+  - 
   - the status of the interaction goes into limbo sometimes
   - add 'mean' as a function (and others...)
   - Bindings could be created in the smala program, not in the C++ formula parsing code
+  - List instead of Component, otherwise the symtable contains the last created cell (they all have the same name)
 
 
 ## other stuff:

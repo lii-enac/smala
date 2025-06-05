@@ -14,7 +14,6 @@ find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]"
 
 ## 1-counter:
 - FIXME
-  - frame should have default values
   - TextField.text_color default values
 
 ## 2-temp-converter

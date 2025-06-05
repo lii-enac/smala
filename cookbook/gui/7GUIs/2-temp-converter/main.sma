@@ -15,7 +15,7 @@ import gui.widgets.Label
 
 _main_
 Component root {
-    Frame f ("7GUIs Temperature Converter UNFINISHED", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing
+    Frame f ("7GUIs Temperature Converter UNFINISHED")  // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
     UITextField _TC              // [7GUIs] two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.

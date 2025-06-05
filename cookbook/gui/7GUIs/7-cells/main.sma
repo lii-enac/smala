@@ -162,7 +162,7 @@ cpp_compute_formula (Process* c)
 
 _main_
 Component root {
-    Frame f ("7GUIs Cells UNFINISHED", 600, 0, 600, 600)  // [7GUIs] The task is to create a simple but usable spreadsheet application.
+    Frame f ("7GUIs Cells UNFINISHED")  // [7GUIs] The task is to create a simple but usable spreadsheet application.
     f.close ->! mainloop
 
     // [7GUIs] The spreadsheet should be scrollable.

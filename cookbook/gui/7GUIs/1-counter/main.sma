@@ -12,7 +12,7 @@ import gui.widgets.StandAlonePushButton
 
 _main_
 Component root {
-    Frame f("7GUIs Counter", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing
+    Frame f("7GUIs Counter")                  // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop 
 
     TextField T(0,0, 100, 20)                 // [7GUIs] a label or read-only textfield T and

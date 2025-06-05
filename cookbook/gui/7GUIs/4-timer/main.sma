@@ -15,8 +15,7 @@ import gui.widgets.HBox
 
 _main_
 Component root {
-    Frame f ("7GUIs Timer", 0, 0, 600, 600)   // [7GUIs] The task is to build a frame containing
-                         // FIXME there should be default parameters to Frame
+    Frame f ("7GUIs Timer") // [7GUIs] The task is to build a frame containing
     f.close ->! mainloop
     mouseTracking = 1    // FIXME otherwise Slider adjustment won't work
     //Gauge _G(50)                            // [7GUIs] a gauge G for the elapsed time e,

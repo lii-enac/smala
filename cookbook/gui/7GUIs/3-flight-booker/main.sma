@@ -44,7 +44,7 @@ _native_code_
 
 _main_
 Component root {
-    Frame f ("7GUIs Flight Booker - DOES NOT WORK YET", 600, 0, 600, 600) // [7GUIs] The task is to build a frame containing
+    Frame f ("7GUIs Flight Booker - DOES NOT WORK YET") // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
     ComboBox _C                 // [7GUIs] a combobox C

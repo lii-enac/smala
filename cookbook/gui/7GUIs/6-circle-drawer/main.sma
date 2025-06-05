@@ -20,7 +20,7 @@ import CircleItem
 
 _main_
 Component root {
-    Frame f ("7GUIs Circle Drawer - DOES NOT WORK YET AS REQUIRED", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing...
+    Frame f ("7GUIs Circle Drawer - DOES NOT WORK YET AS REQUIRED")  // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
     mouseTracking = 1 // for enter and leave events FIXME should be automatic
 

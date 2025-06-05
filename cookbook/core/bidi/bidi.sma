@@ -19,12 +19,13 @@ use gui
 
 import HMI
 
-// does not work yet, but it would be excellent it if would
+// does not work yet without _AUTHORIZE_CYCLE, but it would be excellent it if would
 // idea: when detecting a cycle, test if it's with properties
 // if yes
 // test previous value: if it's the same, silently ignore the cycle
 // if it's not the same, raise the error
 // idea2: when detecting a cycle, do nothing, just don't activate again
+// idea3: reuse cycle number/id
 
 // could have been:
 // f2c : (5./9.) * (fahrenheit-32) => celsius
@@ -35,17 +36,17 @@ _main_
 Component root {
   _AUTHORIZE_CYCLE = 1
 
-  // first bidi: fahrenheit <=> celsius model
+  // 1st bidi: fahrenheit <=> celsius model
   Double fahrenheit (0)
   Double celsius (0)
 
-  (5./9.) * (fahrenheit-32) => celsius
-  (9./5.) * celsius + 32 => fahrenheit
+  (5./9.) * (fahrenheit - 32) => celsius
+  (9./5.  *  celsius)   + 32  => fahrenheit
 
-  // HMI hidden bidi in scale
+  // 2nd bidi: slider position <=> value in sliders of the HMI (value is actually an VM from MVVM )
   HMI hmi()
 
-  // 2nd bidi: M <=> VM (VM = View Model of MVVM)
+  // 3rd bidi: M <=> VM
   fahrenheit => hmi.sf.value
   hmi.sf.value => fahrenheit
   

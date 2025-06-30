@@ -16,6 +16,12 @@ use base
 use display
 use gui
 
+_native_code_
+%{
+#include <cmath>
+%}
+
+
 _action_
 smala_build_pie_menu (Process src, Process data)
 {     

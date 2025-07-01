@@ -74,6 +74,7 @@ Component root {
     FillColor fc (White)
     Circle icon (0, 0, 30)
     PieMenu piemenu (frame, 0, 0, 50, 150)
+    piemenu.text_size_px = 20
     items_list =: piemenu.model
   #AA30BB =: piemenu.background_color
 

@@ -94,7 +94,6 @@ smala_build_pie_menu (Process src, Process data)
           FillColor fc ($data.foreground_color)
           data.foreground_color =:> fc.value
           FontSize fs (5, $data.text_size_px) // 5 = pixel
-          data.text_size_px =:> fs.size
           Translation t2 (0, 0)
           TextAnchor _ (1) // middle
           Text text (0, 0, getString (items_list.[i+1]))

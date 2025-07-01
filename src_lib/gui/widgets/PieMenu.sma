@@ -149,7 +149,7 @@ smala_build_pie_menu (Process src, Process data)
 }
 
 _define_
-PieMenu (Process _frame, double x_, double y_, int _inner_radius, int _outer_radius) {
+PieMenu (double x_, double y_, int _inner_radius, int _outer_radius) {
   
   mouseTracking = 1
   Translation t (x_, y_)
@@ -157,7 +157,6 @@ PieMenu (Process _frame, double x_, double y_, int _inner_radius, int _outer_rad
   /*----- interface -----*/
   x aka t.tx
   y aka t.ty
-  frame aka _frame
   RefProperty model (0)
   DerefInt model_size (model, "size", DJNN_GET_ON_CHANGE)
   Int outer_radius (_outer_radius)

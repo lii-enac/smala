@@ -36,7 +36,7 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (frame, 0, 0, 50, 150)
+    PieMenu piemenu (0, 0, 50, 150)
     items_list =: piemenu.model
 
     "Value : " + piemenu.value =:> result.text
@@ -73,7 +73,7 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (frame, 0, 0, 50, 150)
+    PieMenu piemenu (0, 0, 50, 150)
     piemenu.text_size_px = 20
     items_list =: piemenu.model
   #AA30BB =: piemenu.background_color
@@ -115,7 +115,7 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (frame, 0, 0, 35, 100)
+    PieMenu piemenu (0, 0, 35, 100)
     items_list =: piemenu.model
   #FFFFFF =: piemenu.background_color
   #AA30BB =: piemenu.foreground_color

@@ -9,9 +9,9 @@ Component root
   Frame f ("my frame", 0, 0, 500, 300)
   Exit ex (0, 1)
   f.close -> ex
+
   TextPrinter tp
   TextPrinter tp2
-  TextPrinter tp3
 
   FillColor _ (100, 100, 100)
   Rectangle r1 (10, 30, 150, 70, 0, 0)
@@ -54,7 +54,6 @@ Component root
   r4.press -> set_press
 
   r5.press -> na_set_null:(root) {
-    // print ("Set null !")
     setRef (root.current, null)
   }
   // r5.press -> {
@@ -69,8 +68,11 @@ Component root
   incr.state =:> t.text
 
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
+  Text _ ($r1.x + $r1.width / 2, $r1.y + $r1.height / 2, "set rect 1")
+  Text _ ($r2.x + $r2.width / 2, $r2.y + $r2.height / 2, "set rect 2")
   Text _ ($r3.x + $r3.width / 2, $r3.y + $r3.height / 2, "'.move'")
   Text _ ($r4.x + $r4.width / 2, $r4.y + $r4.height / 2, "'.press'")
+  Text _ ($r5.x + $r5.width / 2, $r5.y + $r5.height / 2, "set null")
 
   "Ref current is null ? " + current.is_null =:> tp.input
 
@@ -79,11 +81,7 @@ Component root
   }
 
   current.is_null.true -> {
-    "Ref current is NULL" =: tp3.input
+    "Ref current is NULL" =: tp2.input
   }
-
-  // current.is_null -> (root) {
-  //   dump root.current
-  // }
 }
 

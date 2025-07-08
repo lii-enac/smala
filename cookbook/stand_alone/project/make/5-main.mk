@@ -141,9 +141,9 @@ config_test:
 		printf "\033[0;31m \n\n The config.mk file does not exist. Please run 'make config' to create it and configure it.\033[0m\n\n" ; exit 1 ; \
 	fi
 
-test: config_test $(exe)
+test: config_test $(full_exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(launch_cmd) "$(shell pwd)/$(full_exe)")
-dbg: $(exe)
+dbg: $(full_exe)
 	(cd $(exe_dir); env $(LD_LIBRARY_PATH)=$(ld_library_path):$$$(LD_LIBRARY_PATH) $(debugger) "$(shell pwd)/$(full_exe)")
 .PHONY: test config_test
 

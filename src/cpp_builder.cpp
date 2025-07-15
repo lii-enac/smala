@@ -2580,7 +2580,6 @@ namespace Smala
       //os << "error " ... // djnn-cpp should raise an error
       
     } else {
-      m_parent_list.push_back (new BuildNode (s, m_parent_list.back ()));
       push_ctxt (s);
       /* FIXME dirty trick to set the parent name of the enclosed nodes*/
       node->set_build_name (s);

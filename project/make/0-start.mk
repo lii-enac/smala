@@ -6,7 +6,7 @@ MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
 MAJOR = 1
-MINOR = 21
+MINOR = 22
 MINOR2 = 0
 
 default: smalac

@@ -6,6 +6,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : <https://github.com/lii-enac/djnn-cpp>
 
+## [1.22.0] - 2025-07-29
+
+### compliant with djnn-cpp [1.22.0]
+
+### NEW
+
+    - NEW Pie Menu widget with corresponding cookbook recipe
+    - NEW debug variable `_STYLUS_EMULATE_MOUSE` for stylus emulation
+    - NEW  `load_from_XML` and `load_from_XML_once` APIs for parsing hidden SVG attributes
+    - NEW cookbook recipe for sprite animation
+    - NEW stylus recipes (pen and eraser functionality)
+
+### Added
+
+    - Dockerfile instructions for Raspberry Pi builds
+    - Enhanced RefProperty recipe with `is_null` BoolProperty usage example
+    - New line-circle intersection recipes (v1 and v2)
+    - PixmapLayer component in smala lib with cookbook example
+    - 7GUIs cookbook examples (all 7 tasks implemented)
+    - Architectural pattern examples (MVC, MVVM, PAC, etc.) in cookbook
+    - `_DEBUG_ENABLE_STRESS_TEST` mode for execution order testing
+    - Standalone Makefile improvements for test rules
+    - INSTALL.md instructions for compilation without Makefile
+    - Rpath configuration for smala lib in Makefile
+    - Multi-touch recipes (RRR_DYN, RRRR with RR_T behavior)
+
+### Changed
+
+    - Replaced `_DEBUG_NO_TOUCH_EVENT` with `_ENABLE_TOUCHES` (inverted behavior)
+    - Improved multi-touch recipes and activation documentation
+    - Refactored architecture examples with improved comments
+    - Updated bidi recipe with better comments and alignment
+    - Enhanced layer recipe implementation
+
+### Fixed
+
+    - Parser stack push issue in `addChildrenTo` method
+    - Standalone Makefile test rule (`exe` → `full_exe`)
+    - Linux and Windows compilation errors
+    - Smala "while" statement generation
+    - Animator alternating animations sequence
+    - Path specification update mechanism
+    - Segment intersection calculation
+    - Simple touch recipe compatibility
+    - Gesture recognition deactivation on Linux
+    - djnn-cpp.pc path in Makefile
+    - Sanitizer compilation configuration
+    - Layer recipe cropping behavior
+
 ## [1.21.0] - 2024-07-15
 
 ### compliant with djnn-cpp [1.21.0]

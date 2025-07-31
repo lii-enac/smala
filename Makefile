@@ -674,7 +674,7 @@ pkg_config_install_prefix := $(abspath $(DESTDIR)$(PREFIX))
 ifeq ($(os),Linux)
 sed_pkg_config_install_prefix := /usr
 else
-sed_pkg_config_install_prefix := pkg_config_install_prefix
+sed_pkg_config_install_prefix := $(pkg_config_install_prefix)
 endif
 endif
 

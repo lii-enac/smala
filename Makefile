@@ -142,8 +142,13 @@ debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lld
 #other_runtime_lib_path += /Users/conversy/recherche/istar/code/misc/mesa/builddir/src/gallium/targets/osmesa
 #other_runtime_lib_path += /Users/conversy/recherche/istar/code/misc/SDL2-2.28.1/local/lib
 #CFLAGS_COMMON += -isysroot $(shell xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+ifeq ($(PREFIX),)
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
+else
+CXXFLAGS_SC += -I$(brew_prefix)/opt/flex/include
+LDFLAGS_SC += -L$(brew_prefix)/opt/flex/lib
+endif
 #lib_suffix =.dylib
 #DYNLIB ?= -dynamiclib
 endif

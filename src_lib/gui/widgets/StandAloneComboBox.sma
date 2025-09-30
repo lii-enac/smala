@@ -39,25 +39,42 @@ _native_code_
 //   return p->get_parent ();
 // }
 
-static int has_item (Process *item, Process *list) {
-  auto& str_item = ((djnn::TextProperty*)item)->get_value ();
-  for (auto p : ((djnn::List*)list)->children ()) {
-    if (((djnn::TextProperty*)item)->get_value () == ((djnn::TextProperty*)p->find_child("t/text"))->get_value ()) {
-      return 1;
+static int has_item(Process* item, Process* list) {
+    auto* tp_item = dynamic_cast<djnn::AbstractTextProperty*>(item);
+    if (!tp_item) return 0;
+
+    const auto& str_item = tp_item->get_value();
+
+    auto* tp_list = dynamic_cast<djnn::List*>(list);
+    if (!tp_list) return 0;
+
+    for (auto p : tp_list->children()) {
+        auto* tp_child = dynamic_cast<djnn::AbstractTextProperty*>(p->find_child("t/text"));
+        if (tp_child && str_item == tp_child->get_value()) {
+            return 1;
+        }
     }
-  }
-   return 0;
+    return 0;
 }
 
-static int has_str_item (Process *item, Process *list) {
-  auto& str_item = ((djnn::TextProperty*)item->find_child("t/text"))->get_value ();
-  for (auto p : ((djnn::List*)list)->children ()) {
-    if ( ((djnn::TextProperty*)p)->get_value () == str_item) {
-      return 1;
+static int has_str_item(Process* item, Process* list) {
+    auto* tp_item = dynamic_cast<djnn::AbstractTextProperty*>(item->find_child("t/text"));
+    if (!tp_item) return 0;
+
+    const auto& str_item = tp_item->get_value();
+
+    auto* tp_list = dynamic_cast<djnn::List*>(list);
+    if (!tp_list) return 0;
+
+    for (auto p : tp_list->children()) {
+        auto* tp_child = dynamic_cast<djnn::AbstractTextProperty*>(p);
+        if (tp_child && tp_child->get_value() == str_item) {
+            return 1;
+        }
     }
-  }
-   return 0;
+    return 0;
 }
+
 
 %}
 

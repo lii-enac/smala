@@ -1,76 +1,20 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-
-    //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-    //"program": "${workspaceFolder}/build/cookbook/comms/midi/midi_app",
-    //"program": "${workspaceFolder}/build/cookbook/core/nativeactions/nativeactions_app",
-    //"program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
-
     "version": "0.2.0",
     "configurations": [
-    
     {
-        "name": "(lldb) smala - cookbook",
-        //"type": "cppdbg",
+        "name": "(lldb) smala - simplest_app",
         "type": "lldb",
         "request": "launch",
-        //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/pick_fill/pick_fill_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/svg/svg_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/zoom/tile_grid/tile_grid_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/layer/layer_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/fitts_law/fitts_law_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/dynamic_rectangle/dynamic_rectangle_app",
-        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/multi_touch/multi_touch_app",
-        //"program": "${workspaceFolder}/build/cookbook/gui/chat/chat_app",
-        "args": ["\"\""],
-        //"stopOnEntry": true,
-        //"cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/pick_fill", // path to cookbook file
-        //"cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/dynamic_rectangle", // path to cookbook file
-        //"cwd": "${workspaceFolder}/cookbook/gui/layer", // path to cookbook file
-        //"cwd": "${workspaceFolder}/cookbook/gui/chat", // path to cookbook file
-        "cwd": "${workspaceFolder}/cookbook/gui/svg",
-        //"cwd": "${workspaceFolder}",
-        //"sourceMap": { ".": "${workspaceFolder}/cookbook/gui/fitts_law"},
-        //"sourceMap": { ".": "${workspaceFolder}/djnn-cpp"},
-        //"preRunCommands": ["breakpoint set -f /Users/conversy/recherche/istar/code/djnn/smala/build/cookbook/gui/direct_manipulation/simplest/simplest.cpp -l 42"],
-        //"preLaunchTask": "app",
-        //"externalConsole": false,
-        //"MIMode": "lldb",
-        //"miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb",
-        // "linux": {
-        //     "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        //     // "MIMode": "gdb",
-        //     // "miDebuggerPath": "/usr/bin/gdb"
-        // },
-        // "osx": {
-        //     "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        //     // "MIMode": "lldb",
-        //     // "miDebuggerPath": "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb"
-        // },
-        // "windows": {
-        //     "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        //     // "MIMode": "gdb",
-        //     // "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
-        // },
-        "env":
-                {
-                    "DYLD_LIBRARY_PATH":"${DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib/:/Users/conversy/recherche/istar/code/misc/MGL/build:/Users/conversy/recherche/istar/code/misc/mesa/builddir/src/gallium/targets/osmesa:/Users/conversy/recherche/istar/code/misc/SDL2-2.28.1/local/lib",
-                    //"METAL_DEVICE_WRAPPER_TYPE":"1"
-                    //"PATH": "${PATH}:${workspaceFolder}/../djnn-cpp/build/lib"
-                }
-                // ,
-                // {
-                
-                // }
-                //,
-                // {
-                //     "name": "TSAN_OPTIONS",
-                //     "value": "report_bugs=1 halt_on_error=0 history_size=7"
-                // }
-        
+        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
+        "args": [],
+        "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest",
+        "env": {
+            "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib"
+        },
+        "sourceMap": {
+            "${workspaceFolder}/build": "${workspaceFolder}"
+        },
+        "preLaunchTask": "app"
     }
     ]
 }

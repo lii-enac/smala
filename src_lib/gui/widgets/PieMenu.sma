@@ -149,7 +149,7 @@ smala_build_pie_menu (Process src, Process data)
 }
 
 _define_
-PieMenu (double x_, double y_, int _inner_radius, int _outer_radius) {
+PieMenu (double x_, double y_, int _inner_radius, int _outer_radius, int _is_open) {
   
   mouseTracking = 1
   Translation t (x_, y_)
@@ -169,7 +169,7 @@ PieMenu (double x_, double y_, int _inner_radius, int _outer_radius) {
   Int outline_width (3)
   Int text_size_px (15)
 
-  Bool is_open (false)
+  Bool is_open (_is_open)
 
   /*----- interface -----*/
 

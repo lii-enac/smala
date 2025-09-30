@@ -36,15 +36,13 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (0, 0, 50, 150)
+    PieMenu piemenu (0, 0, 50, 150, 1)
     items_list =: piemenu.model
 
     "Value : " + piemenu.value =:> result.text
 
     FSM fsm_selection {
-      State idle {
-        "false" =: piemenu.is_open
-      }
+      State idle
       State selected {
         Component c {
           FillColor _ (Green)
@@ -73,7 +71,7 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (0, 0, 50, 150)
+    PieMenu piemenu (0, 0, 50, 150, 0)
     piemenu.text_size_px = 20
     items_list =: piemenu.model
   #AA30BB =: piemenu.background_color
@@ -81,9 +79,7 @@ Component root {
     "Value : " + piemenu.value =:> result.text
 
     FSM fsm_selection {
-      State idle {
-        "false" =: piemenu.is_open
-      }
+      State idle
       State selected {
         Component c {
           FillColor _ (Green)
@@ -115,7 +111,7 @@ Component root {
     Translation t (200, 200)
     FillColor fc (White)
     Circle icon (0, 0, 30)
-    PieMenu piemenu (0, 0, 35, 100)
+    PieMenu piemenu (0, 0, 35, 100, 1)
     items_list =: piemenu.model
   #FFFFFF =: piemenu.background_color
   #AA30BB =: piemenu.foreground_color
@@ -125,9 +121,7 @@ Component root {
     "Value : " + piemenu.value =:> result.text
 
     FSM fsm_selection {
-      State idle {
-        "false" =: piemenu.is_open
-      }
+      State idle
       State selected {
         Component c {
           FillColor _ (Green)

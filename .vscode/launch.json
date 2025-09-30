@@ -1,20 +1,41 @@
 {
     "version": "0.2.0",
     "configurations": [
-    {
-        "name": "(lldb) smala - simplest_app",
-        "type": "lldb",
-        "request": "launch",
-        "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
-        "args": [],
-        "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest",
-        "env": {
-            "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib"
+        {
+            "name": "(lldb) smala - cookbook (macOS)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
+            "args": [],
+            "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest",
+            "env": {
+                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib"
+            },
+            "sourceMap": {
+                "${workspaceFolder}/build": "${workspaceFolder}"
+            },
+            "preLaunchTask": "app"
         },
-        "sourceMap": {
-            "${workspaceFolder}/build": "${workspaceFolder}"
-        },
-        "preLaunchTask": "app"
-    }
+        {
+            "name": "(gdb) smala - cookbook (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cookbook/gui/direct_manipulation/simplest/simplest_app",
+            "args": [],
+            "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest",
+            "environment": [
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "${env:LD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "app",
+            "sourceFileMap": {
+                "${workspaceFolder}/build": "${workspaceFolder}"
+            }
+        }
     ]
 }

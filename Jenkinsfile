@@ -24,7 +24,7 @@ pipeline {
                     cleanWs()
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/pipeline']],
+                        branches: [[name: '*/master']],
                         userRemoteConfigs: [[
                             url: env.SMALA_URL,
                             credentialsId: env.GIT_CREDENTIAL_ID
@@ -75,7 +75,7 @@ pipeline {
                             cleanWs()
                             checkout([
                                 $class: 'GitSCM',
-                                branches: [[name: '*/pipeline']],
+                                branches: [[name: '*/master']],
                                 userRemoteConfigs: [[
                                     url: env.SMALA_URL,
                                     credentialsId: env.GIT_CREDENTIAL_ID
@@ -118,7 +118,7 @@ pipeline {
                             cleanWs()
                             checkout([
                                 $class: 'GitSCM',
-                                branches: [[name: '*/pipeline']],
+                                branches: [[name: '*/master']],
                                 userRemoteConfigs: [[
                                     url: env.SMALA_URL,
                                     credentialsId: env.GIT_CREDENTIAL_ID

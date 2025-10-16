@@ -174,7 +174,7 @@ Details: ${env.BUILD_URL}
         failure {
             emailext(
                 to: "${env.EMAIL1}, ${env.EMAIL2}",
-                subject: "❌ Build failed - smala #${currentBuild.number}",
+                subject: "❌ Pipeline build failed - smala #${currentBuild.number}",
                 body: """
 The build has failed.
 

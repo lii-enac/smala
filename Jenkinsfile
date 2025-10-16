@@ -53,7 +53,7 @@ pipeline {
                     emailext(
                         to: "${env.EMAIL1}, ${env.EMAIL2}",
                         subject: "❌ macOS build failed - smala #${currentBuild.number}",
-                        body: "The macOS build failed.\nDetails: ${env.BUILD_URL}"
+                        body: "The macOS build failed.\nDetails: ${env.BUILD_URL}\nError (last 100 lines):\n${currentBuild.rawBuild.getLog(100).join('\n')}"
                     )
                 }
             }
@@ -102,7 +102,7 @@ pipeline {
                             emailext(
                                 to: "${env.EMAIL1}, ${env.EMAIL2}",
                                 subject: "❌ Ubuntu build failed - smala #${currentBuild.number}",
-                                body: "The Ubuntu build failed.\nDetails: ${env.BUILD_URL}"
+                                body: "The Ubuntu build failed.\nDetails: ${env.BUILD_URL}\nError (last 100 lines):\n${currentBuild.rawBuild.getLog(100).join('\n')}"
                             )
                         }
                     }
@@ -142,7 +142,7 @@ pipeline {
                             emailext(
                                 to: "${env.EMAIL1}, ${env.EMAIL2}",
                                 subject: "❌ Windows build failed - smala #${currentBuild.number}",
-                                body: "The Windows build failed.\nDetails: ${env.BUILD_URL}"
+                                body: "The Windows build failed.\nDetails: ${env.BUILD_URL}\nError (last 100 lines):\n${currentBuild.rawBuild.getLog(100).join('\n')}"
                             )
                         }
                     }

@@ -157,7 +157,7 @@ pipeline {
                 if (currentBuild.previousBuild?.result == 'FAILURE') {
                     emailext(
                         to: "${env.EMAIL1}, ${env.EMAIL2}",
-                        subject: "✅ Back to normal - smala #${currentBuild.number}",
+                        subject: "✅ Pipeline back to normal - smala #${currentBuild.number}",
                         body: """
 The build has recovered after a failure.
 

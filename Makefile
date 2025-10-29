@@ -75,14 +75,18 @@ endif
 
 ifneq ($(pkgexists),0)
 ifneq ($(djnn_path),)
-djnn_cflags = -I$(djnn_path)/src
-djnn_ldflags = -L$(djnn_path)/build/lib
+
+ifndef  djnn_build_dir
+djnn_build_dir := $(djnn_path)/build/$(shell uname)-$(shell uname -m)
+endif
+djnn_cflags := -I$(djnn_path)/src
+djnn_lib_path := $(djnn_build_dir)/lib
+djnn_ldflags := -L$(djnn_lib_path)
 #djnn_ldlibs := -ldjnn-core -ldjnn-base -ldjnn-animation -ldjnn-audio -ldjnn-comms -ldjnn-display -ldjnn-exec_env -ldjnn-files -ldjnn-gui -ldjnn-input -ldjnn-utils
 djnn_modules ?= animation comms gui display input files utils base exec_env core
-djnn_ldlibs = $(addprefix -ldjnn-,$(djnn_modules))
-djnn_libs = $(djnn_ldflags) $(djnn_ldlibs)
-djnn_lib_path = $(djnn_path)/build/lib
-djnn_include_path_only = $(djnn_path)/src
+djnn_ldlibs := $(addprefix -ldjnn-,$(djnn_modules))
+djnn_libs := $(djnn_ldflags) $(djnn_ldlibs)
+djnn_include_path_only := $(djnn_path)/src
 else
 error no djnn_cpp path declared
 endif
@@ -189,6 +193,11 @@ LEX ?= flex
 
 CXXLD_CK ?= $(CXX_CK)
 
+#build_dir ?= build/$(shell uname)-$(shell uname -m) # too costly!!
+ifndef build_dir
+build_dir := build/$(shell uname)-$(shell uname -m)
+endif
+
 # -----------
 # smalac
 
@@ -248,26 +257,25 @@ smala_lib_headers := $(addprefix $(build_dir)/, $(patsubst %.sma,%.h,$(smala_lib
 smala_lib_path ?= $(smala_dst_lib_dir)
 
 $(smala_lib_objs): CXX = $(CXX_CK)
-$(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -Ibuild/src_lib
+$(smala_lib_objs): CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_PCH_DEF) $(CXXFLAGS_PCH_INC) $(CXXFLAGS_CK) -I$(build_dir)/src_lib
 
-# find build -name "*.d" | xargs grep -s "gui/widgets/IWidget.h" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/build/\$\(build_dir\)/ | xargs echo
-# find build/src_lib -name "*.d" | xargs grep -h build/src_lib | xargs echo
-# find build/src_lib -name "*.d" | xargs grep -h build/src_lib | grep -v cpp
-build/src_lib/gui/widgets/StandAloneComboBox.o: build/src_lib/gui/animation/Animator.h build/src_lib/gui/widgets/IWidget.h build/src_lib/gui/widgets/ComboBoxItem.h
-build/src_lib/gui/widgets/RadioButton.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/Label.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/VSlider.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/HSpace.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/PushButton.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/VBox.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/ToggleButton.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/ComboBox.o: build/src_lib/gui/widgets/IWidget.h build/src_lib/gui/widgets/ComboBoxItem.h
-build/src_lib/gui/widgets/VSpace.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/HBox.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/CheckBox.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/HSlider.o: build/src_lib/gui/widgets/IWidget.h
-build/src_lib/gui/widgets/UITextField.o: build/src_lib/gui/widgets/IWidget.h
-
+# find build -name "*.d" | xargs grep -s "gui/widgets/IWidget.h" | awk '{print $1}' | awk -F "." '{print $1".o"}' | sed s/$(build_dir)/\$\(build_dir\)/ | xargs echo
+# find $(build_dir)/src_lib -name "*.d" | xargs grep -h $(build_dir)/src_lib | xargs echo
+# find $(build_dir)/src_lib -name "*.d" | xargs grep -h $(build_dir)/src_lib | grep -v cpp
+$(build_dir)/src_lib/gui/widgets/StandAloneComboBox.o: $(build_dir)/src_lib/gui/animation/Animator.h $(build_dir)/src_lib/gui/widgets/IWidget.h $(build_dir)/src_lib/gui/widgets/ComboBoxItem.h
+$(build_dir)/src_lib/gui/widgets/RadioButton.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/Label.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/VSlider.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/HSpace.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/PushButton.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/VBox.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/ToggleButton.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/ComboBox.o: $(build_dir)/src_lib/gui/widgets/IWidget.h $(build_dir)/src_lib/gui/widgets/ComboBoxItem.h
+$(build_dir)/src_lib/gui/widgets/VSpace.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/HBox.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/CheckBox.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/HSlider.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
+$(build_dir)/src_lib/gui/widgets/UITextField.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
 
 ifeq ($(linker), gnu)
 smala_lib_rpath += -Wl,-rpath-link,$(abspath $(build_dir))/lib
@@ -495,7 +503,7 @@ $1_app_cppflags += -I$(smala_lib_header_dir)
 ifeq ($$(os),em)
 $1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else
-$1_app_libs += -Lbuild/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+$1_app_libs += -L$$(build_dir)/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
 ifeq ($(os),Linux)
 $1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux ld
 endif

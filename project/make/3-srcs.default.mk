@@ -1,5 +1,9 @@
 #relative path
 src_dir ?= src
+#build_dir ?= build # too costly...
+ifndef buildir
+build_dir ?= build/$(shell uname)-$(shell uname -m)
+endif
 res_dir ?= res
 exe_dir ?= .
 

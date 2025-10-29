@@ -32,12 +32,29 @@ endif
 
 ifneq ($(djnn_cpp_path),)
 djnn_cflags := -I$(djnn_cpp_path)/src
-djnn_lib_path := $(djnn_cpp_path)/build/lib
+djnn_build_dir ?= $(djnn_cpp_path)/build/$(shell uname)-$(shell uname -m)
+djnn_lib_path := $(djnn_build_dir)/lib
 djnn_modules ?= core exec_env base display comms gui input animation utils files audio
 djnn_ldflags = -L$(djnn_lib_path)
+
+ifeq ($(linker),gnu)
+djnn_ldflags += -Wl,-rpath-link,$(abspath $(djnn_lib_path)) -Wl,-rpath,$(abspath $(djnn_lib_path))
+else
+ifeq ($(linker),llvm)
+djnn_lib_rpath += -Wl,-install_name,$(abspath $(djnn_lib_path))
+else
+#djnn_ldflags = -L$(djnn_lib_path)
+endif
+endif
 endif
 
 ifneq ($(smala_path),)
+smala_build_dir ?= $(smala_path)/build/$(shell uname)-$(shell uname -m)
+smalac := $(smala_build_dir)/smalac
+smala_cflags := -I$(smala_build_dir)/src_lib
+smala_ldflags := -L$(smala_build_dir)/lib -lsmala
+smala_lib_path := $(smala_build_dir)/lib
+smala_lib_dir ?= $(smala_build_dir)/lib
 smalac := $(smala_path)/build/smalac
 smala_cflags := -I$(smala_path)/build/src_lib
 smala_ldflags := -L$(smala_path)/build/lib -lsmala

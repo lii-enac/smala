@@ -79,6 +79,7 @@ namespace Smala {
     void build_for_every (std::ostream &os, Node *node) override;
     std::string build_step (ExprNode *node) override;
     void build_while (std::ostream &os, Node *node) override;
+    void build_break (std::ostream &os, Node *n) override;
 
     void build_native_action_component (std::ostream &os, Node *n) override;
     void build_native_action (std::ostream &os, Node *n) override;

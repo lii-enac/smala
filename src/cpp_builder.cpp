@@ -949,6 +949,16 @@ namespace Smala
   }
 
   void
+  CPPBuilder::build_break (std::ostream &os, Node *n)
+  {
+
+    if (m_fastcomp && n->djnn_type() == "continue")
+      os << "return" << ";\n"; // we use a function and a 'lambda', continue does not work in a lambda obvioulsy
+    else  
+      os << n->djnn_type() << ";\n";
+  }
+
+  void
   CPPBuilder::build_end_block (std::ostream &os)
   {
     os << "}\n";

@@ -246,6 +246,10 @@ $(smalac_objs): override CXXFLAGS = $(CXXFLAGS_CFG) $(CXXFLAGS_SC)
 # ------------
 # smala lib
 
+ifeq ($(use_fast_compilation),yes)
+SMAFLAGS += -fastcomp
+endif
+
 smala_src_lib_dir := src_lib
 smala_dst_lib_dir := $(build_dir)/lib
 smala_lib_header_dir := $(build_dir)/$(smala_src_lib_dir)
@@ -478,6 +482,10 @@ app_srcs_dir := $$($1_app_srcs_dir)
 gen_srcs_dir := $(build_dir)/cookbook/$1
 
 include cookbook/$1/cookbook_app.mk
+
+ifeq ($(use_fast_compilation),yes)
+djnn_libs_cookbook_app += c_api
+endif
 
 $1_app_objs := $$(objs_cookbook_app)
 $1_app_gensrcs := $$($1_app_objs:.o=.cpp)

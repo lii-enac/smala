@@ -14,7 +14,9 @@ cookbook_app_for_make_test := button
 cookbook_apps_extra :=
 
 #smala flags
-#SMAFLAGS += -g #-gen-cleaner
+#SMAFLAGS += -g
+#SMAFLAGS += -gen-cleaner
+#use_fast_compilation := yes # requires the c_api module in djnn
 #-g for text in debug_info
 
 #C++ flags 
@@ -37,3 +39,5 @@ cookbook_apps_extra :=
 #em_ext_libs_path := ../djnn-emscripten-ext-libs
 
 #keep_intermediate = yes
+
+# ld_library_path += /...

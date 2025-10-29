@@ -55,11 +55,16 @@ smala_cflags := -I$(smala_build_dir)/src_lib
 smala_ldflags := -L$(smala_build_dir)/lib -lsmala
 smala_lib_path := $(smala_build_dir)/lib
 smala_lib_dir ?= $(smala_build_dir)/lib
-smalac := $(smala_path)/build/smalac
-smala_cflags := -I$(smala_path)/build/src_lib
-smala_ldflags := -L$(smala_path)/build/lib -lsmala
-smala_lib_path := $(smala_path)/build/lib
-smala_lib_dir ?= $(smala_path)/build/lib
+
+ifeq ($(linker),gnu)
+smala_lib_rpath += -Wl,-rpath-link,$(abspath $(smala_lib_path)) -Wl,-rpath,$(abspath $(smala_lib_path))
+smala_lib_rpath += -Wl,--no-undefined
+endif
+
+ifeq ($(linker),llvm)
+smala_lib_rpath := -Wl,-install_name,$(abspath $(smala_lib))
+endif
+
 endif
 
 # for emscripten

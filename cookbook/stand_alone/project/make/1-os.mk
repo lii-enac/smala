@@ -8,6 +8,7 @@ endif
 
 ifeq ($(os),Linux)
 compiler ?= gnu
+linker ?= gnu
 CFLAGS_COMMON += -fpic
 YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
@@ -19,6 +20,7 @@ endif
 
 ifeq ($(os),Darwin)
 compiler ?= llvm
+linker ?= llvm
 ifeq ($(PREFIX),)
 brew_prefix := $(shell brew --prefix)
 else

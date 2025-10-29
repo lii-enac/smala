@@ -120,7 +120,7 @@ YACC ?= bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 lib_suffix =.so
-#DYNLIB ?= -shared
+DYNLIB ?= -shared
 LDFLAGS_SC += -lstdc++fs
 endif
 
@@ -278,11 +278,14 @@ $(build_dir)/src_lib/gui/widgets/HSlider.o: $(build_dir)/src_lib/gui/widgets/IWi
 $(build_dir)/src_lib/gui/widgets/UITextField.o: $(build_dir)/src_lib/gui/widgets/IWidget.h
 
 ifeq ($(linker), gnu)
-smala_lib_rpath += -Wl,-rpath-link,$(abspath $(build_dir))/lib
+djnn_lib_rpath += -Wl,-rpath-link,$(abspath $(djnn_lib_path)) -Wl,-rpath,$(abspath $(djnn_lib_path))
+
+smala_lib_rpath += -Wl,-rpath-link,$(abspath $(build_dir))/lib -Wl,-rpath,$(abspath $(build_dir))/lib
 smala_lib_rpath += -Wl,--no-undefined
 endif
 
 ifeq ($(linker), llvm)
+djnn_lib_rpath += -Wl,-install_name,$(abspath $(djnn_lib_path))
 smala_lib_rpath := -Wl,-install_name,$(abspath $(smala_lib)) -Wl,-current_version,1.0.0 -Wl,-compatibility_version,1.0.0 
 endif
 
@@ -457,7 +460,7 @@ endif
 # cookbook apps
 
 ld_library_path := $(call join-with,:,$(ld_library_path))
-ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
+#ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 define cookbookapp_makerule
 djnn_libs_cookbook_app :=
@@ -489,7 +492,8 @@ $1_other_runtime_lib_path := $$(other_runtime_lib_path)
 
 #ifeq ($$(cookbook_cross_prefix),em)
 ifeq ($$(os),em)
-$1_app_libs := $$(addsuffix .bc,$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
+#$1_app_libs := $$(addsuffix $$(lib_suffix),$$(addprefix $$(djnn_lib_path)/libdjnn-,$$(djnn_libs_cookbook_app))) $$(libs_cookbook_app)
+$1_app_libs := $$(addprefix -ldjnn-,$$(djnn_libs_cookbook_app)) $$(libs_cookbook_app)
 
 #	--preload-file $$($1_app_srcs_dir)/$$($1_res_dir)@$$($1_res_dir)
 #	--preload-file /Library/Fonts/Arial.ttf@/usr/share/fonts/Arial.ttf
@@ -526,7 +530,7 @@ $1_app_link := $$(CXXLD_CK)
 $$($1_app_objs): CC = $$(CC_CK)
 $$($1_app_objs): CXX = $$(CXX_CK)
 $$($1_app_objs): CXXFLAGS_CK += $$($1_app_cppflags) $$($1_app_cflags)
-$$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags)
+$$($1_app_exe): LDFLAGS_CK += $$(djnn_ldflags) $$(djnn_lib_rpath)
 $$($1_app_exe): LIBS += $$($1_app_libs)
 
 $$($1_app_exe): $$($1_app_objs)

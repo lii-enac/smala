@@ -13,12 +13,13 @@ YACC = bison -d -W
 LD_LIBRARY_PATH=LD_LIBRARY_PATH
 debugger := gdb
 lib_suffix =.so
-DYNLIB = -shared
+DYNLIB ?= -shared
 LDFLAGS_SC += -lstdc++fs
 endif
 
 ifeq ($(os),Darwin)
 compiler ?= llvm
+linker ?= llvm
 ifeq ($(PREFIX),)
 brew_prefix := $(shell brew --prefix)
 else
@@ -33,7 +34,7 @@ debugger := PATH=/usr/bin /Applications/Xcode.app/Contents/Developer/usr/bin/lld
 CXXFLAGS_SC += -I$(shell brew --prefix flex)/include
 LDFLAGS_SC += -L$(shell brew --prefix flex)/lib
 lib_suffix =.dylib
-DYNLIB = -dynamiclib
+DYNLIB ?= -dynamiclib
 endif
 
 ifeq ($(os),MinGW)
@@ -43,5 +44,5 @@ YACC = bison -d -W
 LD_LIBRARY_PATH=PATH
 debugger := gdb
 lib_suffix =.dll
-DYNLIB = -shared
+DYNLIB ?= -shared
 endif

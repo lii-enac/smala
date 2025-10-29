@@ -306,6 +306,7 @@ namespace Smala
       final_os << "#include \"c_api/djnn_c_api.h\"\n";
     } else {
       final_os << "#include \"core/utils/containers/string.h\"" << std::endl;
+      final_os << "#include \"core/utils/to_string.h\"" << std::endl;
       final_os << "using djnnstl::string;" << std::endl;
       final_os << "using djnnstl::to_string;" << std::endl;
     }

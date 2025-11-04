@@ -466,6 +466,8 @@ endif
 ld_library_path := $(call join-with,:,$(ld_library_path))
 #ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
+user_defined_other_runtime_lib_path:=$(other_runtime_lib_path)
+
 define cookbookapp_makerule
 djnn_libs_cookbook_app :=
 smala_libs_cookbook_app :=
@@ -474,7 +476,7 @@ libs_cookbook_app :=
 cflags_cookbook_app :=
 cppflags_cookbook_app :=
 res_dir :=
-other_runtime_lib_path ?=
+other_runtime_lib_path :=$(user_defined_other_runtime_lib_path)
 
 ckappname := $$(notdir $1)
 $1_app_srcs_dir := cookbook/$1

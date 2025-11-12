@@ -208,6 +208,7 @@
 %token TIMES_ASSGNT_CONN "*=:>"
 %token PAUSED_CONNECTOR "::>"
 %token LAZY_CONNECTOR "=?>"
+%token LAZY_ASSGNT_CONN "=?:>"
 %token ASSIGNMENT "=:"
 %token PAUSED_ASSIGNMENT "::"
 %token LAZY_ASSIGNMENT "=?:"
@@ -1600,6 +1601,7 @@ connector_symbol
   | PAUSED_CONNECTOR { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, true, false, true, ' ', true); }
   | LAZY_CONNECTOR { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, true, true, ' ', true); }
   | ASSGNT_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, ' ', false); }
+  | LAZY_ASSGNT_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, true, true, ' ', false); }
   | PLUS_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, '+', true); }
   | TIMES_CONN { lexer_expression_mode_off (); $$ = new NativeExpressionNode (@$, nullptr, false, false, true, '*', true); }
 

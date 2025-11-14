@@ -24,6 +24,7 @@ Component root {
   Frame frame ("lazy_connectors", 0, 0, 600, 600)
   frame.close ->! mainloop
 
+  int y_feedback = 230
 
   Component using_int {
     FillColor _ (White)
@@ -51,32 +52,32 @@ Component root {
     Component connectors_int {
       Translation _ (0, 40)  
 
-      Text tc1 (10, 0, "Connector init: ")
+      Text tc1 (10, 0, "Connector init:")
       Int vc1 (0)
-      "Connector with init: " + vc1 => tc1.text
+      "Connector with init:\t=:>  " + vc1 => tc1.text
       result =:> vc1
-      Feedback fc1 (170, -15, 300)
+      Feedback fc1 (y_feedback, -15, 300)
       vc1 -> fc1.trigger
 
-      Text tc2 (10, 20, "Connector NON init: ")
+      Text tc2 (10, 20, "Connector NON init: \t=>")
       Int vc2 (0)
-      "Connector : " + vc2 => tc2.text
+      "Connector :\t\t=> " + vc2 => tc2.text
       result => vc2
-      Feedback fc2 (170, 5, 300)
+      Feedback fc2 (y_feedback, 5, 300)
       vc2 -> fc2.trigger
 
-      Text tc3 (10, 40, "Connector ? init: ")
+      Text tc3 (10, 40, "Connector ? init: \t=?:>")
       Int vc3 (0)
-      "Connector ? with init: " + vc3 => tc3.text
+      "Connector ? with init:\t=?:> " + vc3 => tc3.text
       result =?:> vc3
-      Feedback fc3 (170, 25, 300)
+      Feedback fc3 (y_feedback, 25, 300)
       vc3 -> fc3.trigger
 
-      Text tc4 (10, 60, "Connector ? NON init: ")
-      Int vc4 (1) // init a the same as result
-      "Connector ? : " + vc4 => tc4.text
+      Text tc4 (10, 60, "Connector ? NON init:\t=?> ")
+      Int vc4 (1) // should be init the same as result
+      "Connector ? :\t=?> " + vc4 => tc4.text
       result =?> vc4
-      Feedback fc4 (170, 45, 300)
+      Feedback fc4 (y_feedback, 45, 300)
       vc4 -> fc4.trigger
 
     }
@@ -112,32 +113,33 @@ Component root {
     Component connectors_string {
       Translation _ (0, 40)  
 
-      Text tc1 (10, 0, "Connector init: ")
+      Text tc1 (10, 0, "Connector init:")
       String vc1 ("")
-      "Connector with init: " + vc1 => tc1.text
+      "Connector with init:\t=:> " + vc1 => tc1.text
+      // should be init after the connector on tc1.text else it won't react
       result =:> vc1
-      Feedback fc1 (170, -15, 300)
+      Feedback fc1 (y_feedback, -15, 300)
       vc1 -> fc1.trigger
 
-      Text tc2 (10, 20, "Connector NON init: ")
+      Text tc2 (10, 20, "Connector NON init:\t=> ")
       String vc2 ("")
-      "Connector : " + vc2 => tc2.text
+      "Connector :\t\t=> " + vc2 => tc2.text
       result => vc2
-      Feedback fc2 (170, 5, 300)
+      Feedback fc2 (y_feedback, 5, 300)
       vc2 -> fc2.trigger
 
       Text tc3 (10, 40, "Connector ? init: ")
       String vc3 ("")
-      "Connector ? with init: " + vc3 => tc3.text
+      "Connector ? with init:\t=?:> " + vc3 => tc3.text
       result =?:> vc3
-      Feedback fc3 (170, 25, 300)
+      Feedback fc3 (y_feedback, 25, 300)
       vc3 -> fc3.trigger
 
-      Text tc4 (10, 60, "Connector ? NON init: ")
-      String vc4 ("foo")
-      "Connector ? : " + vc4 => tc4.text
+      Text tc4 (10, 60, "Connector ? NON init:\t=?> ")
+      String vc4 ("foo") // should be init the same as result
+      "Connector ? :\t=?> " + vc4 => tc4.text
       result =?> vc4
-      Feedback fc4 (170, 45, 300)
+      Feedback fc4 (y_feedback, 45, 300)
       vc4 -> fc4.trigger
 
     }

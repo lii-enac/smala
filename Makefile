@@ -576,7 +576,11 @@ $$(notdir $1)_dbg_print:
 	@echo $$($1_app_objs)
 	@echo $$($1_app_gensrcs)
 
-app_deps += $$($1_app_objs:.o=.d)
+$1_app_deps := $$($1_app_objs:.o=.d)
+ifneq ($$(dep),no)
+-include ($$($1_app_deps))
+endif
+
 app_objs += $$($1_app_objs)
 endef
 

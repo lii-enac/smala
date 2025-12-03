@@ -5,7 +5,7 @@
 include $(project_dir)/config/config_default.mk
 
 config:
-	cp -n $(project_dir)/config/config_default.mk config.mk
+	cp -n $(project_dir)/config/config_default.mk config.mk || true
 
 config_%:
 	cp $(project_dir)/config/$@.mk config.mk

@@ -9,7 +9,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/cookbook/gui/direct_manipulation/simplest",
             "env": {
-                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/lib:${workspaceFolder}/../smala/build/lib"
+                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/Darwin/lib:${workspaceFolder}/../smala/build/lib"
             },
             "sourceMap": {
                 "${workspaceFolder}/build": "${workspaceFolder}"

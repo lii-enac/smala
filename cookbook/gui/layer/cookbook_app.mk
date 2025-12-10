@@ -13,5 +13,6 @@
 #
 
 objs_cookbook_app := PanAndZoom.o main3.o
+main3.o: PanAndZoom.h
 djnn_libs_cookbook_app := gui display base exec_env core
 #smala_libs_cookbook_app := smala

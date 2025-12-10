@@ -523,10 +523,10 @@ $1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is nece
 $1_other_runtime_lib_path+=$$(abspath $$(build_dir)/lib)
 endif
 endif
-$$($1_app_objs): $$(smala_lib)
+$$($1_app_exe) $$(notdir $1)_test: $$(smala_lib)
 
 $$(notdir $1)_toto:
-	echo $$(smala_lib)
+	echo $$($1_app_objs): $$(smala_lib)
 endif
 
 ifneq ($$($1_app_pkg),)
@@ -559,7 +559,7 @@ $$(notdir $1)_objs: $$($1_app_objs)
 
 $$(notdir $1): $$($1_app_exe)
 
-$$(notdir $1)_test: $$(notdir $1)
+$$(notdir $1)_test: $$(notdir $1) 
 	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$$$LD_LIBRARY_PATH:$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
 	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$$$LD_LIBRARY_PATH:$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
@@ -895,6 +895,7 @@ clean_test test_clean:
 
 
 deps += $(smalac_objs:.o=.d)
+deps += $(smala_lib_objs:.o=.d)
 
 ifneq ($(dep),no)
 -include $(deps)

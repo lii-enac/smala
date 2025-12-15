@@ -477,6 +477,7 @@ cflags_cookbook_app :=
 cppflags_cookbook_app :=
 res_dir :=
 other_runtime_lib_path :=$(user_defined_other_runtime_lib_path)
+objs_cookbook_app :=
 
 ckappname := $$(notdir $1)
 $1_app_srcs_dir := cookbook/$1
@@ -578,7 +579,7 @@ $$(notdir $1)_dbg_print:
 
 $1_app_deps := $$($1_app_objs:.o=.d)
 ifneq ($$(dep),no)
--include ($$($1_app_deps))
+-include $$($1_app_deps)
 endif
 
 app_objs += $$($1_app_objs)

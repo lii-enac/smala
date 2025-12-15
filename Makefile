@@ -99,8 +99,8 @@ djnn_libs_SL := $(djnn_libs)
 # ----------------------------------
 
 CFLAGS_COMMON += -MMD
-
-CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++17
+cxx_version ?= 20
+CXXFLAGS_COMMON += $(CFLAGS_COMMON) -std=c++$(cxx_version)
 
 CXXFLAGS_SC += -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-vla-extension
 CXXFLAGS_SC += $(CXXFLAGS_COMMON) -Isrc -I$(build_dir)/src -I$(build_dir)/lib

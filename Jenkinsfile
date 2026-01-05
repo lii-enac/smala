@@ -111,7 +111,7 @@ pipeline {
                 stage('Build Windows') {
                     agent { label 'win10' }
                     environment {
-                        CUSTOM_WORKSPACE = '../djnn-qt/smala'
+                        CUSTOM_WORKSPACE = '../djnn-qt-msys/smala'
                     }
                     steps {
                         dir(env.CUSTOM_WORKSPACE) {
@@ -142,7 +142,51 @@ pipeline {
                             emailext(
                                 to: "${env.EMAIL1}, ${env.EMAIL2}",
                                 subject: "❌ Windows build failed - smala #${currentBuild.number}",
-                                body: "The Windows build failed.\nDetails: ${env.BUILD_URL}\nError (last 100 lines):\n${currentBuild.rawBuild.getLog(100).join('\n')}"
+                                body: "The Windows build failed.\nDetails: ${env.BUILD_URL}\nError (last 300 lines):\n${currentBuild.rawBuild.getLog(300).join('\n')}"
+                            )
+                        }
+                    }
+                }
+
+                stage('Build Windows WSL') {
+                    agent { label 'win10' } // On utilise le même agent Windows
+                    environment {
+                        CUSTOM_WORKSPACE = '../djnn-qt-wsl/smala'
+                    }
+                    steps {
+                        dir(env.CUSTOM_WORKSPACE) {
+                            cleanWs()
+                            checkout([
+                                $class: 'GitSCM', 
+                                branches: [[name: '*/master']], 
+                                userRemoteConfigs: [[url: env.SMALA_URL, 
+                                credentialsId: env.GIT_CREDENTIAL_ID
+                                ]]
+                            ])
+
+                            // Utilisation de 'bat' pour appeler la commande 'wsl'
+                            // On passe les commandes via wsl --
+                            bat '''
+                                wsl --- echo === Building smala (WSL) ===
+
+                                wsl --- test -d ../djnn-cpp || (
+                                        echo ❌ Error: Missing ../djnn-cpp directory.
+                                        echo Make sure djnn-cpp pipeline ran successfully first.
+                                        exit /b 1
+                                )
+
+                                wsl --- make -j
+                                wsl --- make -j lib
+                                wsl --- make -j cookbook_apps
+                            '''
+                        }
+                    }
+                    post {
+                        failure {
+                            emailext(
+                                to: "${env.EMAIL1}, ${env.EMAIL2}",
+                                subject: "❌ Windows WSL build failed - smala #${currentBuild.number}",
+                                body: "The Windows WSL build failed.\nDetails: ${env.BUILD_URL}\nError (last 300 lines):\n${currentBuild.rawBuild.getLog(300).join('\n')}"
                             )
                         }
                     }
@@ -180,8 +224,8 @@ The build has failed.
 
 Details: ${env.BUILD_URL}
 
-Error (last 100 lines):
-${currentBuild.rawBuild.getLog(100).join('\n')}
+Error (last 300 lines):
+${currentBuild.rawBuild.getLog(300).join('\n')}
 """
             )
         }

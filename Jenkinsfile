@@ -166,11 +166,11 @@ pipeline {
 
                             // Utilisation de 'bat' pour appeler la commande 'wsl'
                             // On passe les commandes via wsl --
-                            bat '''
-                                wsl --- echo === Building smala (WSL) ===
-                                wsl --- make -j
-                                wsl --- make -j lib
-                                wsl --- make -j cookbook_apps
+                             bat '''
+                                wsl -- echo "=== Building smala (Windows) WSL build in $(pwd) --"
+                                wsl -- make -j
+                                wsl -- make -j lib
+                                wsl -- make -j cookbook_apps
                             '''
                         }
                     }

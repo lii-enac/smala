@@ -168,13 +168,6 @@ pipeline {
                             // On passe les commandes via wsl --
                             bat '''
                                 wsl --- echo === Building smala (WSL) ===
-
-                                wsl --- test -d ../djnn-cpp || (
-                                        echo ❌ Error: Missing ../djnn-cpp directory.
-                                        echo Make sure djnn-cpp pipeline ran successfully first.
-                                        exit /b 1
-                                )
-
                                 wsl --- make -j
                                 wsl --- make -j lib
                                 wsl --- make -j cookbook_apps

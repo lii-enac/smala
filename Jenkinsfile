@@ -170,7 +170,7 @@ pipeline {
                                 wsl -- echo "=== Building smala (Windows) WSL build in $(pwd) --"
                                 wsl -- make -j
                                 wsl -- make -j lib
-                                wsl -- make -j cookbook_apps
+                                wsl -- make V=max cookbook_apps
                             '''
                         }
                     }

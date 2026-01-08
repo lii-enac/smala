@@ -185,13 +185,10 @@ Component root {
     Component edit {
         ZOrder z (11)
         Translation tr(0,0) // to control the TextField position
-        HBox h(f) {
-            UITextField tf_ // a TextField we will move on top of cells to edit them
-            addChildrenTo h.items {
-                tf_
-            }
+        HBox h {
+            UITextField tf // a TextField we will move on top of cells to edit them
         }
-        tf aka h.items.[1]
+        tf aka h.tf
 
         h.v_alignment = 0 // top
         h.h_alignment = 0 // left

@@ -15,31 +15,31 @@ import gui.widgets.ComboBox
 
 _native_code_
 %{
-    // #include <iostream>
-    // #include "core/property/s_to_p.h"
-
+    //#include <iostream>
     int to_time(const djnnstl::string& yys, const djnnstl::string& mms, const djnnstl::string& dds ) {
         int yy, mm, dd;
-        yy = atoi(yys.c_str());
+        yy = atoi(yys.c_str()); // should work since we use a regex with numerical data
         mm = atoi(mms.c_str());
         dd = atoi(dds.c_str());
-        //std::cerr << "to_time " << yy << " " << mm << " " << dd << std::endl;
+        //std::cerr << "to_time yy:" << yy << " mm:" << mm << " dd:" << dd << std::endl;
+
+        // validate
+        if ( !(1 <= mm && mm <= 12)) return -1;
+        if ( !(1 <= dd && dd <= 31)) return -1;
+        const int max_day[]={31,29,31,30,31,30,31,31,30,31,30,31};
+        if (!(dd <= max_day[mm-1])) return -1;
+        if (mm==2 && dd==29 && yy%4!=0) return -1; // leap year
+
+        // compute time since 01/01/1900
+        //if (yys.size()<=2) yy+=2000; // if yy is 2 digits, consider it to be 20yy
         std::tm tm{};
-        if (yy<30) yy += 2000; // try to be...
-        else if (yy>30) yy += 1900; // ...smart (?)
-        tm.tm_year = yy - 1900;
-        tm.tm_mon = mm - 1;
+        tm.tm_year = yy;
+        tm.tm_mon = mm-1;
         tm.tm_mday = dd;
-        std::time_t t = std::mktime(&tm);
+        std::time_t t = std::mktime(&tm); // -1 if tm is not valid
+        //std::cerr << "t: " << t << std::endl;
         return t;
     }
-
-    // int to_time(AbstractSimpleProperty * yys_, AbstractSimpleProperty * mms_, AbstractSimpleProperty * dds_) {
-    //     auto yys = dynamic_cast<TextProperty*>(yys_);
-    //     auto mms = dynamic_cast<TextProperty*>(mms_);
-    //     auto dds = dynamic_cast<TextProperty*>(dds_);
-    //     return to_time (yys->get_value(), mms->get_value(), dds->get_value());
-    // }
 %}
 
 _main_
@@ -47,161 +47,113 @@ Component root {
     Frame f ("7GUIs Flight Booker - DOES NOT WORK YET") // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
-    ComboBox _C                 // [7GUIs] a combobox C
-    UITextField _T1             // [7GUIs] two textfields T1
-    UITextField _T2             // [7GUIs] and T2 representing the start and return date, respectively,
-    PushButton _B("Book")       // [7GUIs] and a button B for submitting the selected flight.
-
-    VBox h(f) {}
-    addChildrenTo h.items {
-        _C,
-        _T1,
-        _T2,
-        _B
+    ZOrderedGroup zog {            // FIXME this is for the combobox, since its popup inner listbox has to be on top of other widgets
+        VBox v {    
+            ComboBox C             // [7GUIs] ...a combobox C...
+            UITextField T1         // [7GUIs] ...two textfields T1...
+            UITextField T2         // [7GUIs] ...and T2 representing the start and return date, respectively,...
+            PushButton B("Book")   // [7GUIs] ...and a button B for submitting the selected flight.
+        }
     }
-    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible :-/
-    C  aka h.items.[1]
-    T1 aka h.items.[2]
-    T2 aka h.items.[3]
-    B  aka h.items.[4]
-    
-    Component model {           // [7GUIs] with the two options “one-way flight” and “return flight”,
+    // make widget naming independent from layout hierarchy
+    box aka zog.v
+    C  aka box.C
+    T1 aka box.T1
+    T2 aka box.T2
+    B  aka box.B
+
+    Component cb_model {           // [7GUIs] ...with the two options “one-way flight” and “return flight”...
         List items {
           String one_way ("one-way flight")
           String return_flight ("return flight")
         }
     }
-    model =: C.model
+    cb_model =: C.model
     C.preferred_width = 100
     
-    // FIXME why is the combobox not inited on value 1 ?
-    model.items.[1] =: C.value                  // [7GUIs] Initially, C has the value “one-way flight”
-    // FIXME the text fields shrink when selecting an entry in the combo box !!!!???
+    
+    cb_model.items.[1] =: C.value  // [7GUIs] Initially, C has the value “one-way flight”...
 
     // FIXME does not work
-    //"01/01/2025" =:> T1.text //= "01/01/2025"   // [7GUIs] and T1 as well as T2 have the same (arbitrary) date
+    //"01/01/2025" =: T1.text //= "01/01/2025" // [7GUIs] ...and T1 as well as T2 have the same (arbitrary) date...
     //T2.text = "01/01/2025"
-                                                // [7GUIs] (it is implied that T2 is disabled). (see below)
+                                                // [7GUIs] ...(it is implied that T2 is disabled). (see below)
 
 
-    |-> B.disable // FIXME? -:>                 // [7GUIs] and B is disabled.
-    |-> T2.disable // FIXME T2 non-editing mode resembles disabled state
+    |-> B.disable                  // [7GUIs] ...and B is disabled. // FIXME? -:>
+    |-> T2.disable
     
-    Bool one_way(0)
-    C.value == "one-way flight" =:> one_way
-    // FIXME could be model.items[1] or .one_way -> T2 .return_flight ->! T2
-    one_way.true  -> T2.disable                 // [7GUIs] T2 is enabled iff C’s value is “return flight”.
-    one_way.false -> T2.enable                  // [7GUIs] T2 is enabled iff C’s value is “return flight”.
+    Bool is_return_flight(0)
+    C.value == "return flight" =:> is_return_flight
+    is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
+    is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
+    
+    
+    TextPrinter tp // FIXME popup?
+    B.click -> {                                                             // [7GUIs] When clicking B...
+        "You have booked a " + C.value + " flight on " + T1.text =: tp.input // [7GUIs] ...a message is displayed informing the user of his selection
+    }                                                                        // [7GUIs] (e.g. “You have booked a one-way flight on 04.04.2014.”).
 
-    
-    // [7GUIs] (e.g. “You have booked a one-way flight on 04.04.2014.”).
-    
-    TextPrinter tp
-    B.click -> {                                                             // [7GUIs] When clicking B 
-        "You have booked a " + C.value + " flight on " + T1.text =: tp.input // [7GUIs] a message is displayed informing the user of his selection
-        // FIXME? popup?
-    }
-
-    
-    // [7GUIs] FIXME the following validates the date even if the field is disabled
 
     Bool T1_valid(0)
     Bool T2_valid(0)
-    Bool B_valid(0)
+    Bool  B_valid(0)
 
     Int time1(-1)
 
-    Component _ {
-
-        Regex regex_date ("\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)\\s*")
-
+    string regex_date_str = "\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)" // FIXME group name (not in c++ regex sadly)
+    Component _ { // here only to scope the following components
+        Regex regex_date (regex_date_str)
         T1.text => regex_date.input
-
-        String yy("0")
-        String mm("0")
-        String dd("0")
-        regex_date.[1] =:> dd // FIXME? regex_date[1] (without the .) is accepted by the compiler 
-        regex_date.[2] =:> mm
-        regex_date.[3] =:> yy
-
-        //dd+" " + mm + " " + yy =:> tp.input
-
-        Bool res(0)
-        regex_date.matched =:> res // FIXME bool property find_child_impl
-        res.true -> {
-            //to_time($toString(regex_date.[1]), $toString(regex_date.[2]), $toString(regex_date.[3])) =: time1 // FIXME Native expression action
-            to_time($getString(yy), $getString(mm), $getString(dd)) =: time1
+        regex_date.matched.true -> {
+            to_time($toString(regex_date.[3]), $toString(regex_date.[2]), $toString(regex_date.[1])) =: time1
         }
-        res.false -> {
+        regex_date.matched.false -> {
             -1 =: time1
         }
-        //time1 => tp.input
         time1 != -1 =:> T1_valid
 
         T1_valid.false -> {
-            #FF0000 =: T1.text_color                // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
+            #FF0000 =: T1.text_color   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
         }
         T1_valid.true -> {
-            #000000 =: T1.text_color
+            #000000 =: T1.text_color   // ...else...
         }
     }
 
-    Switch T2_sw(disabled) {
-        Component disabled {
+    Switch T2_sw(false) {
+        Component false {
             T1_valid =:> B_valid
         }
-        Component enabled {
-            //regex_date_2 = clone(regex_date) // FIXME clone does not work
-            Regex regex_date_2 ("\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)\\s*")
-            T2.text =:> regex_date_2.input
+        Component true {
             Int time2(-1)
-            Bool res(0)
-            regex_date_2.matched =:> res
-            //regex_date_2.matched == 1 -> { // FIXME?
-            //regex_date_2.matched.true -> { // FIXME find_child_impl in BoolProperty
-            String yy("")
-            String mm("")
-            String dd("")
-            regex_date_2.[1] =:> dd
-            regex_date_2.[2] =:> mm
-            regex_date_2.[3] =:> yy
-            res.true -> {
-                //to_time($getString(regex_date_2.[1]), $getString(regex_date_2.[2]), $getString(regex_date_2.[3])) =: time2
-                to_time($getString(yy), $getString(mm), $getString(dd)) =: time2
-                //to_time(regex_date_2.[1], regex_date_2.[2], regex_date_2.[3]) =: time2
-                //T2.text + " /" + regex_date_2.[1] + " " + regex_date_2.[2] + " " + regex_date_2.[3] + "/ " + time2 =: tp.input
-                //regex_date_2.[2] =: tp.input
+    
+            Regex regex_date_2 (regex_date_str)
+            T2.text =:> regex_date_2.input
+            regex_date_2.matched.true -> {
+                to_time($getString(regex_date_2.[3]), $getString(regex_date_2.[2]), $getString(regex_date_2.[1])) =: time2
             }
-            //regex_date_2.matched.false -> {
-            res.false -> {
+            regex_date_2.matched.false -> {
                 -1 =: time2
             }
-            //T2.text + "time2 " + time2 =:> tp.input
             time2 != -1 =:> T2_valid
 
             T2_valid.false -> {
-                #FF0000 =: T2.text_color                // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
+                #FF0000 =: T2.text_color    // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
             }
             T2_valid.true -> {
-                #000000 =: T2.text_color
+                #000000 =: T2.text_color    // ...else...
             }
 
-            T1_valid && T2_valid && (time1 <= time2) =:> B_valid
+            T1_valid && T2_valid && (time1 < time2) =:> B_valid // [7GUIs] [When C has the value “return flight”] and T2’s date is strictly before T1’s then B is disabled.
         }
     }
-                 
-    one_way.true -> {
-        "disabled" =: T2_sw.state 
-    }
-    one_way.false -> {
-        "enabled" =: T2_sw.state 
-    }
+
+    is_return_flight =:> T2_sw.state  // [7GUIs] When C has the value “return flight”...
     //T2_sw.state =:> tp.input
 
-
-    // [7GUIs] When C has the value “return flight” and T2’s date is strictly before T1’s then B is disabled.
     // FIXME the following does not work if C is "one-way":
-    B_valid.true -> B.enable // FIXME should be -:>
+    B_valid.true  -> B.enable // FIXME should be -:>
     B_valid.false -> B.disable
     //"--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\nB_valid " + B_valid =:> tp.input
 }

@@ -21,7 +21,10 @@ import gui.widgets.IWidget
 
 _define_
 Label (string _label) inherits IWidget () {
-  FillColor fc (#323232)
+  Int text_color (#FFFFFF)
+
+  FillColor fc ($text_color)
+  text_color =:> fc.value
   Translation offset (0, 0)
   Text ui (0, 0, _label)
   text aka ui.text

@@ -31,6 +31,8 @@ IWidget ()
   Spike enabled
   Spike disabled
 
+  Spike pack
+
   // style
   FontFamily font_family ("B612")
   FontSize font_size (5, 13) // 5 to use the pixel unit. Allows to have the same rendering on macOS & Linux

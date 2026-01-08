@@ -15,65 +15,62 @@ import gui.widgets.Label
 
 _main_
 Component root {
-    Frame f ("7GUIs Temperature Converter UNFINISHED")  // [7GUIs] The task is to build a frame containing...
+    Frame f ("7GUIs Temp Converter") // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
-    UITextField _TC              // [7GUIs] two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
-    Label c_text(" celsius =")   // [7GUIs] (implicit) and...
-    Label f_text(" farenheit")   // [7GUIs] ... two labels
-    UITextField _TF              // [7GUIs] Initially, both TC and TF are empty.
-
-    HBox h(f) {}
-    addChildrenTo h.items {
-        _TC,
-        c_text,
-        _TF,
-        f_text
+    HBox h {
+        UITextField TC               // [7GUIs] ...two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
+        Label LC(" celsius =")       // [7GUIs] (implicit) and...
+        UITextField TF               // [7GUIs] ... two labels
+        Label LF(" farenheit")       // [7GUIs] Initially, both TC and TF are empty.
     }
-    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible :-/
-    TC aka h.items.[1]
-    TF aka h.items.[3]
-
-    TC.text_color = #FFFFFF     // FIXME should be a value that enables reading!
-    TF.text_color = #FFFFFF
-
 
     Double C(0)
     Double F(0)
 
-    // The code below could be the most straightforward but it introduces a cycle
-    // (F - 32) * (5/9.) => C        // [7GUIs] C = (F - 32) * (5/9)
-    //  C * (9/5.) + 32 => F         // [7GUIs] F = C * (9/5) + 32
-    // It would be better done this way, but more work needs to be done in the execution engine FIXME
+    // The code below is the most straightforward but it introduces a cycle
+    // More work needs to be done in the execution engine to handle it seamlessly if it's ever possible
+    // Meanwhile there is an _AUTHORIZE_CYCLE variable we can set, but it's global to the program...
+    _AUTHORIZE_CYCLE = 1
+
+    (F - 32) * (5/9.) => C           // [7GUIs] C = (F - 32) * (5/9)
+      C * (9/5.) + 32 => F           // [7GUIs] F = C * (9/5) + 32
     
-    // To avoid the cycle, we use a Switch to specify which direction is required according to the user interaction
-    Switch conv_dir (from_C_to_F) {  // [7GUIs] The formula for converting a temperature C in Celsius into a temperature F in Fahrenheit is
-        Component from_F_to_C {
-            (F - 32) * (5/9.) =:> C  // [7GUIs] C = (F - 32) * (5/9)
-        }
-        Component from_C_to_F {      // [7GUIs] and the dual direction is
-            C * (9/5.) + 32 =:> F    // [7GUIs] F = C * (9/5) + 32.
-        }
+    
+    // To avoid the cycle and not use _AUTHORIZE_CYCLE,
+    // we can use a Switch to specify which dependency direction is required
+    // according to the user interaction i.e. which field is changed
+    // Switch conv_dir (from_C_to_F) {  // [7GUIs] The formula for converting a temperature C in Celsius into a temperature F in Fahrenheit is...
+    //     Component from_F_to_C {
+    //         (F - 32) * (5/9.) =:> C  // [7GUIs] C = (F - 32) * (5/9)...
+    //     }
+    //     Component from_C_to_F {      // [7GUIs] ...and the dual direction is...
+    //         C * (9/5.) + 32 =:> F    // [7GUIs] F = C * (9/5) + 32.
+    //     }
+    // }
+
+    // h.TC.text -> {                      // [7GUIs] When the user enters a numerical value into TC...
+    //     "from_C_to_F" =: conv_dir.state // [7GUIs] ...the corresponding value in TF is automatically updated...
+    // }
+    // h.TF.text -> {                      // [7GUIs] ...and
+    //     "from_F_to_C" =: conv_dir.state // [7GUIs] ...vice versa.
+    // }
+
+    string regex_str = "\\s*[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)\\s*" // real number regex, as per https://stackoverflow.com/a/12643073/2036022
+
+    Regex regex_num_C (regex_str)
+    h.TC.text =:> regex_num_C.input     // [7GUIs] When the user enters into TC...
+    regex_num_C.matched -> {            // [7GUIs] ...a [non-]numerical string,
+        regex_num_C.[0] =: C            // [7GUIs] ...the value in TF is [not] updated...
     }
+    toString(C) =:> h.TC.field.content.text
 
-    TC.text -> {                        // [7GUIs] When the user enters a numerical value into TC
-        "from_C_to_F" =: conv_dir.state // [7GUIs] the corresponding value in TF is automatically updated
+    Regex regex_num_F (regex_str)
+    h.TF.text =:> regex_num_F.input     // [7GUIs]...and...
+    regex_num_F.matched -> {            // [7GUIs]...vice...
+        regex_num_F.[0] =: F            // [7GUIs]...versa.
     }
-    TF.text -> {                        // [7GUIs] and
-        "from_F_to_C" =: conv_dir.state // [7GUIs] vice versa.
-    }
-
-    // [7GUIs] TODO When the user enters a non-numerical string into TC the value in TF is not updated and vice versa.
-
-    TC.text =:> C
-    toString(C) => TC.field.content.text
-
-    TF.text =:> F
-    toString(F) => TF.field.content.text
-
-    // debug
-    // TextPrinter tp
-    // "" + C + " " + F + " " + TF.text + " " + conv_dir.state =:> tp.input
+    toString(F) =:> h.TF.field.content.text
 }
 
 

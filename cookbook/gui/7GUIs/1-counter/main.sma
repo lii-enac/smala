@@ -13,25 +13,24 @@ import gui.widgets.StandAlonePushButton
 _main_
 Component root {
     Frame f("7GUIs Counter")                  // [7GUIs] The task is to build a frame containing...
-    f.close ->! mainloop 
+    f.close ->! mainloop
 
-    TextField T(0,0, 100, 20)                 // [7GUIs] a label or read-only textfield T and
-    T.text_color = #FFFFFF                  // FIXME should be a value that enables reading!
+    FillColor _(#FFFFFF)                      // svg 'fill' defaults to black, which is hardly visible in smala lib's default dark theme
+    Text T(0,20,"")                           // [7GUIs] ...a label or read-only textfield T and...
     
-    OutlineColor _(255,255,255)               // FIXME should be a sensible value
-    StandAlonePushButton B("Count", 100, 0)   // [7GUIs] a button B.
+    StandAlonePushButton B("Count", 100, 0)   // [7GUIs] ...a button B. // FIXME label parameter should be after x and y, and it should be a "Button"
 
     // solution #1
-    Int counter(0)                            // [7GUIs] Initially, the value in T is “0”
-    counter =:> T.content.text
-    B.click -> {                              // [7GUIs] and each click of B
-        counter + 1 =: counter                // [7GUIs] increases the value in T by one.
+    Int counter(0)                            // [7GUIs] Initially, the value in T is “0”...
+    counter =:> T.text
+    B.click -> {                              // [7GUIs] ...and each click of B...
+        counter + 1 =: counter                // [7GUIs] ...increases the value in T by one.
     }
 
     // // solution #2
-    // Incr counter(0)                        // [7GUIs] Initially, the value in T is “0”
-    // B.click -> counter                     // [7GUIs] and each click of B increases
-    // counter.state =:> T.content.text       // [7GUIs] the value in T by one.
+    // Incr counter(0)                        // [7GUIs] Initially, the value in T is “0”...
+    // B.click -> counter                     // [7GUIs] ...and each click of B increases...
+    // counter.state =:> T.text               // [7GUIs] ...the value in T by one.
 }
 
 

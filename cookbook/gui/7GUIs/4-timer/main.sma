@@ -18,25 +18,20 @@ Component root {
     Frame f ("7GUIs Timer") // [7GUIs] The task is to build a frame containing
     f.close ->! mainloop
     mouseTracking = 1    // FIXME otherwise Slider adjustment won't work
-    //Gauge _G(50)                            // [7GUIs] a gauge G for the elapsed time e,
-    HSlider _G(50)       // FIXME should be a Gauge     
-    FillColor _(#FFFFFF) // FIXME how to control color once reparented???
-    Label _L("empty")                         // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
-    HSlider _S(50)                            // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
-    PushButton _R("Reset")                    // [7GUIs] a reset button R.
 
-    VBox box(f) {}
-    addChildrenTo box.items {
-        _G,
-        _L,
-        _S,
-        _R
+    VBox box {
+        //Gauge _G(50)          // [7GUIs] a gauge G for the elapsed time e,
+        HSlider G(50)          // FIXME should be a Gauge     
+        FillColor _(#FFFFFF)   // FIXME how to control color once reparented???
+        Label L("empty")       // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
+        HSlider S(50)          // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
+        PushButton R("Reset")  // [7GUIs] a reset button R.
     }
-    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible
-    G aka box.items.[1]
-    L aka box.items.[2]
-    S aka box.items.[3]
-    R aka box.items.[4]
+    // make widget naming independent from layout hierarchy
+    G aka box.G
+    L aka box.L
+    S aka box.S
+    R aka box.R
 
 
     Double d(0)             // [7GUIs] ...duration...

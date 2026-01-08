@@ -14,6 +14,8 @@ import gui.widgets.HBox
 import gui.widgets.ComboBox
 import gui.widgets.Label
 
+import gui.widgets.HBoxPolicy
+
 _native_code_
 %{
     #include "core/property/text_property.h"
@@ -36,46 +38,56 @@ Component root {
     Frame f ("7GUIs CRUD - DOES NOT WORK YET", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
     f.close ->! mainloop
 
-    
-    UITextField T_prefix    // [7GUIs] a textfield Tprefix
-    UITextField T_name      // [7GUIs] a pair of textfields Tname and Tsurname,
-    UITextField T_surname
-    //Listbox L               // [7GUIs] a listbox L,
+    //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
 
-    PushButton BC("Create") // [7GUIs] buttons BC,
-    PushButton BU("Update") // [7GUIs] BU and
-    PushButton BD("Delete") // [7GUIs] BD and
-    
-    Label filter_prefix("Filter prefix:") // [7GUIs] the three labels as seen in the screenshot.
-    Label name("Name:")
-    Label surname("Surname:")
+    // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
+    // screenshot:
+    // Filter prefix: [     ]
+    // --------------
+    // | blabla     |      Name:[    ]
+    // | blabla     |   Surname:[    ]
+    // | blabla     |
+    // --------------
+    // [Create] [Update] [Delete]
 
-    VBox b_all(f) {
-        HBox filter(f) {
-            VBox _(f) {
-                // label field
-            }
+    // widget identifiers:
+    // L_prefix T_prefix
+    // L L L L     L_name T_name
+    // L L L L  L_surname Tsurname
+    // L L L L
+    // BC BU BD
+
+    VBox b_all {
+        HBox filter {
+            Label L_prefix("Filter prefix:") // [7GUIs] the three labels as seen in the screenshot.
+            UITextField T_prefix             // [7GUIs] a textfield Tprefix
         }
-        HBox data(f) {
-            VBox _(f) {
-                HBox _(f) {
-                    // list props
-                    VBox props(f) {
-                        HBox name(f) {
-                            // label field
-                        }
-                        HBox surname(f) {
-                            // label field
-                        }
-                    }
+        HBox data {
+            UITextField L                    // FIXME should be a ListBox
+            VBox props {
+                HBox name {
+                    Label L_name("Name:")   // [7GUIs] a pair of textfields Tname and Tsurname,
+                    UITextField T_name      // [7GUIs] [with a label],
+                }
+                HBox surname {
+                    Label L_surname("Surname:") // [7GUIs] a pair of textfields Tname and Tsurname,
+                    UITextField T_surname   // [7GUIs] [with a label]
                 }
             }
         }
-        HBox buttons(f) {
-            // create update delete
+        HBox buttons {
+            PushButton BC("Create") // [7GUIs] buttons BC,
+            PushButton BU("Update") // [7GUIs] BU and
+            PushButton BD("Delete") // [7GUIs] BD
         }
     }
+
+    // TextPrinter tp
+    // b_all.filter.T_prefix.text =:> tp.input
+
+    // make widget naming independent from layout hierarchy
+    // TODO
 
     // TODO !!
     

@@ -43,6 +43,7 @@ PushButton (string _label) inherits IWidget () {
   GenericKeyboard.key\-pressed == DJN_Key_Return => ret_key_pressed
   GenericKeyboard.key\-released == DJN_Key_Return => ret_key_released
   FSM fsm {
+    //State start
     State idle {
       idle_color =: fc.value
     }
@@ -64,11 +65,13 @@ PushButton (string _label) inherits IWidget () {
     State out {
       idle_color =: fc.value
     }
+       //start -> idle     (start, this.enabled)
     disabled -> idle     (this.enable,  this.enabled)
-        idle -> disabled (this.disable, this.disabled)
-    selected -> disabled (this.disable, this.disabled)
-     pressed -> disabled (this.disable, this.disabled)
-         out -> disabled (this.disable, this.disabled)
+    { idle, selected, pressed, out } -> disabled (this.disable, this.disabled)
+    //     idle -> disabled (this.disable, this.disabled)
+    // selected -> disabled (this.disable, this.disabled)
+    //  pressed -> disabled (this.disable, this.disabled)
+    //      out -> disabled (this.disable, this.disabled)
 
     idle->pressed (r.press)
     idle->selected (select)
@@ -80,6 +83,8 @@ PushButton (string _label) inherits IWidget () {
     out->pressed (r.enter)
     out->idle (r.release)
   }
+  // TextPrinter tp
+  // fsm.state =:> tp.input
 
   FillColor tc (255, 255, 255)
   text_color =: tc.value

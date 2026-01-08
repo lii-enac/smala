@@ -24,16 +24,13 @@ Component root {
     f.close ->! mainloop
     mouseTracking = 1 // for enter and leave events FIXME should be automatic
 
-    PushButton _undo("Undo")                        // [7GUIs] ...an undo and...
-    PushButton _redo("Redo")                        // [7GUIs] ...redo button... 
-
-    HBox hbox(f) {}
-    addChildrenTo hbox.items {
-        _undo, _redo
+    HBox box {
+        PushButton undo("Undo")                        // [7GUIs] ...an undo and...
+        PushButton redo("Redo")                        // [7GUIs] ...redo button... o
     }
-    // FIXME now that all widgets have been reparented by addChildrenTo, they are inaccessible :-/
-    undo aka hbox.items.[1]
-    redo aka hbox.items.[2]
+    
+    undo aka box.undo
+    redo aka box.redo
 
     Component canvas                                // [7GUIs] ...as well as a canvas area underneath.
 
@@ -44,8 +41,8 @@ Component root {
 
     StandAloneSlider radius_slider(0,100,200,10)    // [7GUIs] ...a slider inside that adjusts the diameter of C.
 
-    UndoRedoManager undo_redo_manager // FIXME should be provided in smala lib
-    // FIXME are we sure it works? check CreateAction, undo must be repeated multiple times :-/
+    UndoRedoManager undo_redo_manager               // FIXME should be provided in smala lib
+    // FIXME are we sure the the undo redo manager works? check CreateAction, undo must be repeated multiple times :-/
     undo.click -> undo_redo_manager.undo            // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
     redo.click -> undo_redo_manager.redo            // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
 
@@ -57,8 +54,8 @@ Component root {
             CircleItem gcircle (root, $root.f.background_rect.press.x, $root.f.background_rect.press.y) // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
             setRef(root.gcircle_ref_, &gcircle)
         }
-        notify root.undo_redo_manager.removeActionsStartingFromCurrent // FIXME should be done by undo_redo_manager(?)
-        graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
+        activate (root.undo_redo_manager.removeActionsStartingFromCurrent) // FIXME should be done by undo_redo_manager(?)
+        //graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
         Process ca_ = CreateAction (root.undo_redo_manager.actions, "ca_", getRef(root.gcircle_ref_))
     }
 
@@ -74,8 +71,8 @@ Component root {
     radius_slider.button_fsm.idle -> (root) {       // TODO [7GUIs] Closing this frame will mark the last diameter as significant for the undo/redo history.
         gcircle = getRef(&root.gcircle_ref_)
         if (&gcircle != null) {
-            notify root.undo_redo_manager.removeActionsStartingFromCurrent // FIXME should be done by undo_redo_manager(?)
-            graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
+            activate (root.undo_redo_manager.removeActionsStartingFromCurrent) // FIXME should be done by undo_redo_manager(?)
+            //graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
             // FIXME save old radius before changing it with the slider
             Process ca_ = ChangeRadiusAction (root.undo_redo_manager.actions, "cra_", getRef(root.gcircle_ref_), 10, $gcircle.c.r)
         }

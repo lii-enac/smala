@@ -5,7 +5,7 @@ This is the smala version of the [7GUIs GUI Programming Benchmark](https://eugen
 - assess by counting the number of lines that do not contain "// [7GUIs]" as a measure of boilerplate/scaffolding
   - without empty, comment-only and closing brace-only `}` lines 
 ```
-find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]" | grep -v "^\s*$" | grep -v "^\s*//" | grep -v "^\s*\}\s*" | wc -l
+find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]" | grep -v "^\s*$" | grep -v "^\s*//" | grep -v –E "^\s*}+\s*" | wc -l
 ```
 
 # FIXMEs and TODOs:
@@ -14,26 +14,26 @@ find cookbook/gui/7GUIs/1-counter -name "*.sma" | xargs grep -v "\/\/ \[7GUIs\]"
 
 ## 1-counter:
 - FIXME
-  - TextField.text_color default values
+  - TextField.text_color default values?
+  - button label parameter should be after x and y(?)
+    - maybe make it so that x,y,w,h are optional (inc. for SVG shapes): if they are to be controlled by a layout algorithm anyway, they will be modified
 
 ## 2-temp-converter
 - FIXME
-  - layout API
   - handle (partial) cycles
+  - //regex_num_F = clone(regex_num_C)  // FIXME clone does not work
 
 ## 3-flight-booker
-- TODO
-  - validate dates
-  - init dates
-  - validation only if T2 is active
-  
 - FIXME
-  - combobox not inited
+  - "01/01/2025" =: T1.text does not work 
+  - ZOrderedGroup zog {            // FIXME this is for the combobox, since its popup inner listbox has to be on top of other widgets
+  - // FIXME why isn't the combobox inited with value 1?
+  - // FIXME the text fields shrink when selecting an entry in the combo box !!!!???
+  - // FIXME? could be cb_model.items[1] or cb_model.one_way -> T2 and cb_model.return_flight ->! T2
+  - // FIXME T2 non-editing mode resembles the disabled state. TextEdit style is weird anyway.
 
 
 ## 4-timer
-- TODO
-
 - FIXME
   - Gauge widget (here we use a scale)
   - The bv stuff is intrusive, we know too much of the internal of the widget
@@ -80,3 +80,4 @@ Operations:
   - Rename Component into Composite
   - rename 'Native'/lambda (it's called like that in the parser :-/) into something more appropriate
   - maybe capture more variables into 'native'
+  - implement mbl's sticky line algorithms

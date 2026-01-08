@@ -37,11 +37,14 @@ UITextField () inherits IWidget () {
   FillColor _ (Black)
   TextField field (0, 0, 180, 18, "", 1)
   this.preferred_height = 18
+  this.min_width = 100
   this.width =:> bkg.width
   this.width - 10 =:> field.width
 
   Int unedit_text_color (#909090)
   Int edit_text_color (0)
+  Int disabled_color (#959595)
+
   text_color aka field.text_color // IntProperty
   text_selected_color aka field.text_selected_color // IntProperty
   selection_color aka field.selection_color // IntProperty
@@ -65,6 +68,9 @@ UITextField () inherits IWidget () {
     State no_edit {
       unedit_text_color =: text_color
     }
+    State disabled {
+      disabled_color =: text_color
+    }
     State edit {
       edit_text_color =: text_color
       /* Cursor */
@@ -85,6 +91,9 @@ UITextField () inherits IWidget () {
     no_edit->edit (activate)
     edit->no_edit (leave)
     edit->no_edit (next)
+    
+    disabled -> no_edit (this.enable,  this.enabled)
+    { no_edit, edit } -> disabled (this.disable,  this.disabled)
   }
 
   clear->field.clear

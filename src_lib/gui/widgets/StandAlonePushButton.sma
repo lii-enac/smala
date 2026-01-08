@@ -28,8 +28,17 @@ StandAlonePushButton (string _label, double x_, double y_) {
   Spike release
   /*----- interface -----*/
 
-  Int idle_color (#303030)
-  Int pressed_color (#535353)
+  // Int idle_color (#303030)
+  // Int pressed_color (#535353)
+
+  Int disabled_color (#959595)
+  Int idle_color (#323232)
+  Int pressed_color (#959595)
+  Int text_color (#FFFFFF)
+  Int outline_color (#FFFFFF)
+  
+  OutlineColor oc (#535353)
+  outline_color =:> oc.value
   FillColor fc (#323232)
   Rectangle r (0, 0, 100, 40, 5, 5)
 
@@ -53,7 +62,8 @@ StandAlonePushButton (string _label, double x_, double y_) {
     out->idle (r.release)
   }
 
-  FillColor text_color (255, 255, 255)
+  FillColor tc ($text_color)
+  text_color =:> tc.value
   TextAnchor _ (DJN_MIDDLE_ANCHOR)
   FontFamily _ ("B612")
   FontSize _ (5, 13) // 5 to use the pixel unit. Allows to have the same rendering on MAC & Linux
@@ -66,14 +76,6 @@ StandAlonePushButton (string _label, double x_, double y_) {
   r.height/2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =:> thisLabel.y
   r.width / 2.0 =:> thisLabel.x
 
-  /*Double rw(0)
-  Double rh(0)
-  thisLabel.width + 20 =:> rw 
-  thisLabel.height + 10 =:> rh
-  rw =?> r.width // FIXME cycle?
-  rh =?> r.height // FIXME cycle?
-  r.height / 2.0 + (thisLabel.ascent - thisLabel.descent)/2.0 - 1 =?> thisLabel.y
-  r.width / 2.0 =?> thisLabel.x*/
 
   width aka r.width
   height aka r.height

@@ -15,33 +15,10 @@
 use core
 use base
 
-import core.ontology.process
-import core.tree.container
-import base.process_handler
+import display.window
 
-import gui.widgets.IWidget
+import gui.widgets.AbstractBox
 
-_native_code_
-%{
-#include "core/utils/iostream.h"
-
-// static Process* find_without_warning (Process* p, string path)
-// {
-//   if (p == nullptr)
-//     return 0;
-//   return p->find_child_impl(path);
-// }
-
-static void
-check (Process* p, const djnnstl::string& p_name)
-{
-	if (find_optional (p, p_name) == 0) {
-		std::cerr << "Process " << p_name << " not found in VBox initialisation\n";
-		exit (0);
-	}
-}
-
-%}
 
 _action_
 fn_update_items_pos_and_geom (Process src, Process data)
@@ -52,11 +29,15 @@ fn_update_items_pos_and_geom (Process src, Process data)
   int padding_top = data.padding_top
   int preferred_width = data.preferred_width
   int preferred_height = data.preferred_height
-  int width = data.preferred_width == -1 ? data.container_width - 2*padding_left : data.preferred_width - 2*padding_left
-  int height = data.preferred_height == -1 ? data.container_height - 2*padding_top : data.preferred_height - 2*padding_top
-
+  int width  = (preferred_width  != -1 ? preferred_width  : data.container_width)  - 2*padding_left
+  int height = (preferred_height != -1 ? preferred_height : data.container_height) - 2*padding_top
+  // int preferred_width = -1
+  // int preferred_height = -1
+  // int width = data.container_width - 2*padding_left
+  // int height = data.container_height - 2*padding_top
 
   int space = data.space
+
   int fixed_height = 0
   int nb_fixed_height = 0
   for item : data.items {
@@ -65,11 +46,13 @@ fn_update_items_pos_and_geom (Process src, Process data)
       nb_fixed_height++
     }
   }
+
   int space_per_item = 0
   if (nb_items != nb_fixed_height) {
     space_per_item = (height - fixed_height - (nb_items-1)*space - 2*padding_top) / (nb_items - nb_fixed_height)
   }
-  int dy = 0
+
+  int dy = padding_top
   int max_width = 0
   for item : data.items {
     if ($item.preferred_height != -1) {
@@ -98,7 +81,8 @@ fn_update_items_pos_and_geom (Process src, Process data)
       max_width = $item.width
     } 
   }
-  dy -= space
+  dy -= space // remove last added space FIXME requires non empty items
+
   for item : data.items {
     if (item.h_alignment == 0) { // left
       item.x = 0
@@ -126,49 +110,40 @@ fn_update_items_pos_and_geom (Process src, Process data)
       data.off_y = data.container_height - dy - padding_top
     }
   }
-  data.preferred_width = max_width + 2*padding_left
-  data.preferred_height = dy + 2*padding_top
-  data.cell_width = max_width
-  data.cell_height = space_per_item
+
+  if (data.top_level_box != 1) {
+    data.preferred_width = max_width + 2*padding_left
+    data.preferred_height = dy + 2*padding_top
+    data.cell_width = max_width
+    data.cell_height = space_per_item
+  }
 }
 
 _define_
-VBox (Process container) inherits IWidget ()
-{
-  check (container, "width")
-  check (container, "height")
-  Bool set_pos (1)
-  Translation offset (0, 0)
-  off_x aka offset.tx
-  off_y aka offset.ty
-  Translation padding (5, 5)
-  padding_left aka padding.tx
-  padding_top aka padding.ty
-  Int cell_width (0)
-  Int cell_height (0)
-  Int space (5)
-  if (find_optional (container, "cell_width")) {
-    container_width aka container.cell_width
-    container_height aka container.cell_height
-    set_pos = 0
-    padding_left = 0
-    padding_top = 0
-  } else {
-    container_width aka container.width
-    container_height aka container.height
-  }
-
-  ZOrderedGroup g {
-    List items
-  }
-  items aka g.items
-  
+VBox () inherits AbstractBox ()
+{ 
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
   this.container_width->update_items_pos_and_geom
   this.container_height->update_items_pos_and_geom 
-  SumList sl (items, "min_height")
-  MaxList ml (items, "min_width")
+  SumList sl (this.items, "min_height")
+  MaxList ml (this.items, "min_width")
   sl.output->update_items_pos_and_geom // bad trick to force geometry recomputation at startup, needed for text
-  sl.output + space*(items.size - 1) =:> this.min_height
+  sl.output + this.space*(this.items.size - 1) =:> this.min_height
   ml.output =:> this.min_width
+
+  if (this.top_level_box == 1) {
+    Timer t(1)
+    t.end -> this.pack     // FIXME
+    t.end -> update_items_pos_and_geom
+
+    if (this.preferred_width == -1) {
+      this.container_width =:> this.preferred_width
+    }
+    if (this.preferred_height == -1) {
+      this.container_height =:> this.preferred_height
+    }
+  }
+  this.pack ~> update_items_pos_and_geom
+  
+  moveChild this.remaining >>
 }

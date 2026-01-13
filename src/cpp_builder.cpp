@@ -1525,6 +1525,9 @@ namespace Smala
   void
   CPPBuilder::build_native_expression_node (std::ostream &os, Node *n)
   {
+    indent (os);
+    emit_debug_location (os, n);
+
     m_expr_in = m_expr_out = 0;
     NativeExpressionNode *node = dynamic_cast<NativeExpressionNode*> (n);
     if (node->get_expression ()->get_expr_node_type() < 2) {
@@ -2894,6 +2897,7 @@ namespace Smala
   CPPBuilder::build_transition_node (std::ostream &os, Node *n)
   {
     emit_compiler_info(os);
+    emit_debug_location (os, n);
     TransitionNode* ctrl = dynamic_cast<TransitionNode*> (n);
     std::string constructor = get_constructor (ctrl->djnn_type ());
     indent (os);

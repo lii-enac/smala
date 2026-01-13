@@ -16,9 +16,9 @@ Component root {
     f.close ->! mainloop
 
     FillColor _(#FFFFFF)                      // svg 'fill' defaults to black, which is hardly visible in smala lib's default dark theme
-    Text T(0,20,"")                           // [7GUIs] ...a label or read-only textfield T and...
+    Text T (10, 26,"")                           // [7GUIs] ...a label or read-only textfield T and...
     
-    StandAlonePushButton B("Count", 100, 0)   // [7GUIs] ...a button B. // FIXME label parameter should be after x and y, and it should be a "Button"
+    StandAlonePushButton B ("Count", 50, 10)   // [7GUIs] ...a button B. // FIXME label parameter should be after x and y, and it should be a "Button"
 
     // solution #1
     Int counter(0)                            // [7GUIs] Initially, the value in T is “0”...

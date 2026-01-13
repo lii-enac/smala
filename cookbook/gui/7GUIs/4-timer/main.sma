@@ -10,6 +10,7 @@ use gui
 import gui.widgets.PushButton
 import gui.widgets.HSlider
 import gui.widgets.Label
+import gui.widgets.ProgressBar
 import gui.widgets.VBox
 import gui.widgets.HBox
 
@@ -19,19 +20,24 @@ Component root {
     f.close ->! mainloop
     mouseTracking = 1    // FIXME otherwise Slider adjustment won't work
 
-    VBox box {
-        //Gauge _G(50)          // [7GUIs] a gauge G for the elapsed time e,
-        HSlider G(50)          // FIXME should be a Gauge     
-        FillColor _(#FFFFFF)   // FIXME how to control color once reparented???
-        Label L("empty")       // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
-        HSlider S(50)          // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
-        PushButton R("Reset")  // [7GUIs] a reset button R.
+    VBox v_box {
+        HBox h_box1 {
+            Label L1 ("Elapsed time: ")
+            ProgressBar G (0)           // [7GUIs] a gauge G for the elapsed time e,
+        }
+        // FillColor _(#FFFFFF)         // FIXME how to control color once reparented???
+        Label L ("0s")                  // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
+        HBox h_box2 {
+            Label L2 ("Duration: ")
+            HSlider S (50)              // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
+        }
+        PushButton R ("Reset")          // [7GUIs] a reset button R.
     }
     // make widget naming independent from layout hierarchy
-    G aka box.G
-    L aka box.L
-    S aka box.S
-    R aka box.R
+    G aka v_box.h_box1.G
+    L aka v_box.L
+    S aka v_box.h_box2.S
+    R aka v_box.R
 
 
     Double d(0)             // [7GUIs] ...duration...
@@ -44,7 +50,7 @@ Component root {
     d * 10 =:> G.bv.max     // [7GUIs] a gauge G for the elapsed time e
     e * 10 =:> G.bv.input
     
-    e =:> L.text            // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
+    e + "s" =:> L.text      // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
 
     S.value / 10 =:> d      // [7GUIs] Adjusting S must immediately reflect on d and not only when S is released.
 

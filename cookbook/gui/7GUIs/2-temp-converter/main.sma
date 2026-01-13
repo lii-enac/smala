@@ -20,9 +20,9 @@ Component root {
 
     HBox h {
         UITextField TC               // [7GUIs] ...two textfields TC and TF representing the temperature in Celsius and Fahrenheit, respectively.
-        Label LC(" celsius =")       // [7GUIs] (implicit) and...
+        Label LC(" Celsius =")       // [7GUIs] (implicit) and...
         UITextField TF               // [7GUIs] ... two labels
-        Label LF(" farenheit")       // [7GUIs] Initially, both TC and TF are empty.
+        Label LF(" Farenheit")       // [7GUIs] Initially, both TC and TF are empty.
     }
 
     Double C(0)

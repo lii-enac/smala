@@ -9,8 +9,9 @@
 #   Contributors:
 #     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
 #     Stephane Conversy <stephane.conversy@enac.fr>
+#	  Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
 #
 
-objs_cookbook_app := main.o
+objs_cookbook_app := PersonModel.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

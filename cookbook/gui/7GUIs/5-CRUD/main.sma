@@ -16,21 +16,12 @@ import gui.widgets.Label
 
 import gui.widgets.HBoxPolicy
 
+import PersonModel
+
 _native_code_
 %{
     #include "core/property/text_property.h"
-    bool validate_date(Process *tf, Process *b_valid) {
-        auto tf_text = dynamic_cast<djnn::TextProperty*> (tf);
-        if (tf_text) {
-            djnnstl::string s = tf_text ->get_value();
-            // TODO
-        }
-        return true;
-    }
 
-    bool validate_seq(Process* tf_outbound, Process* tf_return, Process* b_valid) {
-        return true;
-    }
 %}
 
 _main_
@@ -39,6 +30,7 @@ Component root {
     f.close ->! mainloop
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
+    // _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -87,9 +79,16 @@ Component root {
     // b_all.filter.T_prefix.text =:> tp.input
 
     // make widget naming independent from layout hierarchy
-    // TODO
+    T_name aka b_all.data.props.name.T_name
+    T_surname aka b_all.data.props.surname.T_surname
+    BC aka b_all.buttons.BC
+    BU aka b_all.buttons.BU
+    BD aka b_all.buttons.BD
 
     // TODO !!
+    List models
+
+    PersonModel temp_person ("Vince", "Pey")
     
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
@@ -98,6 +97,22 @@ Component root {
     // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
+    // BC.click -> {
+
+    // }
+    Bool is_missing_value (false)
+    (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
+
+    BC.click -> na_create:(root) {
+        print ("Click on BC with " + root.T_name.text + " " + root.T_surname.text)
+        addChildrenTo root.models {
+            PersonModel _ (getString (root.T_name.text), getString (root.T_surname.text))
+        }
+    }
+    
+    // (getString (T_name.text) == "") || (getString (T_surname.text) == "") -> BC.disable
+    is_missing_value.false -> BC.enable
+    is_missing_value.true -> BC.disable
 
     // [7GUIs] BU and BD are enabled iff an entry in L is selected.
 

@@ -21,16 +21,22 @@ Component root {
     mouseTracking = 1    // FIXME otherwise Slider adjustment won't work
 
     VBox v_box {
+        v_box.space = 20
+
         HBox h_box1 {
             Label L1 ("Elapsed time: ")
             ProgressBar G (0)           // [7GUIs] a gauge G for the elapsed time e,
         }
         // FillColor _(#FFFFFF)         // FIXME how to control color once reparented???
         Label L ("0s")                  // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
+        L.h_alignment = 0
+
         HBox h_box2 {
             Label L2 ("Duration: ")
             HSlider S (50)              // [7GUIs] a slider S by which the duration d of the timer can be adjusted while the timer is running and
         }
+        h_box2.h_alignment = 0
+        
         PushButton R ("Reset")          // [7GUIs] a reset button R.
     }
     // make widget naming independent from layout hierarchy

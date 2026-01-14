@@ -51,19 +51,28 @@ Component root {
     // BC BU BD
 
     VBox b_all {
+        b_all.space = 20
+
         HBox filter {
             Label L_prefix("Filter prefix:") // [7GUIs] the three labels as seen in the screenshot.
             UITextField T_prefix             // [7GUIs] a textfield Tprefix
         }
+        filter.h_alignment = 0
+
         HBox data {
+            data.space = 20
+
             UITextField L                    // FIXME should be a ListBox
+
             VBox props {
                 HBox name {
                     Label L_name("Name:")   // [7GUIs] a pair of textfields Tname and Tsurname,
+                    L_name.preferred_width = 60
                     UITextField T_name      // [7GUIs] [with a label],
                 }
                 HBox surname {
                     Label L_surname("Surname:") // [7GUIs] a pair of textfields Tname and Tsurname,
+                    L_surname.preferred_width = 60
                     UITextField T_surname   // [7GUIs] [with a label]
                 }
             }
@@ -73,6 +82,7 @@ Component root {
             PushButton BU("Update") // [7GUIs] BU and
             PushButton BD("Delete") // [7GUIs] BD
         }
+        buttons.h_alignment = 0
     }
 
     // TextPrinter tp
@@ -85,9 +95,15 @@ Component root {
     BU aka b_all.buttons.BU
     BD aka b_all.buttons.BD
 
+    TextPrinter tp
+
+    // By default, all buttons are disabled
+    |-> BC.disable, BU.disable, BD.disable
+
     // TODO !!
     List models
 
+    // FIXME: for test
     PersonModel temp_person ("Vince", "Pey")
     
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
@@ -97,22 +113,25 @@ Component root {
     // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
-    // BC.click -> {
-
-    // }
-    Bool is_missing_value (false)
+    Bool is_missing_value (true)
     (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
 
-    BC.click -> na_create:(root) {
+    BC.click -> na_create_person:(root) {
         print ("Click on BC with " + root.T_name.text + " " + root.T_surname.text)
         addChildrenTo root.models {
             PersonModel _ (getString (root.T_name.text), getString (root.T_surname.text))
         }
     }
+    na_create_person -> root.T_name.clear, root.T_surname.clear
     
     // (getString (T_name.text) == "") || (getString (T_surname.text) == "") -> BC.disable
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
+
+    // Key "tab" allows to set the focus to next text field
+    T_name.next -> T_surname.activate
+
+    T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
     // [7GUIs] BU and BD are enabled iff an entry in L is selected.
 

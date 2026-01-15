@@ -82,11 +82,22 @@ my_find_frame(CoreProcess* obj)
 
 static
 void
-add_one(CoreProcess* pc_, CoreProcess* child)
+add_if_not_yet(CoreProcess* pc_, CoreProcess* child)
 {
   auto pc = dynamic_cast<ProcessCollector*>(pc_);
   //assert (pc);
-  pc->add_one(child);
+  if (pc) {
+    bool exist = false;
+    for (CoreProcess* widget : pc->get_list ()) {
+      if (widget == child) {
+        exist = true;
+        break;
+      }
+    }
+    if (!exist) {
+      pc->add_one(child);
+    }
+  }
 }
 
 %}
@@ -134,40 +145,45 @@ AbstractBox () inherits IWidget ()
   }
 
   ProcessCollector items(0)
+
+  // TextPrinter tp
+  // items.size + " items in box" => tp.input
+
   Component remaining // will be moved at the end, serves as a marker for additional components
 
-  Spike pack
-
-  pack -> (this) {
-    // print("***")
-    // string nthis = get_debug_name(this)
-    // myprint(nthis)
-    int yep = 0
+  this.pack -> (this) {
+    // print("\n******")
+    // string s_this = get_debug_name(this)
+    // myprint(s_this)
+    int found_remaining = 0
     for item : this {
       //string n = get_debug_name(item)
       //myprint(n)
 
       if (&item == &this.remaining) {
-        yep=1
+        // print ("...remaining")
+        found_remaining = 1
         continue
       }
-      if (yep > 0) {
-          //string n = get_debug_name(item)
-          //myprint(n)
+      if (found_remaining > 0) {
+          // string n = get_debug_name(item)
+          // myprint(n)
           if (find_optional (item, "pack")) {
             //print("--- pack")
             //notify item.pack // FIXME rename to propagate?
             activate (item.pack)
-            add_one (this.items, item)
+            
+            add_if_not_yet (this.items, item)
           }
-        //   else {
-        //     string n = get_debug_name(item)
-        //     print ("warning:")
-        //     myprint (n)
-        //     print (" is not a IWidget")
-        //   }
+          // else {
+          //   string n = get_debug_name(item)
+          //   print ("warning:")
+          //   myprint (n)
+          //   print (" is not a IWidget")
+          // }
       }
     }
+    // print("END\n")
   }
 
 //   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)

@@ -40,9 +40,10 @@ Component root {
     List models
     models.size + " persons in the list" => tp.input
 
-    Component prototype (1) {
-        PersonView view
-    }
+    // FIXME: v0.1
+    // Component prototype (1) {
+    //     PersonView view
+    // }
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -73,12 +74,11 @@ Component root {
 
         HBox data {
             data.space = 20
+            
+            // FIXME: v0.1
+            // ListViewer list_viewer (models, prototype.view)
 
-            // UITextField L                    // FIXME should be a ListBox
-            // VBox props {
-
-            // }
-            ListViewer list_viewer (models, prototype.view)
+            VBox L {}                       // [7GUIs] L presents a view of the data in the database that consists of a list of names.
 
             VBox props {
                 HBox name {
@@ -104,6 +104,7 @@ Component root {
     // b_all.filter.T_prefix.text =:> tp.input
 
     // make widget naming independent from layout hierarchy
+    L aka b_all.data.L
     T_name aka b_all.data.props.name.T_name
     T_surname aka b_all.data.props.surname.T_surname
     BC aka b_all.buttons.BC
@@ -137,11 +138,26 @@ Component root {
     }
     na_create_person -> root.T_name.clear, root.T_surname.clear
     
+    BD.click -> na_delete_person:(root) {
+        if (root.models.size > 0) {
+            Process model = &root.models.[root.models.size]
+
+            // We cannot delete the model yet
+            //delete model
+            // Only remove from list
+            remove model from root.models
+        }
+    }
+
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
 
+    models.size > 0 -> BD.enable
+    models.size == 0 -> BD.disable
+
     // Key "tab" allows to set the focus to next text field
     T_name.next -> T_surname.activate
+    T_surname.next -> BC.select
 
     // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
@@ -150,6 +166,35 @@ Component root {
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
 
     // [7GUIs] BD will remove the selected entry.
+
+    models.$added -> na_added:(root) {
+        model = getRef (&root.models.$added)
+        if (&model != null)
+        {
+            print ("The model '" + model.fullname + "' has been added to the list")
+            addChildrenTo root.L {
+                Label _ (getString (model.fullname))
+                // How to link this model and this view to update it when model change ?
+                // model.fullname =:> _.text
+            }
+
+            notify root.L.pack
+        }
+    }
+    
+    models.$removed -> na_removed:(root) {
+        model = getRef (&root.models.$removed)
+        if (&model != null)
+        {
+            print ("The model '" + model.fullname + "' has been removed from the list")
+
+            for view : root.L.items {
+                // print ("view of " + view.model.fullname)
+                print ("view of " + view.text)
+            }
+            // delete model
+        }        
+    }
 }
 
 

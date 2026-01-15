@@ -14,9 +14,12 @@ import gui.widgets.HBox
 import gui.widgets.ComboBox
 import gui.widgets.Label
 
-import gui.widgets.HBoxPolicy
+// import gui.widgets.HBoxPolicy
+
+import gui.widgets.ListViewer
 
 import PersonModel
+import PersonView
 
 _native_code_
 %{
@@ -31,6 +34,15 @@ Component root {
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
     // _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+
+    TextPrinter tp
+
+    List models
+    models.size + " persons in the list" => tp.input
+
+    Component prototype (1) {
+        PersonView view
+    }
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -62,7 +74,11 @@ Component root {
         HBox data {
             data.space = 20
 
-            UITextField L                    // FIXME should be a ListBox
+            // UITextField L                    // FIXME should be a ListBox
+            // VBox props {
+
+            // }
+            ListViewer list_viewer (models, prototype.view)
 
             VBox props {
                 HBox name {
@@ -85,7 +101,6 @@ Component root {
         buttons.h_alignment = 0
     }
 
-    // TextPrinter tp
     // b_all.filter.T_prefix.text =:> tp.input
 
     // make widget naming independent from layout hierarchy
@@ -95,16 +110,14 @@ Component root {
     BU aka b_all.buttons.BU
     BD aka b_all.buttons.BD
 
-    TextPrinter tp
 
     // By default, all buttons are disabled
     |-> BC.disable, BU.disable, BD.disable
 
     // TODO !!
-    List models
 
     // FIXME: for test
-    PersonModel temp_person ("Vince", "Pey")
+    // PersonModel temp_person ("Vince", "Pey")
     
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
@@ -117,21 +130,20 @@ Component root {
     (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
 
     BC.click -> na_create_person:(root) {
-        print ("Click on BC with " + root.T_name.text + " " + root.T_surname.text)
+        // print ("Click on BC with " + root.T_name.text + " " + root.T_surname.text)
         addChildrenTo root.models {
             PersonModel _ (getString (root.T_name.text), getString (root.T_surname.text))
         }
     }
     na_create_person -> root.T_name.clear, root.T_surname.clear
     
-    // (getString (T_name.text) == "") || (getString (T_surname.text) == "") -> BC.disable
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
 
     // Key "tab" allows to set the focus to next text field
     T_name.next -> T_surname.activate
 
-    T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
+    // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
     // [7GUIs] BU and BD are enabled iff an entry in L is selected.
 

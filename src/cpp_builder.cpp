@@ -2035,6 +2035,10 @@ namespace Smala
   void
   CPPBuilder::build_end_define (std::ostream &os, Node *node)
   {
+    emit_compiler_info(os);
+    //emit_debug_location (os, node);
+    indent (os);
+    os << "Context::instance()->parser_info(-1,-1,-1,-1,\"\");\n";
     indent (os);
     os << "return " << m_parent_list.back ()->get_symbol ("this") << ";\n}\n";
     m_indent--;

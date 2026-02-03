@@ -19,6 +19,7 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
   Double output (0)
   EasingGenerator gen (func)
   Incr incr (1)
+  Int period (20)
   //Int loop (_loop)
   //Int start_on_activation (_start_on_activation)
 
@@ -50,7 +51,8 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
       // Option 1: Reset the flag "start_on_activation"
       // 0 =: start_on_activation
 
-      Clock cl (20)
+      Clock cl ($period)
+      period =: cl.tick
       Int num_step (0)
       duration/cl.period =:> num_step
       1 / num_step =:> incr.delta
@@ -66,7 +68,8 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
     }
 
     State rewinding {
-      Clock cl (20)
+      Clock cl ($period)
+      period =: cl.tick
       Bool is_ended (0)
       // Use previous value, because incr.state may have been reseted in state "stopped"
       previous.output =: incr.state

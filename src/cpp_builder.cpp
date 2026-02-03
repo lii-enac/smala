@@ -305,6 +305,11 @@ namespace Smala
     if (m_fastcomp) { 
       final_os << "#include \"c_api/djnn_c_api.h\"\n";
     } else {
+      final_os << R"( 
+      #if __has_include("smala_pre_include.h")
+      #include "smala_pre_include.h"
+      #endif
+      )";
       final_os << "#include \"core/utils/containers/string.h\"" << std::endl;
       final_os << "#include \"core/utils/to_string.h\"" << std::endl;
       final_os << "using djnnstl::string;" << std::endl;

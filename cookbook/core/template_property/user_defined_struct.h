@@ -1,6 +1,9 @@
 #pragma once
 
+#include <valarray> // valarray has all math operator defined...
+
 #include "core/utils/to_string.h" // should be djnn/core/...
+
 
 // example with user-defined type
 
@@ -43,13 +46,15 @@ using namespace units::velocity;
 inline std::string to_string2 (const meters_per_second_t s) { return to_string(s); }
 
 
-// example with arrray of doubles
+// example with array of doubles
 //#include <execution>
 //#include <algorithm>
-#include <valarray> // valarray has all math operator defined...
+
 
 using vector_double = std::valarray<double>; //vector<double>;
-using DoubleArray = TemplateProperty<vector_double>;
+//#define vector_double std::valarray<double>
+//struct vector_double : std::valarray<double> {};
+//using DoubleArray = TemplateProperty<vector_double>;
 extern vector_double vd_def;
 
 inline std::string to_string2 (const vector_double& v) {

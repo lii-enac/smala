@@ -74,7 +74,7 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
       // Use previous value, because incr.state may have been reseted in state "stopped"
       previous.output =: incr.state
       -incr.delta =: incr.delta
-      cl.period -> incr
+      cl.tick -> incr
       gen.output * (max - min) + min =:> output
 
       incr.state <= 0 => is_ended

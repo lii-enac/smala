@@ -52,7 +52,7 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
       // 0 =: start_on_activation
 
       Clock cl ($period)
-      period =: cl.tick
+      period =: cl.period
       Int num_step (0)
       duration/cl.period =:> num_step
       1 / num_step =:> incr.delta
@@ -69,12 +69,12 @@ Animator (int _duration, double _min, double _max, int func, int _loop, int _sta
 
     State rewinding {
       Clock cl ($period)
-      period =: cl.tick
+      period =: cl.period
       Bool is_ended (0)
       // Use previous value, because incr.state may have been reseted in state "stopped"
       previous.output =: incr.state
       -incr.delta =: incr.delta
-      cl.tick -> incr
+      cl.period -> incr
       gen.output * (max - min) + min =:> output
 
       incr.state <= 0 => is_ended

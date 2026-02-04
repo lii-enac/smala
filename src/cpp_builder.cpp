@@ -2844,6 +2844,7 @@ namespace Smala
   CPPBuilder::build_native_action_component (std::ostream &os, Node *n)
   {
     emit_compiler_info(os);
+    emit_debug_location (os, n);
     NativeComponentNode* node = dynamic_cast<NativeComponentNode*> (n);
     native_type type = node->get_native_type();
     std::string constructor;

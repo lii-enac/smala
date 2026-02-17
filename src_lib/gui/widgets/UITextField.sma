@@ -48,7 +48,7 @@ UITextField () inherits IWidget () {
   this.width =:> bkg.width
   this.width - 10 =:> field.width
 
-  Int unedit_text_color (#909090)
+  Int unedit_text_color (0) //(#909090)
   Int edit_text_color (0)
   Int disabled_color (#959595)
 
@@ -67,7 +67,7 @@ UITextField () inherits IWidget () {
   }
 
   AssignmentSequence set_text (1) {
-    field.content.text =?: text   // Only if the content of inner text field changed
+    field.content.text =: text
   }
 
   FSM edit_fsm {

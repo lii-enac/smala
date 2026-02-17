@@ -31,7 +31,7 @@ _native_code_
         if (mm==2 && dd==29 && yy%4!=0) return -1; // leap year
 
         // compute time since 01/01/1900
-        //if (yys.size()<=2) yy+=2000; // if yy is 2 digits, consider it to be 20yy
+        if (yys.size()<=2) yy+=100; // Interpret yy as 20YY; add 100 to the offset from 1900.
         std::tm tm{};
         tm.tm_year = yy;
         tm.tm_mon = mm-1;
@@ -44,8 +44,13 @@ _native_code_
 
 _main_
 Component root {
-    Frame f ("7GUIs Flight Booker - DOES NOT WORK YET") // [7GUIs] The task is to build a frame containing...
+    Frame f ("7GUIs Flight Booker - DOES NOT WORK YET") // FIXME no size ? self containing size ? // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
+    150 =: f.width // BUG ! des qu'on touche une propriété ca remonte la fenetre en haut !!
+    120 =: f.height
+    f.background_color.r = 237
+    f.background_color.g = 237
+    f.background_color.b = 237
 
     ZOrderedGroup zog {            // FIXME this is for the combobox, since its popup inner listbox has to be on top of other widgets
         VBox v {    
@@ -69,14 +74,13 @@ Component root {
         }
     }
     cb_model =: C.model
-    C.preferred_width = 100
+    // C.preferred_width = 120
     
     
     cb_model.items.[1] =: C.value  // [7GUIs] Initially, C has the value “one-way flight”...
 
-    // FIXME does not work
-    //"01/01/2025" =: T1.text //= "01/01/2025" // [7GUIs] ...and T1 as well as T2 have the same (arbitrary) date...
-    //T2.text = "01/01/2025"
+    "01.01.26" =: T1.init_text  // [7GUIs] ...and T1 as well as T2 have the same (arbitrary) date...
+    "01.01.26" =: T2.init_text
                                                 // [7GUIs] ...(it is implied that T2 is disabled). (see below)
 
 
@@ -100,22 +104,52 @@ Component root {
     Bool  B_valid(0)
 
     Int time1(-1)
+    Int time2(-1)
 
-    string regex_date_str = "\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)" // FIXME group name (not in c++ regex sadly)
+    // 3 types of regex
+    // string regex_date_str = "\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)" // FIXME group name (not in c++ regex sadly)
+    // Regex regex_date ("\\s*(\\d\\d?)\\s(\\d\\d?)\\s(\\d\\d)\\s*")
+        
+    // Matches dates in the formats: DD.MM.YY, DD.MM.YYYY, DD MM YY, or DD MM YYYY
+    // - Day and month: 1 or 2 digits
+    // - Year: exactly 2 or 4 digits (3-digit years are rejected)
+    // - Separator: either a single dot or a single space
+    // - The same separator must be used consistently between all parts
+    // - No extra spaces allowed between the date components (only around the whole date)
+    // Valid examples: 10.02.26, 1 9 2026
+    // Invalid examples: 10. 02. 26, 10   02   26, 10.02.026
+    // Regex regex_date ("^\\s*(\\d{1,2})([ .])(\\d{1,2})\\2(\\d{2}|\\d{4})\\s*$")
+
+    // Matches dates in the formats: DD.MM.YY or DD MM YY
+    // - Day and month: 1 or 2 digits
+    // - Year: exactly 2 digits
+    // - Separator: either a single dot or a single space
+    // - No extra spaces allowed between components (only around the whole date)
+    // Valid examples: 10.02.26, 1 9 26
+    // Invalid examples: 10. 02. 26, 10   02   26, 10.02.026
+    string regex_date_str = ("^\\s*(\\d{1,2})[ .](\\d{1,2})[ .](\\d{2})\\s*$")
+
     Component _ { // here only to scope the following components
         Regex regex_date (regex_date_str)
         T1.text => regex_date.input
+
+        // DEBUG
+        // TextPrinter tp
+        // "regex: " + regex_date.[1] + " - " + regex_date.[2] + " - " + regex_date.[3] => tp.input
+
         regex_date.matched.true -> {
-            to_time($toString(regex_date.[3]), $toString(regex_date.[2]), $toString(regex_date.[1])) =: time1
+            to_time(getString(regex_date.[3]), getString(regex_date.[2]), getString(regex_date.[1])) =: time1
         }
         regex_date.matched.false -> {
             -1 =: time1
         }
-        time1 != -1 =:> T1_valid
+        (time1 != -1) =:> T1_valid
 
         T1_valid.false -> {
             #FF0000 =: T1.text_color   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
         }
+        T1_valid.false -> B.disable
+
         T1_valid.true -> {
             #000000 =: T1.text_color   // ...else...
         }
@@ -126,12 +160,14 @@ Component root {
             T1_valid =:> B_valid
         }
         Component true {
-            Int time2(-1)
-    
+            
+            
             Regex regex_date_2 (regex_date_str)
-            T2.text =:> regex_date_2.input
+            T2.init_text =: regex_date_2.input // Initialize time2 with init_text; otherwise T2 will be invalid the first time it’s enabled.
+                                               // Note: T2.text is used only when the Return key is pressed, so it can’t be used during initialization.
+            T2.text => regex_date_2.input
             regex_date_2.matched.true -> {
-                to_time($getString(regex_date_2.[3]), $getString(regex_date_2.[2]), $getString(regex_date_2.[1])) =: time2
+                to_time(getString(regex_date_2.[3]), getString(regex_date_2.[2]), getString(regex_date_2.[1])) =: time2
             }
             regex_date_2.matched.false -> {
                 -1 =: time2
@@ -141,6 +177,8 @@ Component root {
             T2_valid.false -> {
                 #FF0000 =: T2.text_color    // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
             }
+            T2_valid.false -> B.disable
+            
             T2_valid.true -> {
                 #000000 =: T2.text_color    // ...else...
             }
@@ -155,11 +193,11 @@ Component root {
     // FIXME the following does not work if C is "one-way":
     B_valid.true  -> B.enable // FIXME should be -:>
     B_valid.false -> B.disable
-    //"--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\nB_valid " + B_valid =:> tp.input
+    //"--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\ntime1 " + time1 + "\ntime2 " + time2 + "\n(time1 < time2) " + to_string((time1 < time2)) + "\nB_valid " + B_valid =:> tp.input
 }
 
 
-
+// original text
 // [7GUIs] The task is to build a frame containing a combobox C with the two options “one-way flight” and “return flight”,
 // [7GUIs] two textfields T1 and T2 representing the start and return date, respectively,
 // [7GUIs] and a button B for submitting the selected flight.

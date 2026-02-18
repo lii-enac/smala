@@ -1560,6 +1560,7 @@ namespace Smala
     extract_leaves (leaves, expr);
 
     vector<string> tmpl_varnames;
+
     // to avoid multiple loops, generate source code with multiple streams that we assemble at the end
     stringstream create_temp_properties;
     stringstream populate_native_fields;
@@ -1570,7 +1571,7 @@ namespace Smala
         string arg = build_find (l->get_path (), true);
         build_properties(create_temp_properties);
         //std::cerr << "--arg: " << arg << " --parent?_name: " << whatever_name << std::endl;
-        if (arg.compare (0, 6, "d_var_") == 0 || arg.compare (0, 6, "i_var_") == 0) {
+        if (arg.compare (0, 6, "d_var_") == 0 || arg.compare (0, 6, "i_var_") == 0) { // double or int
           string new_param_name = transform_name(whatever_name);
           if (prop_sym.find (new_param_name) == prop_sym.end ()) {
             emit_compiler_info(populate_native_fields);
@@ -1579,7 +1580,7 @@ namespace Smala
                   << ";\n";
           }
 
-        } else if (arg.compare (0, 6, "s_var_") == 0) {
+        } else if (arg.compare (0, 6, "s_var_") == 0) { // string
           string new_param_name = transform_name(whatever_name);
           if (prop_sym.find (new_param_name) == prop_sym.end ()) {
             emit_compiler_info(populate_native_fields);
@@ -1596,11 +1597,39 @@ namespace Smala
           } else {
             str_to_find = "djnn_find";
           }
-          //if (arg.find ("->") != std::string::npos) {
-          //if (arg.find ("djnn_find") != std::string::npos) {
-          if (arg.find (str_to_find) != std::string::npos) {
+          if (arg.find (str_to_find) != std::string::npos) { // the property has to be found from a parent
             std::string new_param_name = transform_name (fake_name);
-            if (prop_sym.find (new_param_name) == prop_sym.end ()) {
+            if (prop_sym.find (new_param_name) == prop_sym.end ()) { // check the property is already known, create it otherwise
+              std::string tmpl_class_name = "AbstractProperty*";
+              std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+
+              emit_compiler_info(create_temp_properties);
+              indent (create_temp_properties);
+              emit_not_a_property (create_temp_properties, arg);
+              indent (create_temp_properties);
+              if (!m_fastcomp) {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
+              } else {
+                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n\n";
+              }
+              if (!m_fastcomp)
+                used_processes["AbstractProperty"] = true;
+              sym[new_param_name] = new_name;
+              prop_sym[new_param_name] = new_name;
+            }
+            std::string field_name = transform_name (fake_name);
+            const auto& new_name = prop_sym[new_param_name];
+            emit_compiler_info(populate_native_fields);
+            indent (populate_native_fields);
+            populate_native_fields << native_name << "->" << field_name <<  " = " << new_name << ";\n";
+            if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
+              triggers.push_back (new_name);
+              tmpl_varnames.push_back (new_name);
+            }
+
+          } else {
+            std::string new_param_name = transform_name (whatever_name);
+            if (prop_sym.find (new_param_name) == prop_sym.end ()) { // check the property is already known, create it otherwise
               std::string tmpl_class_name = "AbstractProperty*";
               std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
 
@@ -1619,42 +1648,9 @@ namespace Smala
               prop_sym[new_param_name] = new_name;
             }
             const auto& new_name = prop_sym[new_param_name];
-            std::string field_name = transform_name (fake_name);
-            indent (populate_native_fields);
-            populate_native_fields << native_name << "->" << field_name <<  " = " << new_name << ";\n";
-            if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
-              triggers.push_back (new_name);
-              tmpl_varnames.push_back (new_name);
-            }
-
-          } else {
-            std::string new_param_name = transform_name(whatever_name);
-            
-            if (prop_sym.find (new_param_name) == prop_sym.end ()) {
-              std::string new_name;     
-              new_name = "cpnt_" + std::to_string (m_cpnt_num++);
-              std::string tmpl_class_name = "AbstractProperty*";
-
-              emit_compiler_info(create_temp_properties);
-              indent (create_temp_properties);
-              emit_not_a_property (create_temp_properties, arg);
-              indent (create_temp_properties);
-              if (!m_fastcomp) {
-                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << ">(" << arg << ");\n";
-              } else {
-                create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
-              }
-              if (!m_fastcomp)
-                used_processes["AbstractProperty"] = true;
-              sym[new_param_name] = new_name;
-              prop_sym[new_param_name] = new_name;
-
-            }
-            const auto& new_name = prop_sym[new_param_name];
             emit_compiler_info(populate_native_fields);
             indent (populate_native_fields);
-            populate_native_fields << native_name << "->" << new_param_name << " = " 
-              <<  new_name << ";\n";
+            populate_native_fields << native_name << "->" << new_param_name << " = "  <<  new_name << ";\n";
             if (find(begin(tmpl_varnames), end(tmpl_varnames), new_name) == end(tmpl_varnames)) {
               triggers.push_back (new_name);
               tmpl_varnames.push_back(new_name);
@@ -1680,21 +1676,21 @@ namespace Smala
           std::string fake_name = build_fake_name (e, true);
           std::string new_param_name = transform_name (fake_name);
 
-          if (prop_sym.find (new_param_name) == prop_sym.end ()) {
-            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
+          if (prop_sym.find (new_param_name) == prop_sym.end ()) { // check the property is already known, create it otherwise
             std::string tmpl_class_name = "AbstractProperty*";
+            std::string new_name ("cpnt_" + std::to_string (m_cpnt_num++));
 
             emit_compiler_info(create_temp_properties);
             indent (create_temp_properties);
             emit_not_a_property (create_temp_properties, arg);
             indent (create_temp_properties);
             if (!m_fastcomp) {
-              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" + tmpl_class_name + "> (" << arg << ");\n";
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = dynamic_cast<" << tmpl_class_name << "> (" << arg << ");\n\n";
             } else {
-              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n";
+              create_temp_properties << "[[maybe_unused]] auto * " << new_name << " = " << arg << ";\n\n";
             }
             if (!m_fastcomp)
-              used_processes["AbstractProperty"] = true;            
+              used_processes["AbstractProperty"] = true;
             sym[new_param_name] = new_name;
             prop_sym[new_param_name] = new_name;
           }
@@ -1729,6 +1725,7 @@ namespace Smala
               used_processes["AbstractProperty"] = true;
             prop_sym[new_param_name] = new_name;
           }
+
           const string& new_name = prop_sym[new_param_name];
           emit_compiler_info(populate_native_fields);
           indent (populate_native_fields);
@@ -1740,22 +1737,23 @@ namespace Smala
         
         }
       }
-
     }
 
     stringstream native_stream;
     emit_compiler_info(native_stream);
     indent (native_stream);
-    native_stream << "[[maybe_unused]] auto * " << native_name << " = new " << native_name_struct << "<";
-
+    native_stream << "[[maybe_unused]] auto * " << native_name << " = new " << native_name_struct;
+    
+    native_stream << "<";
+    // join tmpl_varnames with "decltype("
     native_stream << "decltype(";
-
     std::copy(std::begin(tmpl_varnames),
               std::end(tmpl_varnames),
               std::experimental::make_ostream_joiner(native_stream, "), decltype("));
-
     native_stream << ")";
+
     native_stream << ">";
+    
     native_stream << "("
        << p_name << ", " << n_expr_name << ", true, " << node->is_model ()
        << ");\n";

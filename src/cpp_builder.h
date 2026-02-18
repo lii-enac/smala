@@ -53,6 +53,7 @@ namespace Smala {
 
     void build_native_expression (std::ostream &os, Node *n) override;
     void build_native_expression_node (std::ostream &os, Node *n) override;
+    void createPropertyIfNotKnownYet(const std::string& arg, const std::string &new_param_name, stringstream&);
     void emit_not_a_property (std::ostream &os, const std::string& arg);
 
     void build_control_node (std::ostream &os, Node *n) override;

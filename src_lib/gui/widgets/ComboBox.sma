@@ -2,13 +2,14 @@
  *	djnn Smala compiler
  *
  *	The copyright holders for the contents of this file are:
- *		Ecole Nationale de l'Aviation Civile, France (2017)
+ *		Ecole Nationale de l'Aviation Civile, France (2017-2026)
  *	See file "license.terms" for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
  *		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+ *    Mathieu Poirier <mathieu.poirier@enac.fr>
  *
  */
 use core
@@ -35,24 +36,40 @@ Process* getParent (Process *p)
   return p->get_parent ();
 }
 
-int has_item (Process *item, Process *list) {
-  auto & str_item = ((djnn::TextProperty*)item)->get_value ();
-  for (auto p : ((djnn::List*)list)->children ()) {
-    if (((djnn::TextProperty*)item)->get_value () == ((djnn::TextProperty*)p->find_child("t/text"))->get_value ()) {
-      return 1;
+static int has_item(Process* item, Process* list) {
+    auto* tp_item = dynamic_cast<djnn::AbstractTextProperty*>(item);
+    if (!tp_item) return 0;
+
+    const auto& str_item = tp_item->get_value();
+
+    auto* tp_list = dynamic_cast<djnn::List*>(list);
+    if (!tp_list) return 0;
+
+    for (auto p : tp_list->children()) {
+        auto* tp_child = dynamic_cast<djnn::AbstractTextProperty*>(p->find_child("t/text"));
+        if (tp_child && str_item == tp_child->get_value()) {
+            return 1;
+        }
     }
-  }
-   return 0;
+    return 0;
 }
 
-int has_str_item (Process *item, Process *list) {
-  auto& str_item = ((djnn::TextProperty*)item->find_child("t/text"))->get_value ();
-  for (auto p : ((djnn::List*)list)->children ()) {
-    if ( ((djnn::TextProperty*)p)->get_value () == str_item) {
-      return 1;
+static int has_str_item(Process* item, Process* list) {
+    auto* tp_item = dynamic_cast<djnn::AbstractTextProperty*>(item->find_child("t/text"));
+    if (!tp_item) return 0;
+
+    const auto& str_item = tp_item->get_value();
+
+    auto* tp_list = dynamic_cast<djnn::List*>(list);
+    if (!tp_list) return 0;
+
+    for (auto p : tp_list->children()) {
+        auto* tp_child = dynamic_cast<djnn::AbstractTextProperty*>(p);
+        if (tp_child && tp_child->get_value() == str_item) {
+            return 1;
+        }
     }
-  }
-   return 0;
+    return 0;
 }
 
 %}
@@ -98,7 +115,21 @@ ComboBox () inherits IWidget () {
   OutlineColor _ (#535353)
   FillColor fc (#535353)
   Rectangle r (0, 0, 100, 25, 3, 3)
+  this.width =:> r.width
   
+  /* --- magic number ----- */ 
+
+  int arrow_offset_x = 16
+  int selected_item_clip_offset_x = 20
+  int item_size = 17
+
+  /* ---------------------- */
+
+  Component selected_item {
+    RectangleClip clip (0, 0, 40, 40)
+    FillColor _ (White)
+    Text t (5, 0, "")
+  }
   Component arrow {
     FillColor _ (Black)
     Translation pos (0, 10)
@@ -107,13 +138,8 @@ ComboBox () inherits IWidget () {
       Point _ (12, 0)
       Point _ (6, 12)
     }
-    r.width - 16 =:> pos.tx
+    r.width - arrow_offset_x =:> pos.tx
     (r.height - 12)/2.0 + 1 =:> pos.ty
-  }
-  Component selected_item {
-    RectangleClip clip (0, 0, 0, 40)
-    FillColor _ (White)
-    Text t (5, 0, "")
   }
   selected_item.t.height + 10 =:> this.min_height
   this.min_height = selected_item.t.height + 10
@@ -121,7 +147,7 @@ ComboBox () inherits IWidget () {
 
   r.height/2.0 + (selected_item.t.ascent - selected_item.t.descent)/2.0 - 1 =:> selected_item.t.y
 
-  this.width - 20 =:> selected_item.clip.width
+  this.width - selected_item_clip_offset_x =:> selected_item.clip.width
 
   value aka selected_item.t.text
 
@@ -138,19 +164,19 @@ ComboBox () inherits IWidget () {
       0 =: incr.state, decr.state
       FillColor _ (White)
       OutlineColor _ (#323232)
-      Rectangle bg (0, 0,100, 70, 0, 0)
+      ZOrder z (11) // same a comboBoxItem
+      Rectangle bg (0, 0 ,100, 70, 0, 0)
       RectangleClip clip (0, 0, 100, 70)
       bg.{width,height} => clip.{width, height}
 
       r.width =:> bg.width
       r.height =:> bg.y, clip.y
-      bg.z = 10
 
       Translation t (0, 15)
       r.height + 15 =:> t.ty
       Translation lift (0, 0)
       BoundedValue bv_lift (0, 0, 0)
-      Int szItem (17)
+      Int szItem (item_size)
       List text_items
       -(text_items.size-1) * szItem =:> bv_lift.min
       GenericMouse.wheel.dy > 0 -> { lift.ty + szItem =: bv_lift.input}
@@ -164,6 +190,7 @@ ComboBox () inherits IWidget () {
         hover->not_hover (is_hover.false)
         not_hover->hover (is_hover.true)
       }
+      (text_items.size * szItem) + 5 /* extra pixel */  =:> bg.height // Resize bg according to the number of items.
     }
     st_idle->st_dpy (r.press)
     st_dpy->st_idle (r.press)

@@ -16,43 +16,43 @@ import gui.widgets.ComboBox
 _native_code_
 %{
     //#include <iostream>
-    int to_time(const djnnstl::string& yys, const djnnstl::string& mms, const djnnstl::string& dds ) {
-        int yy, mm, dd;
-        yy = atoi(yys.c_str()); // should work since we use a regex with numerical data
-        mm = atoi(mms.c_str());
-        dd = atoi(dds.c_str());
-        //std::cerr << "to_time yy:" << yy << " mm:" << mm << " dd:" << dd << std::endl;
+    int 
+    to_time(double yy_d, double mm_d, double dd_d) {
+   
+    //std::cerr << "to_time yy:" << yy_d << " mm:" << mm_d << " dd:" << dd_d << std::endl;
 
-        // validate
-        if ( !(1 <= mm && mm <= 12)) return -1;
-        if ( !(1 <= dd && dd <= 31)) return -1;
-        const int max_day[]={31,29,31,30,31,30,31,31,30,31,30,31};
-        if (!(dd <= max_day[mm-1])) return -1;
-        if (mm==2 && dd==29 && yy%4!=0) return -1; // leap year
+    // 2. Conversion des double en int
+    int yy = static_cast<int>(yy_d);
+    int mm = static_cast<int>(mm_d);
+    int dd = static_cast<int>(dd_d);
 
-        // compute time since 01/01/1900
-        if (yys.size()<=2) yy+=100; // Interpret yy as 20YY; add 100 to the offset from 1900.
-        std::tm tm{};
-        tm.tm_year = yy;
-        tm.tm_mon = mm-1;
-        tm.tm_mday = dd;
-        std::time_t t = std::mktime(&tm); // -1 if tm is not valid
-        //std::cerr << "t: " << t << std::endl;
-        return t;
+    if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return -1;
+
+    const int max_day[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (dd > max_day[mm - 1]) {
+        if (!(mm == 2 && dd == 29 && yy % 4 == 0)) {
+            return -1;
+        }
     }
+
+    std::tm tm{};
+    tm.tm_year = yy + 100; // because the yy start is 1900
+    tm.tm_mon = mm - 1;
+    tm.tm_mday = dd;
+    tm.tm_isdst = -1; // Indispensable pour éviter les erreurs de changement d'heure
+    std::time_t t = std::mktime(&tm);
+    
+    //std::cerr << "t: " << t << std::endl;
+    return static_cast<int>(t);
+}
 %}
 
 _main_
 Component root {
-    Frame f ("7GUIs Flight Booker - DOES NOT WORK YET") // FIXME no size ? self containing size ? // [7GUIs] The task is to build a frame containing...
+    Frame f ("7GUIs Flight Booker", 800, 500, 150, 120) // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
-    150 =: f.width // BUG ! des qu'on touche une propriété ca remonte la fenetre en haut !!
-    120 =: f.height
-    f.background_color.r = 237
-    f.background_color.g = 237
-    f.background_color.b = 237
 
-    ZOrderedGroup zog {            // FIXME this is for the combobox, since its popup inner listbox has to be on top of other widgets
+    ZOrderedGroup zog {
         VBox v {    
             ComboBox C             // [7GUIs] ...a combobox C...
             UITextField T1         // [7GUIs] ...two textfields T1...
@@ -77,26 +77,26 @@ Component root {
     // C.preferred_width = 120
     
     
+    Bool is_return_flight(0)
+    (C.value == "return flight") =:> is_return_flight
+    is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
+    is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
+    
     cb_model.items.[1] =: C.value  // [7GUIs] Initially, C has the value “one-way flight”...
 
     "01.01.26" =: T1.init_text  // [7GUIs] ...and T1 as well as T2 have the same (arbitrary) date...
     "01.01.26" =: T2.init_text
-                                                // [7GUIs] ...(it is implied that T2 is disabled). (see below)
 
 
-    |-> B.disable                  // [7GUIs] ...and B is disabled. // FIXME? -:>
-    |-> T2.disable
-    
-    Bool is_return_flight(0)
-    C.value == "return flight" =:> is_return_flight
-    is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
-    is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
-    
-    
-    TextPrinter tp // FIXME popup?
-    B.click -> {                                                             // [7GUIs] When clicking B...
-        "You have booked a " + C.value + " flight on " + T1.text =: tp.input // [7GUIs] ...a message is displayed informing the user of his selection
-    }                                                                        // [7GUIs] (e.g. “You have booked a one-way flight on 04.04.2014.”).
+    TextPrinter tp // FIXME popup? or a text beneath the Vbox
+    B.click -> (root) {   // [7GUIs] When clicking B...
+        if (root.is_return_flight) {
+            root.tp.input = "You have booked a " + root.C.value + " on " + root.T1.text + " return on " + root.T2.text
+        }
+        else {                                                      
+            root.tp.input = "You have booked a " + root.C.value + " on " + root.T1.text      // [7GUIs] ...a message is displayed informing the user of his selection 
+        }                                                                                    // [7GUIs] (e.g. “You have booked a one-way flight on 04.04.2014.”).
+    }                                                                        
 
 
     Bool T1_valid(0)
@@ -131,14 +131,12 @@ Component root {
 
     Component _ { // here only to scope the following components
         Regex regex_date (regex_date_str)
-        T1.text => regex_date.input
-
-        // DEBUG
-        // TextPrinter tp
-        // "regex: " + regex_date.[1] + " - " + regex_date.[2] + " - " + regex_date.[3] => tp.input
+        T1.init_text =: T1.text // Initialize time1 by passing T1.init_text to T1.text to ensure T1 is valid when first enabled. 
+                                // Since T1.text is normally only assigned on Return key press, it must be explicitly initialized with T1.init_text during setup.
+        T1.text =:> regex_date.input
 
         regex_date.matched.true -> {
-            to_time(getString(regex_date.[3]), getString(regex_date.[2]), getString(regex_date.[1])) =: time1
+            to_time($regex_date.[3], $regex_date.[2], $regex_date.[1]) =: time1
         }
         regex_date.matched.false -> {
             -1 =: time1
@@ -148,7 +146,6 @@ Component root {
         T1_valid.false -> {
             #FF0000 =: T1.text_color   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
         }
-        T1_valid.false -> B.disable
 
         T1_valid.true -> {
             #000000 =: T1.text_color   // ...else...
@@ -163,11 +160,11 @@ Component root {
             
             
             Regex regex_date_2 (regex_date_str)
-            T2.init_text =: regex_date_2.input // Initialize time2 with init_text; otherwise T2 will be invalid the first time it’s enabled.
-                                               // Note: T2.text is used only when the Return key is pressed, so it can’t be used during initialization.
-            T2.text => regex_date_2.input
+            T2.init_text =: T2.text // Initialize time2 by passing T2.init_text to T2.text to ensure T2 is valid when first enabled. 
+                                    // Since T2.text is normally only assigned on Return key press, it must be explicitly initialized with T2.init_text during setup.
+            T2.text =:> regex_date_2.input
             regex_date_2.matched.true -> {
-                to_time(getString(regex_date_2.[3]), getString(regex_date_2.[2]), getString(regex_date_2.[1])) =: time2
+                to_time($regex_date_2.[3], $regex_date_2.[2], $regex_date_2.[1]) =: time2
             }
             regex_date_2.matched.false -> {
                 -1 =: time2
@@ -177,33 +174,32 @@ Component root {
             T2_valid.false -> {
                 #FF0000 =: T2.text_color    // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
             }
-            T2_valid.false -> B.disable
             
             T2_valid.true -> {
                 #000000 =: T2.text_color    // ...else...
             }
 
-            T1_valid && T2_valid && (time1 < time2) =:> B_valid // [7GUIs] [When C has the value “return flight”] and T2’s date is strictly before T1’s then B is disabled.
+            T1_valid && T2_valid && (time1 <= time2) =:> B_valid // [7GUIs] [When C has the value “return flight”] and T2’s date is strictly before T1’s then B is disabled.
         }
     }
 
     is_return_flight =:> T2_sw.state  // [7GUIs] When C has the value “return flight”...
-    //T2_sw.state =:> tp.input
 
-    // FIXME the following does not work if C is "one-way":
-    B_valid.true  -> B.enable // FIXME should be -:>
+    B_valid.true  -> B.enable
     B_valid.false -> B.disable
-    //"--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\ntime1 " + time1 + "\ntime2 " + time2 + "\n(time1 < time2) " + to_string((time1 < time2)) + "\nB_valid " + B_valid =:> tp.input
+    // "--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\ntime1 " + time1 + "\ntime2 " + time2 + "\n(time1 < time2) " + to_string((time1 < time2)) + "\nB_valid " + B_valid =:> tp.input
 }
 
 
 // original text
-// [7GUIs] The task is to build a frame containing a combobox C with the two options “one-way flight” and “return flight”,
-// [7GUIs] two textfields T1 and T2 representing the start and return date, respectively,
-// [7GUIs] and a button B for submitting the selected flight.
-// [7GUIs] T2 is enabled iff C’s value is “return flight”.
-// [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red and B is disabled.
-// [7GUIs] When C has the value “return flight” and T2’s date is strictly before T1’s then B is disabled.
+// [7GUIs] The task is to build a frame containing a combobox C with the two options “one-way flight” and “return flight”, 
+// [7GUIs] two textfields T1 and T2 representing the start and return date, respectively, 
+// [7GUIs] and a button B for submitting the selected flight. 
+// [7GUIs] T2 is enabled iff C’s value is “return flight”. 
+// [7GUIs] When C has the value “return flight” and T2’s date is strictly before T1’s then B is disabled. 
+// [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red and B is disabled. 
+// [7GUIs] When clicking B a message is displayed informing the user of his selection (e.g. “You have booked a one-way flight on 04.04.2014.”). 
+// [7GUIs] Initially, C has the value “one-way flight” and T1 as well as T2 have the same (arbitrary) date (it is implied that T2 is disabled).
 
 // [7GUIs] The focus of Flight Booker lies on modelling constraints between widgets on the one hand
 // [7GUIs] and modelling constraints within a widget on the other hand.

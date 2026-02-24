@@ -23,6 +23,28 @@ You can use several option to debug on smala :
   _DEBUG_SEE_ACTIVATION_SEQUENCE_ONLY_TARGETED = 0|1 // will display only the targeted process or full_stack (O)
   _DEBUG_SEE_ACTIVATION_SEQUENCE_TARGET_LOCATION = "file.sma:lineno" // display sequence from a specific debug info : file.sma:lineno
 
+## Activation Sequence on "live"
+
+    import gui.keyboard.AltKey
+    
+    ...
+    some code 
+    ...
+
+    AltKey alt_d (frame, DJN_Key_D)
+
+      alt_d.press -> (this) {
+        if (_DEBUG_SEE_ACTIVATION_SEQUENCE_2) {
+          _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
+          _DEBUG_SEE_PROP_SET_VALUE = 0
+        }
+        else {
+          _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+          _DEBUG_SEE_PROP_SET_VALUE = 1
+        }
+      }
+    ...
+
 ## paintevent and Layer recomputation
 
   _DEBUG_SEE_RECOMPUTE_PIXMAP_AND_PAINTEVENT = 1|0 (default)

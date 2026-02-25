@@ -76,18 +76,16 @@ Component root {
     cb_model =: C.model
     // C.preferred_width = 120
     
-    
-    Bool is_return_flight(0)
-    (C.value == "return flight") =:> is_return_flight
-    is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
-    is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
-    
     cb_model.items.[1] =: C.value  // [7GUIs] Initially, C has the value “one-way flight”...
 
     "01.01.26" =: T1.init_text  // [7GUIs] ...and T1 as well as T2 have the same (arbitrary) date...
     "01.01.26" =: T2.init_text
-
-
+    
+    Bool is_return_flight(0)
+    is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
+    is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
+    (C.value == "return flight") =:> is_return_flight
+    
     TextPrinter tp // FIXME popup? or a text beneath the Vbox
     B.click -> (root) {   // [7GUIs] When clicking B...
         if (root.is_return_flight) {

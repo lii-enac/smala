@@ -18,10 +18,11 @@ CircleItem (Process root_, int x, int y)
     root aka root_
 
     // FIXME should be right press 
-    c.press -> {                            // [7GUIs] Right-clicking C will make a popup menu appear with one entry “Adjust diameter..”.
+    c.right.press -> {                            // [7GUIs] Right-clicking C will make a popup menu appear with one entry “Adjust diameter..”.
         c.press.x =: root.menu.x
         c.press.y =: root.menu.y
     }
+    c.right.press -> root.menu.unfold
 
     c.press -> (this) {
         setRef(this.root.gcircle_ref_, this)
@@ -29,4 +30,4 @@ CircleItem (Process root_, int x, int y)
     // c.leave -> (this) {
     //     setRef(this.root.gcircle_ref_, null)
     // }
-}
+} 

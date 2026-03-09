@@ -3,16 +3,10 @@ use gui
 use base
 use gui
 
-import gui.shape.text
-
-import core.ontology.process
-import core.tree.container
-import base.process_handler
-
 _action_
 fn_init(Process src, Process data)
 {
-  int y = 18 // default_height
+  int y = data.default_height
   for t : data.choices {
     addChildrenTo data.fsm.unfolded.items {
       Component c {
@@ -39,7 +33,7 @@ fn_init(Process src, Process data)
         }
       }
     }
-    y = y + 18 // default_height
+    y = y + data.default_height
   }
 }
 
@@ -70,7 +64,8 @@ SimpleMenu (double _x, double _y)
     State unfolded {
       FillColor fc (Red)
       bg_color.value =:> fc.value
-      OutlineColor _ (#000000)
+      OutlineColor oc (Red)
+      border_color.value =:> oc.value
       Rectangle rec_list (0, 0, 100, 0, 0, 0)
       choices.size * default_height  + default_space =:> rec_list.height
       width =:> rec_list.width
@@ -80,18 +75,8 @@ SimpleMenu (double _x, double _y)
     folded -> unfolded (unfold)
     unfolded -> folded (fold)
   }
-  
-  
+   
   MaxList sum (fsm.unfolded.items, "width")
-  // MaxList sum (choices, "width")
   NativeAction init (fn_init, this, 0)
   sum.output + 10 =:> width // note: +10 because in items text a draw at x=5, and we want to add 5 at the end also
-
-  TextPrinter tp
-  "width output: " + width =:> tp.input
-
-  // ask_selection->l_ask
-  // l_ask ~> selected
-
-  
 }

@@ -37,7 +37,9 @@ UndoRedoManager ()
 
     root = find(this, "//")
 
-    //TextPrinter tp
+    TextPrinter tp
+
+
 
     // whenever a new action is added to the list, make the cursor point to this action
     actions.$added -> added_: {
@@ -45,24 +47,28 @@ UndoRedoManager ()
     }
     //debug
     // added_ -> (this) {
-    //     print ("LIST actions size :" + this.actions.size)
+    //      print ("DEBUG -- undo_redo LIST actions size :" + this.actions.size)
     // }
 
-    //current =:> tp.input
+    "DEBUG -- undo_redo current : " + current + " / size : " + actions.size  + "\n" =:> tp.input
 
     // after a few undo's, the user might perform a new action
     // in this case this spike should be triggered to erase all actions that have been undone
     // this is the traditional policy in interactive applications, though it could be better usability-wise
     Spike removeActionsStartingFromCurrent
     removeActionsStartingFromCurrent -> remove_part1 : (this) {
-        //print ("removeActionsStartingFromCurrent - remove_part1 - allinone")
+        // root = find(this, "//")
+        // dump root.undo_redo_manager.actions
+        // dump root.canvas.items
+        print ("\n ---> removeActionsStartingFromCurrent - remove_part1 - allinone")
         for (int i = this.actions.size; i > this.current; i--) {
+            print ( /*"i : " + string(i) + */" size " + this.actions.size + " current : " + this.current)
             notify this.actions.[i].del // notify deletion so the action has a chance to clean-up its content
             graph_exec () // force sync on notify
             delete this.actions.[i]
             graph_exec ()
         }
-        //print ("removeActionsStartingFromCurrent AFTER - actions size :" + this.actions.size)
+        print (" <--- removeActionsStartingFromCurrent AFTER - actions size :" + this.actions.size + "\n")
     }
 
     // management of the position of the cursor in the action list
@@ -85,7 +91,7 @@ UndoRedoManager ()
     //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
 
     // management of the possibility of undoing or redoing, depending on the position of the cursor in the list
-    FSM myfsm {
+    FSM undo_redo_manager_fsm {
         State empty
         State end {
             undo -> (this) {
@@ -103,7 +109,7 @@ UndoRedoManager ()
         } 
         State middle {
             undo -> (this) {
-                action = &this.actions.[this.current]
+                action = &this.actions.[this.current] //bug !
                 notify action.undo
                 this.current = this.current - 1
             }
@@ -126,5 +132,5 @@ UndoRedoManager ()
         
     }
     // TextPrinter tp1
-    // myfsm.state =:> tp1.input
+    // undo_redo_manager_fsm.state =:> tp1.input
 }

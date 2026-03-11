@@ -39,25 +39,20 @@ Component root {
         t.tx = canvas_offset
         canvas_y =: t.ty
         FillColor _ (#535353)
+        RectangleClip clip (0, 0, 0, 0)
         Rectangle mask (0, 0, 0, 0, 0, 0 )
-        f.width - (2* canvas_offset) =:> mask.width
-        f.height - canvas_y - canvas_offset =:> mask.height
-        Component items                      
+        f.width - (2* canvas_offset) =:> mask.width, clip.width
+        f.height - canvas_y - canvas_offset =:> mask.height, clip.height
+        List items                      
     }
 
 
     SimpleMenu menu (100, 100)                     // [7GUIs] a popup menu...
     addChildrenTo menu.choices {
         String _ ("Adjust diameter")             // [7GUIs] ... with one entry “Adjust diameter..”.
-        // String _ ("test2") 
-        // String _ ("test3") 
     }
 
     Ref gcircle_ref_(nullptr)
-
-    //debug
-    //TextPrinter tp
-    //"menu.selected: " + menu.selected => tp.input
 
     UndoRedoManager undo_redo_manager               // FIXME should be provided in smala lib
     // FIXME are we sure the the undo redo manager works? check CreateAction, undo must be repeated multiple times :-/
@@ -74,39 +69,55 @@ Component root {
         // Deref circle_y
         // circle_x -offset =: f2.x
         // circle_y - offset =: f2.y
+        Double old_radius (0)
         StandAloneSlider radius_slider(45, 25, 208, 10)    // [7GUIs] ...a slider inside that adjusts the diameter of C.
 
         // FIXME should be in another window
         radius_slider.output -> (root) {                 // [7GUIs] Clicking on this entry will open another frame with a slider inside that adjusts the diameter of C.
             gcircle = getRef(&root.gcircle_ref_)
             if (&gcircle != null) {
-                gcircle.c.r = $root.radius_slider.output // [7GUIs] Changes are applied immediately. 
+                gcircle.c.r = $root.popup_slider.radius_slider.output // [7GUIs] Changes are applied immediately. 
             }
+        }
+
+        // save the old radius as soon as we enter the thumb
+        radius_slider.button_fsm.hover -> (root) {
+            gcircle = getRef(&root.gcircle_ref_)
+            root.popup_slider.old_radius = $gcircle.c.r
         }
 
         // FIXME should be done on 'close', here we do it when the interaction is terminated
         radius_slider.button_fsm.idle -> (root) {       // TODO [7GUIs] Closing this frame will mark the last diameter as significant for the undo/redo history.
             gcircle = getRef(&root.gcircle_ref_)
-            if (&gcircle != null) {
+            if (&gcircle != null && $gcircle.c.r != $root.popup_slider.old_radius) {
                 activate (root.undo_redo_manager.removeActionsStartingFromCurrent) // FIXME should be done by undo_redo_manager(?)
-                //graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
-                // FIXME save old radius before changing it with the slider
-                Process ca_ = ChangeRadiusAction (root.undo_redo_manager.actions, "cra_", getRef(root.gcircle_ref_), 10, $gcircle.c.r)
+                graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
+                Process ca_ = ChangeRadiusAction (root.undo_redo_manager.actions, "cra_", gcircle, $root.popup_slider.old_radius, $gcircle.c.r)
             }
+            print ("==== RADIUS ACTION ")
+            dump root.undo_redo_manager.actions
+            dump root.canvas.items
         }    
     }
 
-    //(menu.selected == "Adjust diameter") -> popup_slider
+    (menu.selected == "Adjust diameter") -> popup_slider
+    canvas.mask.left.press ->! popup_slider
 
     canvas.mask.left.press -> (root) {             // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
+        setRef (root.gcircle_ref_, null) // sécurité ou util ?
         addChildrenTo root.canvas.items {
             // FIXME? cannot create inline component with another, deeper native, the compiler error seems pointless
             CircleItem gcircle (root, $root.canvas.mask.press.local_x, $root.canvas.mask.press.local_y ) // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
             setRef(root.gcircle_ref_, &gcircle)
         }
+        
         activate (root.undo_redo_manager.removeActionsStartingFromCurrent) // FIXME should be done by undo_redo_manager(?)
-        //graph_exec () // force sync with notify // FIXME should be done by undo_redo_manager(?)
+        graph_exec () // needed force sync with activate // FIXME should be done by undo_redo_manager(?)
         Process ca_ = CreateAction (root.undo_redo_manager.actions, "ca_", getRef(root.gcircle_ref_))
+        // toto = getRef(root.gcircle_ref_)
+        print ("==== CREATE ACTION ")
+        dump root.undo_redo_manager.actions
+        dump root.canvas.items
     }
 }
 

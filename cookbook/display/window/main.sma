@@ -44,13 +44,14 @@ Component root {
     Translation _ (100, 10)
     FillColor _ (Black)
     FillOpacity _ (0.8)
-    Rectangle _ (0, 0, $f.width - 200 , 120, 0, 0)
+    Rectangle _ (0, 0, $f.width - 200 , 140, 0, 0)
     FillColor w (White)
     Text l1 (10, 20,  "note:")
     Text l2 (10, 40,  "- For a transparent window you HAVE to set f.frameless = 1")
     Text l3 (10, 60,  "- All transparent windows will be set  \"On Top\" of all other windows")
     Text l4 (10, 80,  "- Windows: only fully transparent windows are available BUT you CAN click through the window")
     Text l5 (10, 100, "- Linux/macos: opacity and color on transparency are available BUT you CAN'T click through the window")
+    Text l6 (10, 120, "- ALL: AVOID interactive updates to the frame background color, as this is unsupported.")
   }
 
   Component Group {
@@ -74,24 +75,4 @@ Component root {
     }
   }
 
-  Component Group2 {
-    Translation _ (400, 100)
-    FillColor g (White)
-    Rectangle r2 (0, 60, 120, 40)
-    
-    FSM fsm {
-      State idle {
-        FillColor _ (Red)
-        Text _ (10, 80, "Red background")
-        #0000FF =: f.background_color.value 
-      }
-      State changed {
-        FillColor _ (Blue)
-        Text _ (10, 80, "Blue background")
-        #FF0000 =: f.background_color.value
-      }
-      idle -> changed (r2.press)
-      changed -> idle (r2.press)
-    }
-  }
 }

@@ -24,14 +24,14 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
+  // transparency 
+  f.background_isTransparent = 1 // will auto set frameless to true
 
-  // important note: 
-  // for a full transparent frame you HAVE to set f.frameless = 1
-  f.frameless = 1
-  f.background_opacity = 0.2
-  f.background_color.r = 0
-  f.background_color.g = 0
-  f.background_color.b = 255
+  // plain background without frame
+  // f.frameless = 1
+  // f.background_color.r = 0
+  // f.background_color.g = 0
+  // f.background_color.b = 255
 
   //then not transparent component
   Component rect_close {
@@ -40,18 +40,26 @@ Component root {
   }
   rect_close.r.press -> ex
 
+  Component background {
+    FillOpacity _ (0.1)
+    FillColor _ (Red)
+    Rectangle rec (200, 200, 0, 0, 0, 0)
+    f.width - 400 =:> rec.width
+    f.height - 400 =:> rec.height
+  }
+
   Component Explanation {
     Translation _ (100, 10)
     FillColor _ (Black)
     FillOpacity _ (0.8)
     Rectangle _ (0, 0, $f.width - 200 , 140, 0, 0)
     FillColor w (White)
-    Text l1 (10, 20,  "note:")
-    Text l2 (10, 40,  "- For a transparent window you HAVE to set f.frameless = 1")
-    Text l3 (10, 60,  "- All transparent windows will be set  \"On Top\" of all other windows")
-    Text l4 (10, 80,  "- Windows: only fully transparent windows are available BUT you CAN click through the window")
-    Text l5 (10, 100, "- Linux/macos: opacity and color on transparency are available BUT you CAN'T click through the window")
-    Text l6 (10, 120, "- ALL: AVOID interactive updates to the frame background color, as this is unsupported.")
+    Text l1 (10, 20,  "Note:")
+    Text l2 (10, 40,  "- Setting 'isTransparent' to true will automatically set 'isFrameless' to true.")
+    Text l3 (10, 60,  "- Transparent windows are automatically set to 'Always on Top'.")
+    Text l4 (10, 80,  "- Windows are fully transparent and support 'Click-Through' (mouse events pass through).")
+    Text l5 (10, 100, "- Real-time updates to background color or transparency are NOT supported")
+    Text l6 (10, 120, "- Tip: Use a Rectangle with custom opacity as a child element if semi-transparency is needed.")
   }
 
   Component Group {

@@ -168,6 +168,8 @@ lib_suffix =.dll
 #DYNLIB ?= -shared
 endif
 
+
+
 LD_LIBRARY_PATH ?= LD_LIBRARY_PATH
 
 ifeq ($(linker),gnu)
@@ -464,7 +466,7 @@ endif
 # cookbook apps
 
 ld_library_path := $(call join-with,:,$(ld_library_path))
-#ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
+ld_library_path := $(ld_library_path):$(abspath $(djnn_lib_path)):$(abspath $(smala_lib_path))
 
 user_defined_other_runtime_lib_path:=$(other_runtime_lib_path)
 
@@ -561,9 +563,9 @@ $$(notdir $1)_objs: $$($1_app_objs)
 $$(notdir $1): $$($1_app_exe)
 
 $$(notdir $1)_test: $$(notdir $1) 
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$$$LD_LIBRARY_PATH:$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(launch_cmd) "$$(shell pwd)/$$($1_app_exe)")
 $$(notdir $1)_dbg: $$(notdir $1)
-	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$$$LD_LIBRARY_PATH:$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
+	(cd "$$($1_app_srcs_dir)"; env $$(LD_LIBRARY_PATH)="$$($$(LD_LIBRARY_PATH)):$$(ld_library_path):$(call join-with,:,$$($1_other_runtime_lib_path))" $$(debugger) "$$(shell pwd)/$$($1_app_exe)")
 
 $$(notdir $1)_clean:
 	rm -f $$($1_app_exe) $$($1_app_objs) $$($1_app_gensrcs)

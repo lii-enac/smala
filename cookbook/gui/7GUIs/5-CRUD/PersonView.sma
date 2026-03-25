@@ -33,5 +33,5 @@ PersonView (Process _model, int _index) inherits ListBoxItem (_model, _index)
 
 
     _model.surname + ", " + _model.name =:> this.text
-    "View of person [" + this.index + "]: " + _model.surname + ", " + _model.name =: tp.input
+    "View of person [" + this.index + "]: " + _model.surname + ", " + _model.name =:> tp.input
 }

@@ -52,6 +52,8 @@ Component root {
 	}
 
     TextPrinter tp
+    // TextPrinter tp_forename
+    // TextPrinter tp_surename
 
     List models
     models.size + " persons in the list" => tp.input
@@ -136,6 +138,8 @@ Component root {
     BU aka b_all.buttons.BU
     BD aka b_all.buttons.BD
 
+    DerefString name_of_selected_item (L.selected_item, "model/name", DJNN_GET_ON_CHANGE)
+    DerefString surname_of_selected_item (L.selected_item, "model/surname", DJNN_GET_ON_CHANGE)
 
     // By default, all buttons are disabled
     |-> BC.disable, BU.disable, BD.disable
@@ -186,11 +190,25 @@ Component root {
 
     // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
-    // [7GUIs] BU and BD are enabled iff an entry in L is selected.
+    // [7GUIs] BU and BD are enabled if an entry in L is selected.
     L.is_selected_item.true -> BU.enable, BD.enable
     L.is_selected_item.false -> BU.disable, BD.disable
 
+
+    // (L.selected_item.is_null == 0) && L.selected_item -> {
+    L.selected_item -> {
+        name_of_selected_item.value =: root.T_name.init_text
+        surname_of_selected_item.value =: root.T_surname.init_text
+    }
+
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
+    // (is_missing_value == 0) && BU.click -> {
+    BU.click -> {
+        // "Update (fore)name: " + name_of_selected_item.value + " -> " + root.T_name.text =: tp_forename.input
+        // "Update surname: " + surname_of_selected_item.value + " -> " + root.T_surname.text =: tp_surename.input
+        root.T_name.text =?: name_of_selected_item.value
+        root.T_surname.text =?: surname_of_selected_item.value
+    }
 
     // [7GUIs] BD will remove the selected entry.
     BD.click -> na_delete_person:(root) {
@@ -216,7 +234,9 @@ Component root {
             }
         }
     }
+    // FIXME: don't work
     // na_delete_person -> L.pack
+
 
     models.$added -> na_added:(root) {
         model = getRef (&root.models.$added)

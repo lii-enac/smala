@@ -47,15 +47,15 @@ ListBoxItem (Process _model, int _index) inherits IWidget () {
   Component label {
     FillColor fill_c (#000000)
 
+    // Default text: "item " + index
     Text txt ($LBI_HZ_MARGIN / 2, 0, "item " + toString (index))
-
   }
   
   text aka label.txt.text
   LBI_HEIGHT / 2 + label.txt.ascent / 2 - 1 =:> offset.ty
 
-  label.txt.width + LBI_HZ_MARGIN =: this.min_width
-  this.preferred_width == -1 ? label.txt.width + LBI_HZ_MARGIN : this.preferred_width =: this.preferred_width, bg.r.width
+  label.txt.width + LBI_HZ_MARGIN =:> this.min_width
+  (this.preferred_width == -1) || (this.preferred_width < this.min_width) ? this.min_width : this.preferred_width =:> this.preferred_width, bg.r.width
 
   LBI_HEIGHT =: this.min_height, this.preferred_height
 

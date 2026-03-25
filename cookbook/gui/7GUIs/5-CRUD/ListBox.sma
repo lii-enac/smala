@@ -37,7 +37,7 @@ ListBox () inherits VBox () {
 
     Rectangle r (0, 0, 0, 0, 5, 5)
     
-    this.preferred_width == -1 ? this.min_width : this.preferred_width =:> r.width
+    (this.preferred_width == -1) || (this.preferred_width < this.min_width) ? this.min_width : this.preferred_width =:> r.width
     this.preferred_height == -1 ? this.min_height : this.preferred_height =:> r.height
   }
 

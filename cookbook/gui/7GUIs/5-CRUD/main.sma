@@ -54,9 +54,10 @@ Component root {
     TextPrinter tp
     // TextPrinter tp_forename
     // TextPrinter tp_surename
+    TextPrinter tp_selection
 
     List models
-    models.size + " persons in the list" => tp.input
+    models.size + " persons in the (models) list" => tp.input
 
     // FIXME: v0.1
     // Component prototype (1) {
@@ -97,10 +98,8 @@ Component root {
             // ListViewer list_viewer (models, prototype.view)
 
             // VBox L {}                       // [7GUIs] L presents a view of the data in the database that consists of a list of names.
-            // ListBox L (models) {
-            ListBox L () {
-
-            }
+            // ListBox L (models) { }
+            ListBox L () { }
             // L.preferred_width = 200
             // 200 =: L.preferred_width
             // L.min_width = 250
@@ -128,9 +127,8 @@ Component root {
         buttons.h_alignment = 0
     }
 
-    // b_all.filter.T_prefix.text =:> tp.input
-
     // make widget naming independent from layout hierarchy
+    T_prefix aka b_all.filter.T_prefix
     L aka b_all.data.L
     T_name aka b_all.data.props.name.T_name
     T_surname aka b_all.data.props.surname.T_surname
@@ -144,9 +142,49 @@ Component root {
     // By default, all buttons are disabled
     |-> BC.disable, BU.disable, BD.disable
 
-    // TODO !!
+    
+    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
+    // [7GUIs] At most one entry can be selected in L at a time.
 
-    // FIXME: for test
+    models.$added -> na_added:(root) {
+        model = getRef (&root.models.$added)
+        if (&model != null)
+        {
+            print ("The model '" + model.fullname + "' has been added to the list of " + root.models.size + " models")
+            addChildrenTo root.L {
+                // Label _ (getString (model.fullname))
+                // How to link this model and this view to update it when model change ?
+                // model.fullname =:> _.text
+                //ListBoxItem item (model, getInt (root.models.size))
+                PersonView item (model, getInt (root.models.size))
+                
+                // FIXME: don't work
+                // item.min_width -> root.L.pack
+            }
+            // Label (root.L, getString (model.name), getString (model.fullname))
+
+            notify root.L.pack
+        }
+    }
+    
+    // models.$removed -> na_removed:(root) {
+    //     model = getRef (&root.models.$removed)
+    //     if (&model != null)
+    //     {
+    //         print ("The model '" + model.fullname + "' has been removed from the list of " + root.models.size + " models")
+
+    //         for view : root.L.items {
+    //             if (&view.model == &model) {
+    //                print ("We found the view of the removed model " + view.model.fullname)
+    //                // delete model
+    //                break
+    //             }
+    //         }
+    //     }        
+    // }
+
+
+    // FIXME: for tests / debug
     f.key\-pressed -> na_key_pressed:(root) {
         // print ("key pressed '" + root.f.key\-pressed + "'")
 
@@ -162,12 +200,24 @@ Component root {
         }
     }
 
-    
-    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
-    // [7GUIs] At most one entry can be selected in L at a time.
+    // L.selected_item -> {
+    (L.selected_item.is_null == 0) && L.selected_item -> {
+        name_of_selected_item.value =: root.T_name.init_text
+        surname_of_selected_item.value =: root.T_surname.init_text
+    }
+    // NO selection -> clear text fields
+    L.selected_item.is_null.true -> root.T_name.clear, root.T_surname.clear
 
     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
     // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
+
+    TextPrinter tp_prefix
+    // "Filter list with prefix " + T_prefix.text => tp_prefix.input
+    "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
+    // T_prefix.text -> {
+        
+    // }
+
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
     Bool is_missing_value (true)
@@ -191,15 +241,9 @@ Component root {
     // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
     // [7GUIs] BU and BD are enabled if an entry in L is selected.
-    L.is_selected_item.true -> BU.enable, BD.enable
-    L.is_selected_item.false -> BU.disable, BD.disable
+    L.selected_item.is_null.false -> BU.enable, BD.enable
+    L.selected_item.is_null.true -> BU.disable, BD.disable
 
-
-    // (L.selected_item.is_null == 0) && L.selected_item -> {
-    L.selected_item -> {
-        name_of_selected_item.value =: root.T_name.init_text
-        surname_of_selected_item.value =: root.T_surname.init_text
-    }
 
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
     // (is_missing_value == 0) && BU.click -> {
@@ -216,62 +260,30 @@ Component root {
         if (&selected_item != null) {
             print ("Delete view of " + selected_item.text)
 
-            // notify selected_item.unselect
+            // notify selected_item.unselect   // FIXME: useless, used until remove works !
             notify root.L.reset_selection
             
             Process model = find (selected_item, "model")
 
-            // delete selected_item    // Delete view
+            // Only remove from list
             remove selected_item from root.L.items
+
+            // Delete view ?
+            // delete selected_item
 
             if (&model != null) {
                 print ("Delete its model " + model.fullname)
-                // We cannot delete the model yet ?
-                //delete model      // Delete model
                 
                 // Only remove from list
                 remove model from root.models
+
+                // Delete the model ?
+                // delete model
             }
         }
     }
     // FIXME: don't work
     // na_delete_person -> L.pack
-
-
-    models.$added -> na_added:(root) {
-        model = getRef (&root.models.$added)
-        if (&model != null)
-        {
-            print ("The model '" + model.fullname + "' has been added to the list of " + root.models.size + " models")
-            addChildrenTo root.L {
-                // Label _ (getString (model.fullname))
-                // How to link this model and this view to update it when model change ?
-                // model.fullname =:> _.text
-                //ListBoxItem item (model, getInt (root.models.size))
-                PersonView item (model, getInt (root.models.size))
-                
-                // FIXME: don't work
-                // item.min_width -> root.L.pack
-            }
-            // Label (root.L, getString (model.name), getString (model.fullname))
-
-            notify root.L.pack
-        }
-    }
-    
-    models.$removed -> na_removed:(root) {
-        model = getRef (&root.models.$removed)
-        if (&model != null)
-        {
-            print ("The model '" + model.fullname + "' has been removed from the list of " + root.models.size + " models")
-
-            for view : root.L.items {
-                // print ("view of " + view.model.fullname)
-                print ("view of " + view.text)
-            }
-            // delete model
-        }        
-    }
 }
 
 

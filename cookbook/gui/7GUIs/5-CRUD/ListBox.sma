@@ -36,31 +36,19 @@ action_select_item (Process src, Process self)
   // }
 
   setRef (self.selected_item, item)
-  self.is_selected_item = true
 }
 
 
-// _action_
-// action_model_unselected (Process src, Process self)
-// {
-//   // This action is called when user unselect or clicks on background
-//   // --> src is not always track_model
-//   //track_model = find (&src, "..")
-  
-//   if (self.is_selected_item)
-//   {
-//     selected_model = getRef (self.selected_model)
-//     if (&selected_model != null)
-//     {
-//       //print ("Previous selected flight " + selected_model.callsign + "\n")
-//       selected_model.is_selected = false
-//     }
+_action_
+action_unselect_item (Process src, Process self)
+{
+  selected_item = getRef (self.selected_item)
+  if (&selected_item != null) {
+    notify selected_item.unselect
+  }
 
-//     setRef (self.selected_model, null)
-//     self.is_selected_item = false
-//   }
-// }
-
+  setRef (self.selected_item, null)
+}
 
 
 _define_
@@ -71,7 +59,6 @@ ListBox () inherits VBox () {
 
   this.space = 2
 
-  Bool is_selected_item (false)
   Ref selected_item (null)
   Spike reset_selection
 
@@ -108,6 +95,7 @@ ListBox () inherits VBox () {
 
 
   NativeAction na_select_item (action_select_item, this, 1)
+  NativeAction na_unselect_item (action_unselect_item, this, 1)
 
   this.items.size -> na_items_size:(this) {
     print ("Size changed: " + this.items.size + " items in the list box")
@@ -119,17 +107,19 @@ ListBox () inherits VBox () {
 
         addChildrenTo this.bindings {
           item.select -> this.na_select_item
+          // item.unselect -> this.na_unselect_item
         }
       }
     }
   }
 
-  reset_selection -> na_reset_selection:(this) {
-    if (this.is_selected_item) {
-      setRef (this.selected_item, null)
-      this.is_selected_item = false
-    }
-  }
+  // (selected_item.is_null == 0) && reset_selection -> na_reset_selection:(this) {
+  //   setRef (this.selected_item, null)
+  // }
+  // (selected_item.is_null == 0) && reset_selection -> {
+  //   null =: selected_item
+  // }
+  reset_selection -> na_unselect_item
 
 //   Translation offset (0, 0)
 //   Text ui (0, 0, _label)

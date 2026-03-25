@@ -26,6 +26,9 @@ _native_code_
 %{
     #include "core/property/text_property.h"
 
+    bool starts_with (const string &str, const string &prefix) {
+      return str.starts_with (prefix);  // C++20
+    }
 %}
 
 
@@ -214,9 +217,17 @@ Component root {
     TextPrinter tp_prefix
     // "Filter list with prefix " + T_prefix.text => tp_prefix.input
     "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
-    // T_prefix.text -> {
-        
-    // }
+    T_prefix.field.content.text -> na_filter:(root) {
+        string prefix = getString (root.T_prefix.field.content.text)
+        for view : root.L.items {
+            if (starts_with (getString (view.model.surname), prefix)) {
+               print ("+ " + view.model.surname + " STARTS with prefix")
+            }
+            else {
+                print ("- " + view.model.surname + " does NOT start with prefix")
+            }
+        }
+    }
 
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.

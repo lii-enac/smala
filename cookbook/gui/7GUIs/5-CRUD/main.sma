@@ -28,6 +28,7 @@ _native_code_
 
 %}
 
+
 _main_
 Component root {
     Frame f ("7GUIs CRUD - DOES NOT WORK YET", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
@@ -142,7 +143,21 @@ Component root {
     // TODO !!
 
     // FIXME: for test
-    // PersonModel temp_person ("Vince", "Pey")
+    f.key\-pressed -> na_key_pressed:(root) {
+        // print ("key pressed '" + root.f.key\-pressed + "'")
+
+        // Key +
+        if (root.f.key\-pressed == "43") {
+            // print ("+ --> " + root.models.size)
+            string nb = to_string (getInt (root.models.size))
+            string forename = "prenom_" + nb
+            string surname = "nom_" + nb
+            addChildrenTo root.models {
+                PersonModel _ (forename, surname)
+            }
+        }
+    }
+
     
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
@@ -162,17 +177,6 @@ Component root {
     }
     na_create_person -> root.T_name.clear, root.T_surname.clear
     
-    BD.click -> na_delete_person:(root) {
-        if (root.models.size > 0) {
-            Process model = &root.models.[root.models.size]
-
-            // We cannot delete the model yet
-            //delete model
-            // Only remove from list
-            remove model from root.models
-        }
-    }
-
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
 
@@ -189,12 +193,36 @@ Component root {
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
 
     // [7GUIs] BD will remove the selected entry.
+    BD.click -> na_delete_person:(root) {
+        selected_item = getRef (root.L.selected_item)
+        if (&selected_item != null) {
+            print ("Delete view of " + selected_item.text)
+
+            // notify selected_item.unselect
+            notify root.L.reset_selection
+            
+            Process model = find (selected_item, "model")
+
+            // delete selected_item    // Delete view
+            remove selected_item from root.L.items
+
+            if (&model != null) {
+                print ("Delete its model " + model.fullname)
+                // We cannot delete the model yet ?
+                //delete model      // Delete model
+                
+                // Only remove from list
+                remove model from root.models
+            }
+        }
+    }
+    // na_delete_person -> L.pack
 
     models.$added -> na_added:(root) {
         model = getRef (&root.models.$added)
         if (&model != null)
         {
-            print ("The model '" + model.fullname + "' has been added to the list")
+            print ("The model '" + model.fullname + "' has been added to the list of " + root.models.size + " models")
             addChildrenTo root.L {
                 // Label _ (getString (model.fullname))
                 // How to link this model and this view to update it when model change ?
@@ -215,7 +243,7 @@ Component root {
         model = getRef (&root.models.$removed)
         if (&model != null)
         {
-            print ("The model '" + model.fullname + "' has been removed from the list")
+            print ("The model '" + model.fullname + "' has been removed from the list of " + root.models.size + " models")
 
             for view : root.L.items {
                 // print ("view of " + view.model.fullname)

@@ -73,6 +73,7 @@ ListBox () inherits VBox () {
 
   Bool is_selected_item (false)
   Ref selected_item (null)
+  Spike reset_selection
 
   Component bindings
 
@@ -89,12 +90,14 @@ ListBox () inherits VBox () {
     this.preferred_height == -1 ? this.min_height : this.preferred_height =:> r.height
   }
 
-  TextPrinter tp
-  // "Max of min width = " + this.ml.output =:> tp.input
-  "Max of items min W = " + this.ml.output + " -- min W " + this.min_width + " -- preferred W " + this.preferred_width + " -- container W " + this.container_width =:> tp.input
+  // TextPrinter tp
+  // "Max of items min W = " + this.ml.output + " -- min W " + this.min_width + " -- preferred W " + this.preferred_width + " -- container W " + this.container_width =:> tp.input
 
 
-  // ProcessCollector "items" in class AbstractBox: sub process "add" is not activated when an item is added
+  // ProcessCollector "items" in class AbstractBox:
+  // - RefProperty _add is not set
+  // - sub process "add" is not activated when an item is added
+
   // We can NOT bind to this.items.add !
   // this.items.add -> na_item_added:(this) {
   //   item = getRef (&this.items.add)
@@ -107,17 +110,24 @@ ListBox () inherits VBox () {
   NativeAction na_select_item (action_select_item, this, 1)
 
   this.items.size -> na_items_size:(this) {
-    print ("Items size changed " + this.items.size)
+    print ("Size changed: " + this.items.size + " items in the list box")
 
     for item : this.items {
       if (!item._is_binded) {
-        print ("Add binding on " + item.text)
+        // print ("Add binding on " + item.text)
         item._is_binded = true
 
         addChildrenTo this.bindings {
           item.select -> this.na_select_item
         }
       }
+    }
+  }
+
+  reset_selection -> na_reset_selection:(this) {
+    if (this.is_selected_item) {
+      setRef (this.selected_item, null)
+      this.is_selected_item = false
     }
   }
 

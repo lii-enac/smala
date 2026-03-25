@@ -8,5 +8,5 @@ PersonModel (string _name, string _surname)
     String fullname (_surname + ", " + _name)   // Can be made in the view
 
     TextPrinter tp
-    name + " " + surname + " --> " + fullname =:> tp.input
+    "Model of Person: " + name + " " + surname + " --> " + fullname =:> tp.input
 }

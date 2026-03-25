@@ -104,7 +104,6 @@ UITextField () inherits IWidget () {
   }
 
   // Init the inner text field
-  // init_text =: field.content.text // FIXME: should be sufficient
-  init_text =:> field.content.text
+  init_text =:> field.content.text, text
   
 }

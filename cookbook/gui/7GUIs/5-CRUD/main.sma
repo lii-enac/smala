@@ -176,9 +176,6 @@ Component root {
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
 
-    models.size > 0 -> BD.enable
-    models.size == 0 -> BD.disable
-
     // Key "tab" allows to set the focus to next text field
     T_name.next -> T_surname.activate
     T_surname.next -> BC.select
@@ -186,6 +183,8 @@ Component root {
     // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
 
     // [7GUIs] BU and BD are enabled iff an entry in L is selected.
+    L.is_selected_item.true -> BU.enable, BD.enable
+    L.is_selected_item.false -> BU.disable, BD.disable
 
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
 

@@ -22,6 +22,8 @@ _define_
 ListBoxItem (Process _model, int _index) inherits IWidget () {
   model aka _model
   Int index (_index)
+  Bool _is_binded (false)
+  Bool is_selected (false)
 
   Int LBI_HEIGHT (18)
   Int LBI_HZ_MARGIN (6)
@@ -61,23 +63,27 @@ ListBoxItem (Process _model, int _index) inherits IWidget () {
 
   FSM fsm_selection {
     State st_unselected {
+      0 =: is_selected
+
       #DDDDDD =: bg.fill_c.value
       #000000 =: label.fill_c.value
     }
 
-    // State st_hover {
-
-    // }
-
     State st_selected {
+      1 =: is_selected
+
       #197EFF =: bg.fill_c.value
       #FFFFFF =: label.fill_c.value
     }
 
     st_unselected -> st_selected (bg.r.press, select)
     st_selected -> st_unselected (unselect)
-
-    // (bg.r.enter)
-    // (bg.r.leave)
   }
+
+  // FSM fsm_hover {
+
+  //   out -> in (bg.r.enter)
+  //   in -> out (bg.r.leave)
+  // }
+  
 }

@@ -8,6 +8,8 @@ _define_
 // PersonView () inherits ItemView ()
 PersonView (Process _model, int _index) inherits ListBoxItem (_model, _index)
 {
+    TextPrinter tp
+
     // FillColor _ (#666666)
     // OutlineColor _ (White)
     // OutlineWidth _ (2)
@@ -29,5 +31,7 @@ PersonView (Process _model, int _index) inherits ListBoxItem (_model, _index)
     // ref_surname.value =:> txt_surname.text
     // ref_name.value =:> txt_name.text
 
+
     _model.surname + ", " + _model.name =:> this.text
+    "View of person [" + this.index + "]: " + _model.surname + ", " + _model.name =: tp.input
 }

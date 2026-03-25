@@ -13,6 +13,7 @@ import gui.widgets.VBox
 import gui.widgets.HBox
 import gui.widgets.ComboBox
 import gui.widgets.Label
+import gui.keyboard.ControlKey
 
 // import gui.widgets.ListViewer
 import ListBox
@@ -33,7 +34,21 @@ Component root {
     f.close ->! mainloop
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
-    // _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+    _DEBUG_SEE_PROP_SET_VALUE = 0
+    _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
+
+    ControlKey ctrl_d (f, DJN_Key_D)
+
+	ctrl_d.press -> (root) {
+		if (_DEBUG_SEE_ACTIVATION_SEQUENCE_2) {
+			_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
+			_DEBUG_SEE_PROP_SET_VALUE = 0
+		}
+		else {
+			_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+			_DEBUG_SEE_PROP_SET_VALUE = 1
+		}
+	}
 
     TextPrinter tp
 
@@ -84,7 +99,9 @@ Component root {
 
             }
             // L.preferred_width = 200
+            // 200 =: L.preferred_width
             // L.min_width = 250
+            // 250 =: L.min_width
             // L.min_height = 450
 
             VBox props {

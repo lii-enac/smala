@@ -15,7 +15,6 @@ import gui.widgets.ComboBox
 import gui.widgets.Label
 import gui.keyboard.ControlKey
 
-// import gui.widgets.ListViewer
 import ListBox
 import ListBoxItem
 
@@ -62,10 +61,6 @@ Component root {
     List models
     models.size + " persons in the (models) list" => tp.input
 
-    // FIXME: v0.1
-    // Component prototype (1) {
-    //     PersonView view
-    // }
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -96,9 +91,6 @@ Component root {
 
         HBox data {
             data.space = 20
-            
-            // FIXME: v0.1
-            // ListViewer list_viewer (models, prototype.view)
 
             // VBox L {}                       // [7GUIs] L presents a view of the data in the database that consists of a list of names.
             // ListBox L (models) { }
@@ -155,16 +147,12 @@ Component root {
         {
             print ("The model '" + model.fullname + "' has been added to the list of " + root.models.size + " models")
             addChildrenTo root.L {
-                // Label _ (getString (model.fullname))
-                // How to link this model and this view to update it when model change ?
-                // model.fullname =:> _.text
                 //ListBoxItem item (model, getInt (root.models.size))
                 PersonView item (model, getInt (root.models.size))
                 
                 // FIXME: don't work
                 // item.min_width -> root.L.pack
             }
-            // Label (root.L, getString (model.name), getString (model.fullname))
 
             notify root.L.pack
         }
@@ -195,10 +183,9 @@ Component root {
         if (root.f.key\-pressed == "43") {
             // print ("+ --> " + root.models.size)
             string nb = to_string (getInt (root.models.size))
-            string forename = "prenom_" + nb
-            string surname = "nom_" + nb
+
             addChildrenTo root.models {
-                PersonModel _ (forename, surname)
+                PersonModel _ ("prenom_" + nb, "nom_" + nb)
             }
         }
     }

@@ -43,6 +43,13 @@ _native_code_
         return false;
     }
 
+    void remove_one (Process* collection, Process* item) {
+        ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
+        if ( (pc != nullptr) && (item != nullptr) ) {
+            pc->remove_one (item);
+        }
+    }
+
     // bool contains (ProcessCollector* collection, Process* item) {
     //     if ( (collection) && (item != nullptr) ) {
     //         for (CoreProcess* item_i : collection->get_list ()) {
@@ -272,6 +279,7 @@ Component root {
                     break
                 }
             }
+            // graph_exec ()
             // notify root.L.pack  // Update layout
         }
     }
@@ -318,7 +326,7 @@ Component root {
                 if (contains (root.displayed_models, model)) {
                     print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
 
-                    // Add to the list of displayed_models
+                    // Remove from the list of displayed_models
                     setRef (root.displayed_models.rm, model)
                     graph_exec ()
                 }
@@ -376,14 +384,24 @@ Component root {
             // Only remove from list
             remove selected_item from root.L.items
 
-            // Delete view ?
-            // delete selected_item
-
             if (&model != null) {
                 print ("Delete its model " + model.fullname)
                 
-                // Only remove from list
+                if (contains (root.displayed_models, model)) {
+                    // Remove from the list of displayed_models
+                    // setRef (root.displayed_models.rm, model)
+                    // graph_exec ()
+                    remove_one (root.displayed_models, model)
+                }
+
+                // Only remove from list of all models
                 remove model from root.models
+
+                // Delete view ?
+                // delete selected_item
+
+                // graph_exec ()
+                // notify root.L.pack
 
                 // Delete the model ?
                 // delete model

@@ -19,8 +19,8 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-ListBoxItem (Process _model, int _index) inherits IWidget () {
-  model aka _model
+ListBoxItem (int _index) inherits IWidget ()
+{
   Int index (_index)
   Bool _is_binded (false)
   Bool is_selected (false)
@@ -44,17 +44,15 @@ ListBoxItem (Process _model, int _index) inherits IWidget () {
     // this.preferred_width =:> r.width
   }
 
-  Translation offset (0, 0)
-
   Component label {
     FillColor fill_c (#000000)
 
     // Default text: "item " + index
     Text txt ($LBI_HZ_MARGIN / 2, 0, "item " + toString (index))
+    LBI_HEIGHT / 2 + txt.ascent / 2 - 1 =:> txt.y
   }
   
   text aka label.txt.text
-  LBI_HEIGHT / 2 + label.txt.ascent / 2 - 1 =:> offset.ty
 
   label.txt.width + LBI_HZ_MARGIN =:> this.min_width
   (this.preferred_width == -1) || (this.preferred_width < this.min_width) ? this.min_width : this.preferred_width =:> this.preferred_width, bg.r.width

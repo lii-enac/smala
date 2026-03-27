@@ -25,10 +25,79 @@ _native_code_
 %{
     #include "core/property/text_property.h"
 
+    using namespace djnnstl;
+
     bool starts_with (const string &str, const string &prefix) {
       return str.starts_with (prefix);  // C++20
     }
+
+    bool contains (Process* collection, Process* item) {
+        ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
+        if ( (pc != nullptr) && (item != nullptr) ) {
+            for (CoreProcess* item_i : pc->get_list ()) {
+                if (item_i == item) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // bool contains (ProcessCollector* collection, Process* item) {
+    //     if ( (collection) && (item != nullptr) ) {
+    //         for (CoreProcess* item_i : collection->get_list ()) {
+    //             if (item_i == item) {
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
+
 %}
+
+
+// _action_
+// action_filter (Process c)
+// %{
+//     Process* self = (Process*) get_native_user_data (c);
+//     Process* src = c->get_activation_source ();
+//     const string& prefix = toString (src);
+
+//     List* models = dynamic_cast<djnn::List*> (self->find_child ("models"));
+//     ProcessCollector* displayed_models = dynamic_cast<ProcessCollector*> (self->find_child ("displayed_models"));
+
+//     // if (prefix.is_empty) {
+//         // displayed_models = models
+//     // }
+//     // else {
+        
+//     // }
+    
+//     if ( (models != nullptr) && (displayed_models != nullptr) )
+//     {
+//         for (CoreProcess* model : models->children())
+//         {
+//             string surname = static_cast<TextProperty*> (model->find_child ("surname"))->get_value ();
+//             if (surname.starts_with (prefix)) {
+//                 // cout << "+ " << surname + " STARTS with prefix " << prefix << endl;
+
+//                 if (!contains (displayed_models, model)) {
+//                     cout << "+ " << surname << " STARTS with prefix & NOT in displayed list --> add it" << endl;
+//                     displayed_models->add_one (model);
+//                 }
+//             }
+//             else {
+//                 // cout << "- " << surname + " does NOT start with prefix " << prefix << endl;
+
+//                 if (contains (displayed_models, model)) {
+//                     cout << "- " << surname << " does NOT start with prefix & IN displayed list --> remove it" << endl;
+//                     displayed_models->remove_one (model);
+//                 }
+//             }
+//         }
+//     }
+// %}
 
 
 _main_
@@ -58,8 +127,9 @@ Component root {
     // TextPrinter tp_surename
     TextPrinter tp_selection
 
-    List models
-    models.size + " persons in the (models) list" => tp.input
+    List models // List of all models
+    ProcessCollector displayed_models
+    displayed_models.size + " displayed models among the " + models.size + " persons in the full list" => tp.input
 
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
@@ -145,29 +215,23 @@ Component root {
         model = getRef (&root.models.$added)
         if (&model != null)
         {
-            print ("The model '" + model.fullname + "' has been added to the list of " + root.models.size + " models")
-            addChildrenTo root.L {
-                //ListBoxItem item (model, getInt (root.models.size))
-                PersonView item (model, getInt (root.models.size))
-                
-                // FIXME: don't work
-                // item.min_width -> root.L.pack
-            }
+            print ("The model '" + model.fullname + "' has been added to the list of all " + root.models.size + " models")
 
-            notify root.L.pack
+            // By default, add to the list of displayed_models
+            // FIXME TODO: check if T_prefix.field.content.text != ""
+            setRef (root.displayed_models.add, model)
         }
     }
-    
+
     // models.$removed -> na_removed:(root) {
     //     model = getRef (&root.models.$removed)
     //     if (&model != null)
     //     {
-    //         print ("The model '" + model.fullname + "' has been removed from the list of " + root.models.size + " models")
+    //         print ("The model '" + model.fullname + "' has been removed from the list of all " + root.models.size + " models")
 
     //         for view : root.L.items {
     //             if (&view.model == &model) {
     //                print ("We found the view of the removed model " + view.model.fullname)
-    //                // delete model
     //                break
     //             }
     //         }
@@ -175,20 +239,44 @@ Component root {
     // }
 
 
-    // FIXME: for tests / debug
-    f.key\-pressed -> na_key_pressed:(root) {
-        // print ("key pressed '" + root.f.key\-pressed + "'")
+    displayed_models.add -> na_model_to_display:(root) {
+        model = getRef (&root.displayed_models.add)
+        if (&model != null)
+        {
+            print ("The model '" + model.fullname + "' has been added to the list of " + root.displayed_models.size + " models to display")
 
-        // Key +
-        if (root.f.key\-pressed == "43") {
-            // print ("+ --> " + root.models.size)
-            string nb = to_string (getInt (root.models.size))
-
-            addChildrenTo root.models {
-                PersonModel _ ("prenom_" + nb, "nom_" + nb)
+            addChildrenTo root.L {
+                //ListBoxItem item (model, getInt (root.models.size))
+                PersonView item (model, getInt (root.models.size))
             }
+            notify root.L.pack  // Update layout
         }
     }
+
+    displayed_models.rm -> na_model_to_hide:(root) {
+        model = getRef (&root.displayed_models.rm)
+        if (&model != null)
+        {
+            print ("The model '" + model.fullname + "' has been removed from the list of " + root.displayed_models.size + " models to display")
+
+            for view : root.L.items {
+                if (&view.model == &model) {
+                    print ("We found the view of the removed model " + view.model.fullname)
+                   
+                    // Only remove from list
+                    remove view from root.L.items
+
+                    // Delete view ?
+                    // delete view
+
+                    break
+                }
+            }
+            // notify root.L.pack  // Update layout
+        }
+    }
+    // na_model_to_hide -> root.L.pack
+
 
     // L.selected_item -> {
     (L.selected_item.is_null == 0) && L.selected_item -> {
@@ -201,17 +289,39 @@ Component root {
     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
     // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
 
-    TextPrinter tp_prefix
-    // "Filter list with prefix " + T_prefix.text => tp_prefix.input
-    "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
+    // TextPrinter tp_prefix
+    // // "Filter list with prefix " + T_prefix.text => tp_prefix.input
+    // "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
+    
+    // NativeAction na_filter (action_filter, root, 1)
+    // T_prefix.field.content.text -> na_filter
+
     T_prefix.field.content.text -> na_filter:(root) {
+        print ("Filter list with prefix '" + root.T_prefix.field.content.text + "'")
         string prefix = getString (root.T_prefix.field.content.text)
-        for view : root.L.items {
-            if (starts_with (getString (view.model.surname), prefix)) {
-               print ("+ " + view.model.surname + " STARTS with prefix")
+        
+        for model : root.models {
+            if (starts_with (getString (model.surname), prefix)) {
+                // print ("+ " + model.surname + " STARTS with prefix")
+                
+                if (!contains (root.displayed_models, model)) {
+                    print ("+ " + model.surname + " STARTS with prefix & NOT in displayed list --> add it")
+
+                    // Add to the list of displayed_models
+                    setRef (root.displayed_models.add, model)
+                    graph_exec ()
+                }
             }
             else {
-                print ("- " + view.model.surname + " does NOT start with prefix")
+                // print ("- " + model.surname + " does NOT start with prefix")
+
+                if (contains (root.displayed_models, model)) {
+                    print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
+
+                    // Add to the list of displayed_models
+                    setRef (root.displayed_models.rm, model)
+                    graph_exec ()
+                }
             }
         }
     }
@@ -282,6 +392,22 @@ Component root {
     }
     // FIXME: don't work
     // na_delete_person -> L.pack
+
+
+    // FIXME: for tests / debug
+    f.key\-pressed -> na_key_pressed:(root) {
+        // print ("key pressed '" + root.f.key\-pressed + "'")
+
+        // Key +
+        if (root.f.key\-pressed == "43") {
+            // print ("+ --> " + root.models.size)
+            string nb = to_string (getInt (root.models.size))
+
+            addChildrenTo root.models {
+                PersonModel _ ("prenom_" + nb, "nom_" + nb)
+            }
+        }
+    }
 }
 
 

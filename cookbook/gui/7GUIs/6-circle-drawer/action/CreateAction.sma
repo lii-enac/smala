@@ -18,8 +18,6 @@ CreateAction (Process view_)
         addChildrenTo this.hidden {
             this.view
         }
-        print ("UNDO: move " + this.view + " from canvas.items to hidden")
-        dump root.canvas.items
     }
 
     redo -> (this) {
@@ -28,20 +26,12 @@ CreateAction (Process view_)
         addChildrenTo root.canvas.items {
             this.view
         }
-        print ("REDO: move " + this.view + " from hidden to canvas.items")
-        dump root.canvas.items
     }
 
     del -> (this) {
-        // delete only if an undo is active because view and model has been removed from root.model and root.gui
-        // if "idle" or redo everything is managed as normal
-        //for v: this.hidden {
-            //root = find(this, "//")
-            print ("CreateAction::del : " /*+ this.view*/)
-            remove this.view from this.hidden
-            delete this.view // Quest ce qu'il reste dans la ref ?
-        //}
-        //print ("CreateAction::del")
+        // delete only if an undo is active
+        remove this.view from this.hidden
+        delete this.view
     }
 
 }

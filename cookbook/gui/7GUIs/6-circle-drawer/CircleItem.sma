@@ -25,9 +25,6 @@ CircleItem (Process root_, int x, int y)
     c.right.press -> root.menu.unfold
 
     c.press -> (this) {
-        setRef(this.root.gcircle_ref_, this)
+        setRef(this.root._selected_item_ref, this)
     }
-    // c.leave -> (this) {
-    //     setRef(this.root.gcircle_ref_, null)
-    // }
 } 

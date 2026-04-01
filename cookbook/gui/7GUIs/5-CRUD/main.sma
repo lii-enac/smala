@@ -50,61 +50,12 @@ _native_code_
         }
     }
 
-    // bool contains (ProcessCollector* collection, Process* item) {
-    //     if ( (collection) && (item != nullptr) ) {
-    //         for (CoreProcess* item_i : collection->get_list ()) {
-    //             if (item_i == item) {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
+    void my_print (const string& s1, const string& s2) {
+        cout << s1 << s2 << endl;
+    }
 
 %}
 
-
-// _action_
-// action_filter (Process c)
-// %{
-//     Process* self = (Process*) get_native_user_data (c);
-//     Process* src = c->get_activation_source ();
-//     const string& prefix = toString (src);
-
-//     List* models = dynamic_cast<djnn::List*> (self->find_child ("models"));
-//     ProcessCollector* displayed_models = dynamic_cast<ProcessCollector*> (self->find_child ("displayed_models"));
-
-//     // if (prefix.is_empty) {
-//         // displayed_models = models
-//     // }
-//     // else {
-        
-//     // }
-    
-//     if ( (models != nullptr) && (displayed_models != nullptr) )
-//     {
-//         for (CoreProcess* model : models->children())
-//         {
-//             string surname = static_cast<TextProperty*> (model->find_child ("surname"))->get_value ();
-//             if (surname.starts_with (prefix)) {
-//                 // cout << "+ " << surname + " STARTS with prefix " << prefix << endl;
-
-//                 if (!contains (displayed_models, model)) {
-//                     cout << "+ " << surname << " STARTS with prefix & NOT in displayed list --> add it" << endl;
-//                     displayed_models->add_one (model);
-//                 }
-//             }
-//             else {
-//                 // cout << "- " << surname + " does NOT start with prefix " << prefix << endl;
-
-//                 if (contains (displayed_models, model)) {
-//                     cout << "- " << surname << " does NOT start with prefix & IN displayed list --> remove it" << endl;
-//                     displayed_models->remove_one (model);
-//                 }
-//             }
-//         }
-//     }
-// %}
 
 
 _main_
@@ -237,9 +188,24 @@ Component root {
         {
             print ("The model '" + model.fullname + "' has been added to the list of " + root.displayed_models.size + " models to display")
 
+            // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
+            int index = 0
+            for model_i : root.models {
+                if (&model_i == &model) {   // found
+                    break
+                }
+                index++
+            }
+            if (index == root.models.size - 1) {
+                my_print ("Add at the end: ", to_string (index))
+            }
+            else {
+                my_print ("Insert at: ", to_string (index))
+            }
+
             addChildrenTo root.L {
-                //ListBoxItem item (model, getInt (root.models.size))
-                PersonView item (model, getInt (root.models.size))
+                //ListBoxItem item (model, index)
+                PersonView item (model, index)
             }
             notify root.L.pack  // Update layout
         }
@@ -298,8 +264,8 @@ Component root {
         string prefix = getString (root.T_prefix.field.content.text)
         
         for model : root.models {
+            // Surname STARTS with prefix
             if (starts_with (getString (model.surname), prefix)) {
-                // print ("+ " + model.surname + " STARTS with prefix")
                 
                 if (!contains (root.displayed_models, model)) {
                     print ("+ " + model.surname + " STARTS with prefix & NOT in displayed list --> add it")
@@ -309,9 +275,8 @@ Component root {
                     graph_exec ()
                 }
             }
+            // Surname does NOT start with prefix
             else {
-                // print ("- " + model.surname + " does NOT start with prefix")
-
                 if (contains (root.displayed_models, model)) {
                     print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
 
@@ -400,13 +365,15 @@ Component root {
 
 
     // FIXME: for tests / debug
+    Int DEBUG_Index (0)
     f.key\-pressed -> na_key_pressed:(root) {
         // print ("key pressed '" + root.f.key\-pressed + "'")
 
         // Key +
         if (root.f.key\-pressed == "43") {
-            // print ("+ --> " + root.models.size)
-            string nb = to_string (getInt (root.models.size))
+            root.DEBUG_Index++
+            // print ("+ --> " + root.DEBUG_Index)
+            string nb = to_string (getInt (root.DEBUG_Index))
 
             addChildrenTo root.models {
                 PersonModel _ ("prenom_" + nb, "nom_" + nb)

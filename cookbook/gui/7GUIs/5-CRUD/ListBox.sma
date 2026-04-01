@@ -121,13 +121,12 @@ ListBox () inherits VBox () {
   // }
   reset_selection -> na_unselect_item
 
-//   Translation offset (0, 0)
-//   Text ui (0, 0, _label)
-//   text aka ui.text
-//   this.height/2 + ui.ascent/2 - 1 =:> offset.ty
 
 //   ui.width =: this.min_width
 //   this.preferred_width == -1 ? ui.width : this.preferred_width =: this.preferred_width
 //   ui.height =: this.min_height
 //   this.preferred_height == -1 ? ui.height : this.preferred_height =: this.preferred_height
+
+  // will be moved at the end, serves as a marker for additional components
+  moveChild this.remaining >>
 }

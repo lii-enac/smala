@@ -381,8 +381,10 @@ Component root {
             
             Process model = find (selected_item, "model")
 
-            // Only remove from list
-            remove selected_item from root.L.items
+            // Remove from collection
+            remove_one (root.L.items, selected_item)
+            // Remove from children list
+            remove selected_item from root.L
 
             if (&model != null) {
                 print ("Delete its model " + model.fullname)
@@ -397,18 +399,17 @@ Component root {
                 // Only remove from list of all models
                 remove model from root.models
 
-                // Delete view ?
-                // delete selected_item
+                // Delete view
+                delete selected_item
 
-                // graph_exec ()
+                //graph_exec ()
                 // notify root.L.pack
 
                 // Delete the model ?
-                // delete model
+                delete model
             }
         }
     }
-    // FIXME: don't work
     // na_delete_person -> L.pack
 
 

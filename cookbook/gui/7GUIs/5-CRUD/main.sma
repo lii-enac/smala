@@ -230,21 +230,6 @@ Component root {
         }
     }
 
-    // models.$removed -> na_removed:(root) {
-    //     model = getRef (&root.models.$removed)
-    //     if (&model != null)
-    //     {
-    //         print ("The model '" + model.fullname + "' has been removed from the list of all " + root.models.size + " models")
-
-    //         for view : root.L.items {
-    //             if (&view.model == &model) {
-    //                print ("We found the view of the removed model " + view.model.fullname)
-    //                break
-    //             }
-    //         }
-    //     }        
-    // }
-
 
     displayed_models.add -> na_model_to_display:(root) {
         model = getRef (&root.displayed_models.add)
@@ -270,20 +255,24 @@ Component root {
                 if (&view.model == &model) {
                     print ("We found the view of the removed model " + view.model.fullname)
                    
-                    // Only remove from list
-                    remove view from root.L.items
+                    if (view.is_selected) {
+                        notify root.L.reset_selection
+                    }
 
-                    // Delete view ?
-                    // delete view
+                    // Remove from collection
+                    remove_one (root.L.items, view)
+                    // Remove from children list
+                    remove view from root.L
+
+                    // Delete view
+                    delete view
 
                     break
                 }
             }
-            // graph_exec ()
             // notify root.L.pack  // Update layout
         }
     }
-    // na_model_to_hide -> root.L.pack
 
 
     // L.selected_item -> {
@@ -376,7 +365,6 @@ Component root {
         if (&selected_item != null) {
             print ("Delete view of " + selected_item.text)
 
-            // notify selected_item.unselect   // FIXME: useless, used until remove works !
             notify root.L.reset_selection
             
             Process model = find (selected_item, "model")
@@ -390,7 +378,7 @@ Component root {
                 print ("Delete its model " + model.fullname)
                 
                 if (contains (root.displayed_models, model)) {
-                    // Remove from the list of displayed_models
+                    // We have to remove from the list of displayed_models immediately !
                     // setRef (root.displayed_models.rm, model)
                     // graph_exec ()
                     remove_one (root.displayed_models, model)
@@ -402,15 +390,13 @@ Component root {
                 // Delete view
                 delete selected_item
 
-                //graph_exec ()
-                // notify root.L.pack
+                // notify root.L.pack  // Update layout
 
-                // Delete the model ?
+                // Delete the model
                 delete model
             }
         }
     }
-    // na_delete_person -> L.pack
 
 
     // FIXME: for tests / debug

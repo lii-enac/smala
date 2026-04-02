@@ -11,20 +11,27 @@ CircleItem (Process root_, int x, int y)
     PickFill _
     OutlineColor oc(255,255,255)
     Circle c(x, y, 10)                      // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
+    Spike deselect
 
     c.enter ->! nf                          // [7GUIs] The circle nearest to the mouse pointer such that the distance from its center to the pointer is less than its radius, if it exists, is filled with the color gray.
-    c.leave -> nf
+    // c.leave -> nf // NOT that simple !
+    deselect -> nf
 
     root aka root_
 
-    // FIXME should be right press 
     c.right.press -> {                            // [7GUIs] Right-clicking C will make a popup menu appear with one entry “Adjust diameter..”.
         c.press.x =: root.menu.x
         c.press.y =: root.menu.y
     }
     c.right.press -> root.menu.unfold
 
-    c.press -> (this) {
+    // Enter deselects the previously selected one (if any) and selects the current item and 
+    c.enter -> (this) {
+        old_selected_item = getRef(&this.root._selected_item_ref)
+        if (&old_selected_item != null && &old_selected_item != &this) {
+            activate (old_selected_item.deselect)
+        }
+        graph_exec ()
         setRef(this.root._selected_item_ref, this)
     }
-} 
+}  

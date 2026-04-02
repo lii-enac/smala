@@ -35,40 +35,34 @@ UndoRedoManager ()
     Spike undo
     Spike redo
 
-    root = find(this, "//")
-
-    TextPrinter tp
-
-
-
     // whenever a new action is added to the list, make the cursor point to this action
-    actions.$added -> added_: {
+    actions.$added -> added_ : {
         current + 1 =: current
     }
-    //debug
-    // added_ -> (this) {
-    //      print ("DEBUG -- undo_redo LIST actions size :" + this.actions.size)
-    // }
-
-    "DEBUG -- undo_redo current : " + current + " / size : " + actions.size  + "\n" =:> tp.input
+    
+    // debug
+    // TextPrinter tp
+    //"DEBUG -- undo_redo current : " + current + " / size : " + actions.size  + "\n" =:> tp.input
 
     // after a few undo's, the user might perform a new action
     // in this case this spike should be triggered to erase all actions that have been undone
     // this is the traditional policy in interactive applications, though it could be better usability-wise
     Spike removeActionsStartingFromCurrent
     removeActionsStartingFromCurrent -> remove_part1 : (this) {
-        // root = find(this, "//")
-        // dump root.undo_redo_manager.actions
-        // dump root.canvas.items
-        print ("\n ---> removeActionsStartingFromCurrent - remove_part1 - allinone")
+        
+        // debug
+        //print ("\n ---> removeActionsStartingFromCurrent - remove_part1 - allinone")
+        
         for (int i = this.actions.size; i > this.current; i--) {
-            print ( /*"i : " + string(i) + */" size " + this.actions.size + " current : " + this.current)
+            //print ( /*"i : " + string(i) + */" size " + this.actions.size + " current : " + this.current)
             notify this.actions.[i].del // notify deletion so the action has a chance to clean-up its content
             graph_exec () // force sync on notify
             delete this.actions.[i]
             graph_exec ()
         }
-        print (" <--- removeActionsStartingFromCurrent AFTER - actions size :" + this.actions.size + "\n")
+        
+        // debug
+        //print (" <--- removeActionsStartingFromCurrent AFTER - actions size :" + this.actions.size + "\n")
     }
 
     // management of the position of the cursor in the action list
@@ -131,6 +125,8 @@ UndoRedoManager ()
         beg -> middle (bmiddle.true)
         
     }
+
+    // debug
     // TextPrinter tp1
     // undo_redo_manager_fsm.state =:> tp1.input
 }

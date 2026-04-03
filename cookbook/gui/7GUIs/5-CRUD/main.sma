@@ -50,10 +50,69 @@ _native_code_
         }
     }
 
+    size_t get_index (Container* lst_models, Process* model)
+    {
+        if ( (lst_models != nullptr) && (model != nullptr) )
+        {
+            vector<CoreProcess*> models = lst_models->children ();
+            auto it = std::find (models.begin(), models.end(), model);
+            if (it == models.end())
+                return -1;
+            return std::distance(models.begin(), it);
+        }
+        return -1;
+    }
+
     void my_print (const string& s1, const string& s2) {
         cout << s1 << s2 << endl;
     }
 
+
+    void insert_displayed_model (Process* model, Process* ordered_models, Process* list_box)
+    {
+        const string& fullname = static_cast<TextProperty*>(model->find_child("fullname"))->get_value();
+        cout << "\nInsert view of " << fullname << " in displayed views" << endl;
+        Container* lst_models = dynamic_cast<Container*> (ordered_models);
+
+        // Get index in list with all models
+        size_t index = get_index (lst_models, model);
+        if (index == -1)
+            return; 
+
+        // AbstractList* lst_displayed_models = dynamic_cast<AbstractList*> (list_box);
+        ProcessCollector* pc_items = dynamic_cast<ProcessCollector*> (list_box->find_child ("items"));
+        if (pc_items != nullptr)
+        {
+            const vector<CoreProcess*>& displayed_items = pc_items->get_list ();
+
+            // Browse list_box.items to find where to insert
+            auto insert_pos = displayed_items.end();    // At the end by default
+            
+            for (auto it = displayed_items.begin(); it != displayed_items.end(); ++it)
+            {
+                auto item = *it;
+                Process* model_i = item->find_child ("model");
+
+                size_t current_index = get_index (lst_models, model_i);
+                if (current_index > index) {
+                    // Insert before this item
+                    insert_pos = it;
+                    break;
+                }
+            }
+
+            size_t insert_index = std::distance(displayed_items.begin(), insert_pos);
+
+            Process* view = PersonView (nullptr, fullname, model, index);
+
+            // Insert the view in the ProcessCollector
+            // pc_items->insert_one (view, insert_pos);
+            pc_items->insert_one (view, insert_index);
+
+            // Finally, add the view as child of the list box
+            list_box->add_child (view, fullname);
+        }
+    }
 %}
 
 
@@ -83,26 +142,7 @@ action_model_added_to_displayed_models (Process src, Process self)
     {
         print ("The model '" + model.fullname + "' has been added to the list of " + self.displayed_models.size + " models to display")
 
-        // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
-        int index = 0
-        for model_i : self.models {
-            if (&model_i == &model) {   // found
-                break
-            }
-            index++
-        }
-        if (index == self.models.size - 1) {
-            my_print ("Add at the end: ", to_string (index))
-        }
-        else {
-            my_print ("Insert at: ", to_string (index))
-        }
-
-        addChildrenTo self.L {
-            //ListBoxItem item (model, index)
-            PersonView item (model, index)
-        }
-        notify self.L.pack  // Update layout
+        insert_displayed_model (model, self.models, self.L)
     }
 }
 
@@ -317,81 +357,12 @@ Component root {
     NativeAction na_model_added_to_all_models (action_model_added_to_all_models, root, 1)
     models.$added -> na_model_added_to_all_models
 
-    // models.$added -> na_added:(root) {
-    //     model = getRef (&root.models.$added)
-    //     if (&model != null)
-    //     {
-    //         print ("The model '" + model.fullname + "' has been added to the list of all " + root.models.size + " models")
-
-    //         // By default, add to the list of displayed_models
-    //         // FIXME TODO: check if T_prefix.field.content.text != ""
-    //         setRef (root.displayed_models.add, model)
-    //     }
-    // }
-
     NativeAction na_model_added_to_displayed_models (action_model_added_to_displayed_models, root, 1)
     displayed_models.add -> na_model_added_to_displayed_models
-
-    // displayed_models.add -> na_model_to_display:(root) {
-    //     model = getRef (&root.displayed_models.add)
-    //     if (&model != null)
-    //     {
-    //         print ("The model '" + model.fullname + "' has been added to the list of " + root.displayed_models.size + " models to display")
-
-    //         // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
-    //         int index = 0
-    //         for model_i : root.models {
-    //             if (&model_i == &model) {   // found
-    //                 break
-    //             }
-    //             index++
-    //         }
-    //         if (index == root.models.size - 1) {
-    //             my_print ("Add at the end: ", to_string (index))
-    //         }
-    //         else {
-    //             my_print ("Insert at: ", to_string (index))
-    //         }
-
-    //         addChildrenTo root.L {
-    //             //ListBoxItem item (model, index)
-    //             PersonView item (model, index)
-    //         }
-    //         notify root.L.pack  // Update layout
-    //     }
-    // }
+    na_model_added_to_displayed_models -> root.L.pack   // Update layout
 
     NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, root, 1)
     displayed_models.rm -> na_model_removed_from_displayed_models
-
-    // displayed_models.rm -> na_model_to_hide:(root) {
-    //     model = getRef (&root.displayed_models.rm)
-    //     if (&model != null)
-    //     {
-    //         print ("The model '" + model.fullname + "' has been removed from the list of " + root.displayed_models.size + " models to display")
-
-    //         for view : root.L.items {
-    //             if (&view.model == &model) {
-    //                 print ("We found the view of the removed model " + view.model.fullname)
-                   
-    //                 if (view.is_selected) {
-    //                     notify root.L.reset_selection
-    //                 }
-
-    //                 // Remove from collection
-    //                 remove_one (root.L.items, view)
-    //                 // Remove from children list
-    //                 remove view from root.L
-
-    //                 // Delete view
-    //                 delete view
-
-    //                 break
-    //             }
-    //         }
-    //         // notify root.L.pack  // Update layout
-    //     }
-    // }
 
 
     // L.selected_item -> {
@@ -411,35 +382,6 @@ Component root {
 
     NativeAction na_filter (action_filter, root, 1)
     T_prefix.field.content.text -> na_filter
-
-    // T_prefix.field.content.text -> na_filter:(root) {
-    //     print ("Filter list with prefix '" + root.T_prefix.field.content.text + "'")
-    //     string prefix = getString (root.T_prefix.field.content.text)
-        
-    //     for model : root.models {
-    //         // Surname STARTS with prefix
-    //         if (starts_with (getString (model.surname), prefix)) {
-                
-    //             if (!contains (root.displayed_models, model)) {
-    //                 print ("+ " + model.surname + " STARTS with prefix & NOT in displayed list --> add it")
-
-    //                 // Add to the list of displayed_models
-    //                 setRef (root.displayed_models.add, model)
-    //                 graph_exec ()
-    //             }
-    //         }
-    //         // Surname does NOT start with prefix
-    //         else {
-    //             if (contains (root.displayed_models, model)) {
-    //                 print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
-
-    //                 // Remove from the list of displayed_models
-    //                 setRef (root.displayed_models.rm, model)
-    //                 graph_exec ()
-    //             }
-    //         }
-    //     }
-    // }
 
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
@@ -481,45 +423,7 @@ Component root {
 
     NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
     BD.click -> na_delete_selected_person
-
-    // BD.click -> na_delete_person:(root) {
-    //     selected_item = getRef (root.L.selected_item)
-    //     if (&selected_item != null) {
-    //         print ("Delete view of " + selected_item.text)
-
-    //         notify root.L.reset_selection
-            
-    //         Process model = find (selected_item, "model")
-
-    //         // Remove from collection
-    //         remove_one (root.L.items, selected_item)
-    //         // Remove from children list
-    //         remove selected_item from root.L
-
-    //         if (&model != null) {
-    //             print ("Delete its model " + model.fullname)
-                
-    //             if (contains (root.displayed_models, model)) {
-    //                 // We have to remove from the list of displayed_models immediately !
-    //                 // setRef (root.displayed_models.rm, model)
-    //                 // graph_exec ()
-    //                 remove_one (root.displayed_models, model)
-    //             }
-
-    //             // Only remove from list of all models
-    //             remove model from root.models
-
-    //             // Delete view
-    //             delete selected_item
-
-    //             // notify root.L.pack  // Update layout
-
-    //             // Delete the model
-    //             delete model
-    //         }
-    //     }
-    // }
-
+    na_delete_selected_person -> root.L.pack   // Update layout
 
 
     // FIXME: for tests / debug

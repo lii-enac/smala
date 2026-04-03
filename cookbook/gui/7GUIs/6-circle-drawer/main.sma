@@ -71,14 +71,17 @@ Component root {
         if (&old_selected_item != null) {
             activate (old_selected_item.deselect)
         }
-        // graph_exec ()
 
         addChildrenTo root.canvas.items {
             CircleItem selected_item (root, $root.canvas.mask.press.local_x, $root.canvas.mask.press.local_y ) // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
             setRef(root._selected_item_ref, &selected_item)
         }
         
-        // FIXME should be done by undo_redo_manager(?)
+        /// FIXME: This should be handled by the undo_redo_manager.
+        // Not that simple: we need a hook on system creation so that when a new
+        // action is added to the manager, the stack can be cleaned from the
+        // current position to the end if necessary.
+        // Also, the following graph_exec must run immediately BEFORE adding the action.
         activate (root.undo_redo_manager.removeActionsStartingFromCurrent) 
         graph_exec ()
         Process ca_ = CreateAction (root.undo_redo_manager.actions, "ca_", getRef(root._selected_item_ref))
@@ -110,12 +113,16 @@ Component root {
     // then open popup
     pre_popup_slider -> popup_slider
 
-    // create the ChangeRadiusAction before closing the popup slider
+    // [7GUIs]  Closing this frame will mark the last diameter as significant for the undo/redo history.
     popup_slider.f2.close -> post_popup_slider : (root) {
         
         selected_item = getRef(&root._selected_item_ref)
         if (&selected_item != null && $selected_item.c.r != $root.ctx_old_radius) {
-            // FIXME should be done by undo_redo_manager(?)
+            /// FIXME: This should be handled by the undo_redo_manager.
+            // Not that simple: we need a hook on system creation so that when a new
+            // action is added to the manager, the stack can be cleaned from the
+            // current position to the end if necessary.
+            // Also, the following graph_exec must run immediately BEFORE adding the action.
             activate (root.undo_redo_manager.removeActionsStartingFromCurrent) 
             graph_exec ()
             Process ca_ = ChangeRadiusAction (root.undo_redo_manager.actions, "cra_", selected_item, $root.ctx_old_radius, $selected_item.c.r)
@@ -136,8 +143,8 @@ Component root {
 // [7GUIs]  Changes are applied immediately.
 // [7GUIs]  Closing this frame will mark the last diameter as significant for the undo/redo history.
 // [7GUIs]  Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
-// [7GUIs]  Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.// [7GUIs] 
-
+// [7GUIs]  Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
+// [7GUIs] 
 // [7GUIs] Circle Drawer’s goal is, among other things, to test how good the common challenge of implementing an undo/redo functionality for a GUI application can be solved.
 // [7GUIs] In an ideal solution the undo/redo functionality comes for free resp. just comes out as a natural consequence of the language / toolkit / paradigm.
 // [7GUIs] Moreover, Circle Drawer tests how dialog control*, i.e. keeping the relevant context between several successive GUI interaction steps, is achieved in the source code.

@@ -48,10 +48,10 @@ UndoRedoManager ()
     // in this case this spike should be triggered to erase all actions that have been undone
     // this is the traditional policy in interactive applications, though it could be better usability-wise
     Spike removeActionsStartingFromCurrent
-    removeActionsStartingFromCurrent -> remove_part1 : (this) {
+    removeActionsStartingFromCurrent -> (this) {
         
         // debug
-        //print ("\n ---> removeActionsStartingFromCurrent - remove_part1 - allinone")
+        //print ("\n ---> removeActionsStartingFromCurrent - BEFORE - allinone")
         
         for (int i = this.actions.size; i > this.current; i--) {
             //print ( /*"i : " + string(i) + */" size " + this.actions.size + " current : " + this.current)

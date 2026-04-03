@@ -57,6 +57,151 @@ _native_code_
 %}
 
 
+_action_
+action_model_added_to_all_models (Process src, Process self)
+{
+    model = getRef (&self.models.$added)
+    if (&model != null)
+    {
+        print ("The model '" + model.fullname + "' has been added to the list of all " + self.models.size + " models")
+
+        // By default, add to the list of displayed_models
+        
+        // FIXME TODO: check if T_prefix.field.content.text != ""
+        // string filter = getString (self.T_prefix.field.content.text)
+        
+        setRef (self.displayed_models.add, model)
+    }
+}
+
+
+_action_
+action_model_added_to_displayed_models (Process src, Process self)
+{
+    model = getRef (&self.displayed_models.add)
+    if (&model != null)
+    {
+        print ("The model '" + model.fullname + "' has been added to the list of " + self.displayed_models.size + " models to display")
+
+        // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
+        int index = 0
+        for model_i : self.models {
+            if (&model_i == &model) {   // found
+                break
+            }
+            index++
+        }
+        if (index == self.models.size - 1) {
+            my_print ("Add at the end: ", to_string (index))
+        }
+        else {
+            my_print ("Insert at: ", to_string (index))
+        }
+
+        addChildrenTo self.L {
+            //ListBoxItem item (model, index)
+            PersonView item (model, index)
+        }
+        notify self.L.pack  // Update layout
+    }
+}
+
+
+_action_
+action_model_removed_from_displayed_models (Process src, Process self)
+{
+    model = getRef (&self.displayed_models.rm)
+    if (&model != null)
+    {
+        print ("The model '" + model.fullname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
+
+        for view : self.L.items {
+            if (&view.model == &model) {
+                print ("We found the view of the removed model " + view.model.fullname)
+                
+                if (view.is_selected) {
+                    notify self.L.reset_selection
+                }
+
+                // Remove from collection
+                remove_one (self.L.items, view)
+                // Remove from children list
+                remove view from self.L
+
+                // Delete view
+                delete view
+
+                break
+            }
+        }
+        // notify self.L.pack  // Update layout
+    }
+}
+
+
+_action_
+action_filter (Process src, Process self)
+{
+    print ("Filter list with prefix '" + src + "'")
+    string prefix = getString (src)
+    
+    for model : self.models {
+        // Surname STARTS with prefix
+        if (starts_with (getString (model.surname), prefix)) {
+            
+            if (!contains (self.displayed_models, model)) {
+                print ("+ " + model.surname + " STARTS with prefix (" + src +") & NOT in displayed list --> add it")
+
+                // Add to the list of displayed_models
+                setRef (self.displayed_models.add, model)
+                graph_exec ()
+            }
+        }
+        // Surname does NOT start with prefix
+        else {
+            if (contains (self.displayed_models, model)) {
+                print ("- " + model.surname + " does NOT start with prefix (" + src + ") & already IN displayed list --> remove it")
+
+                // Remove from the list of displayed_models
+                setRef (self.displayed_models.rm, model)
+                graph_exec ()
+            }
+        }
+    }
+}
+
+
+_action_
+action_delete_selected_person (Process src, Process self)
+{
+    selected_item = getRef (self.L.selected_item)
+    if (&selected_item != null) {
+        print ("Delete view & model of " + selected_item.text)
+
+        notify self.L.reset_selection                   // Reset the selection
+        
+        Process model = find (selected_item, "model")   // Get the corresponding model
+
+        remove_one (self.L.items, selected_item)        // Remove view from collection
+        remove selected_item from self.L                // Remove view from children list
+
+        if (&model != null) {
+            if (contains (self.displayed_models, model)) {
+                // setRef (root.displayed_models.rm, model)
+                // graph_exec ()
+                remove_one (self.displayed_models, model)   // We have to remove from the list of displayed_models immediately !
+            }
+
+            delete selected_item            // Delete view
+
+            // notify self.L.pack           // Update layout
+
+            remove model from self.models   // Remove from list of all models
+            delete model                    // Delete the model
+        }
+    }
+}
+
 
 _main_
 Component root {
@@ -169,76 +314,84 @@ Component root {
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
 
-    models.$added -> na_added:(root) {
-        model = getRef (&root.models.$added)
-        if (&model != null)
-        {
-            print ("The model '" + model.fullname + "' has been added to the list of all " + root.models.size + " models")
+    NativeAction na_model_added_to_all_models (action_model_added_to_all_models, root, 1)
+    models.$added -> na_model_added_to_all_models
 
-            // By default, add to the list of displayed_models
-            // FIXME TODO: check if T_prefix.field.content.text != ""
-            setRef (root.displayed_models.add, model)
-        }
-    }
+    // models.$added -> na_added:(root) {
+    //     model = getRef (&root.models.$added)
+    //     if (&model != null)
+    //     {
+    //         print ("The model '" + model.fullname + "' has been added to the list of all " + root.models.size + " models")
 
+    //         // By default, add to the list of displayed_models
+    //         // FIXME TODO: check if T_prefix.field.content.text != ""
+    //         setRef (root.displayed_models.add, model)
+    //     }
+    // }
 
-    displayed_models.add -> na_model_to_display:(root) {
-        model = getRef (&root.displayed_models.add)
-        if (&model != null)
-        {
-            print ("The model '" + model.fullname + "' has been added to the list of " + root.displayed_models.size + " models to display")
+    NativeAction na_model_added_to_displayed_models (action_model_added_to_displayed_models, root, 1)
+    displayed_models.add -> na_model_added_to_displayed_models
 
-            // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
-            int index = 0
-            for model_i : root.models {
-                if (&model_i == &model) {   // found
-                    break
-                }
-                index++
-            }
-            if (index == root.models.size - 1) {
-                my_print ("Add at the end: ", to_string (index))
-            }
-            else {
-                my_print ("Insert at: ", to_string (index))
-            }
+    // displayed_models.add -> na_model_to_display:(root) {
+    //     model = getRef (&root.displayed_models.add)
+    //     if (&model != null)
+    //     {
+    //         print ("The model '" + model.fullname + "' has been added to the list of " + root.displayed_models.size + " models to display")
 
-            addChildrenTo root.L {
-                //ListBoxItem item (model, index)
-                PersonView item (model, index)
-            }
-            notify root.L.pack  // Update layout
-        }
-    }
+    //         // Find the index of this model in the full list "models" & use it to insert at the right place in the views list
+    //         int index = 0
+    //         for model_i : root.models {
+    //             if (&model_i == &model) {   // found
+    //                 break
+    //             }
+    //             index++
+    //         }
+    //         if (index == root.models.size - 1) {
+    //             my_print ("Add at the end: ", to_string (index))
+    //         }
+    //         else {
+    //             my_print ("Insert at: ", to_string (index))
+    //         }
 
-    displayed_models.rm -> na_model_to_hide:(root) {
-        model = getRef (&root.displayed_models.rm)
-        if (&model != null)
-        {
-            print ("The model '" + model.fullname + "' has been removed from the list of " + root.displayed_models.size + " models to display")
+    //         addChildrenTo root.L {
+    //             //ListBoxItem item (model, index)
+    //             PersonView item (model, index)
+    //         }
+    //         notify root.L.pack  // Update layout
+    //     }
+    // }
 
-            for view : root.L.items {
-                if (&view.model == &model) {
-                    print ("We found the view of the removed model " + view.model.fullname)
+    NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, root, 1)
+    displayed_models.rm -> na_model_removed_from_displayed_models
+
+    // displayed_models.rm -> na_model_to_hide:(root) {
+    //     model = getRef (&root.displayed_models.rm)
+    //     if (&model != null)
+    //     {
+    //         print ("The model '" + model.fullname + "' has been removed from the list of " + root.displayed_models.size + " models to display")
+
+    //         for view : root.L.items {
+    //             if (&view.model == &model) {
+    //                 print ("We found the view of the removed model " + view.model.fullname)
                    
-                    if (view.is_selected) {
-                        notify root.L.reset_selection
-                    }
+    //                 if (view.is_selected) {
+    //                     notify root.L.reset_selection
+    //                 }
 
-                    // Remove from collection
-                    remove_one (root.L.items, view)
-                    // Remove from children list
-                    remove view from root.L
+    //                 // Remove from collection
+    //                 remove_one (root.L.items, view)
+    //                 // Remove from children list
+    //                 remove view from root.L
 
-                    // Delete view
-                    delete view
+    //                 // Delete view
+    //                 delete view
 
-                    break
-                }
-            }
-            // notify root.L.pack  // Update layout
-        }
-    }
+    //                 break
+    //             }
+    //         }
+    //         // notify root.L.pack  // Update layout
+    //     }
+    // }
 
 
     // L.selected_item -> {
@@ -255,38 +408,38 @@ Component root {
     // TextPrinter tp_prefix
     // // "Filter list with prefix " + T_prefix.text => tp_prefix.input
     // "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
-    
-    // NativeAction na_filter (action_filter, root, 1)
-    // T_prefix.field.content.text -> na_filter
 
-    T_prefix.field.content.text -> na_filter:(root) {
-        print ("Filter list with prefix '" + root.T_prefix.field.content.text + "'")
-        string prefix = getString (root.T_prefix.field.content.text)
+    NativeAction na_filter (action_filter, root, 1)
+    T_prefix.field.content.text -> na_filter
+
+    // T_prefix.field.content.text -> na_filter:(root) {
+    //     print ("Filter list with prefix '" + root.T_prefix.field.content.text + "'")
+    //     string prefix = getString (root.T_prefix.field.content.text)
         
-        for model : root.models {
-            // Surname STARTS with prefix
-            if (starts_with (getString (model.surname), prefix)) {
+    //     for model : root.models {
+    //         // Surname STARTS with prefix
+    //         if (starts_with (getString (model.surname), prefix)) {
                 
-                if (!contains (root.displayed_models, model)) {
-                    print ("+ " + model.surname + " STARTS with prefix & NOT in displayed list --> add it")
+    //             if (!contains (root.displayed_models, model)) {
+    //                 print ("+ " + model.surname + " STARTS with prefix & NOT in displayed list --> add it")
 
-                    // Add to the list of displayed_models
-                    setRef (root.displayed_models.add, model)
-                    graph_exec ()
-                }
-            }
-            // Surname does NOT start with prefix
-            else {
-                if (contains (root.displayed_models, model)) {
-                    print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
+    //                 // Add to the list of displayed_models
+    //                 setRef (root.displayed_models.add, model)
+    //                 graph_exec ()
+    //             }
+    //         }
+    //         // Surname does NOT start with prefix
+    //         else {
+    //             if (contains (root.displayed_models, model)) {
+    //                 print ("- " + model.surname + " does NOT start with prefix & IN displayed list --> remove it")
 
-                    // Remove from the list of displayed_models
-                    setRef (root.displayed_models.rm, model)
-                    graph_exec ()
-                }
-            }
-        }
-    }
+    //                 // Remove from the list of displayed_models
+    //                 setRef (root.displayed_models.rm, model)
+    //                 graph_exec ()
+    //             }
+    //         }
+    //     }
+    // }
 
 
     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
@@ -325,50 +478,53 @@ Component root {
     }
 
     // [7GUIs] BD will remove the selected entry.
-    BD.click -> na_delete_person:(root) {
-        selected_item = getRef (root.L.selected_item)
-        if (&selected_item != null) {
-            print ("Delete view of " + selected_item.text)
 
-            notify root.L.reset_selection
+    NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
+    BD.click -> na_delete_selected_person
+
+    // BD.click -> na_delete_person:(root) {
+    //     selected_item = getRef (root.L.selected_item)
+    //     if (&selected_item != null) {
+    //         print ("Delete view of " + selected_item.text)
+
+    //         notify root.L.reset_selection
             
-            Process model = find (selected_item, "model")
+    //         Process model = find (selected_item, "model")
 
-            // Remove from collection
-            remove_one (root.L.items, selected_item)
-            // Remove from children list
-            remove selected_item from root.L
+    //         // Remove from collection
+    //         remove_one (root.L.items, selected_item)
+    //         // Remove from children list
+    //         remove selected_item from root.L
 
-            if (&model != null) {
-                print ("Delete its model " + model.fullname)
+    //         if (&model != null) {
+    //             print ("Delete its model " + model.fullname)
                 
-                if (contains (root.displayed_models, model)) {
-                    // We have to remove from the list of displayed_models immediately !
-                    // setRef (root.displayed_models.rm, model)
-                    // graph_exec ()
-                    remove_one (root.displayed_models, model)
-                }
+    //             if (contains (root.displayed_models, model)) {
+    //                 // We have to remove from the list of displayed_models immediately !
+    //                 // setRef (root.displayed_models.rm, model)
+    //                 // graph_exec ()
+    //                 remove_one (root.displayed_models, model)
+    //             }
 
-                // Only remove from list of all models
-                remove model from root.models
+    //             // Only remove from list of all models
+    //             remove model from root.models
 
-                // Delete view
-                delete selected_item
+    //             // Delete view
+    //             delete selected_item
 
-                // notify root.L.pack  // Update layout
+    //             // notify root.L.pack  // Update layout
 
-                // Delete the model
-                delete model
-            }
-        }
-    }
+    //             // Delete the model
+    //             delete model
+    //         }
+    //     }
+    // }
+
 
 
     // FIXME: for tests / debug
     Int DEBUG_Index (0)
     f.key\-pressed -> na_key_pressed:(root) {
-        // print ("key pressed '" + root.f.key\-pressed + "'")
-
         // Key +
         if (root.f.key\-pressed == "43") {
             root.DEBUG_Index++

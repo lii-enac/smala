@@ -65,8 +65,8 @@ _native_code_
 
     void insert_displayed_model (Process* model, Process* ordered_models, Process* list_box)
     {
-        const string& fullname = static_cast<TextProperty*>(model->find_child("fullname"))->get_value();
-        // cout << "\nInsert view of " << fullname << " in displayed views" << endl;
+        const string& surname = static_cast<TextProperty*>(model->find_child("surname"))->get_value();
+        // cout << "\nInsert view of " << surname << " in displayed views" << endl;
         Container* lst_models = dynamic_cast<Container*> (ordered_models);
 
         // Get index in list with all models
@@ -98,48 +98,17 @@ _native_code_
             size_t insert_index = std::distance(displayed_items.begin(), insert_pos);
 
             // Create the view without parent !
-            Process* view = PersonView (nullptr, fullname, model, index);
+            Process* view = PersonView (nullptr, surname, model, index);
 
             // Insert the view in the ProcessCollector
             // pc_items->insert_one (view, insert_pos);
             pc_items->insert_one (view, insert_index);
 
             // Finally, add the view as child of the list box
-            list_box->add_child (view, fullname);
+            list_box->add_child (view, surname);
         }
     }
 %}
-
-
-_action_
-action_model_added_to_all_models (Process src, Process self)
-{
-    model = getRef (&self.models.$added)
-    if (&model != null)
-    {
-        // print ("The model '" + model.fullname + "' has been added to the list of all " + self.models.size + " models")
-
-        string prefix = getString (self.T_prefix.field.content.text)
-        
-        // Add to the list of displayed_models if the prefix is empty OR if the surname starts with it
-        if ( (prefix == "") || starts_with (getString (model.surname), prefix) ) {
-            setRef (self.displayed_models.add, model)        
-        }
-    }
-}
-
-
-_action_
-action_model_added_to_displayed_models (Process src, Process self)
-{
-    model = getRef (&self.displayed_models.add)
-    if (&model != null)
-    {
-        // print ("The model '" + model.fullname + "' has been added to the list of " + self.displayed_models.size + " models to display")
-
-        insert_displayed_model (model, self.models, self.L)
-    }
-}
 
 
 _action_
@@ -148,11 +117,11 @@ action_model_removed_from_displayed_models (Process src, Process self)
     model = getRef (&self.displayed_models.rm)
     if (&model != null)
     {
-        // print ("The model '" + model.fullname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
+        // print ("The model '" + model.surname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
 
         for view : self.L.items {
             if (&view.model == &model) {
-                // print ("We found the view of the removed model " + view.model.fullname)
+                // print ("We found the view of the removed model " + view.model.surname)
                 
                 if (view.is_selected) {
                     notify self.L.reset_selection
@@ -343,11 +312,27 @@ Component root {
     // [7GUIs] L presents a view of the data in the database that consists of a list of names.
     // [7GUIs] At most one entry can be selected in L at a time.
 
-    NativeAction na_model_added_to_all_models (action_model_added_to_all_models, root, 1)
-    models.$added -> na_model_added_to_all_models
+    models.$added -> na_model_added_to_all_models:(root) {
+        model = getRef (&root.models.$added)
+        if (&model != null) {
+            // print ("The model '" + model.surname + "' has been added to the list of all " + root.models.size + " models")
+            string prefix = getString (root.T_prefix.field.content.text)
+            
+            // Add to the list of displayed_models if the prefix is empty OR if the surname starts with it
+            if ( (prefix == "") || starts_with (getString (model.surname), prefix) ) {
+                setRef (root.displayed_models.add, model)        
+            }
+        }
+    }
 
-    NativeAction na_model_added_to_displayed_models (action_model_added_to_displayed_models, root, 1)
-    displayed_models.add -> na_model_added_to_displayed_models
+
+    displayed_models.add -> na_model_added_to_displayed_models:(root) {
+        model = getRef (&root.displayed_models.add)
+        if (&model != null) {
+            // print ("The model '" + model.surname + "' has been added to the list of " + root.displayed_models.size + " models to display")
+            insert_displayed_model (model, root.models, root.L)
+        }
+    }
     na_model_added_to_displayed_models -> root.L.pack   // Update layout
 
     NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, root, 1)

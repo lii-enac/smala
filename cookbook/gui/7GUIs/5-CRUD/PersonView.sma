@@ -11,6 +11,6 @@ PersonView (Process _model, int _index) inherits ListBoxItem (_index)
     // Link properties of the model and set the content of the (inherited) label
     _model.surname + ", " + _model.name =:> this.text
 
-    TextPrinter tp
-    "View of person [" + this.index + "]: " + _model.surname + ", " + _model.name =:> tp.input
+    // TextPrinter tp
+    // "View of person [" + this.index + "]: " + _model.surname + ", " + _model.name =:> tp.input
 }

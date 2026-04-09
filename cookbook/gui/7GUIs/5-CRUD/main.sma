@@ -63,15 +63,10 @@ _native_code_
         return -1;
     }
 
-    void my_print (const string& s1, const string& s2) {
-        cout << s1 << s2 << endl;
-    }
-
-
     void insert_displayed_model (Process* model, Process* ordered_models, Process* list_box)
     {
         const string& fullname = static_cast<TextProperty*>(model->find_child("fullname"))->get_value();
-        cout << "\nInsert view of " << fullname << " in displayed views" << endl;
+        // cout << "\nInsert view of " << fullname << " in displayed views" << endl;
         Container* lst_models = dynamic_cast<Container*> (ordered_models);
 
         // Get index in list with all models
@@ -79,7 +74,6 @@ _native_code_
         if (index == -1)
             return; 
 
-        // AbstractList* lst_displayed_models = dynamic_cast<AbstractList*> (list_box);
         ProcessCollector* pc_items = dynamic_cast<ProcessCollector*> (list_box->find_child ("items"));
         if (pc_items != nullptr)
         {
@@ -103,6 +97,7 @@ _native_code_
 
             size_t insert_index = std::distance(displayed_items.begin(), insert_pos);
 
+            // Create the view without parent !
             Process* view = PersonView (nullptr, fullname, model, index);
 
             // Insert the view in the ProcessCollector
@@ -122,14 +117,14 @@ action_model_added_to_all_models (Process src, Process self)
     model = getRef (&self.models.$added)
     if (&model != null)
     {
-        print ("The model '" + model.fullname + "' has been added to the list of all " + self.models.size + " models")
+        // print ("The model '" + model.fullname + "' has been added to the list of all " + self.models.size + " models")
 
-        // By default, add to the list of displayed_models
+        string prefix = getString (self.T_prefix.field.content.text)
         
-        // FIXME TODO: check if T_prefix.field.content.text != ""
-        // string filter = getString (self.T_prefix.field.content.text)
-        
-        setRef (self.displayed_models.add, model)
+        // Add to the list of displayed_models if the prefix is empty OR if the surname starts with it
+        if ( (prefix == "") || starts_with (getString (model.surname), prefix) ) {
+            setRef (self.displayed_models.add, model)        
+        }
     }
 }
 
@@ -140,7 +135,7 @@ action_model_added_to_displayed_models (Process src, Process self)
     model = getRef (&self.displayed_models.add)
     if (&model != null)
     {
-        print ("The model '" + model.fullname + "' has been added to the list of " + self.displayed_models.size + " models to display")
+        // print ("The model '" + model.fullname + "' has been added to the list of " + self.displayed_models.size + " models to display")
 
         insert_displayed_model (model, self.models, self.L)
     }
@@ -153,11 +148,11 @@ action_model_removed_from_displayed_models (Process src, Process self)
     model = getRef (&self.displayed_models.rm)
     if (&model != null)
     {
-        print ("The model '" + model.fullname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
+        // print ("The model '" + model.fullname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
 
         for view : self.L.items {
             if (&view.model == &model) {
-                print ("We found the view of the removed model " + view.model.fullname)
+                // print ("We found the view of the removed model " + view.model.fullname)
                 
                 if (view.is_selected) {
                     notify self.L.reset_selection
@@ -174,7 +169,6 @@ action_model_removed_from_displayed_models (Process src, Process self)
                 break
             }
         }
-        // notify self.L.pack  // Update layout
     }
 }
 
@@ -189,9 +183,8 @@ action_filter (Process src, Process self)
         // Surname STARTS with prefix
         if (starts_with (getString (model.surname), prefix)) {
             
+            // The surname STARTS with the prefix & NOT in displayed list --> add it")
             if (!contains (self.displayed_models, model)) {
-                print ("+ " + model.surname + " STARTS with prefix (" + src +") & NOT in displayed list --> add it")
-
                 // Add to the list of displayed_models
                 setRef (self.displayed_models.add, model)
                 graph_exec ()
@@ -199,9 +192,8 @@ action_filter (Process src, Process self)
         }
         // Surname does NOT start with prefix
         else {
+            // The surname does NOT start with the prefix & already IN displayed list --> remove it")
             if (contains (self.displayed_models, model)) {
-                print ("- " + model.surname + " does NOT start with prefix (" + src + ") & already IN displayed list --> remove it")
-
                 // Remove from the list of displayed_models
                 setRef (self.displayed_models.rm, model)
                 graph_exec ()
@@ -216,7 +208,7 @@ action_delete_selected_person (Process src, Process self)
 {
     selected_item = getRef (self.L.selected_item)
     if (&selected_item != null) {
-        print ("Delete view & model of " + selected_item.text)
+        // print ("Delete view & model of " + selected_item.text)
 
         notify self.L.reset_selection                   // Reset the selection
         
@@ -234,8 +226,6 @@ action_delete_selected_person (Process src, Process self)
 
             delete selected_item            // Delete view
 
-            // notify self.L.pack           // Update layout
-
             remove model from self.models   // Remove from list of all models
             delete model                    // Delete the model
         }
@@ -245,7 +235,7 @@ action_delete_selected_person (Process src, Process self)
 
 _main_
 Component root {
-    Frame f ("7GUIs CRUD - DOES NOT WORK YET", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
+    Frame f ("7GUIs CRUD", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
     f.close ->! mainloop
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
@@ -268,11 +258,10 @@ Component root {
     TextPrinter tp
     // TextPrinter tp_forename
     // TextPrinter tp_surename
-    TextPrinter tp_selection
 
     List models // List of all models
     ProcessCollector displayed_models
-    displayed_models.size + " displayed models among the " + models.size + " persons in the full list" => tp.input
+    // displayed_models.size + " displayed models among the " + models.size + " persons in the full list" => tp.input
 
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
@@ -305,9 +294,9 @@ Component root {
         HBox data {
             data.space = 20
 
-            // VBox L {}                       // [7GUIs] L presents a view of the data in the database that consists of a list of names.
+            // VBox L {}
             // ListBox L (models) { }
-            ListBox L () { }
+            ListBox L ()                    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
             // L.preferred_width = 200
             // 200 =: L.preferred_width
             // L.min_width = 250
@@ -365,7 +354,6 @@ Component root {
     displayed_models.rm -> na_model_removed_from_displayed_models
 
 
-    // L.selected_item -> {
     (L.selected_item.is_null == 0) && L.selected_item -> {
         name_of_selected_item.value =: root.T_name.init_text
         surname_of_selected_item.value =: root.T_surname.init_text
@@ -375,10 +363,6 @@ Component root {
 
     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
     // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
-
-    // TextPrinter tp_prefix
-    // // "Filter list with prefix " + T_prefix.text => tp_prefix.input
-    // "Filter list with prefix " + T_prefix.field.content.text => tp_prefix.input
 
     NativeAction na_filter (action_filter, root, 1)
     T_prefix.field.content.text -> na_filter
@@ -403,15 +387,12 @@ Component root {
     T_name.next -> T_surname.activate
     T_surname.next -> BC.select
 
-    // T_name.text + " & " + T_surname.text + " --> is_missing_value ?= " + is_missing_value =:> tp.input
-
     // [7GUIs] BU and BD are enabled if an entry in L is selected.
     L.selected_item.is_null.false -> BU.enable, BD.enable
     L.selected_item.is_null.true -> BU.disable, BD.disable
 
 
     // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
-    // (is_missing_value == 0) && BU.click -> {
     BU.click -> {
         // "Update (fore)name: " + name_of_selected_item.value + " -> " + root.T_name.text =: tp_forename.input
         // "Update surname: " + surname_of_selected_item.value + " -> " + root.T_surname.text =: tp_surename.input
@@ -420,7 +401,6 @@ Component root {
     }
 
     // [7GUIs] BD will remove the selected entry.
-
     NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
     BD.click -> na_delete_selected_person
     na_delete_selected_person -> root.L.pack   // Update layout

@@ -68,8 +68,8 @@ ListBox () inherits VBox () {
     // FillOpacity op (0.5)
     FillColor fill_c (#FFFFFF)
 
-    OutlineWidth _ (2)
-    OutlineColor outln_c (#FF0000)
+    OutlineWidth _ (1)
+    OutlineColor outln_c (#AAAAAA)
 
     Rectangle r (0, 0, 0, 0, 5, 5)
     
@@ -98,7 +98,7 @@ ListBox () inherits VBox () {
   NativeAction na_unselect_item (action_unselect_item, this, 1)
 
   this.items.size -> na_items_size:(this) {
-    print ("Size changed: " + this.items.size + " items in the list box")
+    // print ("Size changed: " + this.items.size + " items in the list box")
 
     for item : this.items {
       if (!item._is_binded) {

@@ -11,7 +11,6 @@ import gui.widgets.PushButton
 import gui.widgets.UITextField
 import gui.widgets.VBox
 import gui.widgets.HBox
-import gui.widgets.ComboBox
 import gui.widgets.Label
 import gui.keyboard.ControlKey
 
@@ -31,6 +30,7 @@ _native_code_
       return str.starts_with (prefix);  // C++20
     }
 
+    // Add this helper function in ProcessCollector ?
     bool contains (Process* collection, Process* item) {
         ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
         if ( (pc != nullptr) && (item != nullptr) ) {
@@ -43,6 +43,7 @@ _native_code_
         return false;
     }
 
+    // Add this helper function in ProcessCollector ?
     void remove_one (Process* collection, Process* item) {
         ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
         if ( (pc != nullptr) && (item != nullptr) ) {
@@ -50,6 +51,7 @@ _native_code_
         }
     }
 
+    // Get the index of a model in a vector
     size_t get_index (Container* lst_models, Process* model)
     {
         if ( (lst_models != nullptr) && (model != nullptr) )
@@ -63,15 +65,17 @@ _native_code_
         return -1;
     }
 
-    void insert_displayed_model (Process* model, Process* ordered_models, Process* list_box)
+    // Create a view corresponding to the model to display
+    // & insert it in the list box at the right index (to correspond to the ordered list with all models)
+    void insert_view_for_model_to_display (Process* model, Process* ordered_models, Process* list_box)
     {
         const string& surname = static_cast<TextProperty*>(model->find_child("surname"))->get_value();
         // cout << "\nInsert view of " << surname << " in displayed views" << endl;
         Container* lst_models = dynamic_cast<Container*> (ordered_models);
 
-        // Get index in list with all models
-        size_t index = get_index (lst_models, model);
-        if (index == -1)
+        // Get the index of this model in the list of all models (to use it as reference for comparison)
+        size_t ref_index = get_index (lst_models, model);
+        if (ref_index == -1)
             return; 
 
         ProcessCollector* pc_items = dynamic_cast<ProcessCollector*> (list_box->find_child ("items"));
@@ -79,32 +83,28 @@ _native_code_
         {
             const vector<CoreProcess*>& displayed_items = pc_items->get_list ();
 
-            // Browse list_box.items to find where to insert
             auto insert_pos = displayed_items.end();    // At the end by default
-            
+
+            // Browse list_box.items to find where to insert
             for (auto it = displayed_items.begin(); it != displayed_items.end(); ++it)
             {
-                auto item = *it;
-                Process* model_i = item->find_child ("model");
-
-                size_t current_index = get_index (lst_models, model_i);
-                if (current_index > index) {
-                    // Insert before this item
-                    insert_pos = it;
-                    break;
+                Process* model_i = (*it)->find_child ("model");
+                size_t current_index = get_index (lst_models, model_i); // Get the index of the current model in the list of all models
+                if (current_index > ref_index) {                        // If this current index > reference index...
+                    insert_pos = it;                                    // Insert before this item
+                    break;                                              // Exit loop
                 }
             }
-
             size_t insert_index = std::distance(displayed_items.begin(), insert_pos);
 
             // Create the view without parent !
-            Process* view = PersonView (nullptr, surname, model, index);
+            Process* view = PersonView (nullptr, surname, model, ref_index);
 
-            // Insert the view in the ProcessCollector
+            // Insert the view in the ProcessCollector "list_box.items"
             // pc_items->insert_one (view, insert_pos);
             pc_items->insert_one (view, insert_index);
 
-            // Finally, add the view as child of the list box
+            // Finally, add the view as child of the list box (at the end but it doesn't matter)
             list_box->add_child (view, surname);
         }
     }
@@ -120,22 +120,17 @@ action_model_removed_from_displayed_models (Process src, Process self)
         // print ("The model '" + model.surname + "' has been removed from the list of " + self.displayed_models.size + " models to display")
 
         for view : self.L.items {
-            if (&view.model == &model) {
-                // print ("We found the view of the removed model " + view.model.surname)
-                
+            if (&view.model == &model) {            // We found the view of the removed model
                 if (view.is_selected) {
-                    notify self.L.reset_selection
+                    notify self.L.reset_selection   // Reset the selection
                 }
 
-                // Remove from collection
-                remove_one (self.L.items, view)
-                // Remove from children list
-                remove view from self.L
+                remove_one (self.L.items, view)     // Remove from the ProcessCollector "list_box.items"
+                remove view from self.L             // Remove from children list of the list box
 
-                // Delete view
-                delete view
+                delete view                         // Then, delete the view
 
-                break
+                break                               // exit loop for
             }
         }
     }
@@ -145,7 +140,7 @@ action_model_removed_from_displayed_models (Process src, Process self)
 _action_
 action_filter (Process src, Process self)
 {
-    print ("Filter list with prefix '" + src + "'")
+    // print ("Filter list with prefix '" + src + "'")
     string prefix = getString (src)
     
     for model : self.models {
@@ -183,7 +178,7 @@ action_delete_selected_person (Process src, Process self)
         
         Process model = find (selected_item, "model")   // Get the corresponding model
 
-        remove_one (self.L.items, selected_item)        // Remove view from collection
+        remove_one (self.L.items, selected_item)        // Remove view from collection "items"
         remove selected_item from self.L                // Remove view from children list
 
         if (&model != null) {
@@ -224,14 +219,11 @@ Component root {
 		}
 	}
 
-    TextPrinter tp
-    // TextPrinter tp_forename
-    // TextPrinter tp_surename
+    List models                         // (Ordered) list of all models
+    ProcessCollector displayed_models   // (Unordered) collection of the displayed models
 
-    List models // List of all models
-    ProcessCollector displayed_models
+    // TextPrinter tp
     // displayed_models.size + " displayed models among the " + models.size + " persons in the full list" => tp.input
-
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -263,27 +255,32 @@ Component root {
         HBox data {
             data.space = 20
 
-            // VBox L {}
-            // ListBox L (models) { }
             ListBox L ()                    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
-            // L.preferred_width = 200
-            // 200 =: L.preferred_width
+            
+            // FIXME: does NOT work
+            // L.preferred_width = 250
+            // 250 =: L.preferred_width
+            // L.preferred_height = 250
+            // 250 =: L.preferred_height
+
             // L.min_width = 250
             // 250 =: L.min_width
-            // L.min_height = 450
+            // L.min_height = 250
+            // 250 =: L.min_height
 
             VBox props {
                 HBox name {
-                    Label L_name("Name:")   // [7GUIs] a pair of textfields Tname and Tsurname,
+                    Label L_name("Name:")       // [7GUIs] a pair of textfields Tname and Tsurname,
                     L_name.preferred_width = 60
-                    UITextField T_name      // [7GUIs] [with a label],
+                    UITextField T_name          // [7GUIs] [with a label],
                 }
                 HBox surname {
                     Label L_surname("Surname:") // [7GUIs] a pair of textfields Tname and Tsurname,
                     L_surname.preferred_width = 60
-                    UITextField T_surname   // [7GUIs] [with a label]
+                    UITextField T_surname       // [7GUIs] [with a label]
                 }
             }
+            props.v_alignment = 0
         }
         HBox buttons {
             PushButton BC("Create") // [7GUIs] buttons BC,
@@ -302,17 +299,14 @@ Component root {
     BU aka b_all.buttons.BU
     BD aka b_all.buttons.BD
 
+    // References on name & surname of the model of the selected item
     DerefString name_of_selected_item (L.selected_item, "model/name", DJNN_GET_ON_CHANGE)
     DerefString surname_of_selected_item (L.selected_item, "model/surname", DJNN_GET_ON_CHANGE)
 
     // By default, all buttons are disabled
     |-> BC.disable, BU.disable, BD.disable
 
-    
-    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
-    // [7GUIs] At most one entry can be selected in L at a time.
-
-    models.$added -> na_model_added_to_all_models:(root) {
+    models.$added -> na_model_added_to_all_models:(root) {  // Called when a model is created & added to the ordered list of all models
         model = getRef (&root.models.$added)
         if (&model != null) {
             // print ("The model '" + model.surname + "' has been added to the list of all " + root.models.size + " models")
@@ -325,70 +319,55 @@ Component root {
         }
     }
 
-
-    displayed_models.add -> na_model_added_to_displayed_models:(root) {
+    displayed_models.add -> na_model_added_to_displayed_models:(root) {     // Called when a model is added to the unordered list of displayed models (its view should be display)
         model = getRef (&root.displayed_models.add)
         if (&model != null) {
-            // print ("The model '" + model.surname + "' has been added to the list of " + root.displayed_models.size + " models to display")
-            insert_displayed_model (model, root.models, root.L)
+            // Create a view corresponding to the model to display
+            // & insert it in the list box at the right index (to correspond to the ordered list with all models)
+            insert_view_for_model_to_display (model, root.models, root.L)
         }
     }
     na_model_added_to_displayed_models -> root.L.pack   // Update layout
 
     NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, root, 1)
-    displayed_models.rm -> na_model_removed_from_displayed_models
+    displayed_models.rm -> na_model_removed_from_displayed_models           // Called when a model is removed from the unordered list of displayed models (its view should be hide)
 
-
-    (L.selected_item.is_null == 0) && L.selected_item -> {
+    (L.selected_item.is_null == 0) && L.selected_item -> {      // [7GUIs] At most one entry can be selected in L at a time.
         name_of_selected_item.value =: root.T_name.init_text
         surname_of_selected_item.value =: root.T_surname.init_text
     }
-    // NO selection -> clear text fields
-    L.selected_item.is_null.true -> root.T_name.clear, root.T_surname.clear
+    L.selected_item.is_null.true -> root.T_name.clear, root.T_surname.clear     // NO selection -> clear text fields
 
-    // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
-    // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
+    NativeAction na_filter (action_filter, root, 1)     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
+    T_prefix.field.content.text -> na_filter            // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
 
-    NativeAction na_filter (action_filter, root, 1)
-    T_prefix.field.content.text -> na_filter
-
-
-    // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
+    // Flag indicating whether a value is missing: either the name or the surname
     Bool is_missing_value (true)
     (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
+    is_missing_value.false -> BC.enable
+    is_missing_value.true -> BC.disable
 
-    BC.click -> na_create_person:(root) {
-        // print ("Click on BC with " + root.T_name.text + " " + root.T_surname.text)
+    L.selected_item.is_null.false -> BU.enable, BD.enable       // [7GUIs] BU and BD are enabled if an entry in L is selected.
+    L.selected_item.is_null.true -> BU.disable, BD.disable      // [7GUIs] BU and BD are enabled if an entry in L is selected.
+
+    BC.click -> na_create_person:(root) {               // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
         addChildrenTo root.models {
             PersonModel _ (getString (root.T_name.text), getString (root.T_surname.text))
         }
     }
     na_create_person -> root.T_name.clear, root.T_surname.clear
-    
-    is_missing_value.false -> BC.enable
-    is_missing_value.true -> BC.disable
 
-    // Key "tab" allows to set the focus to next text field
-    T_name.next -> T_surname.activate
-    T_surname.next -> BC.select
+    T_name.next -> T_surname.activate       // Key "tab" allows to set the focus to next text field (T_name -> T_surname)
+    T_surname.next -> BC.select             // Key "tab" allows to set the focus to next button (T_surname -> BC)
 
-    // [7GUIs] BU and BD are enabled if an entry in L is selected.
-    L.selected_item.is_null.false -> BU.enable, BD.enable
-    L.selected_item.is_null.true -> BU.disable, BD.disable
-
-
-    // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
-    BU.click -> {
-        // "Update (fore)name: " + name_of_selected_item.value + " -> " + root.T_name.text =: tp_forename.input
-        // "Update surname: " + surname_of_selected_item.value + " -> " + root.T_surname.text =: tp_surename.input
+    BU.click -> {       // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
         root.T_name.text =?: name_of_selected_item.value
         root.T_surname.text =?: surname_of_selected_item.value
     }
 
-    // [7GUIs] BD will remove the selected entry.
     NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
-    BD.click -> na_delete_selected_person
-    na_delete_selected_person -> root.L.pack   // Update layout
+    BD.click -> na_delete_selected_person       // [7GUIs] BD will remove the selected entry.
+    na_delete_selected_person -> root.L.pack    // Update layout after deletion
 
 
     // FIXME: for tests / debug
@@ -417,7 +396,7 @@ Component root {
 // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
 // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
 // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
-// [7GUIs] BU and BD are enabled iff an entry in L is selected.
+// [7GUIs] BU and BD are enabled if an entry in L is selected.
 // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
 // [7GUIs] BD will remove the selected entry.
 

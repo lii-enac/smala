@@ -16,7 +16,6 @@ use base
 use display
 use gui
 
-// import gui.widgets.AbstractBox
 import gui.widgets.VBox
 
 
@@ -52,7 +51,6 @@ action_unselect_item (Process src, Process self)
 
 
 _define_
-// ListBox (Process _model) inherits AbstractBox () {
 // ListBox (Process _models) inherits VBox () {
 ListBox () inherits VBox () {
   // models aka _models
@@ -106,6 +104,7 @@ ListBox () inherits VBox () {
         item._is_binded = true
 
         addChildrenTo this.bindings {
+          // FIXME: memory leak when we delete an item
           item.select -> this.na_select_item
           // item.unselect -> this.na_unselect_item
         }

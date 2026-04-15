@@ -299,13 +299,11 @@ endif
 $(smala_lib): $(smala_lib_objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(smala_lib_rpath)
-	mv $(notdir $@) $@
+	$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath)
 else
 	@$(call rule_message,linking to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXXLD_CK) $(DYNLIB) -o $(notdir $@) $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(smala_lib_rpath)
-	@mv $(notdir $@) $@
+	@$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath)
 endif
 
 #@mkdir -p $(dir $@)
@@ -525,6 +523,7 @@ ifeq ($(os),Linux)
 $1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux ld
 $1_other_runtime_lib_path+=$$(abspath $$(build_dir)/lib)
 endif
+$1_app_libs += $$(smala_lib_rpath)
 endif
 $$($1_app_exe) $$(notdir $1)_test: $$(smala_lib)
 
@@ -550,11 +549,11 @@ $$($1_app_exe): LIBS += $$($1_app_libs)
 $$($1_app_exe): $$($1_app_objs)
 ifeq ($V,max)
 	@mkdir -p $$(dir $$@)
-	$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
+	$$($1_app_link) $$($1_app_objs) -o $$@ $$(LDFLAGS_CK) $$(LIBS)
 else
 	@$$(call rule_message,linking to,$$(stylized_target))
 	@mkdir -p $$(dir $$@)
-	@$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) $$(LIBS)
+	@$$($1_app_link) $$($1_app_objs) -o $$@ $$(LDFLAGS_CK) $$(LIBS)
 endif
 #@#$$($1_app_link) $$^ -o $$@ $$(LDFLAGS_CK) `env PKG_CONFIG_PATH=$$(djnn_lib_path)/.. pkg-config --libs --static djnn-cpp`
 

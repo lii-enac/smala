@@ -291,19 +291,23 @@ smala_lib_rpath += -Wl,--no-undefined
 endif
 
 ifeq ($(linker), llvm)
-djnn_lib_rpath += -Wl,-install_name,$(abspath $(djnn_lib_path))
-smala_lib_rpath := -Wl,-install_name,$(abspath $(smala_lib)) -Wl,-current_version,1.0.0 -Wl,-compatibility_version,1.0.0 
+# do not understand why none of these are required, set them anyway
+#djnn_lib_rpath += -Wl,-rpath-link,$(abspath $(djnn_lib_path))
+djnn_lib_rpath += -Wl,-rpath,$(abspath $(djnn_lib_path))
+#smala_lib_rpath += -Wl,-rpath-link,$(abspath $(build_dir))/lib
+smala_lib_rpath += -Wl,-rpath,$(abspath $(smala_dst_lib_dir))
+smala_lib_install_name += -Wl,-install_name,$(abspath $(smala_lib)) -Wl,-current_version,1.0.0 -Wl,-compatibility_version,1.0.0 
 endif
 
 
 $(smala_lib): $(smala_lib_objs)
 ifeq ($V,max)
 	@mkdir -p $(dir $@)
-	$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath)
+	$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath) $(smala_lib_install_name)
 else
 	@$(call rule_message,linking to,$(stylized_target))
 	@mkdir -p $(dir $@)
-	@$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath)
+	@$(CXXLD_CK) $(DYNLIB) -o $@ $^ $(LDFLAGS_CK) $(djnn_libs_SL) $(djnn_lib_rpath) $(smala_lib_rpath) $(smala_lib_install_name)
 endif
 
 #@mkdir -p $(dir $@)

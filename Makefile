@@ -516,12 +516,12 @@ ifneq ($$(smala_libs_cookbook_app),)
 $1_app_cppflags += -I$(smala_lib_header_dir)
 #ifeq ($$(cookbook_cross_prefix),em)
 ifeq ($$(os),em)
-$1_app_libs += $$(build_dir)/lib/lib$$(smala_libs_cookbook_app)$(lib_suffix)
+$1_app_libs += $$(smala_dst_lib_dir)/lib$$(smala_libs_cookbook_app)$(lib_suffix)
 else
-$1_app_libs += -L$$(build_dir)/lib $$(addprefix -l,$$(smala_libs_cookbook_app))
+$1_app_libs += -L$$(smala_dst_lib_dir) $$(addprefix -l,$$(smala_libs_cookbook_app))
 ifeq ($(os),Linux)
 $1_app_libs += $$(call uniq,$$(djnn_libs) $$($1_app_libs)) #$(djnn_libs) is necessary for linux ld
-$1_other_runtime_lib_path+=$$(abspath $$(build_dir)/lib)
+$1_other_runtime_lib_path+=$$(abspath $$(smala_dst_lib_dir))
 endif
 $1_app_libs += $$(smala_lib_rpath)
 endif
@@ -736,7 +736,7 @@ endif
 
 smala_lib_headers_no_src = $(patsubst $(build_dir)/src_lib/%,%,$(smala_lib_headers))
 
-smala_libs_no_build_dir = $(patsubst $(build_dir)/lib/%,%,$(lib_smala_name)$(lib_suffix))
+smala_libs_no_build_dir = $(patsubst $(smala_dst_lib_dir)/%,%,$(lib_smala_name)$(lib_suffix))
 
 install_headers: $(addprefix $(smala_install_prefix)/include/smala/,$(smala_lib_headers_no_src))
 
@@ -748,7 +748,7 @@ $(smala_install_prefix)/include/smala/%.h: $(build_dir)/src_lib/%.h
 	@mkdir -p $(dir $@)
 	install -m 644 $< $@
 
-$(smala_install_prefix)/lib/%$(lib_suffix): $(build_dir)/lib/%$(lib_suffix)
+$(smala_install_prefix)/lib/%$(lib_suffix): $(smala_dst_lib_dir)/%$(lib_suffix)
 	@mkdir -p $(dir $@)
 ifneq ($(PREFIX),)
 	install -m 644 $< $@

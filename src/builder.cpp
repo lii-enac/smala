@@ -754,6 +754,11 @@ namespace Smala
     }
 
     std::string parent_name = (node->parent () == nullptr || node->ignore_parent ()) ? m_null_symbol : node->parent ()->build_name ();
+
+    if (parent_name=="") {
+      print_error_message (error_level::error, "no parent in component construction for '" + node->name () + "'", 1, node);
+      print_error_message (error_level::error, "are you creating a component inside a native?", 1, node);
+    }
     
     //print_start_component (os, var_name, constructor);
     //build_component_arguments (os, parent_name, name, node);

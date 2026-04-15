@@ -525,7 +525,13 @@ $1_other_runtime_lib_path+=$$(abspath $$(build_dir)/lib)
 endif
 $1_app_libs += $$(smala_lib_rpath)
 endif
-$$($1_app_exe) $$(notdir $1)_test: $$(smala_lib)
+$$($1_app_exe): $$(smala_lib)
+
+# don't understand why the two followings are required :-/...
+$$(notdir $1): $$(smala_lib)
+$$(notdir $1)_test: $$(smala_lib)
+$$(notdir $1)_dbg: $$(smala_lib)
+
 
 $$(notdir $1)_toto:
 	echo $$($1_app_objs): $$(smala_lib)
@@ -571,7 +577,7 @@ $$(notdir $1)_clean:
 $$(notdir $1)_clear:
 	rm -rf $(build_dir)/cookbook/$1
 
-.PHONY: $1 $1_test $1_dbg
+.PHONY: $$(notdir $1) $$(notdir $1)_test $$(notdir $1)_dbg
 
 $$(notdir $1)_dbg_print:
 	@echo $1_dbg

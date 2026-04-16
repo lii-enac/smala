@@ -112,12 +112,6 @@ ListBox () inherits VBox () {
     }
   }
 
-  // (selected_item.is_null == 0) && reset_selection -> na_reset_selection:(this) {
-  //   setRef (this.selected_item, null)
-  // }
-  // (selected_item.is_null == 0) && reset_selection -> {
-  //   null =: selected_item
-  // }
   reset_selection -> na_unselect_item
 
 

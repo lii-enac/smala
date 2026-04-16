@@ -56,7 +56,7 @@ _native_code_
     {
         if ( (lst_models != nullptr) && (model != nullptr) )
         {
-            vector<CoreProcess*> models = lst_models->children ();
+            const vector<CoreProcess*>& models = lst_models->children ();
             auto it = std::find (models.begin(), models.end(), model);
             if (it == models.end())
                 return -1;
@@ -122,7 +122,8 @@ action_model_removed_from_displayed_models (Process src, Process self)
         for view : self.L.items {
             if (&view.model == &model) {            // We found the view of the removed model
                 if (view.is_selected) {
-                    notify self.L.reset_selection   // Reset the selection
+                    notify self.L.reset_selection       // Reset the selection // drawback: not visible in the main code
+                    // activate (self.L.reset_selection)   // Replace notify by activate (...) ?
                 }
 
                 remove_one (self.L.items, view)     // Remove from the ProcessCollector "list_box.items"
@@ -174,7 +175,8 @@ action_delete_selected_person (Process src, Process self)
     if (&selected_item != null) {
         // print ("Delete view & model of " + selected_item.text)
 
-        notify self.L.reset_selection                   // Reset the selection
+        notify self.L.reset_selection                   // Reset the selection // drawback: not visible in the main code
+        // activate (self.L.reset_selection)               // Replace notify by activate (...) ?
         
         Process model = find (selected_item, "model")   // Get the corresponding model
 
@@ -182,7 +184,7 @@ action_delete_selected_person (Process src, Process self)
         remove selected_item from self.L                // Remove view from children list
 
         if (&model != null) {
-            if (contains (self.displayed_models, model)) {
+            if (contains (self.displayed_models, model)) {  // Could be filtered out
                 // setRef (root.displayed_models.rm, model)
                 // graph_exec ()
                 remove_one (self.displayed_models, model)   // We have to remove from the list of displayed_models immediately !
@@ -258,6 +260,7 @@ Component root {
             ListBox L ()                    // [7GUIs] L presents a view of the data in the database that consists of a list of names.
             
             // FIXME: does NOT work
+            // We want a minimum size for the listbox even if the list box is empty
             // L.preferred_width = 250
             // 250 =: L.preferred_width
             // L.preferred_height = 250
@@ -366,6 +369,7 @@ Component root {
     }
 
     NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
+    // BD.click -> L.reset_selection               // drawback: we can't do that because we use the ref on selected_item in the native action "delete_selected_person"
     BD.click -> na_delete_selected_person       // [7GUIs] BD will remove the selected entry.
     na_delete_selected_person -> root.L.pack    // Update layout after deletion
 

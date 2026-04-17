@@ -19,14 +19,23 @@ use gui
 import gui.widgets.IWidget
 
 _define_
-ListBoxItem (int _index) inherits IWidget ()
+// ListBoxItem (int _index) inherits IWidget ()
+
+// - _horizontal_margin: Horizontal margin on the left & on the right of the label
+// - _height: height of the list box item
+ListBoxItem (int _horizontal_margin, int _height) inherits IWidget ()
 {
-  Int index (_index)
+  // Int index (_index)
   Bool _is_binded (false)
   Bool is_selected (false)
 
-  Int LBI_HEIGHT (18)
-  Int LBI_HZ_MARGIN (6)
+  Int HORIZONTAL_MARGIN (_horizontal_margin)  // Horizontal margin on the left & on the right of the label
+
+  this.h_alignment = 0  // List box item are aligned to the left
+  
+  // _height =: this.min_height, this.preferred_height  // FIXME: does NOT work
+  this.min_height = _height
+  this.preferred_height = _height
 
   // Int text_color (#FFFFFF)
 
@@ -34,35 +43,37 @@ ListBoxItem (int _index) inherits IWidget ()
   Spike unselect
 
   Component bg {
-    //FillOpacity _ (0.5)
+    FillOpacity fill_op (0.5)
     FillColor fill_c (#DDDDDD)
-    OutlineWidth _ (1)
-    OutlineColor outln_c (#666666)
 
-    Rectangle r (0, 0, 0, $LBI_HEIGHT, 2, 2)
-    // this.min_width =:> r.width
-    // this.preferred_width =:> r.width
+    NoOutline _
+    // OutlineWidth _ (1)
+    // OutlineColor outln_c (#666666)
+
+    // Rectangle r (0, 0, 0, _height, 2, 2)
+    Rectangle r (0, 0, 0, _height, 0, 0)
   }
 
   Component label {
     FillColor fill_c (#000000)
 
     // Default text: "item " + index
-    Text txt ($LBI_HZ_MARGIN / 2, 0, "item " + toString (index))
-    LBI_HEIGHT / 2 + txt.ascent / 2 - 1 =:> txt.y
+    // Text txt (_horizontal_margin, 0, "item " + toString (index))
+    Text txt (_horizontal_margin, 0, "item")
+    this.min_height / 2 + txt.ascent / 2 - 1 =:> txt.y
   }
-  
   text aka label.txt.text
 
-  label.txt.width + LBI_HZ_MARGIN =:> this.min_width
+  label.txt.width + (2 * HORIZONTAL_MARGIN) =:> this.min_width
   (this.preferred_width == -1) || (this.preferred_width < this.min_width) ? this.min_width : this.preferred_width =:> this.preferred_width, bg.r.width
 
-  LBI_HEIGHT =: this.min_height, this.preferred_height
+  // _height =: this.min_height, this.preferred_height
 
   FSM fsm_selection {
     State st_unselected {
       0 =: is_selected
 
+      0.0 =: bg.fill_op.a
       #DDDDDD =: bg.fill_c.value
       #000000 =: label.fill_c.value
     }
@@ -70,6 +81,7 @@ ListBoxItem (int _index) inherits IWidget ()
     State st_selected {
       1 =: is_selected
 
+      1.0 =: bg.fill_op.a
       #197EFF =: bg.fill_c.value
       #FFFFFF =: label.fill_c.value
     }

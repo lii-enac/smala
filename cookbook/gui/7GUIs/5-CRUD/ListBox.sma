@@ -78,6 +78,16 @@ ListBox () inherits VBox () {
   // TextPrinter tp
   // "Max of items min W = " + this.ml.output + " -- min W " + this.min_width + " -- preferred W " + this.preferred_width + " -- container W " + this.container_width =:> tp.input
 
+  // When preferred_width (or min_width ? or r.width ?) changes
+  this.preferred_width -> na_update_items_width:(this) {
+    int width = getInt (this.preferred_width)
+    // Update the preferred_width of each item (if necessary)
+    for item : this.items {
+      if (getInt (item.preferred_width) != width) {
+        item.preferred_width = width
+      }
+    }
+  }
 
   // ProcessCollector "items" in class AbstractBox:
   // - RefProperty _add is not set

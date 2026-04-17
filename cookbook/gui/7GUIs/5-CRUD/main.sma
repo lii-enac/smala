@@ -98,7 +98,9 @@ _native_code_
             size_t insert_index = std::distance(displayed_items.begin(), insert_pos);
 
             // Create the view without parent !
-            Process* view = PersonView (nullptr, surname, model, ref_index);
+            // 4: Horizontal margin on the left & on the right of the label
+            // 18: height of the list box item
+            Process* view = PersonView (nullptr, surname, model, 4, 18);
 
             // Insert the view in the ProcessCollector "list_box.items"
             // pc_items->insert_one (view, insert_pos);

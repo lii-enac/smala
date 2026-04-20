@@ -186,8 +186,19 @@ Component root {
     B_valid.true  -> B.enable
     B_valid.false -> B.disable
     // "--\nT1_valid " + T1_valid + "\nT2_valid " + T2_valid + "\ntime1 " + time1 + "\ntime2 " + time2 + "\n(time1 < time2) " + to_string((time1 < time2)) + "\nB_valid " + B_valid =:> tp.input
-}
 
+    // # Bonus
+    T1.next -> (root) {
+        if (root.is_return_flight == 1) {
+            notify root.T2.activate
+        }
+        else {
+            notify root.B.select
+        }
+
+    }
+    T2.next -> B.select
+}
 
 // original text
 // [7GUIs] The task is to build a frame containing a combobox C with the two options “one-way flight” and “return flight”, 

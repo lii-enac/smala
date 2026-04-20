@@ -73,11 +73,13 @@ UITextField () inherits IWidget () {
   FSM edit_fsm {
     State no_edit {
       unedit_text_color =: text_color
+      |-> field.disable_edit
     }
     State disabled {
       disabled_color =: text_color
     }
     State edit {
+      |-> field.enable_edit
       edit_text_color =: text_color
       /* Cursor */
       OutlineColor _ (Black)
@@ -87,6 +89,7 @@ UITextField () inherits IWidget () {
       field.cursor_height =:> cursor.y2
 
       validate -> leave   // Key "Return" --> validate -> leave --> change state to no_edit
+      next -> validate
 
       GenericKeyboard.key\-pressed => field.key_pressed
       GenericKeyboard.key\-released => field.key_released
@@ -99,8 +102,8 @@ UITextField () inherits IWidget () {
     edit->no_edit (leave, set_text)   // Update current value of our text
     edit->no_edit (next, set_text)    // Update current value of our text
     
-    disabled -> no_edit (this.enable,  this.enabled)
-    { no_edit, edit } -> disabled (this.disable,  this.disabled)
+    disabled -> no_edit (this.enable, this.enabled)
+    { no_edit, edit } -> disabled (this.disable, this.disabled)
   }
 
   // Init the inner text field

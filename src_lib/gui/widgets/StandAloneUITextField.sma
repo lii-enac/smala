@@ -84,11 +84,13 @@ StandAloneUITextField (int tx_, int ty_, int width_, int height_) {
   FSM edit_fsm {
     State no_edit {
       unedit_text_color =: text_color
+      |-> field.disable_edit
     }
     State disabled {
       disabled_color =: text_color
     }
     State edit {
+      |-> field.enable_edit
       edit_text_color =: text_color
       /* Cursor */
       OutlineColor _ (Black)
@@ -98,6 +100,7 @@ StandAloneUITextField (int tx_, int ty_, int width_, int height_) {
       field.cursor_height =:> cursor.y2
 
       validate -> leave   // Key "Return" --> validate -> leave --> change state to no_edit
+      next -> validate
 
       GenericKeyboard.key\-pressed => field.key_pressed
       GenericKeyboard.key\-released => field.key_released

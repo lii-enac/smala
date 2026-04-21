@@ -24,6 +24,7 @@ Component root {
     // [7GUIs] The rows should be numbered from 0 to 99 and the columns from A to Z.
 
     Spreadsheet sheet (root, 10, 10, 0, 50)
+    
 }
 
 

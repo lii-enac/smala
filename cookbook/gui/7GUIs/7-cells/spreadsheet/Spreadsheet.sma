@@ -198,6 +198,13 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
     Spike reset_box_edit
     Spike toto
 
+    Component dummy_cell {
+        Int row(-100)
+        Int col(-100)
+        String formula("NaN") // if it starts with an '='
+        String value("NaN") 
+    }
+
     Component grid {
         Translation t (start_grid_x, start_grid_y)
         List cells 
@@ -228,14 +235,8 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         if ((col == 2) && (row == 4)){ "40" =: value }  // C4
                         // -------------------------
 
-
-                        //-- DEBUG
                         FillColor fc (Blue)
                         settings.cell_color.value =:> fc.value
-                        // NoOutline _
-
-                        // NoFill _
-                        // PickFill _
                         OutlineColor oc (Blue)
                         settings.grid_color.value =:> oc.value
                         Rectangle bg((col)*cell_width, (row)*cell_height, cell_width, cell_height) // bg will receive mouse events
@@ -248,12 +249,11 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                             cell =: _current_cell 
                         }
 
-                        Component bindings // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
-                        ProcessCollector input_cells // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
+                        Component bindings // Cell bindings that can cause the calculation to refresh
+                        ProcessCollector input_cells // List of the cells used in the calculations
 
                         formula -> parse_formula
                         parse_formula -> compute_formula
-                        //compute_formula ~> value // not sure of this one...
 
                         compute_formula -> reset_box_edit
                     }
@@ -273,8 +273,6 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
             FillColor _ (Black)
             StandAloneUITextField tf ($ow.width, default_text_spacing, cell_width - default_text_spacing - $ow.width , cell_height) // a TextField we will move on top of cells to edit them
             edit_bg_color.value =:> tf.bg_color.value, tf.bg_ol_color.value
-
-            //toto -> tf.field.press // TODO : NE s'ACTIVE qu'une fois sur deux ??
              
             _formula_of_current_cell.value =:> tf.init_text
 
@@ -283,8 +281,8 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                 this._formula_of_current_cell.value = str
             }
 
-            reset_box_edit -> (this) {  // TODO  on reset_box_edit ??
-                //setRef (this._current_cell, nullptr) ///  ou apres le parse_formula  // probleme de VD !! as usual 
+            reset_box_edit -> (this) {
+                setRef (this._current_cell, this.dummy_cell) // reset 
                 this.grid.box_edit.t.tx = -100
                 this.grid.box_edit.t.ty = -100
             }
@@ -303,9 +301,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
     //     }
     // } 
 
-    
-
-    // Debug
+    // Debug Component 
     Component debug {
         Translation t (0, row_ * cell_height + 3* cell_height)
         FillColor _ (White)

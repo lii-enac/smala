@@ -212,7 +212,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
         {
             for (int irow = 0; irow < row_; irow++) {
                 for (int icol = 0; icol < col_; icol++) {
-                    Component cell { // FIXME Adding to a List item will lose is name
+                    Component cell {
                         Int row(irow) // retain row
                         Int col(icol) // retain col
                         String col_string(ascii_to_string_from(icol, "A"))
@@ -245,7 +245,8 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         Text t ((col*cell_width)+default_text_spacing,(row*cell_height)+cell_height-(2*default_text_spacing), "")
                         value =:> t.text
 
-                        bg.press -> { // move the TextField on top of the cell
+                        // move the TextField on top of the cell
+                        bg.press -> { 
                             cell =: _current_cell 
                         }
 
@@ -261,7 +262,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
             }
         }
         Component box_edit {
-            Translation t (-100,-100) // to control the TextField position
+            Translation t (-100,-100) // to control the box_edit position
             _col_of_current_cell.value * cell_width => t.tx
             _row_of_current_cell.value * cell_height => t.ty
             FillColor edit_bg_color (White)
@@ -289,18 +290,6 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
         }
     }
 
-    // Component grid_gfx { // better draw outline in cell ?
-    //     Translation t (start_grid_x, start_grid_y)
-    //     OutlineColor oc (Black)
-    //     settings.grid_color.value =: oc.value
-    //     for (int row=0; row < row_; row++) {      
-    //         Line _ (0, (row+1)* cell_height, (row_ * cell_width), (row+1)* cell_height)
-    //     }
-    //     for (int col=0; col < col_; col++) {      
-    //         Line _ (((col+1) * cell_width), 0, ((col+1)* cell_width), (col_ * cell_height))
-    //     }
-    // } 
-
     // Debug Component 
     // Component debug {
     //     Translation t (0, row_ * cell_height + 3* cell_height)
@@ -324,102 +313,16 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
         Text t4 (default_text_spacing, 3*cell_height, "- You can directly type a value (e.g., 90) to update any cell")
     }
 
-
-    // moving edit box
-    // Component edit {
-    //     ZOrder z (11)
-    //     Translation tr(0,0) // to control the TextField position
-    //     HBox h {
-    //         UITextField tf // a TextField we will move on top of cells to edit them
+    // Prefer drawing the cell outline rather than rendering the entire grid ?
+    // Component grid_gfx { 
+    //     Translation t (start_grid_x, start_grid_y)
+    //     OutlineColor oc (Black)
+    //     settings.grid_color.value =: oc.value
+    //     for (int row=0; row < row_; row++) {      
+    //         Line _ (0, (row+1)* cell_height, (row_ * cell_width), (row+1)* cell_height)
     //     }
-    //     tf aka h.tf
-
-    //     h.v_alignment = 0 // top
-    //     h.h_alignment = 0 // left
-        
-    //     tf.text_color = #FF0000
-    //     tf.preferred_width = 100
-    //     "toto" =: edit.tf.text
-    // }
-
-    // Text _(0,10,"z test") // test Z-Order
-
-    // NativeAction parse_formula (cpp_parse_formula, this, 1)
-
-    // TextPrinter tp
-    // // "" + edit.tf.x + " " + edit.tf.y =:> tp.input
-
-    //Ref current_cell(null)
-    
-
-    // //ZOrder z (-1)
-    //Component cells
-    //List cells // prefer a list so as to have access to all of its children
-    // addChildrenTo cells
-    // {
-    //     for (int row_ = 0; row_ < 10; row_++) {
-    //         for (int col_ = 0; col_ < 10; col_++) {
-    //             //string name = "cells" + valueOf(row_)
-    //             Component cell { // FIXME this will replace previous "cell" in the component symtable. How to generate a name? change a name?
-    //                 Int row(row_) // retain row
-    //                 Int col(col_) // retain col
-    //                 String col_string(ascii_to_string_from(col_, "A"))
-
-    //                 String formula("") // if it starts with an '='
-    //                 String value("")      // either a value or the result of the computation of the formula
-
-    //                 NoFill _
-    //                 PickFill _
-    //                 OutlineColor _(#222222)
-    //                 Rectangle bg((col+1)*100, (row+1)*20, 100, 20) // this will receive mouse events
-
-    //                 FillColor _(#FFFFFF)
-    //                 Text t((col+1)*100, (row+1)*20+20, "")
-
-    //                 Component bindings // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
-    //                 ProcessCollector input_cells // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
-
-    //                 //formula -> parse_formula
-    //                 //NativeAction compute_formula (cpp_compute_formula, cell, 1)
-    //                 //parse_formula -> compute_formula
-    //                 //compute_formula ~> value // not sure of this one...
-
-    //                 // input_cells -> (cell) {
-    //                 //     Binding (cell.bindings, "", )
-    //                 // }
-
-    //                 Switch mode(displaying) {
-    //                     Component displaying {
-    //                         value =:> t.text
-    //                         100 =: bg.width
-    //                     }
-    //                     Component editing {
-    //                         // "" =: t.text
-    //                         // 0 =: bg.width // FIXME z-order does not seem to work between UITextField and Rectangle, the rectangle prevents editing
-
-    //                         // edit.tf.text -> yop: { // whenever the text has changed
-    //                         //     // update the formula and the value (TODO this should depend on the presence of '=')
-    //                         //     edit.tf.text =: formula
-    //                         //     //edit.tf.text =: value
-    //                         //     // move back the TextField
-    //                         //     0 =: edit.tr.tx
-    //                         //     0 =: edit.tr.ty
-
-    //                         //     "displaying" =: mode.state
-    //                         // }
-    //                         // yop -> edit.tf.clear
-    //                     }
-    //                 }
-
-    //                 // bg.press -> { // move the TextField on top of the cell
-    //                 //     (col+1)*100 =: edit.tr.tx
-    //                 //     (row+1)*20  =: edit.tr.ty
-    //                 //     formula =: edit.tf.text // FIXME does not work :-/
-    //                 //     "editing" =: mode.state
-    //                 //     cell =: current_cell // this is how to set a ref in an assignment sequence...
-    //                 // }
-    //             }
-    //         }   
+    //     for (int col=0; col < col_; col++) {      
+    //         Line _ (((col+1) * cell_width), 0, ((col+1)* cell_width), (col_ * cell_height))
     //     }
     // }
 } 

@@ -302,18 +302,27 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
     // } 
 
     // Debug Component 
+    // Component debug {
+    //     Translation t (0, row_ * cell_height + 3* cell_height)
+    //     FillColor _ (White)
+    //     Text _ (default_text_spacing, 0, "---- DEBUG current cell ---- ")
+    //     Text name (default_text_spacing, cell_height, "Name :")
+    //     Text formula (default_text_spacing, 2*cell_height, "Formula: ")
+    //     Text value (default_text_spacing, 3*cell_height, "Value:")
+    //     "Name: (" + _row_of_current_cell.value + ", " + _col_of_current_cell.value + ")" =:> name.text
+    //     "Formula: " + _formula_of_current_cell.value =:> formula.text
+    //     "Value: " + _value_of_current_cell.value =:> value.text
+    // }
+
+    // Explicaton component
     Component debug {
         Translation t (0, row_ * cell_height + 3* cell_height)
         FillColor _ (White)
-        Text _ (default_text_spacing, 0, "---- DEBUG current cell ---- ")
-        Text name (default_text_spacing, cell_height, "Name :")
-        Text formula (default_text_spacing, 2*cell_height, "Formula: ")
-        Text value (default_text_spacing, 3*cell_height, "Value:")
-        "Name: (" + _row_of_current_cell.value + ", " + _col_of_current_cell.value + ")" =:> name.text
-        "Formula: " + _formula_of_current_cell.value =:> formula.text
-        "Value: " + _value_of_current_cell.value =:> value.text
+        Text t1 (default_text_spacing, 0,             "---- General information ---- ")
+        Text t2 (default_text_spacing, cell_height,   "- Some table cells were pre‑initialized with numeric values")
+        Text t3 (default_text_spacing, 2*cell_height, "- These cells can be summed using the \"sum\" formula, such as =sum(B2:C4)")
+        Text t4 (default_text_spacing, 3*cell_height, "- You can directly type a value (e.g., 90) to update any cell")
     }
-
 
 
     // moving edit box

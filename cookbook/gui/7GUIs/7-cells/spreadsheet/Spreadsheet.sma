@@ -48,10 +48,13 @@ cpp_parse_formula (Process* c)
     assert (bindings);
     bindings->clean_up_content ();
 
+    // note: 
+    // Use a regex if we want to support more flexible formula parsing
+    //
     const djnnstl::string& f = formula->get_value();
-    if (f.find("=")==0) { // TODO: Use a regex if we want to support flexible formula parsing
-        // it's a formula
-        if (f.find("sum(",1)==1) {
+    if (f.find("=")==0) { 
+        // it's a formula : sum or ave
+        if (f.find("sum(",1)==1 || f.find("ave(",1)==1) {
 
             //debug
             //std::cerr << " SUM DETECTED: " << f << std::endl;
@@ -60,13 +63,13 @@ cpp_parse_formula (Process* c)
             auto end = f.find(")", start);
             //std::cerr << start << " " << end << __FL__;
             if (end==djnnstl::string::npos) {
-                std::cerr << "no ')' found" << __FL__;
+                std::cerr << "no ')' found" << std::endl;
                 return;
             }
             auto col = f.find(":", start);
             //std::cerr << start << " " << col << " " << end << __FL__;
             if (col==djnnstl::string::npos || col>end) {
-                std::cerr << "no ':' found inside range expression" << __FL__;
+                std::cerr << "no ':' found inside range expression" << std::endl;
                 return;
             }
 
@@ -92,7 +95,7 @@ cpp_parse_formula (Process* c)
                     end_cell_id_row_str   >= row
                     )
                 {
-                    //debug std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;
+                    //std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;   
                     input_cells->add_one(c);
                     new Binding(cell->find_child("bindings"), "b_to_formula", c->find_child("compute_formula"), cell->find_child("compute_formula"));
                 }
@@ -117,18 +120,22 @@ cpp_compute_formula (Process* c)
 
     //std::cerr << formula->get_value () << std::endl;
 
-    if (formula->get_value().empty()) return;
-    if (formula->get_value()[0]!='=') return; // formula start with "="
+    const djnnstl::string& f = formula->get_value();
+    if (f.empty()) return;
+    if (f[0]!='=') return; // formula start with "="
 
     GET_CHILD(ProcessCollector, cell, input_cells);
     assert (input_cells);
 
     int res = 0;
+    int count = 0;
     for (auto* p : input_cells->get_list()) {
         GET_CHILD_VALUE(in_val, Text, p, value);
         //std::cerr << in_val << __FL__;
-        if (!in_val.empty())
+        if (!in_val.empty()) {
             res += atoi(in_val.c_str());
+            count++;
+        }
     }
 
     // std::cerr
@@ -138,7 +145,19 @@ cpp_compute_formula (Process* c)
     //     << __FL__;
 
     GET_CHILD(TextProperty, cell, value);
-    value->set_value(res, true);
+    assert(value);
+
+    djnnstl::string final_res = "NaN";
+    if (!input_cells->get_list().empty()) {
+        if (f.find("sum(", 1) == 1) {
+            final_res = std::to_string(res);
+        } 
+        else if (f.find("ave(", 1) == 1 && count != 0) {
+            final_res = std::to_string(res / count);
+        }
+    }
+    value->set_value(final_res, true);
+    
 }
 
 %}
@@ -195,7 +214,6 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
     DerefString _value_of_current_cell (_current_cell, "value", DJNN_GET_ON_CHANGE)
 
     Spike reset_box_edit
-    Spike toto
 
     Component dummy_cell {
         Int row(-100)
@@ -218,20 +236,21 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         NativeAction parse_formula (cpp_parse_formula, this, 1)
                         NativeAction compute_formula (cpp_compute_formula, cell, 1)
 
-                        String formula("") // if it starts with an '='
+                        String formula("")    // if it starts with an '='
                         String value("")      // either a value or the result of the computation of the formula
 
-                        // ------  DEBUG -------
-                        // B2 = 90      C2 = 45
-                        // B3 = 45      C3 = 0
-                        // B4 = 5       C4 = 40
-                        // =sum(B2:C4)  == 225
-                        if ((col == 1) && (row == 2)){ "90" =: value "90" =: formula }  // B2
-                        if ((col == 1) && (row == 3)){ "45" =: value "45" =: formula}   // B3
-                        if ((col == 1) && (row == 4)){ "5" =: value  "5" =: formula}    // B4
-                        if ((col == 2) && (row == 2)){ "45" =: value "45" =: formula}   // C2
-                        if ((col == 2) && (row == 3)){ "0" =: value  "0" =: formula}    // C3
-                        if ((col == 2) && (row == 4)){ "40" =: value "40" =: formula}   // C4
+                        // ------  INIT for the example -------
+                        // B2 = 100     C2 = 100
+                        // B3 = 50      C3 = 0
+                        // B4 = 100     C4 = 100
+                        // =sum(B2:C4)  == 450
+                        // =ave(B2:C4)  == 75
+                        if ((col == 1) && (row == 2)){ "100" =: value "100" =: formula }  // B2
+                        if ((col == 1) && (row == 3)){ "50" =: value  "50" =: formula}    // B3
+                        if ((col == 1) && (row == 4)){ "100" =: value "100" =: formula}   // B4
+                        if ((col == 2) && (row == 2)){ "100" =: value "100" =: formula}   // C2
+                        if ((col == 2) && (row == 3)){ "0" =: value  "0" =: formula}      // C3
+                        if ((col == 2) && (row == 4)){ "100" =: value "100" =: formula}   // C4
                         // -------------------------
 
                         FillColor fc (Blue)
@@ -308,7 +327,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
         FillColor _ (White)
         Text t1 (default_text_spacing, 0,             "---- General information ---- ")
         Text t2 (default_text_spacing, cell_height,   "- Some table cells were pre‑initialized with numeric values")
-        Text t3 (default_text_spacing, 2*cell_height, "- These cells can be summed using the \"sum\" formula, such as =sum(B2:C4)")
+        Text t3 (default_text_spacing, 2*cell_height, "- These cells can be summed using the \"sum|ave\" formula, such as =sum(B2:C4), =ave(B2:C4)")
         Text t4 (default_text_spacing, 3*cell_height, "- You can directly type a value (e.g., 90) to update any cell")
     }
 

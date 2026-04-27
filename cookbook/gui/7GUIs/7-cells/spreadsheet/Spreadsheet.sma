@@ -117,9 +117,8 @@ cpp_compute_formula (Process* c)
 
     //std::cerr << formula->get_value () << std::endl;
 
-    // MP  necesaaire ??
     if (formula->get_value().empty()) return;
-    if (formula->get_value()[0]!='=') return; 
+    if (formula->get_value()[0]!='=') return; // formula start with "="
 
     GET_CHILD(ProcessCollector, cell, input_cells);
     assert (input_cells);
@@ -227,12 +226,12 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         // B3 = 45      C3 = 0
                         // B4 = 5       C4 = 40
                         // =sum(B2:C4)  == 225
-                        if ((col == 1) && (row == 2)){ "90" =: value }  // B2
-                        if ((col == 1) && (row == 3)){ "45" =: value }  // B3
-                        if ((col == 1) && (row == 4)){ "5" =: value }   // B4
-                        if ((col == 2) && (row == 2)){ "45" =: value }  // C2
-                        if ((col == 2) && (row == 3)){ "0" =: value }   // C3
-                        if ((col == 2) && (row == 4)){ "40" =: value }  // C4
+                        if ((col == 1) && (row == 2)){ "90" =: value "90" =: formula }  // B2
+                        if ((col == 1) && (row == 3)){ "45" =: value "45" =: formula}   // B3
+                        if ((col == 1) && (row == 4)){ "5" =: value  "5" =: formula}    // B4
+                        if ((col == 2) && (row == 2)){ "45" =: value "45" =: formula}   // C2
+                        if ((col == 2) && (row == 3)){ "0" =: value  "0" =: formula}    // C3
+                        if ((col == 2) && (row == 4)){ "40" =: value "40" =: formula}   // C4
                         // -------------------------
 
                         FillColor fc (Blue)

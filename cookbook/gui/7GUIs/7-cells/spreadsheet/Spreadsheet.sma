@@ -22,22 +22,11 @@ ascii_to_string_from(int c, const djnnstl::string& from_char)
     return djnnstl::string("") + (char)(c + from_char[0]);
 }
 
-// bool
-// starts_with(const djnnstl::string& s, const djnnstl::string& prefix) {
-//     return s.size() >= prefix.size()
-//         && s.compare(0, prefix.size(), prefix) == 0;
-// }
-
 void
 cpp_parse_formula (Process* c)
 {
     //std::cerr << c->get_debug_name () << __FL__;
     auto * spreadsheet = reinterpret_cast<Process*>(get_native_user_data (c));
-    
-    // MP : possibilité d'utiliser les DerefString en C++ ??
-    //qqchose dans le genre :
-    //GET_CHILD(TextProperty, this, _formula_of_current_cell.value);
-    //assert (formula ??? );
 
     GET_CHILD(RefProperty, spreadsheet, _current_cell);
     assert (_current_cell);
@@ -45,6 +34,8 @@ cpp_parse_formula (Process* c)
     assert (cell);
     GET_CHILD(TextProperty, cell, formula);
     assert (formula);
+
+    //debug
     // std::cerr << cell<< __FL__ << std::endl;
     // std::cerr
     //     //<< formula->get_debug_name () << " "
@@ -53,10 +44,9 @@ cpp_parse_formula (Process* c)
     GET_CHILD(ProcessCollector, cell, input_cells);
     assert (input_cells);
     input_cells->remove_all ();
-
-    // TODO : deletion of Bindings
-    // delete_content bindings ?
-    // graph_exec ()
+    GET_CHILD(Component, cell, bindings);
+    assert (bindings);
+    bindings->clean_up_content ();
 
     const djnnstl::string& f = formula->get_value();
     if (f.find("=")==0) { // TODO: Use a regex if we want to support flexible formula parsing
@@ -64,7 +54,8 @@ cpp_parse_formula (Process* c)
         if (f.find("sum(",1)==1) {
 
             //debug
-            std::cerr << " SUM DETECTED: " << f << std::endl;
+            //std::cerr << " SUM DETECTED: " << f << std::endl;
+
             djnnstl::string::size_type start = 5;
             auto end = f.find(")", start);
             //std::cerr << start << " " << end << __FL__;
@@ -88,26 +79,9 @@ cpp_parse_formula (Process* c)
             auto end_cell_id_col_str = end_cell_id[0]-'A';
             auto end_cell_id_row_str = end_cell_id[1]-'0';
 
-            // lapin compris le but !
-            // if (start_cell_id_col_str != end_cell_id_col_str && start_cell_id_row_str != end_cell_id_row_str) {
-            //     std::cerr << "'" << f.substr(start,end-start) << "' is not a range" << std::endl;
-            // }
-
-            // std::cerr << "'" << f.substr(start,end-start) << "' is a range" << std::endl;
-            std::cerr << "start cell col id : " << start_cell_id_col_str << " - end cell col id " << end_cell_id_col_str << std::endl;
-            std::cerr << "start cell row id : " << start_cell_id_row_str << " - end cell row id " << end_cell_id_row_str << std::endl;
-
-            // TODO
-            // collect all cells
-            // bind cell change to recomputation
-            // recompute according to function
-
             GET_CHILD(Component, spreadsheet, grid);
             GET_CHILD(List, grid, cells);
-            // for (auto &cpair: cells->symtable()) { // does not work since all elements are named 'cell'!!
-            //     auto &c = cpair.second;
-            // GET_CHILD(List, spreadsheet, cells);
-            
+            assert (cells);
             for (auto &c: cells->children()) {
                 GET_CHILD_VALUE(col, Int, c, col);
                 GET_CHILD_VALUE(row, Int, c, row);
@@ -118,7 +92,7 @@ cpp_parse_formula (Process* c)
                     end_cell_id_row_str   >= row
                     )
                 {
-                    std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;
+                    //debug std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;
                     input_cells->add_one(c);
                     new Binding(cell->find_child("bindings"), "b_to_formula", c->find_child("compute_formula"), cell->find_child("compute_formula"));
                 }
@@ -127,7 +101,6 @@ cpp_parse_formula (Process* c)
     } else {
         GET_CHILD(TextProperty, cell, value);
         assert (value);
-        // std::cerr << f << __FL__;
         value->set_value (f, true);
     }
 }
@@ -135,17 +108,18 @@ cpp_parse_formula (Process* c)
 void
 cpp_compute_formula (Process* c)
 {
-    std::cerr << "cpp_compute_formula " << c->get_debug_name () << std::endl;
+    //std::cerr << "cpp_compute_formula " << c->get_debug_name () << std::endl;
 
     auto * cell = reinterpret_cast<Process*>(get_native_user_data (c));
     assert (cell);
     GET_CHILD(TextProperty, cell, formula);
     assert (formula);
 
-    std::cerr << formula->get_value () << std::endl;
+    //std::cerr << formula->get_value () << std::endl;
 
+    // MP  necesaaire ??
     if (formula->get_value().empty()) return;
-    if (formula->get_value()[0]!='=') return; // hack could be better
+    if (formula->get_value()[0]!='=') return; 
 
     GET_CHILD(ProcessCollector, cell, input_cells);
     assert (input_cells);
@@ -273,7 +247,6 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         bg.press -> { // move the TextField on top of the cell
                             cell =: _current_cell 
                         }
-                        bg.press -> toto
 
                         Component bindings // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
                         ProcessCollector input_cells // this is where we store bindings from other cells e.g. sum(A3:A8), the bindings from A3 to A8
@@ -301,7 +274,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
             StandAloneUITextField tf ($ow.width, default_text_spacing, cell_width - default_text_spacing - $ow.width , cell_height) // a TextField we will move on top of cells to edit them
             edit_bg_color.value =:> tf.bg_color.value, tf.bg_ol_color.value
 
-            toto -> tf.activate  // TODO : NE s'ACTIVE qu'une fois sur deux ??
+            //toto -> tf.field.press // TODO : NE s'ACTIVE qu'une fois sur deux ??
              
             _formula_of_current_cell.value =:> tf.init_text
 
@@ -311,7 +284,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
             }
 
             reset_box_edit -> (this) {  // TODO  on reset_box_edit ??
-                setRef (this._current_cell, nullptr) ///  ou apres le parse_formula  // probleme de VD !! as usual 
+                //setRef (this._current_cell, nullptr) ///  ou apres le parse_formula  // probleme de VD !! as usual 
                 this.grid.box_edit.t.tx = -100
                 this.grid.box_edit.t.ty = -100
             }

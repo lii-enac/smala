@@ -41,6 +41,14 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+        {
+            "label": "simplest",
+            "type": "shell",
+            "command": "make -j simplest",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

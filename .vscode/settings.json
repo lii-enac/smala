@@ -1,4 +1,8 @@
 {
     "cmake.configureOnOpen": false,
-    "lldb.verboseLogging": true
+    "lldb.verboseLogging": true,
+    "build_dir": "build/Darwin-arm64",
+    //"build_dir": "build/Darwin-x86_64",
+    //"build_dir": "build/Linux-x86_64",
+    //"build_dir": "build/Linux-arm64",
 }

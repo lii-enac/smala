@@ -43,9 +43,12 @@ use gui
     // refill layer
     addChildrenTo root.drawing_layer.canvas {
       FillColor _ (#0000FF)
-      Rectangle r1 (100, 100, 40, 40)
-      Rectangle r2 (150, 100, 40, 40)
-      Rectangle r3 (200, 100, 40, 40)
+      // Rectangle r1 (100, 100, 40, 40)
+      // Rectangle r2 (150, 100, 40, 40)
+      // Rectangle r3 (200, 100, 40, 40)
+      for (int i = 0 ; i < 3 ; i++) {
+        Rectangle _ (100+(50*i), 100, 40, 40)
+      }
     }
   }
 
@@ -55,9 +58,12 @@ use gui
     // refill layer
     addChildrenTo root.drawing_layer.canvas {
       FillColor _ (#00FF00)
-      Circle c1 (100, 100, 20)
-      Circle c2 (150, 100, 20)
-      Circle c3 (200, 100, 20)
+      // Circle c1 (100, 100, 20)
+      // Circle c2 (150, 100, 20)
+      // Circle c3 (200, 100, 20)
+      for (int i = 0 ; i < 3 ; i++) {
+        Circle _ (100+ (50*i), 100, 20)
+      }
     }
   }
 }

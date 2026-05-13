@@ -24,7 +24,7 @@ namespace Smala
   }
 
   Argument::Argument (int argc, const char** argv) :
-    _lang (CPP), _debug (false), _cleaner (false), _fastcomp (false)
+    _lang (CPP), _debug (false), _cleaner (false), _fastcomp (false), _rmt (false)
     {
     int i;
     m_program_name = argv[0];
@@ -38,6 +38,8 @@ namespace Smala
         _cleaner = true;
       } else if (str.compare ("-fastcomp") == 0) {
         _fastcomp = true;
+      } else if (str.compare ("-rmt") == 0) {
+        _rmt = true;
       } else if (str.compare ("-lang=js") == 0) {
           _lang = JS;
       } else if (str.compare ("-o") == 0) {

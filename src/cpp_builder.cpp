@@ -177,10 +177,11 @@ namespace Smala
 
   int
   CPPBuilder::build (const Ast &ast, const std::string &builddir,
-                     const std::string &prefix, bool debug, bool cleaner, bool fastcomp)
+                     const std::string &prefix, bool debug, bool cleaner, bool fastcomp, bool rmt)
   {
     m_cleaner = cleaner;
     m_fastcomp = fastcomp;
+    m_rmt = rmt;
     m_debug = debug;
     m_indent = 0;
     m_cpnt_num = 0;
@@ -314,6 +315,8 @@ namespace Smala
       final_os << "#include \"core/utils/to_string.h\"" << std::endl;
       final_os << "using djnnstl::string;" << std::endl;
       final_os << "using djnnstl::to_string;" << std::endl;
+      if (m_rmt)
+        final_os << "#include \"core/utils/remotery.h\"" << std::endl;
     }
     {
       for (auto p: used_processes) {
@@ -2943,6 +2946,8 @@ namespace Smala
     std::string data_name = "cpnt_" + std::to_string (m_cpnt_num++);
 
     os << "\nstatic void\n" << n->fct () << " (CoreProcess* c) {\n";
+    if (m_rmt)
+      os << "\trmt_BeginCPUSample (" << n->fct () << ", RMTSF_Aggregate);\n";
     os << "\t[[maybe_unused]] auto * " << src_name << " = ";
     if (!m_fastcomp) {
       os << "c->get_activation_source ();\n";
@@ -2987,6 +2992,8 @@ namespace Smala
 
     pop_ctxt(); //DBG;
     m_indent = 0;
+    if (m_rmt)
+      os << "\trmt_EndCPUSample ();\n";
     os << "}\n\n";
   }
 

@@ -182,6 +182,7 @@ namespace Smala
     m_cleaner = cleaner;
     m_fastcomp = fastcomp;
     m_rmt = rmt;
+    m_component_name = prefix.substr(prefix.rfind('/')+1);
     m_debug = debug;
     m_indent = 0;
     m_cpnt_num = 0;
@@ -2947,7 +2948,7 @@ namespace Smala
 
     os << "\nstatic void\n" << n->fct () << " (CoreProcess* c) {\n";
     if (m_rmt)
-      os << "\trmt_BeginCPUSample (" << n->fct () << ", RMTSF_Aggregate);\n";
+      os << "\trmt_BeginCPUSample (" << m_component_name << "_" <<  n->fct () << ", RMTSF_Aggregate);\n";
     os << "\t[[maybe_unused]] auto * " << src_name << " = ";
     if (!m_fastcomp) {
       os << "c->get_activation_source ();\n";

@@ -117,6 +117,7 @@ namespace Smala {
     bool m_cleaner;
     bool m_fastcomp;
     bool m_rmt;
+    std::string m_component_name;
     bool m_debug;
     int m_expr_in, m_expr_out; // are we in an expression or not?
     std::map<std::string, std::string> m_import_types;

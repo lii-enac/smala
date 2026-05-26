@@ -30,20 +30,16 @@ _native_code_
       return str.starts_with (prefix);  // C++20
     }
 
-    // Add this helper function in ProcessCollector ?
+    // Allow to call ProcessCollector::contains (CoreProcess* p) directly from smala
     bool contains (Process* collection, Process* item) {
         ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
         if ( (pc != nullptr) && (item != nullptr) ) {
-            for (CoreProcess* item_i : pc->get_list ()) {
-                if (item_i == item) {
-                    return true;
-                }
-            }
+            return pc->contains (item);
         }
         return false;
     }
 
-    // Add this helper function in ProcessCollector ?
+    // Allow to call ProcessCollector::remove_one (CoreProcess* p) directly from smala
     void remove_one (Process* collection, Process* item) {
         ProcessCollector* pc = dynamic_cast<ProcessCollector*> (collection);
         if ( (pc != nullptr) && (item != nullptr) ) {

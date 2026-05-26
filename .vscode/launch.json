@@ -2,6 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) smala - cookbook (macOS) - 1-counter",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Darwin-arm64/cookbook/gui/7GUIs/1-counter/1-counter_app",
+            "args": [],
+            "cwd": "${workspaceFolder}/cookbook/gui/7GUIs/1-counter",
+            "env": {
+                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/Darwin-arm64/lib:${workspaceFolder}/../smala/build/Darwin-arm64/lib"
+            },
+            "sourceMap": {
+                "${workspaceFolder}/build/Darwin-x86_64": "${workspaceFolder}/src"
+            },
+            "preLaunchTask": "app"
+        },
+        {
             "name": "(lldb) smala - cookbook (macOS)",
             "type": "lldb",
             "request": "launch",

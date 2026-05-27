@@ -12,6 +12,8 @@
 #	  Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
 #
 
-objs_cookbook_app := PersonModel.o ListBoxItem.o ListBox.o PersonView.o main.o
+objs_cookbook_app := PersonModel.o PersonView.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala
+
+SMAFLAGS += -g

@@ -50,7 +50,6 @@ ListBoxItem (int _horizontal_margin, int _height) inherits IWidget ()
     // OutlineWidth _ (1)
     // OutlineColor outln_c (#666666)
 
-    // Rectangle r (0, 0, 0, _height, 2, 2)
     Rectangle r (0, 0, 0, _height, 0, 0)
   }
 
@@ -91,7 +90,6 @@ ListBoxItem (int _horizontal_margin, int _height) inherits IWidget ()
   }
 
   // FSM fsm_hover {
-
   //   out -> in (bg.r.enter)
   //   in -> out (bg.r.leave)
   // }

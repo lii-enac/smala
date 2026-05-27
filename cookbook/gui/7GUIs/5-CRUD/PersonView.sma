@@ -1,10 +1,9 @@
 use core
 use base
 
-import ListBoxItem
+import gui.widgets.ListBoxItem
 
 _define_
-// PersonView (Process _model, int _index) inherits ListBoxItem (_index)
 PersonView (Process _model, int _horizontal_margin, int _height) inherits ListBoxItem (_horizontal_margin, _height)
 {
     model aka _model

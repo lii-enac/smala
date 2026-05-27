@@ -7,15 +7,14 @@ use base
 use display
 use gui
 
+// import gui.keyboard.ControlKey
 import gui.widgets.PushButton
 import gui.widgets.UITextField
 import gui.widgets.VBox
 import gui.widgets.HBox
 import gui.widgets.Label
-import gui.keyboard.ControlKey
-
-import ListBox
-import ListBoxItem
+import gui.widgets.ListBox
+// import gui.widgets.ListBoxItem
 
 import PersonModel
 import PersonView
@@ -202,22 +201,22 @@ Component root {
     Frame f ("7GUIs CRUD", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
     f.close ->! mainloop
 
-    //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
-    _DEBUG_SEE_PROP_SET_VALUE = 0
-    _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
+    // //_DEBUG_SEE_ACTIVATION_SEQUENCE = 1
+    // _DEBUG_SEE_PROP_SET_VALUE = 0
+    // _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
 
-    ControlKey ctrl_d (f, DJN_Key_D)
+    // ControlKey ctrl_d (f, DJN_Key_D)
 
-	ctrl_d.press -> (root) {
-		if (_DEBUG_SEE_ACTIVATION_SEQUENCE_2) {
-			_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
-			_DEBUG_SEE_PROP_SET_VALUE = 0
-		}
-		else {
-			_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
-			_DEBUG_SEE_PROP_SET_VALUE = 1
-		}
-	}
+	// ctrl_d.press -> (root) {
+	// 	if (_DEBUG_SEE_ACTIVATION_SEQUENCE_2) {
+	// 		_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 0
+	// 		_DEBUG_SEE_PROP_SET_VALUE = 0
+	// 	}
+	// 	else {
+	// 		_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+	// 		_DEBUG_SEE_PROP_SET_VALUE = 1
+	// 	}
+	// }
 
     List models                         // (Ordered) list of all models
     ProcessCollector displayed_models   // (Unordered) collection of the displayed models

@@ -53,8 +53,8 @@ cpp_parse_formula (Process* c)
     //
     const djnnstl::string& f = formula->get_value();
     if (f.find("=")==0) { 
-        // it's a formula : sum or ave
-        if (f.find("sum(",1)==1 || f.find("ave(",1)==1) {
+        // it's a formula : sum or avg
+        if (f.find("sum(",1)==1 || f.find("avg(",1)==1) {
 
             //debug
             //std::cerr << " SUM DETECTED: " << f << std::endl;
@@ -152,7 +152,7 @@ cpp_compute_formula (Process* c)
         if (f.find("sum(", 1) == 1) {
             final_res = std::to_string(res);
         } 
-        else if (f.find("ave(", 1) == 1 && count != 0) {
+        else if (f.find("avg(", 1) == 1 && count != 0) {
             final_res = std::to_string(res / count);
         }
     }
@@ -244,7 +244,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
                         // B3 = 50      C3 = 0
                         // B4 = 100     C4 = 100
                         // =sum(B2:C4)  == 450
-                        // =ave(B2:C4)  == 75
+                        // =avg(B2:C4)  == 75
                         if ((col == 1) && (row == 2)){ "100" =: value "100" =: formula }  // B2
                         if ((col == 1) && (row == 3)){ "50" =: value  "50" =: formula}    // B3
                         if ((col == 1) && (row == 4)){ "100" =: value "100" =: formula}   // B4
@@ -327,7 +327,7 @@ Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
         FillColor _ (White)
         Text t1 (default_text_spacing, 0,             "---- General information ---- ")
         Text t2 (default_text_spacing, cell_height,   "- Some table cells were pre‑initialized with numeric values")
-        Text t3 (default_text_spacing, 2*cell_height, "- These cells can be summed using the \"sum|ave\" formula, such as =sum(B2:C4), =ave(B2:C4)")
+        Text t3 (default_text_spacing, 2*cell_height, "- These cells can be combined using the \"sum|avg\" formula, such as =sum(B2:C4), =avg(B2:C4)")
         Text t4 (default_text_spacing, 3*cell_height, "- You can directly type a value (e.g., 90) to update any cell")
     }
 

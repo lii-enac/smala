@@ -5,15 +5,15 @@
             "name": "(lldb) smala - cookbook (macOS) - 1-counter",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Darwin-arm64/cookbook/gui/7GUIs/1-counter/1-counter_app",
+            "program": "${workspaceFolder}/${config:build_dir}/cookbook/gui/7GUIs/1-counter/1-counter_app",
             "args": [],
             "cwd": "${workspaceFolder}/cookbook/gui/7GUIs/1-counter",
             "env": {
-                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/build/Darwin-arm64/lib:${workspaceFolder}/../smala/build/Darwin-arm64/lib"
+                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/${config:build_dir}/lib:${workspaceFolder}/../smala/${config:build_dir}/lib"
             },
-            "sourceMap": {
-                "${workspaceFolder}/build/Darwin-x86_64": "${workspaceFolder}/src"
-            },
+            // "sourceMap": {
+            //     "${workspaceFolder}/build/${config:build_dir}": "${workspaceFolder}/src"
+            // },
             "preLaunchTask": "app"
         },
         {
@@ -24,7 +24,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/cookbook/gui/7GUIs/6-circle-drawer",
             "env": {
-                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/${config:build_dir}/lib:${workspaceFolder}/../smala/${config:build_dir}"
+                "DYLD_LIBRARY_PATH": "${env:DYLD_LIBRARY_PATH}:${workspaceFolder}/../djnn-cpp/${config:build_dir}/lib:${workspaceFolder}/../smala/${config:build_dir}/lib"
             },
             // "sourceMap": {
             //     "${workspaceFolder}/build/Darwin-x86_64": "${workspaceFolder}/src"

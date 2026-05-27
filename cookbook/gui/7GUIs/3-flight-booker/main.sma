@@ -155,8 +155,6 @@ Component root {
             T1_valid =:> B_valid
         }
         Component true {
-            
-            
             Regex regex_date_2 (regex_date_str)
             T2.init_text =: T2.text // Initialize time2 by passing T2.init_text to T2.text to ensure T2 is valid when first enabled. 
                                     // Since T2.text is normally only assigned on Return key press, it must be explicitly initialized with T2.init_text during setup.

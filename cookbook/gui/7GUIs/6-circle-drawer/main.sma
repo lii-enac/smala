@@ -26,8 +26,8 @@ Component root {
     int pushbutton_y = 20
     int pushbutton_offset = 5
     int canvas_offset = 12
-    StandAlonePushButton undo("Undo", 0, 20)                        // [7GUIs] ...an undo and...
-    StandAlonePushButton redo("Redo", 0, 20)                        // [7GUIs] ...redo button... 
+    StandAlonePushButton undo("Undo", 0, 20)             // [7GUIs] ...an undo and...
+    StandAlonePushButton redo("Redo", 0, 20)             // [7GUIs] ...redo button... 
     (f.width / 2) - undo.width - pushbutton_offset =:> undo.x
     (f.width / 2) + pushbutton_offset =:> redo.x
 
@@ -51,20 +51,20 @@ Component root {
     }
 
 
-    SimpleMenu menu (100, 100)                     // [7GUIs] a popup menu...
+    SimpleMenu menu (100, 100)                 // [7GUIs] a popup menu...
     addChildrenTo menu.choices {
-        String _ ("Adjust diameter")             // [7GUIs] ... with one entry “Adjust diameter..”.
+        String _ ("Adjust diameter")           // [7GUIs] ... with one entry “Adjust diameter..”.
     }
 
     Ref _selected_item_ref(nullptr)
     DerefDouble _radius_of_selected_item (_selected_item_ref, "c/r", DJNN_GET_ON_CHANGE)
 
-    UndoRedoManager undo_redo_manager               // FIXME should be provided in smala lib
+    UndoRedoManager undo_redo_manager          // FIXME should be provided in smala lib
     
-    undo.click -> undo_redo_manager.undo            // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
-    redo.click -> undo_redo_manager.redo            // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
+    undo.click -> undo_redo_manager.undo       // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
+    redo.click -> undo_redo_manager.redo       // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
 
-    canvas.mask.left.press -> (root) {             // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
+    canvas.mask.left.press -> (root) {         // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
     
         // Properly deselect the previously selected item, if any
         old_selected_item = getRef(&root._selected_item_ref)
@@ -93,7 +93,7 @@ Component root {
         Frame f2 ("", 530, 700, 300, 100)
         FillColor _ (White)
         Text t (50, 22, "Ajust diameter of circle at (x, y).") 
-        StandAloneSlider radius_slider(45, 25, 208, 10)    // [7GUIs] ...a slider inside that adjusts the diameter of C.
+        StandAloneSlider radius_slider(45, 25, 208, 10)  // [7GUIs] ...a slider inside that adjusts the diameter of C.
         
         radius_slider.output -> (root) {                 // [7GUIs] Clicking on this entry will open another frame with a slider inside that adjusts the diameter of C.
             selected_item = getRef(&root._selected_item_ref)

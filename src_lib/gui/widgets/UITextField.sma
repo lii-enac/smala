@@ -69,6 +69,7 @@ UITextField () inherits IWidget () {
   AssignmentSequence set_text (1) {
     field.content.text =: text
   }
+  field.clear -> set_text
 
   FSM edit_fsm {
     State no_edit {

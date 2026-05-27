@@ -344,7 +344,11 @@ Component root {
 
     // Flag indicating whether a value is missing: either the name or the surname
     Bool is_missing_value (true)
-    (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
+    
+    // Allow to enable/disable buttons during editing (don't wait to validate a TextField)
+    // (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
+    (getString (T_name.field.content.text) == "") || (getString (T_surname.field.content.text) == "") => is_missing_value
+    
     is_missing_value.false -> BC.enable
     is_missing_value.true -> BC.disable
 

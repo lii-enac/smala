@@ -63,14 +63,14 @@ Component root {
     regex_num_C.matched -> {            // [7GUIs] ...a [non-]numerical string,
         regex_num_C.[0] =: C            // [7GUIs] ...the value in TF is [not] updated...
     }
-    toString(C) =:> h.TC.field.content.text
+    toString(C) => h.TC.init_text // field.content.text
 
     Regex regex_num_F (regex_str)
     h.TF.text =:> regex_num_F.input     // [7GUIs]...and...
     regex_num_F.matched -> {            // [7GUIs]...vice...
         regex_num_F.[0] =: F            // [7GUIs]...versa.
     }
-    toString(F) =:> h.TF.field.content.text
+    toString(F) => h.TF.init_text // field.content.text
 }
 
 

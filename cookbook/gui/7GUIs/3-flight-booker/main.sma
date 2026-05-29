@@ -85,18 +85,7 @@ Component root {
     is_return_flight.true  -> T2.enable     // [7GUIs] T2 is enabled iff [if...]
     is_return_flight.false -> T2.disable    // [7GUIs] [... and only if] C’s value is “return flight”.
     (C.value == "return flight") =:> is_return_flight
-    
-    TextPrinter tp // FIXME popup? or a text beneath the Vbox
-    B.click -> (root) {   // [7GUIs] When clicking B...
-        if (root.is_return_flight) {
-            root.tp.input = "You have booked a " + root.C.value + " on " + root.T1.text + " return on " + root.T2.text
-        }
-        else {                                                      
-            root.tp.input = "You have booked a " + root.C.value + " on " + root.T1.text      // [7GUIs] ...a message is displayed informing the user of his selection 
-        }                                                                                    // [7GUIs] (e.g. “You have booked a one-way flight on 04.04.2014.”).
-    }                                                                        
-
-
+                                                                         
     Bool T1_valid(0)
     Bool T2_valid(0)
     Bool  B_valid(0)
@@ -196,6 +185,22 @@ Component root {
 
     }
     T2.next -> B.select
+
+    Component popup_confirm_order (1) {
+        Frame f2 ("", 650, 550, 400, 100)
+        FillColor _ (White)
+        Text t (10, 50, "NaN") 
+    }
+    B.click -> pre_open_popup_confirm_order : (root) {
+        if (root.is_return_flight) {
+            root.popup_confirm_order.t.text = "You have booked a " + root.C.value + " on " + root.T1.text + " return on " + root.T2.text
+        }
+        else {                                                      
+            root.popup_confirm_order.t.text = "You have booked a " + root.C.value + " on " + root.T1.text   // [7GUIs] ...a message is displayed informing the user of his selection 
+        }    
+    }
+    pre_open_popup_confirm_order -> popup_confirm_order
+    popup_confirm_order.f2.close ->! popup_confirm_order  
 }
 
 // original text

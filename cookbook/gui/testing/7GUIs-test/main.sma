@@ -34,63 +34,55 @@ Component root {
     f.close ->! mainloop
 
     Counter_7GUIs cnt(f)
-    b_ = find(cnt, "//B")
-    t_ = find(cnt, "//T")
-    B aka b_
-    T aka t_
-
     TempConverter_7GUIs tmpc(f)
-    tc_ = find(tmpc, "//TC")
-    tf_ = find(tmpc, "//TF")
-    TC aka tc_
-    TF aka tf_
-
     FlightBooker_7GUIs fb(f)
-    c_ = find(fb, "//C")
-    t1_ = find(fb, "//T1")
-    t2_ = find(fb, "//T2")
-    book_ = find(fb, "//B")
-    C aka c_
-    T1 aka t1_
-    T2 aka t2_
-    Book aka book_
-    fsm aka Book.fsm
 
     mainloop -> (root) {
         // Counter
-        assert (getString(root.T.text) == "0")
+        B = find(root.cnt, "//B")
+        T = find(root.cnt, "//T")
 
-        activate (root.B.click)
-        graph_exec()
-        assert (getString(root.T.text) == "1")
+        assert (getString(T.text) == "0")
 
-        activate (root.B.click)
+        activate (B.click)
         graph_exec()
-        assert (getString(root.T.text) == "2")
+        assert (getString(T.text) == "1")
+
+        activate (B.click)
+        graph_exec()
+        assert (getString(T.text) == "2")
 
         // TempConverter
-        assert (ceil(get_double_value(root.TC.field.content.text)) == -17)
+        TC = find(root.tmpc, "//TC")
+        TF = find(root.tmpc, "//TF")
 
-        root.TC.text = "0"
-        graph_exec()
-        assert (floor(get_double_value(root.TF.field.content.text)) == 32)
+        assert (ceil(get_double_value(TC.field.content.text)) == -17)
 
-        root.TC.text = "10"
+        TC.text = "0"
         graph_exec()
-        assert (floor(get_double_value(root.TF.field.content.text)) == 50)
+        assert (floor(get_double_value(TF.field.content.text)) == 32)
+
+        TC.text = "10"
+        graph_exec()
+        assert (floor(get_double_value(TF.field.content.text)) == 50)
 
         // FlightBooker
-        assert (root.C.value == "one-way flight")
-        assert (root.T1.text == "01.01.26")
-        assert (root.T2.text == "01.01.26")
-        assert (root.fsm.state == "idle")
+        C = find(root.fb, "//C")
+        T1 = find(root.fb, "//T1")
+        T2 = find(root.fb, "//T2")
+        Book = find(root.fb, "//B")
+
+        assert (C.value == "one-way flight")
+        assert (T1.text == "01.01.26")
+        assert (T2.text == "01.01.26")
+        assert (Book.fsm.state == "idle")
 
         _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
         //_DEBUG_SEE_PROP_SET_VALUE = 1
-        root.T1.init_text = "10"
+        T1.init_text = "10"
         graph_exec()
-        print (root.Book.fsm.state)
-        //assert (root.fsm.state == "disabled")
+        print (Book.fsm.state)
+        //assert (fsm.state == "disabled")
 
         // end
         //deactivate (mainloop)
@@ -101,6 +93,7 @@ Component root {
 
 
     TextPrinter tp
+    B = find(root.cnt, "//B")
     B.fsm.state =:> tp.input
     fb.zog.v.B.fsm.state =:> tp.input
     // TC.text =:> tp.input

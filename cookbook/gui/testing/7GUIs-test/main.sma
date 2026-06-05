@@ -26,6 +26,19 @@ get_double_value (const CoreProcess* p)
     return t->get_double_value();
 }
 
+static
+inline
+uint32_t
+get_pixel_color (CoreProcess* p, int x, int y)
+{
+    auto * f = dynamic_cast<Window*>(p);
+    assert(f);
+    auto res = f->get_pixel_color(x,y);
+    //puts(to_string(res).c_str());
+    return res & 0xffffff;
+}
+
+
 %}
 
 _main_
@@ -42,29 +55,35 @@ Component root {
         B = find(root.cnt, "//B")
         T = find(root.cnt, "//T")
 
-        assert (getString(T.text) == "0")
+        // check initial values
+        assert (getString(T.text) == "0") // the text must read "0"
 
-        activate (B.click)
+        activate (B.click) // execute B action (increment)
         graph_exec()
-        assert (getString(T.text) == "1")
+        assert (getString(T.text) == "1") // the text should read "1"
 
-        activate (B.click)
+        activate (B.click) // execute B action (increment)
         graph_exec()
-        assert (getString(T.text) == "2")
+        assert (getString(T.text) == "2") // the text should read "2"
+
 
         // TempConverter
         TC = find(root.tmpc, "//TC")
         TF = find(root.tmpc, "//TF")
 
-        assert (ceil(get_double_value(TC.field.content.text)) == -17)
+        assert (ceil(get_double_value(TC.field.content.text)) == -17) // the Celsius text must read "-17"
+        assert (floor(get_double_value(TF.field.content.text)) == 0)  // the Fahrenheit text must read "0"
 
-        TC.text = "0"
+        TC.text = "0" // set Celsius Text Box to "0"
         graph_exec()
-        assert (floor(get_double_value(TF.field.content.text)) == 32)
+        assert (floor(get_double_value(TF.field.content.text)) == 32) // the Farenheiht text should read "32"
 
-        TC.text = "10"
+        TC.text = "10" // set Celsius Text Box to "10"
         graph_exec()
-        assert (floor(get_double_value(TF.field.content.text)) == 50)
+        assert (floor(get_double_value(TF.field.content.text)) == 50) // the Farenheiht text should read "50"
+
+        // TODO add the other way around
+
 
         // FlightBooker
         C = find(root.fb, "//C")
@@ -72,31 +91,27 @@ Component root {
         T2 = find(root.fb, "//T2")
         Book = find(root.fb, "//B")
 
+        // check initial values
         assert (C.value == "one-way flight")
         assert (T1.text == "01.01.26")
         assert (T2.text == "01.01.26")
         assert (Book.fsm.state == "idle")
 
-        _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
-        //_DEBUG_SEE_PROP_SET_VALUE = 1
         T1.init_text = "10"
         graph_exec()
-        print (Book.fsm.state)
-        //assert (fsm.state == "disabled")
+
+        //print (Book.fsm.state)
+        //assert (Book.fsm.state == "disabled") // button should be disabled // FIXME doesn't work
+        assert (get_pixel_color(root.fb.f, 19, 47)==0xff0000) // T1 text should be red
 
         // end
-        //deactivate (mainloop)
+        deactivate (mainloop) // exit when done
+        print ("\033[32mall tests passed successfully\033[39;49m")
     }
 
-    // _DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
-    // _DEBUG_SEE_PROP_SET_VALUE = 1
-
-
-    TextPrinter tp
-    B = find(root.cnt, "//B")
-    B.fsm.state =:> tp.input
-    fb.zog.v.B.fsm.state =:> tp.input
-    // TC.text =:> tp.input
+    //_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
+    //_DEBUG_SEE_ACTIVATION_SEQUENCE_2_MOVE = 1
+    //_DEBUG_SEE_PROP_SET_VALUE = 1
 
 
     // 

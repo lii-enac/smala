@@ -15,29 +15,44 @@ _native_code_
 %{
 #include <assert.h>
 
+#include "gui/picking/picking.h"
+
 static
 inline
 double
-get_double_value (const CoreProcess* p)
+get_double_value (const CoreProcess* property)
 {
-    auto * t = dynamic_cast<const AbstractProperty*>(p);
-    assert(t);
+    auto * p = dynamic_cast<const AbstractProperty*>(property);
+    assert(p);
     //std::cerr << floor(t->get_double_value()) << std::endl;
-    return t->get_double_value();
+    return p->get_double_value();
 }
 
 static
 inline
 uint32_t
-get_pixel_color (CoreProcess* p, int x, int y)
+get_pixel_color (CoreProcess* frame, int x, int y)
 {
-    auto * f = dynamic_cast<Window*>(p);
+    auto * f = dynamic_cast<Window*>(frame);
     assert(f);
     auto res = f->get_pixel_color(x,y);
     //puts(to_string(res).c_str());
     return res & 0xffffff;
 }
 
+static
+inline
+AbstractGObj*
+pick_graphical_object(CoreProcess* frame, int x, int y)
+{
+    auto * f = dynamic_cast<Window*>(frame);
+    assert(f);
+    Picking * picking = f->picking_view();
+    assert(picking);
+    auto * picked = picking->pick(x, y);
+    puts(to_string(picked).c_str());
+    return dynamic_cast<AbstractGObj*>(picked);
+}
 
 %}
 
@@ -96,13 +111,15 @@ Component root {
         assert (T1.text == "01.01.26")
         assert (T2.text == "01.01.26")
         assert (Book.fsm.state == "idle")
+        assert (pick_graphical_object(root.fb.f, 19, 47) != null) // There must be a Text here
+        assert (get_pixel_color(root.fb.f, 19, 47)==0x000000) // T1 text must be black
 
-        T1.init_text = "10"
+        T1.init_text = "01.01.2" // set one-way date to an invalid date
         graph_exec()
-
+        assert (get_pixel_color(root.fb.f, 19, 47)==0xff0000) // T1 text should be red
         //print (Book.fsm.state)
         //assert (Book.fsm.state == "disabled") // button should be disabled // FIXME doesn't work
-        assert (get_pixel_color(root.fb.f, 19, 47)==0xff0000) // T1 text should be red
+        
 
         // end
         deactivate (mainloop) // exit when done

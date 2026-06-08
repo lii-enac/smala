@@ -26,6 +26,7 @@ Component root {
 
   Regex regex ("foo=(\\S*) bar=(\\S*)")
   
+  FillColor _ (White)
   Text reg_txt (10, 30, "str sent:")
   Text foo_txt (10, 50, "foo value:")
   Text bar_txt (10, 70, "bar value:")
@@ -41,14 +42,10 @@ Component root {
   Incr i1 (0)
   Incr i2 (0)
   i2.delta = 100.01
-  DoubleFormatter df1 (0, 0)
-  DoubleFormatter df2 (0, 2)
-  i1.state => df1.input
-  i2.state => df2.input
 
   AssignmentSequence assign (1) {
 
-    "foo=" + toString(df1.output) +  " bar=" + toString(df2.output) =: reg_value.text
+    "foo=" + toString(i1.state) +  " bar=" + toString(i2.state) =: reg_value.text
     reg_value.text =: regex.input
   }
 

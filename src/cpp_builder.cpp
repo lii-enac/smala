@@ -1546,7 +1546,7 @@ namespace Smala
 
   void CPPBuilder::createPropertyIfNotKnownYet(const string &arg, const string &new_param_name, stringstream& create_temp_properties)
   {
-    if (prop_sym.find(arg) == prop_sym.end())
+    if (prop_sym.find(new_param_name) == prop_sym.end())
     { // check the property is already known, create it otherwise
       const std::string tmpl_class_name = "AbstractProperty*";
       std::string new_name("cpnt_" + std::to_string(m_cpnt_num++));
@@ -1564,8 +1564,8 @@ namespace Smala
       }
       if (!m_fastcomp)
         used_processes["AbstractProperty"] = true;
-      sym[arg] = new_name;
-      prop_sym[arg] = new_name;
+      sym[new_param_name] = new_name;
+      prop_sym[new_param_name] = new_name;
       //std::cerr << "created prop " << new_param_name << " for " << arg << " " << new_name << std::endl;
     }
   }
@@ -1633,7 +1633,7 @@ namespace Smala
             new_param_name = transform_name (whatever_name);
           }
           createPropertyIfNotKnownYet(arg, new_param_name, create_temp_properties);
-          const auto& new_name = prop_sym[arg];
+          const auto& new_name = prop_sym[new_param_name];
           //std::cerr << "got " << new_name << " for " << arg << std::endl;
           emit_compiler_info (populate_native_fields);
           indent (populate_native_fields);
@@ -1662,7 +1662,7 @@ namespace Smala
           new_param_name = transform_name(whatever_name);
         }
         createPropertyIfNotKnownYet(arg, new_param_name, create_temp_properties);
-        const auto& new_name = prop_sym[arg];
+        const auto& new_name = prop_sym[new_param_name];
         emit_compiler_info (populate_native_fields);
         indent (populate_native_fields);
         populate_native_fields << native_name << "->" << new_param_name << " = " <<  new_name << ";\n";
@@ -1703,7 +1703,6 @@ namespace Smala
     populate_native_fields << p_name << ", " << n_expr_name << ");\n";
 
     emit_compiler_info(os);
-    os << "// >>\n";
     os << create_temp_properties.str() << "\n";
     os << native_stream.str() << "\n";
     os << populate_native_fields.str() << "\n";
@@ -1752,7 +1751,7 @@ namespace Smala
       os << arg << ");\n";
     }
 
-    os << "//<<\n\n";
+    os << "\n\n";
   }
 
   void

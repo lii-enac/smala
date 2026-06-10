@@ -23,6 +23,8 @@ _define_
 CheckBox (string _label) inherits IWidget () {
 
   /*----- interface -----*/
+  Bool _is_binded (false) // FIXME – make it work correctly with the manager
+
   Spike selected
   Spike unselected
   Spike unselect

@@ -33,25 +33,20 @@ Component root {
   Exit ex (0, 1)
   f.close -> ex
 
-    HBox hbox (f)
-    Label l ("")
+  HBox hbox {
+    Label l ("foobar")
     l.preferred_height = 20
     l.preferred_width = 100
-    VBox vbox (hbox)
+    VBox vbox {
       CheckBox c1 ("First choice")
       c1.h_alignment = 0
       CheckBox c2 ("Second choice")
       c2.h_alignment = 0
       CheckBox c3 ("Third choice")
       c3.h_alignment = 0
-      addChildrenTo vbox.items {
-        c1, 
-        c2,
-        c3
-      }
-      CheckBoxManager manager (vbox.items, vbox.items.[1])
-    manager.value =:> l.text
-    addChildrenTo hbox.items {
-      l, vbox
     }
+  }
+
+  CheckBoxManager manager (hbox.vbox.items, 1)
+  manager.value =:> hbox.l.text
 }

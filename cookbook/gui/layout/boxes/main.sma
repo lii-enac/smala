@@ -38,8 +38,8 @@ Component root {
   f.{width,height}=:>bkg.{width,height}
   TextPrinter tp
 
-  HBox hbox (f)
-    VBox vbox (hbox)
+  HBox hbox {
+    VBox vbox {
       Component model {
         List items {
           String _ ("First choice")
@@ -47,27 +47,23 @@ Component root {
           String _ ("Third choice")
         }
       }
+      PushButton b1 ("My Button")
+      b1.preferred_width = 100
+      
+      UITextField tf
+      tf.preferred_width = 100
+
       ComboBox cb
       model =: cb.model
       cb.preferred_width = 100
-      
-      PushButton b1 ("My Button")
-      b1.preferred_width = 100
       cb.value =:> b1.label
-      UITextField tf
-      tf.preferred_width = 100
-      addChildrenTo vbox.items
-      { 
-        cb,
-        b1,
-        tf
-      }
+    }
     HSpace hspace (20)
     PushButton b2 ("Quit")
     b2.click->ex
     PushButton b3 ("Say Hello!")
     b3.click -> { "Hello!" =: tp.input }
-    VBox vbox2 (hbox)
+    VBox vbox2 {
       PushButton sub1 ("Sub button 1")
       PushButton sub2 ("Sub button 2")
       ToggleButton sub3 ("Connect slider")
@@ -82,13 +78,6 @@ Component root {
         idle->connected (sub3.toggle)
         connected->idle (sub3.toggle)
       }
-      addChildrenTo vbox2.items
-      { 
-        sub1,
-        sub2,
-        sub3,
-        l,
-        s 
-      }
-  addChildrenTo hbox.items { vbox, hspace, vbox2, b3, b2 }
+    }
+  }
  }

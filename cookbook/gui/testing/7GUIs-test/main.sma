@@ -10,11 +10,15 @@ import exec_env.main_loop
 import Counter_7GUIs
 import TempConverter_7GUIs
 import FlightBooker_7GUIs
+import Timer_7GUIs
 
 _native_code_
 %{
 #include <assert.h>
 #include <math.h> // floor, ceil
+using djnnstl::cerr;
+using djnnstl::cout;
+using djnnstl::endl;
 
 #include "gui/picking/picking.h"
 
@@ -62,9 +66,12 @@ Component root {
     Frame f("7GUIs Test", 0, 0, 100, 100)                    // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
+    TextPrinter tp
+
     Counter_7GUIs cnt(f)
     TempConverter_7GUIs tmpc(f)
     FlightBooker_7GUIs fb(f)
+    Timer_7GUIs tmr (f)
 
     mainloop -> (root) {
         // Counter
@@ -122,9 +129,45 @@ Component root {
         //assert (Book.fsm.state == "disabled") // button should be disabled // FIXME doesn't work
         
 
+        // Timer
+        G = find(root.tmr, "//G")   // gauge (ProgressBar) G
+        L = find(root.tmr, "//L")   // label L
+        S = find(root.tmr, "//S")   // slider S
+        R = find(root.tmr, "//R")   // reset button R
+        d = find(root.tmr, "//d")   // duration
+        e = find(root.tmr, "//e")   // elapsed time
+        // stop_cond = find(root.tmr, "//stop_cond")   // Stop condition
+
+        print ("Init: Gauge = " + G.value + " -- Slider = " + S.value + " -- duration = " + d + " -- elapsed = " + e)
+
+        // check initial values
+        assert (get_double_value (G.value) == 0.0)
+        assert (get_double_value (d) == get_double_value (S.value) / 10)
+        assert (get_double_value (e) == 0.0)
+        assert (L.text == "0.00s")
+
+        // FXME: need something to wait ?
+
+        activate (R.click)  // execute R action (reset)
+        graph_exec()
+        assert (get_double_value (G.value) == 0.0)  // The gauge value must be 0
+        assert (get_double_value (e) == 0.0)        // The elapsed time must be 0
+        assert (L.text == "0.00s")                  // Label should display "0.00s"
         // end
         deactivate (mainloop) // exit when done
         print ("\033[32mall tests passed successfully\033[39;49m")
+    }
+
+    Timer wait (1000)
+    // Timer wait (1100)
+    wait.end -> na_wait:(root) {
+        G = find(root.tmr, "//G")
+        L = find(root.tmr, "//L")
+        e = find(root.tmr, "//e")
+        print ("After 1 s: Gauge = " + G.value + " -- elapsed = " + e + " -- label = " + L.text)
+        // assert (get_double_value (G.value) == 10.0)
+        // assert (get_double_value (e) == 1.0)
+        // assert (L.text == "1.00s")
     }
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1

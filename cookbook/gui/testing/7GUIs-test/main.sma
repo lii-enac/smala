@@ -71,7 +71,7 @@ Component root {
     Counter_7GUIs cnt(f)
     TempConverter_7GUIs tmpc(f)
     FlightBooker_7GUIs fb(f)
-    Timer_7GUIs tmr (f)
+    Timer_7GUIs tmr ()
 
     mainloop -> (root) {
         // Counter

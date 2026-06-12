@@ -11,7 +11,7 @@ import gui.widgets.VBox
 import gui.widgets.HBox
 
 _define_
-Timer_7GUIs (Process a) {
+Timer_7GUIs () {
     Frame f ("7GUIs Timer")             // [7GUIs] The task is to build a frame containing
     // f.close ->! mainloop
     mouseTracking = 1    // FIXME otherwise Slider adjustment won't work

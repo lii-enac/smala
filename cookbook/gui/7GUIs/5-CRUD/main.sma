@@ -182,7 +182,7 @@ action_delete_selected_person (Process src, Process self)
 
         if (&model != null) {
             if (contains (self.displayed_models, model)) {  // Could be filtered out
-                // setRef (root.displayed_models.rm, model)
+                // setRef (self.displayed_models.rm, model)
                 // graph_exec ()
                 remove_one (self.displayed_models, model)   // We have to remove from the list of displayed_models immediately !
             }
@@ -327,16 +327,16 @@ Component root {
             insert_view_for_model_to_display (model, root.models, root.L)
         }
     }
-    na_model_added_to_displayed_models -> root.L.pack   // Update layout
+    na_model_added_to_displayed_models -> L.pack   // Update layout
 
     NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, root, 1)
     displayed_models.rm -> na_model_removed_from_displayed_models           // Called when a model is removed from the unordered list of displayed models (its view should be hide)
 
     (L.selected_item.is_null == 0) && L.selected_item -> {      // [7GUIs] At most one entry can be selected in L at a time.
-        name_of_selected_item.value =: root.T_name.init_text
-        surname_of_selected_item.value =: root.T_surname.init_text
+        name_of_selected_item.value =: T_name.init_text
+        surname_of_selected_item.value =: T_surname.init_text
     }
-    L.selected_item.is_null.true -> root.T_name.clear, root.T_surname.clear     // NO selection -> clear text fields
+    L.selected_item.is_null.true -> T_name.clear, T_surname.clear     // NO selection -> clear text fields
 
     NativeAction na_filter (action_filter, root, 1)     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
     T_prefix.field.content.text -> na_filter            // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
@@ -365,14 +365,14 @@ Component root {
     T_surname.next -> BC.select             // Key "tab" allows to set the focus to next button (T_surname -> BC)
 
     BU.click -> {       // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
-        root.T_name.text =?: name_of_selected_item.value
-        root.T_surname.text =?: surname_of_selected_item.value
+        T_name.text =?: name_of_selected_item.value
+        T_surname.text =?: surname_of_selected_item.value
     }
 
     NativeAction na_delete_selected_person (action_delete_selected_person, root, 1)
     // BD.click -> L.reset_selection               // drawback: we can't do that because we use the ref on selected_item in the native action "delete_selected_person"
     BD.click -> na_delete_selected_person       // [7GUIs] BD will remove the selected entry.
-    na_delete_selected_person -> root.L.pack    // Update layout after deletion
+    na_delete_selected_person -> L.pack    // Update layout after deletion
 
 
     // FIXME: for tests / debug

@@ -11,6 +11,7 @@ import Counter_7GUIs
 import TempConverter_7GUIs
 import FlightBooker_7GUIs
 import Timer_7GUIs
+import CRUD_7GUIs
 
 _native_code_
 %{
@@ -72,9 +73,12 @@ Component root {
     TempConverter_7GUIs tmpc(f)
     FlightBooker_7GUIs fb(f)
     Timer_7GUIs tmr ()
+    CRUD_7GUIs crud ()
 
     mainloop -> (root) {
-        // Counter
+
+        // -------------------------------------------------------
+        // 1- Counter
         B = find(root.cnt, "//B")
         T = find(root.cnt, "//T")
 
@@ -90,7 +94,8 @@ Component root {
         assert (getString(T.text) == "2") // the text should read "2"
 
 
-        // TempConverter
+        // -------------------------------------------------------
+        // 2- Temp Converter
         TC = find(root.tmpc, "//TC")
         TF = find(root.tmpc, "//TF")
 
@@ -108,7 +113,8 @@ Component root {
         // TODO add the other way around
 
 
-        // FlightBooker
+        // -------------------------------------------------------
+        // 3- Flight Booker
         C = find(root.fb, "//C")
         T1 = find(root.fb, "//T1")
         T2 = find(root.fb, "//T2")
@@ -125,11 +131,12 @@ Component root {
         T1.init_text = "01.01.2" // set one-way date to an invalid date
         graph_exec()
         assert (get_pixel_color(root.fb.f, 19, 47)==0xff0000) // T1 text should be red
-        //print (Book.fsm.state)
-        //assert (Book.fsm.state == "disabled") // button should be disabled // FIXME doesn't work
+        print (Book.fsm.state)
+        // assert (Book.fsm.state == "disabled") // button should be disabled // FIXME doesn't work
         
 
-        // Timer
+        // -------------------------------------------------------
+        // 4- Timer
         G = find(root.tmr, "//G")   // gauge (ProgressBar) G
         L = find(root.tmr, "//L")   // label L
         S = find(root.tmr, "//S")   // slider S
@@ -153,9 +160,68 @@ Component root {
         assert (get_double_value (G.value) == 0.0)  // The gauge value must be 0
         assert (get_double_value (e) == 0.0)        // The elapsed time must be 0
         assert (L.text == "0.00s")                  // Label should display "0.00s"
+        
+
+        // -------------------------------------------------------
+        // 5- CRUD
+        T_prefix = find(root.crud, "//T_prefix")
+        LB = find(root.crud, "//LB")
+        T_name = find(root.crud, "//T_name")
+        T_surname = find(root.crud, "//T_surname")
+        BC = find(root.crud, "//BC")
+        BU = find(root.crud, "//BU")
+        BD = find(root.crud, "//BD")
+
+        assert (LB.items.size == 0)
+        
+        T_name.init_text = "John"
+        T_surname.init_text = "Doe"
+        graph_exec()
+        activate (BC.click)  // execute BC action (Create)
+        graph_exec()
+        assert (LB.items.size == 1)
+
+        T_name.init_text = "Jane"
+        T_surname.init_text = "Doe"
+        graph_exec()
+        activate (BC.click)  // execute BC action (Create)
+        graph_exec()
+        assert (LB.items.size == 2)
+
+        for (int n = 1; n < 6; n++) {
+            T_name.init_text = "forename " + to_string (n)
+            T_surname.init_text = "name " + to_string (n)
+            graph_exec()
+            activate (BC.click)  // execute BC action (Create)
+            graph_exec()
+        }
+        assert (LB.items.size == 7)
+
+        // T_prefix.init_text = "name"
+        // graph_exec()
+        // assert (LB.items.size == 5)
+
+        // Select the 6th item
+        activate (LB.items.[6].bg.r.press)
+        graph_exec()
+        print ("T_name = " + T_name.text + " -- T_surname = " + T_surname.text)
+        assert (T_name.text == "forename 4")
+        // assert (T_surname.text == "name 4")
+
+        // Rename it "name 4" --> "name 24"
+        // T_surname.init_text = "name 24"
+        // graph_exec()
+        // activate (BU.click)  // execute BU action (Update)
+        // graph_exec()
+
+
+        // Update prefix with "name 2"
+        // assert (LB.items.size == 2)
+
+
         // end
-        deactivate (mainloop) // exit when done
-        print ("\033[32mall tests passed successfully\033[39;49m")
+        // deactivate (mainloop) // exit when done
+        // print ("\033[32mall tests passed successfully\033[39;49m")
     }
 
     Timer wait (1000)

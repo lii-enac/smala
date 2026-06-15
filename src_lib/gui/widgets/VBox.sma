@@ -81,7 +81,9 @@ fn_update_items_pos_and_geom (Process src, Process data)
       max_width = $item.width
     } 
   }
-  dy -= space // remove last added space FIXME requires non empty items
+  if ($data.items.size>0) {
+    dy -= space // remove last added space
+  }
 
   for item : data.items {
     if (item.h_alignment == 0) { // left
@@ -130,6 +132,8 @@ VBox () inherits AbstractBox ()
   sl.output->update_items_pos_and_geom // bad trick to force geometry recomputation at startup, needed for text
   sl.output + this.space*(this.items.size - 1) =:> this.min_height
   ml.output =:> this.min_width
+  this.min_width -> update_items_pos_and_geom
+  this.min_height -> update_items_pos_and_geom
 
   if (this.top_level_box == 1) {
     Timer t(1)

@@ -165,17 +165,16 @@ HBox () inherits AbstractBox ()
 
   NativeAction update_items_pos_and_geom (fn_update_items_pos_and_geom, this, 0)
   
-  // // whenever the container sizes change, recompute layout
-  // this.container_width -> update_items_pos_and_geom
-  // this.container_height -> update_items_pos_and_geom
+  this.container_width -> update_items_pos_and_geom
+  this.container_height -> update_items_pos_and_geom
 
   SumList sum_of_min_width (this.items, "min_width")
+  sum_of_min_width.output -> update_items_pos_and_geom // force geometry recomputation at startup, needed for text
   sum_of_min_width.output + this.space*(this.items.size - 1) =:> this.min_width
 
   MaxList max_of_min_height (this.items, "min_height")
   max_of_min_height.output =:> this.min_height
 
-  //sl.output -> update_items_pos_and_geom // bad trick to force geometry recomputation at startup, needed for text
   this.min_width  -> update_items_pos_and_geom
   this.min_height -> update_items_pos_and_geom
 
@@ -183,20 +182,14 @@ HBox () inherits AbstractBox ()
     Timer t(1)
     t.end -> this.pack     // FIXME
     t.end -> update_items_pos_and_geom
-  }
 
     if (this.preferred_width == -1) {
       this.container_width =:> this.preferred_width
-      this.preferred_width -> update_items_pos_and_geom
     }
     if (this.preferred_height == -1) {
       this.container_height =:> this.preferred_height
-      this.container_height -> update_items_pos_and_geom
     }
-  // } else {
-  //   this.container_width -> update_items_pos_and_geom
-  //   this.container_height -> update_items_pos_and_geom
-  // }
+  }
   this.pack ~> update_items_pos_and_geom
   
   moveChild this.remaining >>

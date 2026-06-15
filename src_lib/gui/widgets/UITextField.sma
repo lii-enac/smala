@@ -32,21 +32,32 @@ UITextField () inherits IWidget () {
   String init_text ("") // initial value of our text field
 
 
-  OutlineColor _ (#535353)
+  OutlineColor bg_ol_color (#535353)
   FillColor bg_color (White)  
 
+  Int default_width (190)
+  Int default_height (21)
+  Int horizontal_padding (5)
+
+  this.width = default_width
+  this.height = default_height
+
   Rectangle bkg (0, 0, 190, 21, 3, 3)
-  Translation _ (5, 2)
+  Translation content_offset (5, 2)
   FillColor _ (Black)
   
   TextField field (0, 0, 180, 18, "", 1)
   field.validate -> validate  // propagate validate from inner text field
   clear -> field.clear        // our signal clear the inner text field
 
-  this.preferred_height = 18
+  this.preferred_height = default_height
+  this.min_height = default_height
   this.min_width = 100
   this.width =:> bkg.width
-  this.width - 10 =:> field.width
+  this.height =:> bkg.height
+  this.width - 2*horizontal_padding =:> field.width
+  this.height - content_offset.ty =:> field.height
+  this.height > field.cursor_height ? (this.height - field.cursor_height) / 2 : 0 =:> content_offset.ty
 
   Int unedit_text_color (0) //(#909090)
   Int edit_text_color (0)

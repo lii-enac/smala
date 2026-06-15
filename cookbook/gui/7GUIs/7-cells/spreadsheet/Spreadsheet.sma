@@ -288,7 +288,7 @@ Spreadsheet (int row_, int col_, int tx_, int ty_)
             OutlineWidth ow (2)
             Rectangle _ (0, 0, cell_width, cell_height)
             FillColor _ (Black)
-            StandAloneUITextField tf ($ow.width, default_text_spacing, cell_width - default_text_spacing - $ow.width , cell_height) // a TextField we will move on top of cells to edit them
+            StandAloneUITextField tf ($ow.width, default_text_spacing, cell_width - default_text_spacing - $ow.width, cell_height - default_text_spacing - $ow.width) // a TextField we will move on top of cells to edit them
             edit_bg_color.value =:> tf.bg_color.value, tf.bg_ol_color.value
              
             _formula_of_current_cell.value =:> tf.init_text

@@ -27,6 +27,7 @@ _native_code_
     // #include "../../7GUIs/5-CRUD/PersonView.h"
 
     #include "core/property/text_property.h"
+    #include <algorithm>
 
     using namespace djnnstl;
 

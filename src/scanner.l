@@ -59,8 +59,10 @@
 %option c++
 %option yyclass="Scanner"
 %option prefix="Smala_"
+%x IMPORT_PATH
 
 NAME [a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
+IMPORT_NAME [^\/\.\t \n]+
 INT [0-9]+
 ACTION ("run"|"notify"|"stop"|"dump"|"delete"|"XMLSerialize"|"delete_content")
 BREAK ("break"|"continue"|"return")
@@ -162,7 +164,7 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 {ACTION}              { return Smala::Parser::make_ACTION (yytext, loc); }
 {BREAK}               { return Smala::Parser::make_BREAK (yytext, loc); }
 "use"                 { return Smala::Parser::make_USE (loc); }
-"import"              { return Smala::Parser::make_IMPORT (loc); }
+"import"              { BEGIN(IMPORT_PATH); return Smala::Parser::make_IMPORT (loc); }
 "merge"               { return Smala::Parser::make_MERGE (loc); }
 "remove"              { return Smala::Parser::make_REMOVE (loc); }
 "moveChild"           { return Smala::Parser::make_MOVE (loc); }
@@ -194,5 +196,15 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 [\t \.]+              { loc.step (); }
 "\\\n"                {}
 "\n"+                 { loc.lines (yyleng); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
-<<EOF>>               { return yyterminate (); }
+<INITIAL><<EOF>>      { return yyterminate (); }
+
+<IMPORT_PATH>"//"[^\n]* {}
+<IMPORT_PATH>".."       { return Smala::Parser::make_PARENT_DIR (loc); }
+<IMPORT_PATH>"."        { return Smala::Parser::make_DOT (loc); }
+<IMPORT_PATH>"/"        { return Smala::Parser::make_DIVIDE (loc); }
+<IMPORT_PATH>{IMPORT_NAME} { return Smala::Parser::make_NAME (str_filter (yytext), loc); }
+<IMPORT_PATH>[\t ]+     { loc.step (); }
+<IMPORT_PATH>"\\\n"     {}
+<IMPORT_PATH>"\n"+      { BEGIN(INITIAL); loc.lines (yyleng); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
+<IMPORT_PATH><<EOF>>    { BEGIN(INITIAL); return yyterminate (); }
 %%

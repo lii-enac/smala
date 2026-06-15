@@ -14,17 +14,11 @@ import gui.widgets.HBox
 import gui.widgets.Label
 import gui.widgets.ListBox
 
-// import ../../7GUIs/5-CRUD/PersonModel
-// import 7GUIs.5-CRUD.PersonModel
-import CRUD.PersonModel
-// import ../../7GUIs/5-CRUD/PersonView
-// import 7GUIs.5-CRUD.PersonView
-import CRUD.PersonView
+import ../../7GUIs/5-CRUD/PersonModel
+import ../../7GUIs/5-CRUD/PersonView
 
 _native_code_
 %{
-    // #include "../../7GUIs/5-CRUD/PersonModel.h"
-    // #include "../../7GUIs/5-CRUD/PersonView.h"
 
     #include "core/property/text_property.h"
     #include <algorithm>

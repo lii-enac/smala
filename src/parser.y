@@ -288,6 +288,7 @@
 %token <string> ACTION "<action>"
 %token AKA "aka"
 %token IMPORT "import"
+%token PARENT_DIR ".."
 %token END 0 "end of file"
 %token <string> NAME "name"
 
@@ -302,6 +303,8 @@
 %type < expression_t > argument_list
 %type <PathNode*> binding_src
 %type < std::vector<SubPathNode*> > name_or_path
+%type < std::vector<SubPathNode*> > import_path
+%type <SubPathNode*> import_path_item
 %type <bool> is_model
 %type <smala_t> type
 %type < Smala::parameter_t > array_type
@@ -379,9 +382,37 @@ use
     }
 
 import
-  : IMPORT name_or_path
+  : IMPORT import_path
     {
       driver.add_import (@$, new PathNode (@$, $2));
+    }
+
+import_path
+  : import_path_item
+    {
+      std::vector<SubPathNode*> path;
+      path.push_back ($1);
+      $$ = path;
+    }
+  | import_path DOT import_path_item
+    {
+      $1.push_back ($3);
+      $$ = $1;
+    }
+  | import_path DIVIDE import_path_item
+    {
+      $1.push_back ($3);
+      $$ = $1;
+    }
+
+import_path_item
+  : NAME
+    {
+      $$ = new SubPathNode (@$, $1, START, NO_CAST);
+    }
+  | PARENT_DIR
+    {
+      $$ = new SubPathNode (@$, "..", ITEM, NO_CAST);
     }
 
 native_code

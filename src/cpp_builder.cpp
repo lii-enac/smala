@@ -31,6 +31,7 @@
 
 #include <locale>
 #include <algorithm>
+#include <cctype>
 #include <unistd.h> // getpid
 #include "core/utils/filesystem.h"
 
@@ -80,6 +81,57 @@ namespace Smala
     std::replace(new_param_name.begin(), new_param_name.end(), '>','_');
     new_param_name.erase(std::remove(new_param_name.begin(), new_param_name.end(), '"'), new_param_name.end());
     return new_param_name;
+  }
+
+  static std::string
+  sanitize_fake_name_token (const std::string& input)
+  {
+    std::string token;
+    token.reserve (input.size ());
+    bool last_was_separator = false;
+    for (unsigned char c : input) {
+      if (std::isalnum (c)) {
+        token += static_cast<char> (c);
+        last_was_separator = false;
+      } else if (!last_was_separator) {
+        token += '_';
+        last_was_separator = true;
+      }
+    }
+    while (!token.empty () && token.front () == '_')
+      token.erase (token.begin ());
+    while (!token.empty () && token.back () == '_')
+      token.pop_back ();
+    return token;
+  }
+
+  static std::string
+  build_fake_expr_subpath_name (ExprNode* expr, bool out)
+  {
+    std::string name = out ? "expr_out" : "expr_in";
+    std::string token;
+
+    if (expr != nullptr) {
+      switch (expr->get_expr_node_type ()) {
+        case LITERAL:
+          token = expr->get_val ();
+          break;
+        case PATH_EXPR:
+          token = dynamic_cast<PathExprNode*> (expr)->get_path ()->build_string_repr ("_");
+          break;
+        default:
+          break;
+      }
+
+      token = sanitize_fake_name_token (token);
+      if (!token.empty ())
+        name += "_" + token;
+
+      const location& loc = expr->get_location ();
+      name += "_at_" + std::to_string (loc.begin.line) + "_" + std::to_string (loc.begin.column);
+    }
+
+    return name;
   }
 
   CPPBuilder::CPPBuilder () :
@@ -777,15 +829,10 @@ namespace Smala
   std::string
   CPPBuilder::build_fake_name (PathNode* n, bool out)
   {
-    m_expr_in = m_expr_out = 0;
-    
     std::string fake = n->get_subpath_list ().at (0)->get_subpath();
     for (size_t i = 1; i < n->get_subpath_list ().size (); i++) {
       if (n->get_subpath_list ().at (i)->get_path_type() == EXPR) {
-        if (out)
-          fake += ".expr_out" + std::to_string (m_expr_out++);
-        else
-          fake += ".expr_in" + std::to_string (m_expr_in++);
+        fake += "." + build_fake_expr_subpath_name (n->get_subpath_list ().at (i)->get_expr (), out);
       }
       else
         fake += "." + n->get_subpath_list ().at (i)->get_subpath ();

@@ -69,7 +69,8 @@ MyTextField (double _x, double _y, double _w) {
       OutlineWidth _ (1)
       Line cursor (0, 0, 0, 15)
       field.cursor_end_x =:> cursor.x1, cursor.x2
-      field.cursor_height =:> cursor.y2
+      field.cursor_start_y =:> cursor.y1
+      field.cursor_end_y =:> cursor.y2
       //validate->leave
 
       GenericKeyboard.key\-pressed != DJN_Key_Return -> { GenericKeyboard.key\-pressed =: field.key_pressed }

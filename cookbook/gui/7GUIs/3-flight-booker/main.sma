@@ -190,6 +190,8 @@ Component root {
         Frame f2 ("", 650, 550, 400, 100)
         FillColor _ (White)
         Text t (10, 50, "NaN") 
+        t.width + 20 =:> f2.width
+        t.height + 70 =:> f2.height
     }
     B.click -> pre_open_popup_confirm_order : (root) {
         if (root.is_return_flight) {
@@ -220,4 +222,3 @@ Component root {
 // [7GUIs] A good solution for Flight Booker will make the constraints clear, succinct and explicit in the source code and not hidden behind a lot of scaffolding.
 
 // [7GUIs] Flight Booker is directly inspired by the Flight Booking Java example in Sodium with the simplification of using textfields for date input instead of specialized date picking widgets as the focus of Flight Booker is not on specialized/custom widgets.
-

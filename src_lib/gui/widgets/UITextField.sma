@@ -43,7 +43,7 @@ UITextField () inherits IWidget () {
   this.height = default_height
 
   Rectangle bkg (0, 0, 190, 21, 3, 3)
-  Translation content_offset (5, 2)
+  Translation content_offset (5, 0)
   FillColor _ (Black)
   
   TextField field (0, 0, 180, 18, "", 1)
@@ -56,8 +56,7 @@ UITextField () inherits IWidget () {
   this.width =:> bkg.width
   this.height =:> bkg.height
   this.width - 2*horizontal_padding =:> field.width
-  this.height - content_offset.ty =:> field.height
-  this.height > field.cursor_height ? (this.height - field.cursor_height) / 2 : 0 =:> content_offset.ty
+  this.height =:> field.height
 
   Int unedit_text_color (0) //(#909090)
   Int edit_text_color (0)
@@ -98,7 +97,8 @@ UITextField () inherits IWidget () {
       OutlineWidth _ (1)
       Line cursor (0, 0, 0, 15)
       field.cursor_end_x =:> cursor.x1, cursor.x2
-      field.cursor_height =:> cursor.y2
+      field.cursor_start_y =:> cursor.y1
+      field.cursor_end_y =:> cursor.y2
 
       validate -> leave   // Key "Return" --> validate -> leave --> change state to no_edit
       next -> validate

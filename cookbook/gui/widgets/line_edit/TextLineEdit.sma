@@ -38,7 +38,8 @@
   OutlineWidth _ (2)
   Line cursor (0, 0, 0, 15)
   field.cursor_end_x =:> cursor.x1, cursor.x2
-  field.cursor_height =:> cursor.y2
+  field.cursor_start_y =:> cursor.y1
+  field.cursor_end_y =:> cursor.y2
   
 
   AssignmentSequence set_text (1) {

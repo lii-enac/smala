@@ -48,8 +48,9 @@ _native_code_
 %}
 
 _define_
-FlightBooker_7GUIs (Process a) {
-    Frame f ("7GUIs Flight Booker", 800, 500, 150, 120) // [7GUIs] The task is to build a frame containing...
+FlightBooker_7GUIs ()
+{
+    Frame f ("7GUIs Flight Booker", 680, 0, 150, 120) // [7GUIs] The task is to build a frame containing...
     //f.close ->! mainloop
 
     ZOrderedGroup zog {

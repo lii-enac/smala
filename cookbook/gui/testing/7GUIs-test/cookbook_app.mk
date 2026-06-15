@@ -14,6 +14,7 @@
 # 	../../7GUIs/5-CRUD/PersonModel.o ../../7GUIs/5-CRUD/PersonView.o CRUD_7GUIs.o
 objs_cookbook_app := Counter_7GUIs.o TempConverter_7GUIs.o FlightBooker_7GUIs.o Timer_7GUIs.o \
 	CRUD/PersonModel.o CRUD/PersonView.o CRUD_7GUIs.o \
+	CircleDrawer_7GUIs.o Cells_7GUIs.o \
 	main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

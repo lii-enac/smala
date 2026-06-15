@@ -8,8 +8,9 @@ import gui.widgets.StandAlonePushButton
 
 
 _define_
-Counter_7GUIs (Process a) {
-    Frame f("7GUIs Counter")                    // [7GUIs] The task is to build a frame containing...
+Counter_7GUIs ()
+{
+    Frame f("7GUIs Counter", 110, 0, 150, 100)                    // [7GUIs] The task is to build a frame containing...
     //f.close ->! mainloop
 
     FillColor _(#FFFFFF)                        // svg 'fill' defaults to black, which is hardly visible in smala lib's default dark theme

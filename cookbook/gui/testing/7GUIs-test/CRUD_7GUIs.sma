@@ -204,8 +204,7 @@ action_delete_selected_person (Process src, Process self)
 
 _define_
 CRUD_7GUIs () {
-
-    Frame f ("7GUIs CRUD", 0, 0, 600, 600)  // [7GUIs] The task is to build a frame containing the following elements:
+    Frame f ("7GUIs CRUD", 1100, 0, 380, 280)  // [7GUIs] The task is to build a frame containing the following elements:
     // f.close ->! mainloop
 
     List models                         // (Ordered) list of all models

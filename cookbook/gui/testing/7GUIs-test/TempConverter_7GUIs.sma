@@ -15,8 +15,9 @@ import gui.widgets.Label
 //import exec_env.main_loop
 
 _define_
-TempConverter_7GUIs (Process a) {
-    Frame f ("7GUIs Temp Converter") // [7GUIs] The task is to build a frame containing...
+TempConverter_7GUIs ()
+{
+    Frame f ("7GUIs Temp Converter", 270, 0, 400, 100) // [7GUIs] The task is to build a frame containing...
     //f.close ->! mainloop
 
     HBox h {

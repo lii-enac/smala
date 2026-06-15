@@ -12,6 +12,8 @@ import TempConverter_7GUIs
 import FlightBooker_7GUIs
 import Timer_7GUIs
 import CRUD_7GUIs
+import CircleDrawer_7GUIs
+import Cells_7GUIs
 
 _native_code_
 %{
@@ -64,16 +66,24 @@ pick_graphical_object(CoreProcess* frame, int x, int y)
 
 _main_
 Component root {
-    Frame f("7GUIs Test", 0, 0, 100, 100)                    // [7GUIs] The task is to build a frame containing...
+    Frame f("7GUIs Tests", 0, 0, 100, 100)                    // [7GUIs] The task is to build a frame containing...
     f.close ->! mainloop
 
     TextPrinter tp
 
-    Counter_7GUIs cnt(f)
-    TempConverter_7GUIs tmpc(f)
-    FlightBooker_7GUIs fb(f)
+    Component bg {
+        FillColor _ (White)
+        FontWeight _ (DJN_BOLD)
+        Text _ (10, 50, "7GUIs Tests")
+    }
+
+    Counter_7GUIs cnt ()
+    TempConverter_7GUIs tmpc ()
+    FlightBooker_7GUIs fb ()
     Timer_7GUIs tmr ()
     CRUD_7GUIs crud ()
+    CircleDrawer_7GUIs cd ()
+    Cells_7GUIs cll ()
 
     mainloop -> (root) {
 

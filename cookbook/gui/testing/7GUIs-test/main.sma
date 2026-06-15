@@ -174,6 +174,7 @@ Component root {
 
         assert (LB.items.size == 0)
         
+        // Add a 1st person: "Doe, John"
         T_name.init_text = "John"
         T_surname.init_text = "Doe"
         graph_exec()
@@ -181,6 +182,7 @@ Component root {
         graph_exec()
         assert (LB.items.size == 1)
 
+        // Add a 2nd person: "Doe, Jane"
         T_name.init_text = "Jane"
         T_surname.init_text = "Doe"
         graph_exec()
@@ -188,6 +190,7 @@ Component root {
         graph_exec()
         assert (LB.items.size == 2)
 
+        // Add 5 more persons: "name [n], forename [n]"
         for (int n = 1; n < 6; n++) {
             T_name.init_text = "forename " + to_string (n)
             T_surname.init_text = "name " + to_string (n)
@@ -197,27 +200,44 @@ Component root {
         }
         assert (LB.items.size == 7)
 
-        // T_prefix.init_text = "name"
-        // graph_exec()
-        // assert (LB.items.size == 5)
+        // Filter with prefix "name"
+        T_prefix.init_text = "name"
+        graph_exec()
+        assert (LB.items.size == 5)     // 5 persons have their surname that starts with "name"
+
+        // Reset filter
+        T_prefix.init_text = ""
+        graph_exec()
+        assert (LB.items.size == 7)
 
         // Select the 6th item
         activate (LB.items.[6].bg.r.press)
         graph_exec()
         print ("T_name = " + T_name.text + " -- T_surname = " + T_surname.text)
         assert (T_name.text == "forename 4")
-        // assert (T_surname.text == "name 4")
+        // assert (T_surname.text == "name 4")  // FIXME: does NOT work
 
         // Rename it "name 4" --> "name 24"
-        // T_surname.init_text = "name 24"
-        // graph_exec()
-        // activate (BU.click)  // execute BU action (Update)
-        // graph_exec()
+        T_surname.init_text = "name 24"
+        graph_exec()
+        activate (BU.click)  // execute BU action (Update)
+        graph_exec()
 
+        // Update filter with prefix "name 2"
+        T_prefix.init_text = "name 2"
+        graph_exec()
+        assert (LB.items.size == 2)     // 2 persons have their surname that starts with "name 2"
 
-        // Update prefix with "name 2"
-        // assert (LB.items.size == 2)
-
+        // Reset filter
+        T_prefix.init_text = ""
+        graph_exec()
+        
+        // Select the 3st item and delete it
+        activate (LB.items.[3].bg.r.press)
+        graph_exec()
+        activate (BD.click)  // execute BD action (Delete)
+        graph_exec()
+        assert (LB.items.size == 6)     // Only 6 remaining persons
 
         // end
         // deactivate (mainloop) // exit when done

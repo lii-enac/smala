@@ -77,8 +77,14 @@ bin/record_cppautogui -i simplest --retina
 The tool launches `make -j simplest_test` from `smala/`, then records global
 input events.
 
+- Wait a few seconds before doing the first recorded action. Test windows do not
+  always appear at the same speed, and the automatic replay waits before it
+  starts driving the app for the same reason.
 - Press `CTRL+ALT` to capture the current `<test>_app` window.
-- Press `ESC` to stop recording.
+- Before stopping the recorder, close the tested app with the red window button
+  so the quit action is part of the recording.
+- Press `ESC` only after the tested app is closed, to stop the recorder
+  definitively.
 
 Files are written in `new_records/`. Once a recording is good, copy:
 

@@ -110,6 +110,9 @@ pipeline {
 
                 stage('Build Windows') {
                     agent { label 'win10' }
+                    tools {
+                        git 'Git-MSYS'
+                    }
                     environment {
                         CUSTOM_WORKSPACE = '../djnn-qt-msys/smala'
                     }
@@ -150,6 +153,9 @@ pipeline {
 
                 stage('Build Windows WSL') {
                     agent { label 'win10' } // On utilise le même agent Windows
+                    tools {
+                        git 'ubuntu'
+                    }
                     environment {
                         CUSTOM_WORKSPACE = '../djnn-qt-wsl/smala'
                     }

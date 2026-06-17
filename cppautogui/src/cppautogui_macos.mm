@@ -27,6 +27,13 @@
 namespace fs = std::filesystem;
 
 namespace cppautogui {
+
+bool screenshot_window_or_region_bmp(const fs::path& output,
+                                     const std::string& app_window_name,
+                                     Rect fallback_region,
+                                     int scale,
+                                     std::string* error);
+
 namespace {
 
 constexpr int kEscapeKeyCode = 53;
@@ -35,6 +42,11 @@ struct BmpImage {
   int width = 0;
   int height = 0;
   std::vector<uint8_t> rgba;
+};
+
+struct WindowInfo {
+  Rect bounds;
+  CGWindowID id = kCGNullWindowID;
 };
 
 std::string cf_string_to_std(CFStringRef value)
@@ -433,7 +445,27 @@ bool launch_make_test(const std::string& app_name)
   return true;
 }
 
-CGImageRef create_screenshot_image(CGRect capture_rect)
+CGWindowImageOption window_image_options(int scale)
+{
+  if (scale > 1) {
+    return static_cast<CGWindowImageOption>(kCGWindowImageBoundsIgnoreFraming | kCGWindowImageBestResolution);
+  }
+  return static_cast<CGWindowImageOption>(kCGWindowImageBoundsIgnoreFraming | kCGWindowImageNominalResolution);
+}
+
+CGImageRef create_window_screenshot_image(CGWindowID window_id, int scale)
+{
+  using WindowImageFn = CGImageRef (*)(CGRect, CGWindowListOption, CGWindowID, CGWindowImageOption);
+  auto* raw_symbol = dlsym(RTLD_DEFAULT, "CGWindowListCreateImage");
+  if (raw_symbol == nullptr || window_id == kCGNullWindowID) {
+    return nullptr;
+  }
+
+  auto* window_image = reinterpret_cast<WindowImageFn>(raw_symbol);
+  return window_image(CGRectNull, kCGWindowListOptionIncludingWindow, window_id, window_image_options(scale));
+}
+
+CGImageRef create_screenshot_image(CGRect capture_rect, int scale)
 {
   using WindowImageFn = CGImageRef (*)(CGRect, CGWindowListOption, CGWindowID, CGWindowImageOption);
   using DisplayImageFn = CGImageRef (*)(CGDirectDisplayID, CGRect);
@@ -441,7 +473,7 @@ CGImageRef create_screenshot_image(CGRect capture_rect)
   if (raw_symbol != nullptr) {
     auto* window_image = reinterpret_cast<WindowImageFn>(raw_symbol);
     if (CGImageRef image =
-            window_image(capture_rect, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault)) {
+            window_image(capture_rect, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, window_image_options(scale))) {
       return image;
     }
   }
@@ -471,10 +503,10 @@ CGImageRef create_screenshot_image(CGRect capture_rect)
     const double scale_x = bounds.size.width == 0.0 ? 1.0 : CGDisplayPixelsWide(display) / bounds.size.width;
     const double scale_y = bounds.size.height == 0.0 ? 1.0 : CGDisplayPixelsHigh(display) / bounds.size.height;
     const CGRect local_rect =
-        CGRectMake((capture_rect.origin.x - bounds.origin.x) * scale_x,
-                   (capture_rect.origin.y - bounds.origin.y) * scale_y,
-                   capture_rect.size.width * scale_x,
-                   capture_rect.size.height * scale_y);
+        CGRectMake((capture_rect.origin.x - bounds.origin.x) * (scale > 1 ? scale_x : 1.0),
+                   (capture_rect.origin.y - bounds.origin.y) * (scale > 1 ? scale_y : 1.0),
+                   capture_rect.size.width * (scale > 1 ? scale_x : 1.0),
+                   capture_rect.size.height * (scale > 1 ? scale_y : 1.0));
     return display_image(display, local_rect);
   }
 
@@ -500,6 +532,53 @@ void remove_matching_bmps(const fs::path& dir, const std::string& prefix)
       fs::remove(path, ec);
     }
   }
+}
+
+std::optional<WindowInfo> find_window_info_by_name(const std::string& app_name)
+{
+  CFArrayRef windows = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+  if (windows == nullptr) {
+    return std::nullopt;
+  }
+
+  std::optional<WindowInfo> result;
+  const CFIndex count = CFArrayGetCount(windows);
+  for (CFIndex i = 0; i < count; ++i) {
+    auto* dict = static_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(windows, i));
+    auto* owner = static_cast<CFStringRef>(CFDictionaryGetValue(dict, kCGWindowOwnerName));
+    if (cf_string_to_std(owner) != app_name) {
+      continue;
+    }
+
+    int layer = 0;
+    if (auto* layer_number = static_cast<CFNumberRef>(CFDictionaryGetValue(dict, kCGWindowLayer))) {
+      CFNumberGetValue(layer_number, kCFNumberIntType, &layer);
+    }
+    if (layer != 0) {
+      continue;
+    }
+
+    auto* bounds = static_cast<CFDictionaryRef>(CFDictionaryGetValue(dict, kCGWindowBounds));
+    CGRect rect = CGRectNull;
+    if (bounds == nullptr || !CGRectMakeWithDictionaryRepresentation(bounds, &rect) || rect.size.width <= 0 ||
+        rect.size.height <= 0) {
+      continue;
+    }
+
+    uint32_t window_number = 0;
+    if (auto* window_number_ref = static_cast<CFNumberRef>(CFDictionaryGetValue(dict, kCGWindowNumber))) {
+      CFNumberGetValue(window_number_ref, kCFNumberSInt32Type, &window_number);
+    }
+    if (window_number == 0) {
+      continue;
+    }
+
+    result = WindowInfo{Rect{rect.origin.x, rect.origin.y, rect.size.width, rect.size.height}, window_number};
+    break;
+  }
+
+  CFRelease(windows);
+  return result;
 }
 
 std::string retina_suffix(bool retina)
@@ -561,8 +640,8 @@ void record_screenshot(RecorderState& state)
 {
   ++state.screenshot_counter;
   const std::string window_name = state.options.app_name + "_app";
-  const std::optional<Rect> geometry = find_window_geometry_by_name(window_name);
-  if (!geometry) {
+  const std::optional<WindowInfo> window = find_window_info_by_name(window_name);
+  if (!window) {
     std::cerr << "\tWARNING - '" << state.options.app_name << "' window NOT FOUND\n";
     if (state.run_loop != nullptr) {
       CFRunLoopStop(state.run_loop);
@@ -577,16 +656,16 @@ void record_screenshot(RecorderState& state)
        "_Ref.bmp");
   std::string error;
   const int scale = state.options.retina ? 2 : 1;
-  if (!screenshot_bmp(screenshot_name, *geometry, scale, &error)) {
+  if (!screenshot_window_or_region_bmp(screenshot_name, window_name, window->bounds, scale, &error)) {
     std::cerr << "cannot save screenshot: " << error << "\n";
   }
   if (state.options.debug) {
-    std::cout << screenshot_name << " " << geometry->x * scale << " " << geometry->y * scale << " "
-              << geometry->width * scale << " " << geometry->height * scale << " " << pos.x << " " << pos.y
+    std::cout << screenshot_name << " " << window->bounds.x << " " << window->bounds.y << " "
+              << window->bounds.width << " " << window->bounds.height << " " << pos.x << " " << pos.y
               << "\n";
   }
-  state.log << "screenshot " << state.screenshot_counter << " " << geometry->x << " " << geometry->y << " "
-            << geometry->width << " " << geometry->height << " " << static_cast<int>(pos.x) << " "
+  state.log << "screenshot " << state.screenshot_counter << " " << window->bounds.x << " " << window->bounds.y << " "
+            << window->bounds.width << " " << window->bounds.height << " " << static_cast<int>(pos.x) << " "
             << static_cast<int>(pos.y) << "\n";
   state.log.flush();
 }
@@ -709,39 +788,11 @@ std::optional<MouseButton> parse_button(const std::string& text)
 
 std::optional<Rect> find_window_geometry_by_name(const std::string& app_name)
 {
-  CFArrayRef windows = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-  if (windows == nullptr) {
+  const std::optional<WindowInfo> info = find_window_info_by_name(app_name);
+  if (!info) {
     return std::nullopt;
   }
-
-  std::optional<Rect> result;
-  const CFIndex count = CFArrayGetCount(windows);
-  for (CFIndex i = 0; i < count; ++i) {
-    auto* dict = static_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(windows, i));
-    auto* owner = static_cast<CFStringRef>(CFDictionaryGetValue(dict, kCGWindowOwnerName));
-    if (cf_string_to_std(owner) != app_name) {
-      continue;
-    }
-
-    int layer = 0;
-    if (auto* layer_number = static_cast<CFNumberRef>(CFDictionaryGetValue(dict, kCGWindowLayer))) {
-      CFNumberGetValue(layer_number, kCFNumberIntType, &layer);
-    }
-    if (layer != 0) {
-      continue;
-    }
-
-    auto* bounds = static_cast<CFDictionaryRef>(CFDictionaryGetValue(dict, kCGWindowBounds));
-    CGRect rect = CGRectNull;
-    if (bounds != nullptr && CGRectMakeWithDictionaryRepresentation(bounds, &rect) && rect.size.width > 0 &&
-        rect.size.height > 0) {
-      result = Rect{rect.origin.x, rect.origin.y, rect.size.width, rect.size.height};
-      break;
-    }
-  }
-
-  CFRelease(windows);
-  return result;
+  return info->bounds;
 }
 
 Point mouse_position()
@@ -775,15 +826,12 @@ void mouse_up(Point point, MouseButton button)
   post_mouse(mouse_up_type(button), point, button);
 }
 
-bool screenshot_bmp(const fs::path& output, Rect region, int scale, std::string* error)
+bool save_cgimage_as_bmp(const fs::path& output, CGImageRef image, std::string* error)
 {
   if (!create_parent_dir(output, error)) {
     return false;
   }
 
-  const CGRect capture_rect =
-      CGRectMake(region.x * scale, region.y * scale, region.width * scale, region.height * scale);
-  CGImageRef image = create_screenshot_image(capture_rect);
   if (image == nullptr) {
     set_error(error, "screen capture failed");
     return false;
@@ -793,7 +841,6 @@ bool screenshot_bmp(const fs::path& output, Rect region, int scale, std::string*
   CFURLRef url = CFURLCreateFromFileSystemRepresentation(
       kCFAllocatorDefault, reinterpret_cast<const UInt8*>(output_string.c_str()), output_string.size(), false);
   if (url == nullptr) {
-    CGImageRelease(image);
     set_error(error, "cannot create file URL for " + output.string());
     return false;
   }
@@ -802,7 +849,6 @@ bool screenshot_bmp(const fs::path& output, Rect region, int scale, std::string*
       CGImageDestinationCreateWithURL(url, CFSTR("com.microsoft.bmp"), 1, nullptr);
   if (destination == nullptr) {
     CFRelease(url);
-    CGImageRelease(image);
     set_error(error, "cannot create BMP destination for " + output.string());
     return false;
   }
@@ -811,13 +857,40 @@ bool screenshot_bmp(const fs::path& output, Rect region, int scale, std::string*
   const bool ok = CGImageDestinationFinalize(destination);
   CFRelease(destination);
   CFRelease(url);
-  CGImageRelease(image);
 
   if (!ok) {
     set_error(error, "cannot write BMP " + output.string());
     return false;
   }
   return true;
+}
+
+bool screenshot_bmp(const fs::path& output, Rect region, int scale, std::string* error)
+{
+  const CGRect capture_rect = CGRectMake(region.x, region.y, region.width, region.height);
+  CGImageRef image = create_screenshot_image(capture_rect, scale);
+  const bool ok = save_cgimage_as_bmp(output, image, error);
+  if (image != nullptr) {
+    CGImageRelease(image);
+  }
+  return ok;
+}
+
+bool screenshot_window_or_region_bmp(const fs::path& output,
+                                     const std::string& app_window_name,
+                                     Rect fallback_region,
+                                     int scale,
+                                     std::string* error)
+{
+  if (const std::optional<WindowInfo> window = find_window_info_by_name(app_window_name)) {
+    CGImageRef image = create_window_screenshot_image(window->id, scale);
+    if (image != nullptr) {
+      const bool ok = save_cgimage_as_bmp(output, image, error);
+      CGImageRelease(image);
+      return ok;
+    }
+  }
+  return screenshot_bmp(output, fallback_region, scale, error);
 }
 
 ImageDiff compare_bmp(const fs::path& reference,
@@ -1058,7 +1131,8 @@ int run_replay(const ReplayOptions& input_options)
       }
       const fs::path output = screenshot_result_path(options.result_dir, options.app_name, index, options.retina);
       std::string error;
-      if (!screenshot_bmp(output, region, options.retina ? 2 : 1, &error)) {
+      if (!screenshot_window_or_region_bmp(output, options.app_name + "_app", region, options.retina ? 2 : 1,
+                                           &error)) {
         std::cerr << "cannot save screenshot " << output << ": " << error << "\n";
       }
       continue;

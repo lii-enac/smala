@@ -1,0 +1,6 @@
+/build/
+/bin/
+/results/*.bmp
+/results/diffs/*.bmp
+/new_records/*.txt
+/new_records/*.bmp

@@ -3,7 +3,7 @@ use base
 use display
 use gui
 
-// import spreadsheet.Spreadsheet
+import ../../7GUIs/7-cells/spreadsheet/Spreadsheet
 
 _define_
 Cells_7GUIs () {
@@ -13,5 +13,5 @@ Cells_7GUIs () {
     // [7GUIs] The spreadsheet should be scrollable.
     // [7GUIs] The rows should be numbered from 0 to 99 and the columns from A to Z.
 
-    // Spreadsheet sheet (this, 10, 10, 0, 50)
+    Spreadsheet sheet (this, 10, 10, 0, 50)
 }

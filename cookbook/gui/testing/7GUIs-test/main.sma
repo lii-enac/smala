@@ -83,7 +83,7 @@ Component root {
     Timer_7GUIs tmr ()
     CRUD_7GUIs crud ()
     CircleDrawer_7GUIs cd ()
-    Cells_7GUIs cll ()
+    // Cells_7GUIs cll ()
 
     mainloop -> (root) {
 
@@ -248,6 +248,27 @@ Component root {
         activate (BD.click)  // execute BD action (Delete)
         graph_exec()
         assert (LB.items.size == 6)     // Only 6 remaining persons
+
+
+        // -------------------------------------------------------
+        // 6- Circle Drawer
+        canvas = find(root.cd, "//canvas")
+        undo = find(root.cd, "//undo")
+        redo = find(root.cd, "//redo")
+
+        // FIXME: how to set a position before press ?
+        // canvas.mask.left.press.local_x = 50
+        // canvas.mask.left.press.local_y = 50
+        // GenericMouse.x = 50
+        // GenericMouse.y = 50
+        activate (canvas.mask.left.press)
+        graph_exec()
+
+
+        // -------------------------------------------------------
+        // 7- Cells
+
+
 
         // end
         // deactivate (mainloop) // exit when done

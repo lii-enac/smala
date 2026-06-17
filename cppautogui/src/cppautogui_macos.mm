@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <set>
 #include <sstream>
@@ -116,8 +117,71 @@ void write_i32(std::ostream& out, int32_t value)
   write_u32(out, static_cast<uint32_t>(value));
 }
 
+std::optional<BmpImage> load_imageio_bitmap(const fs::path& path, std::string* error)
+{
+  const std::string input_string = path_to_utf8(path);
+  CFURLRef url = CFURLCreateFromFileSystemRepresentation(
+      kCFAllocatorDefault, reinterpret_cast<const UInt8*>(input_string.c_str()), input_string.size(), false);
+  if (url == nullptr) {
+    set_error(error, "cannot create file URL for " + path.string());
+    return std::nullopt;
+  }
+
+  CGImageSourceRef source = CGImageSourceCreateWithURL(url, nullptr);
+  CFRelease(url);
+  if (source == nullptr) {
+    set_error(error, "ImageIO cannot open " + path.string());
+    return std::nullopt;
+  }
+
+  CGImageRef cg_image = CGImageSourceCreateImageAtIndex(source, 0, nullptr);
+  CFRelease(source);
+  if (cg_image == nullptr) {
+    set_error(error, "ImageIO cannot decode " + path.string());
+    return std::nullopt;
+  }
+
+  const size_t width = CGImageGetWidth(cg_image);
+  const size_t height = CGImageGetHeight(cg_image);
+  if (width == 0 || height == 0 || width > static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      height > static_cast<size_t>(std::numeric_limits<int>::max())) {
+    CGImageRelease(cg_image);
+    set_error(error, "invalid image size: " + path.string());
+    return std::nullopt;
+  }
+
+  BmpImage image;
+  image.width = static_cast<int>(width);
+  image.height = static_cast<int>(height);
+  image.rgba.resize(width * height * 4);
+
+  CGColorSpaceRef color_space = CGColorSpaceCreateDeviceRGB();
+  CGContextRef context =
+      CGBitmapContextCreate(image.rgba.data(), width, height, 8, width * 4, color_space,
+                            kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  if (color_space != nullptr) {
+    CGColorSpaceRelease(color_space);
+  }
+  if (context == nullptr) {
+    CGImageRelease(cg_image);
+    set_error(error, "cannot create bitmap context for " + path.string());
+    return std::nullopt;
+  }
+
+  CGContextDrawImage(context, CGRectMake(0.0, 0.0, static_cast<double>(width), static_cast<double>(height)),
+                     cg_image);
+  CGContextRelease(context);
+  CGImageRelease(cg_image);
+  return image;
+}
+
 std::optional<BmpImage> load_bmp(const fs::path& path, std::string* error)
 {
+  std::string imageio_error;
+  if (std::optional<BmpImage> image = load_imageio_bitmap(path, &imageio_error)) {
+    return image;
+  }
+
   std::ifstream in(path, std::ios::binary);
   if (!in) {
     set_error(error, "cannot open " + path.string());
@@ -141,9 +205,10 @@ std::optional<BmpImage> load_bmp(const fs::path& path, std::string* error)
   const uint16_t planes = read_u16(bytes, 26);
   const uint16_t bits_per_pixel = read_u16(bytes, 28);
   const uint32_t compression = read_u32(bytes, 30);
-  if (planes != 1 || compression != 0 || (bits_per_pixel != 24 && bits_per_pixel != 32) || raw_width <= 0 ||
+  const bool supported_compression = compression == 0 || (compression == 3 && bits_per_pixel == 32);
+  if (planes != 1 || !supported_compression || (bits_per_pixel != 24 && bits_per_pixel != 32) || raw_width <= 0 ||
       raw_height == 0) {
-    set_error(error, "unsupported BMP format: " + path.string());
+    set_error(error, "unsupported BMP format: " + path.string() + " (" + imageio_error + ")");
     return std::nullopt;
   }
 

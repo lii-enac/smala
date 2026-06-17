@@ -90,7 +90,7 @@ Files are written in `new_records/`. Once a recording is good, copy:
 ```sh
 bin/replay_cppautogui -i simplest
 bin/replay_cppautogui -i simplest --test
-bin/replay_cppautogui -i simplest --retina
+bin/replay_cppautogui -i simplest --test --retina
 bin/replay_cppautogui -i simplest --no_interpolation
 ```
 

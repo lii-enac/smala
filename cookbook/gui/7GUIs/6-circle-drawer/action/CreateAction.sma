@@ -14,7 +14,8 @@ CreateAction (Process view_)
 
     undo -> (this) {
         root = find(this, "//")
-        remove this.view from root.canvas.items
+        canvas = find(root, "//canvas")
+        remove this.view from canvas.items
         addChildrenTo this.hidden {
             this.view
         }
@@ -22,8 +23,9 @@ CreateAction (Process view_)
 
     redo -> (this) {
         root = find(this, "//")
+        canvas = find(root, "//canvas")
         remove this.view from this.hidden
-        addChildrenTo root.canvas.items {
+        addChildrenTo canvas.items {
             this.view
         }
     }

@@ -83,7 +83,7 @@ Component root {
     Timer_7GUIs tmr ()
     CRUD_7GUIs crud ()
     CircleDrawer_7GUIs cd ()
-    // Cells_7GUIs cll ()
+    Cells_7GUIs cll ()
 
     mainloop -> (root) {
 

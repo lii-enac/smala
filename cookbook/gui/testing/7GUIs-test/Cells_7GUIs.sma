@@ -13,5 +13,5 @@ Cells_7GUIs () {
     // [7GUIs] The spreadsheet should be scrollable.
     // [7GUIs] The rows should be numbered from 0 to 99 and the columns from A to Z.
 
-    Spreadsheet sheet (this, 10, 10, 0, 50)
+    Spreadsheet sheet (10, 10, 0, 50)
 }

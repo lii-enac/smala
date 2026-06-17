@@ -163,10 +163,8 @@ cpp_compute_formula (Process* c)
 %}
 
 _define_
-Spreadsheet (Process root_, int row_, int col_, int tx_, int ty_)
+Spreadsheet (int row_, int col_, int tx_, int ty_)
 {
-    root aka root_
-
     //------- settings ------
     Translation t (tx_, ty_)
     Component settings {

@@ -7,7 +7,7 @@ import ../../7GUIs/7-cells/spreadsheet/Spreadsheet
 
 _define_
 Cells_7GUIs () {
-    Frame f("7GUIs Cells", 620, 360, 500, 500)                    // [7GUIs] The task is to build a frame containing...
+    Frame f("7GUIs Cells", 510, 360, 970, 500)                    // [7GUIs] The task is to build a frame containing...
     //f.close ->! mainloop
 
     // [7GUIs] The spreadsheet should be scrollable.

@@ -267,8 +267,32 @@ Component root {
 
         // -------------------------------------------------------
         // 7- Cells
+        cells = find(root.cll, "//cells")
+        edit = find(root.cll, "//box_edit")
 
+        B2 = find (cells, "22")
+        C2 = find (cells, "23")
+        B3 = find (cells, "32")
+        C3 = find (cells, "33")
+        B4 = find (cells, "42")
+        C4 = find (cells, "43")
+        print ("B2=" + B2.value + " -- C2=" + C2.value + " -- B3=" + B3.value + " -- C3=" + C3.value + " -- B4=" + B4.value + " -- C4=" + C4.value)
 
+        B6 = find (cells, "62")
+        activate (B6.bg.press)  // Set as current cell
+        graph_exec()
+        B6.formula = "=sum(B2:B4)"
+        graph_exec()
+        // print ("B6=" + B6.value)
+        assert (B6.value == "250")
+
+        C6 = find (cells, "63")
+        activate (C6.bg.press)  // Set as current cell
+        graph_exec()
+        C6.formula = "=avg(C2:C4)"
+        graph_exec()
+        // print ("C6=" + C6.value)
+        assert (C6.value == "66")
 
         // end
         // deactivate (mainloop) // exit when done

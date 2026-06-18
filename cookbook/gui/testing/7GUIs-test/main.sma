@@ -17,13 +17,30 @@ import Cells_7GUIs
 
 _native_code_
 %{
-#include <assert.h>
-#include <math.h> // floor, ceil
-using djnnstl::cerr;
-using djnnstl::cout;
-using djnnstl::endl;
+    #include <assert.h>
+    #include <math.h> // floor, ceil
+    using djnnstl::cerr;
+    using djnnstl::cout;
+    using djnnstl::endl;
 
-#include "gui/picking/picking.h"
+    #include "gui/picking/picking.h"
+
+    #include "../../cppautogui/include/cppautogui.hpp"
+    using cppautogui::Point;
+    using cppautogui::MouseButton;
+
+    void move_mouse_to (double x, double y) {
+        move_to (Point {x, y}, 0.0);
+    }
+
+    void press_at (double x, double y) {
+        mouse_down (Point {x, y}, MouseButton::Left);
+    }
+
+    void release_at (double x, double y) {
+        mouse_up (Point {x, y}, MouseButton::Left);
+    }
+    
 
 static
 inline
@@ -256,13 +273,13 @@ Component root {
         undo = find(root.cd, "//undo")
         redo = find(root.cd, "//redo")
 
-        // FIXME: how to set a position before press ?
-        // canvas.mask.left.press.local_x = 50
-        // canvas.mask.left.press.local_y = 50
-        // GenericMouse.x = 50
-        // GenericMouse.y = 50
-        activate (canvas.mask.left.press)
-        graph_exec()
+        move_mouse_to (0, 0)
+
+        // Too soon --> we have to wait
+        // activate (canvas.mask.left.press)
+        // graph_exec()
+        // move_mouse_to (110, 520)
+        // press_at (110, 520)
 
 
         // -------------------------------------------------------
@@ -299,9 +316,13 @@ Component root {
         // print ("\033[32mall tests passed successfully\033[39;49m")
     }
 
-    Timer wait (1000)
+
+    // -------------------------------------------------------
+    // Timers to wait...
+
+    Timer wait_1s (1000)
     // Timer wait (1100)
-    wait.end -> na_wait:(root) {
+    wait_1s.end -> na_wait_1s:(root) {
         G = find(root.tmr, "//G")
         L = find(root.tmr, "//L")
         e = find(root.tmr, "//e")
@@ -309,6 +330,24 @@ Component root {
         // assert (get_double_value (G.value) == 10.0)
         // assert (get_double_value (e) == 1.0)
         // assert (L.text == "1.00s")
+    }
+
+    Timer wait_1_5s (1500)
+    wait_1_5s.end -> na_wait_1_5s:(root) {
+        move_mouse_to (100, 500)
+        press_at (100, 500)
+    }
+
+    Timer wait_2s (2000)
+    wait_2s.end -> na_wait_2s:(root) {
+        move_mouse_to (250, 800)
+        press_at (250, 800)
+    }
+
+    Timer wait_2_5s (2500)
+    wait_2_5s.end -> na_wait_2_5s:(root) {
+        move_mouse_to (400, 650)
+        press_at (400, 650)
     }
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1

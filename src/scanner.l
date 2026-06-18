@@ -62,7 +62,7 @@
 %x IMPORT_PATH
 
 NAME [a-zA-Z_\^]((([a-zA-Z0-9_])|("\\-"))*)
-IMPORT_NAME [^\/\.\t \n]+
+IMPORT_NAME [^\/\.\t \r\n]+
 INT [0-9]+
 ACTION ("run"|"notify"|"stop"|"dump"|"delete"|"XMLSerialize"|"delete_content")
 BREAK ("break"|"continue"|"return")
@@ -205,6 +205,8 @@ NATIVE_CODE "%{"([^%]|%+[^%}])*%+"}"
 <IMPORT_PATH>{IMPORT_NAME} { return Smala::Parser::make_NAME (str_filter (yytext), loc); }
 <IMPORT_PATH>[\t ]+     { loc.step (); }
 <IMPORT_PATH>"\\\n"     {}
+<IMPORT_PATH>"\r\n"     { BEGIN(INITIAL); loc.lines (1); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
 <IMPORT_PATH>"\n"+      { BEGIN(INITIAL); loc.lines (yyleng); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
+<IMPORT_PATH>"\r"+      { BEGIN(INITIAL); loc.lines (yyleng); loc.step (); if(_exp_mode) return Smala::Parser::make_EOL (loc); }
 <IMPORT_PATH><<EOF>>    { BEGIN(INITIAL); return yyterminate (); }
 %%

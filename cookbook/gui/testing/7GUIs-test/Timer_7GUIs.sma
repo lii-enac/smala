@@ -37,7 +37,7 @@ Timer_7GUIs () {
     }
     // make widget naming independent from layout hierarchy
     G aka v_box.h_box1.G
-    L aka v_box.L
+    Lbl aka v_box.L
     S aka v_box.h_box2.S
     R aka v_box.R
 
@@ -52,7 +52,7 @@ Timer_7GUIs () {
     d * 10 =:> G.bv.max     // [7GUIs] a gauge G for the elapsed time e
     e * 10 =:> G.bv.input
     
-    e + "s" =:> L.text      // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
+    e + "s" =:> Lbl.text      // [7GUIs] a label [L] which shows the elapsed time as a numerical value,
 
     S.value / 10 =:> d      // [7GUIs] Adjusting S must immediately reflect on d and not only when S is released.
 

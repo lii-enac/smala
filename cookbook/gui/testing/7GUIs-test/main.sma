@@ -167,7 +167,7 @@ Component root {
         // -------------------------------------------------------
         // 4- Timer
         G = find(root.tmr, "//G")   // gauge (ProgressBar) G
-        L = find(root.tmr, "//L")   // label L
+        Lbl = find(root.tmr, "//Lbl")   // label L
         S = find(root.tmr, "//S")   // slider S
         R = find(root.tmr, "//R")   // reset button R
         d = find(root.tmr, "//d")   // duration
@@ -180,28 +180,22 @@ Component root {
         assert (get_double_value (G.value) == 0.0)
         assert (get_double_value (d) == get_double_value (S.value) / 10)
         assert (get_double_value (e) == 0.0)
-        assert (L.text == "0.00s")
+        assert (Lbl.text == "0.00s")
 
         // FXME: need something to wait ?
-
-        activate (R.click)  // execute R action (reset)
-        graph_exec()
-        assert (get_double_value (G.value) == 0.0)  // The gauge value must be 0
-        assert (get_double_value (e) == 0.0)        // The elapsed time must be 0
-        assert (L.text == "0.00s")                  // Label should display "0.00s"
         
 
         // -------------------------------------------------------
         // 5- CRUD
         T_prefix = find(root.crud, "//T_prefix")
-        LB = find(root.crud, "//LB")
+        L = find(root.crud, "//L")
         T_name = find(root.crud, "//T_name")
         T_surname = find(root.crud, "//T_surname")
         BC = find(root.crud, "//BC")
         BU = find(root.crud, "//BU")
         BD = find(root.crud, "//BD")
 
-        assert (LB.items.size == 0)
+        assert (L.items.size == 0)
         
         // Add a 1st person: "Doe, John"
         T_name.init_text = "John"
@@ -209,7 +203,7 @@ Component root {
         graph_exec()
         activate (BC.click)  // execute BC action (Create)
         graph_exec()
-        assert (LB.items.size == 1)
+        assert (L.items.size == 1)
 
         // Add a 2nd person: "Doe, Jane"
         T_name.init_text = "Jane"
@@ -217,7 +211,7 @@ Component root {
         graph_exec()
         activate (BC.click)  // execute BC action (Create)
         graph_exec()
-        assert (LB.items.size == 2)
+        assert (L.items.size == 2)
 
         // Add 5 more persons: "name [n], forename [n]"
         for (int n = 1; n < 6; n++) {
@@ -227,20 +221,20 @@ Component root {
             activate (BC.click)  // execute BC action (Create)
             graph_exec()
         }
-        assert (LB.items.size == 7)
+        assert (L.items.size == 7)
 
         // Filter with prefix "name"
         T_prefix.init_text = "name"
         graph_exec()
-        assert (LB.items.size == 5)     // 5 persons have their surname that starts with "name"
+        assert (L.items.size == 5)     // 5 persons have their surname that starts with "name"
 
         // Reset filter
         T_prefix.init_text = ""
         graph_exec()
-        assert (LB.items.size == 7)
+        assert (L.items.size == 7)
 
         // Select the 6th item
-        activate (LB.items.[6].bg.r.press)
+        activate (L.items.[6].bg.r.press)
         graph_exec()
         print ("T_name = " + T_name.text + " -- T_surname = " + T_surname.text)
         assert (T_name.text == "forename 4")
@@ -255,18 +249,18 @@ Component root {
         // Update filter with prefix "name 2"
         T_prefix.init_text = "name 2"
         graph_exec()
-        assert (LB.items.size == 2)     // 2 persons have their surname that starts with "name 2"
+        assert (L.items.size == 2)     // 2 persons have their surname that starts with "name 2"
 
         // Reset filter
         T_prefix.init_text = ""
         graph_exec()
         
         // Select the 3st item and delete it
-        activate (LB.items.[3].bg.r.press)
+        activate (L.items.[3].bg.r.press)
         graph_exec()
         activate (BD.click)  // execute BD action (Delete)
         graph_exec()
-        assert (LB.items.size == 6)     // Only 6 remaining persons
+        assert (L.items.size == 6)     // Only 6 remaining persons
 
 
         // -------------------------------------------------------
@@ -306,7 +300,7 @@ Component root {
 
         C4 = find (cells, "43")
         C4.value = "100"
-        
+
         print ("B2=" + B2.value + " -- C2=" + C2.value + " -- B3=" + B3.value + " -- C3=" + C3.value + " -- B4=" + B4.value + " -- C4=" + C4.value)
 
         B6 = find (cells, "62")
@@ -334,16 +328,21 @@ Component root {
     // -------------------------------------------------------
     // Timers to wait...
 
-    Timer wait_1s (1000)
-    // Timer wait (1100)
-    wait_1s.end -> na_wait_1s:(root) {
-        G = find(root.tmr, "//G")
-        L = find(root.tmr, "//L")
-        e = find(root.tmr, "//e")
-        print ("After 1 s: Gauge = " + G.value + " -- elapsed = " + e + " -- label = " + L.text)
-        // assert (get_double_value (G.value) == 10.0)
-        // assert (get_double_value (e) == 1.0)
-        // assert (L.text == "1.00s")
+    Timer wait_500ms (500)
+    wait_500ms.end -> na_wait_500ms:(root) {
+        G = find(root.tmr, "//G")   // gauge (ProgressBar) G
+        Lbl = find(root.tmr, "//Lbl")   // label L
+        // S = find(root.tmr, "//S")   // slider S
+        R = find(root.tmr, "//R")   // reset button R
+        // d = find(root.tmr, "//d")   // duration
+        e = find(root.tmr, "//e")   // elapsed time
+
+        activate (R.click)  // execute R action (reset)
+        graph_exec()
+        print ("RESET timer: Gauge = " + G.value + " -- elapsed = " + e + " -- label = " + Lbl.text)
+        assert (get_double_value (G.value) == 0.0)  // The gauge value must be 0
+        // assert (get_double_value (e) == 0.0)        // The elapsed time must be 0
+        // assert (Lbl.text == "0.00s")                // Label should display "0.00s"
     }
 
     Timer wait_1_5s (1500)
@@ -363,6 +362,20 @@ Component root {
         move_mouse_to (400, 650)
         press_at (400, 650)
     }
+
+    Timer wait_3s (3000)
+    wait_3s.end -> na_wait_3s:(root) {
+        // 2,5 sec since we reseted the timer
+
+        G = find(root.tmr, "//G")
+        Lbl = find(root.tmr, "//Lbl")
+        e = find(root.tmr, "//e")
+        print ("After 2.5 sec: Gauge = " + G.value + " -- elapsed = " + e + " -- label = " + Lbl.text)
+        // assert (get_double_value (G.value) == 25.0)
+        // assert (get_double_value (e) == 2.5)
+        // assert (Lbl.text == "2.50s")
+    }
+
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2_MOVE = 1

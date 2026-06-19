@@ -15,7 +15,7 @@
 
 
 objs_cookbook_app := Counter_7GUIs.o TempConverter_7GUIs.o FlightBooker_7GUIs.o Timer_7GUIs.o \
-	../../7GUIs/5-CRUD/PersonModel.o ../../7GUIs/5-CRUD/PersonView.o CRUD_7GUIs.o \
+	../../7GUIs/5-CRUD/PersonModel.o ../../7GUIs/5-CRUD/PersonView.o ../../7GUIs/5-CRUD/PersonsList.o CRUD_7GUIs.o \
 	../../7GUIs/6-circle-drawer/action/UndoRedoManager.o ../../7GUIs/6-circle-drawer/action/CreateAction.o ../../7GUIs/6-circle-drawer/action/ChangeRadiusAction.o  ../../7GUIs/6-circle-drawer/CircleItem.o CircleDrawer_7GUIs.o \
 	../../7GUIs/7-cells/spreadsheet/Spreadsheet.o Cells_7GUIs.o \
 	../../../../cppautogui/src/cppautogui_macos.o \

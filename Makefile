@@ -609,6 +609,15 @@ disable_cookbook_apps ?= \
 	core/bidi \
 	gui/direct_manipulation/rotate_resize
 
+ifneq ($(os),Darwin)
+disable_cookbook_apps += gui/testing/7GUIs-test
+
+7GUIs-test 7GUIs-test_test 7GUIs-test_dbg:
+	@echo "7GUIs-test is only available on Darwin: cppautogui does not have Linux/Windows backends yet."
+
+.PHONY: 7GUIs-test 7GUIs-test_test 7GUIs-test_dbg
+endif
+
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))
 
 cookbook_apps += $(cookbook_apps_extra)
@@ -937,4 +946,3 @@ endif
 install-pkgdeps:
 	$(pkgcmd) $(pkgdeps)
 .PHONY: install-pkgdeps
-

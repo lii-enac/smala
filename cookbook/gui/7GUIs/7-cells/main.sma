@@ -9,22 +9,41 @@ use gui
 
 import spreadsheet.Spreadsheet
 
-// _action_
-// hook_action_on_die (Process src, Process data)
-// {   
-//     print ("\n\n helloIvy:  HAHHHAAA I don't WAANNNT to DIE !!!! \n\n")
-// }
-
 _main_
 Component root {
-    Frame f ("7GUIs Cells")  // [7GUIs] The task is to create a simple but usable spreadsheet application.
+    Frame f ("7GUIs Cells", 10, 10, 1050, 500)  // [7GUIs] The task is to create a simple but usable spreadsheet application.
     f.close ->! mainloop
 
     // [7GUIs] The spreadsheet should be scrollable.
     // [7GUIs] The rows should be numbered from 0 to 99 and the columns from A to Z.
 
     Spreadsheet sheet (10, 10, 0, 50)
+
+
+    // ------  INIT for the example -------
+    cells = find(sheet, "grid/cells")
     
+    // B2 = 100     C2 = 100
+    // B3 = 50      C3 = 0
+    // B4 = 100     C4 = 100
+
+    B2 = find (cells, "22")
+    "100" =: B2.value
+    
+    C2 = find (cells, "23")
+    "100" =: C2.value
+    
+    B3 = find (cells, "32")
+    "50" =: B3.value
+    
+    C3 = find (cells, "33")
+    "0" =: C3.value
+    
+    B4 = find (cells, "42")
+    "100" =: B4.value
+    
+    C4 = find (cells, "43")
+    "100" =: C4.value
 }
 
 

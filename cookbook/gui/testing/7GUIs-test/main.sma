@@ -290,11 +290,23 @@ Component root {
         edit = find(root.cll, "//box_edit")
 
         B2 = find (cells, "22")
+        B2.value = "100"
+
         C2 = find (cells, "23")
+        C2.value = "100"
+
         B3 = find (cells, "32")
+        B3.value = "50"
+
         C3 = find (cells, "33")
+        C3.value = "0"
+
         B4 = find (cells, "42")
+        B4.value = "100"
+
         C4 = find (cells, "43")
+        C4.value = "100"
+        
         print ("B2=" + B2.value + " -- C2=" + C2.value + " -- B3=" + B3.value + " -- C3=" + C3.value + " -- B4=" + B4.value + " -- C4=" + C4.value)
 
         B6 = find (cells, "62")

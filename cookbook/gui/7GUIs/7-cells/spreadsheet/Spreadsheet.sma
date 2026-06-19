@@ -237,20 +237,6 @@ Spreadsheet (int row_, int col_, int tx_, int ty_)
                         String formula("")    // if it starts with an '='
                         String value("")      // either a value or the result of the computation of the formula
 
-                        // ------  INIT for the example -------
-                        // B2 = 100     C2 = 100
-                        // B3 = 50      C3 = 0
-                        // B4 = 100     C4 = 100
-                        // =sum(B2:C4)  == 450
-                        // =avg(B2:C4)  == 75
-                        if ((col == 1) && (row == 2)){ "100" =: value "100" =: formula }  // B2
-                        if ((col == 1) && (row == 3)){ "50" =: value  "50" =: formula}    // B3
-                        if ((col == 1) && (row == 4)){ "100" =: value "100" =: formula}   // B4
-                        if ((col == 2) && (row == 2)){ "100" =: value "100" =: formula}   // C2
-                        if ((col == 2) && (row == 3)){ "0" =: value  "0" =: formula}      // C3
-                        if ((col == 2) && (row == 4)){ "100" =: value "100" =: formula}   // C4
-                        // -------------------------
-
                         FillColor fc (Blue)
                         settings.cell_color.value =:> fc.value
                         OutlineColor oc (Blue)

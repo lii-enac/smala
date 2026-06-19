@@ -4,6 +4,15 @@
 	"scopeName": "source.smala",
 	"patterns": [
 		{
+			"include": "#comment_block"
+		},
+		{
+			"include": "#comment_line"
+		},
+		{
+			"include": "#cpp_code"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -20,34 +29,31 @@
 		},
 		{
 			"include": "#component"
-		},
-		{
-			"include": "#comment_block"
-		},
-		{
-			"include": "#comment_line"
-		},
-		{
-			"include": "#cpp_code"
 		}
 	],
 	"repository": {
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.smala",
-				"match": "\\b(use|inherits|import|aka|_main_|_define_|_action_|_native_code_|for|if|then|else|while|int|double|string|_src_|_keep_)\\b"
+				"match": "\\b(use|import|inherits|_keep_|int|double|string|list|TRUE|FALSE|null|aka|FSM|State|Process|NativeAction|NativeCollectionAction|NativeAsyncAction|_main_|_define_|_action_|_native_code_|run|notify|stop|dump|delete|XMLSerialize|delete_content|break|continue|return|merge|remove|moveChild|with|from|addChildrenTo|if|else|for|while|print|valueof|NativeCode|of)\\b"
 			}]
 		},
 		"sma_func": {
-			"patterns": [{
-				"name": "variable.language.smala",
-				"match": "\\b(run|stop|delete_content|delete|valueof|notify|merge|dump|with|remove|from|loadFromXML|load_from_XML_once|load_from_XML|addChildrenTo|addChild|find|clone|repeat|isString|getInt|getDouble|getBool|getString|getRef|setRef|print|toString)\\b"
-			}]
+			"patterns": [
+				{
+					"name": "support.function.smala",
+					"match": "\\b(find|find_optional|clone|load_from_XML|load_from_XML_once|getInt|getDouble|getBool|getString|getRef|setRef|toString|to_string|assert|activate|deactivate|graph_exec|ceil|floor|get_double_value|get_pixel_color|pick_graphical_object|move_mouse_to|press_at|release_at|button_to_log|parse_button|find_window_geometry_by_name|mouse_position|move_to|drag_to|mouse_down|mouse_up|screenshot_bmp|compare_bmp|run_record|run_replay|run_launch_tests)\\b"
+				},
+				{
+					"name": "support.function.smala",
+					"match": "(?<![a-zA-Z0-9_]\\s)(?<!\\.)\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\()"
+				}
+			]
   		},
 		"operators": {
 			"patterns": [{
 				"name": "keyword.operator.smala",
-				"match": "\\s*<<\\s*|\\s*=>\\s*|\\s*=\\?>\\s*|\\s*=:>\\s*|\\s*=:\\s*|\\s*=\\?:\\s*|\\s*!?->!?\\s*|\\s*::>\\s*|\\s*::\\s*|\\s*\\|->\\s*"
+				"match": "\\|->|!->!|!->|->!|->|~>|=\\?:>|=\\?>|::>|=:>|\\+=>|\\*=>|=\\?:|=:|::|<<|>>|\\+\\+|--|\\+=|-=|\\*=|/=|&&|\\|\\||<=|>=|==|!=|[+\\-*/%?:!<>=&$]"
 			}]
 		},
 		"strings": {
@@ -64,13 +70,13 @@
 		"numeric": {
 			"patterns": [{
 				"name": "constant.numeric.smala",
-				"match": "\\#?\\b(-)?[0-9ABCDEF]+(.[0-9]*)?\\b"
+				"match": "\\b(?:[0-9]+(?:\\.[0-9]*)?|[0-9]+(?:\\.[0-9]*)?_[a-z]+|0x[0-9A-Fa-f]+)\\b|#[0-9A-Fa-f]+"
 			}]
 		},
 		"component": {
 			"patterns": [{
 				"name": "storage.type.smala",
-				"match": "^\\s*(\\b[A-Z].[a-zA-Z0-9_]*\\b)"
+				"match": "^\\s*\\b([A-Z][a-zA-Z0-9_]*)\\b"
 			}]
 		},
 		"comment_block": {
@@ -84,7 +90,7 @@
 		},
 		"cpp_code": {
             "begin": "%{",
-            "end": "%}",
+            "end": "%+}",
             "name": "meta.embedded.block.cpp",
             "patterns": [ { "include": "source.cpp" } ]
         }

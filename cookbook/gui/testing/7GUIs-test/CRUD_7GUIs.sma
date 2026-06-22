@@ -26,8 +26,6 @@ CRUD_7GUIs () {
     Frame f ("7GUIs CRUD", 1100, 0, 380, 280)  // [7GUIs] The task is to build a frame containing the following elements:
     // f.close ->! mainloop
 
-    Rectangle r (0, 0, 100, 100)
-
     // List of persons
     PersonsList persons ()
 

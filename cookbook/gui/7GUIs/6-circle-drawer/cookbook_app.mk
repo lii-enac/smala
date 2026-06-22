@@ -11,6 +11,6 @@
 #     Stephane Conversy <stephane.conversy@enac.fr>
 #
 
-objs_cookbook_app := action/ChangeRadiusAction.o action/CreateAction.o action/UndoRedoManager.o CircleItem.o main.o
+objs_cookbook_app := action/ChangeRadiusAction.o action/CreateAction.o action/UndoRedoManager.o CircleItem.o CircleDrawer.o main.o
 djnn_libs_cookbook_app := gui display base exec_env core
 smala_libs_cookbook_app := smala

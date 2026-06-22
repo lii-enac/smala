@@ -434,10 +434,11 @@ Component root {
         print (canvas.items.size + " drawn circles (after 3 sec.)")
         assert (floor (get_double_value (canvas.items.size)) == 3)
 
+        // Select 2nd circle & right click to open the menu
         move_mouse_to (250, 800)
         press_at (250, 800, 1)      // MouseButton::Right
 
-        print ("radius of selected circle = " + radius_of_selected.value)
+        print ("(default) radius of selected circle = " + radius_of_selected.value)
 
         // activate (undo.click)  // execute undo action
         // graph_exec()
@@ -462,7 +463,9 @@ Component root {
 
     Timer wait_3_5s (3500)
     wait_3_5s.end -> na_wait_3_5s:(root) {
+        // Move hover option "Adjust diameter"...
         move_mouse_to (270, 810)
+        // ... and click on this option
         press_at (270, 810, 0)
         release_at (270, 810, 0)
     }
@@ -472,6 +475,7 @@ Component root {
         radius_slider = find(root.cd, "//radius_slider")
         popup_slider = find(root.cd, "//popup_slider")
         
+        // Update radius
         radius_slider.output = 45
         graph_exec ()
 
@@ -492,35 +496,48 @@ Component root {
         redo = find(root.cd, "//redo")
         radius_of_selected = find(root.cd, "//_radius_of_selected_item")
 
-        print ("radius of selected circle = " + radius_of_selected.value)
+        print ("(increased) radius of selected circle = " + radius_of_selected.value)
         assert (floor (get_double_value (radius_of_selected.value)) == 45)
 
         activate (undo.click)  // execute undo action
         graph_exec()
         assert (floor (get_double_value (radius_of_selected.value)) == 10)
-        print ("radius of selected circle = " + radius_of_selected.value)
+        print ("(reseted) radius of selected circle = " + radius_of_selected.value + " (after 1st undo)")
 
         // FIXME: NO refresh of UI
 
-        // activate (undo.click)  // execute undo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 2)
+        activate (undo.click)  // execute undo action
+        graph_exec()
+        assert (floor (get_double_value (canvas.items.size)) == 2)
 
-        // activate (undo.click)  // execute undo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 1)
+        activate (undo.click)  // execute undo action
+        graph_exec()
+        assert (floor (get_double_value (canvas.items.size)) == 1)
 
-        // print (canvas.items.size + " drawn circles (after 2 undo)")
+        print (canvas.items.size + " drawn circles (after 3 undo)")
+    }
 
-        // activate (redo.click)  // execute redo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 2)
+    Timer wait_5s (5000)
+    wait_5s.end -> na_wait_5s:(root) {
+        canvas = find(root.cd, "//canvas")
+        undo = find(root.cd, "//undo")
+        redo = find(root.cd, "//redo")
+        radius_of_selected = find(root.cd, "//_radius_of_selected_item")
 
-        // activate (redo.click)  // execute redo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 3)
+        activate (redo.click)  // execute redo action
+        graph_exec()
+        assert (floor (get_double_value (canvas.items.size)) == 2)
 
-        // print (canvas.items.size + " drawn circles (after 2 redo)")
+        activate (redo.click)  // execute redo action
+        graph_exec()
+        assert (floor (get_double_value (canvas.items.size)) == 3)
+
+        print (canvas.items.size + " drawn circles (after 2 redo)")
+
+        activate (redo.click)  // execute redo action
+        graph_exec()
+        print ("radius of selected circle = " + radius_of_selected.value + " (after 3 redo)")
+        assert (floor (get_double_value (radius_of_selected.value)) == 45)
     }
 
 

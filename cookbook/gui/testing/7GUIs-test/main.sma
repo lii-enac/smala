@@ -1,3 +1,18 @@
+/*
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2026)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Stephane Conversy <stephane.conversy@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*/
+
 use core
 use base
 use display
@@ -14,6 +29,13 @@ import Timer_7GUIs
 import CRUD_7GUIs
 import CircleDrawer_7GUIs
 import Cells_7GUIs
+
+/* ---------------------------------------------------------------------------------------------
+ *  In order to test all 7GUIs app, this app must be able to control your mouse.
+ *  We use the lib "cpp auto gui" to move the cursor & to press/release the mouse buttons.
+ *  To allow the lib, you have to go into "System Settings" (or System "Preferences").
+ *  Then "Privacy & Security", "Accessibility" and enable "Terminal" in the list of applications
+ * --------------------------------------------------------------------------------------------- */
 
 _native_code_
 %{
@@ -65,9 +87,9 @@ _native_code_
         }
     }
 
-    void drag_mouse_to (double x, double y) {
-        drag_to (Point {x, y}, MouseButton::Left, 1.0);
-    }
+    // void drag_mouse_to (double x, double y) {
+    //     drag_to (Point {x, y}, MouseButton::Left, 1.0);
+    // }
     
 
 static
@@ -354,6 +376,21 @@ Component root {
 
 
     // -------------------------------------------------------
+    // Callbacks
+
+    Int nb_press_on_canvas (0)
+
+    na_canvas_pressed = find(root.cd, "//na_canvas_pressed")
+    na_canvas_pressed -> na_CD_canvas_pressed:(root) {
+        canvas = find(root.cd, "//canvas")
+
+        root.nb_press_on_canvas++
+        print (root.nb_press_on_canvas + " press on canvas = " + canvas.items.size + " drawn circles ?")
+        assert (floor (get_double_value (canvas.items.size)) == root.nb_press_on_canvas)
+    }
+
+
+    // -------------------------------------------------------
     // Timers to wait...
 
     Timer wait_500ms (500)
@@ -375,41 +412,23 @@ Component root {
 
     Timer wait_1_5s (1500)
     wait_1_5s.end -> na_wait_1_5s:(root) {
+        // Create 1st circle
         move_mouse_to (100, 500)
         press_at (100, 500, 0)
-    }
-    na_wait_1_5s -> (root) {
-        // items = find(root.cd, "//items")
-        canvas = find(root.cd, "//canvas")
-        print (canvas.items.size + " drawn circles (after 1.5s)")
-        // FIXME: too soon but why ?
-        // assert (floor (get_double_value (canvas.items.size)) == 1)
     }
 
     Timer wait_2s (2000)
     wait_2s.end -> na_wait_2s:(root) {
+        // Create 2nd circle
         move_mouse_to (250, 800)
         press_at (250, 800, 0)
-    }
-    na_wait_2s -> (root) {
-        // items = find(root.cd, "//items")
-        canvas = find(root.cd, "//canvas")
-        print (canvas.items.size + " drawn circles (after 2s)")
-        // FIXME: too soon but why ?
-        // assert (floor (get_double_value (canvas.items.size)) == 2)
     }
 
     Timer wait_2_5s (2500)
     wait_2_5s.end -> na_wait_2_5s:(root) {
+        // Create 3rd circle
         move_mouse_to (400, 650)
         press_at (400, 650, 0)
-    }
-    na_wait_2_5s -> (root) {
-        // items = find(root.cd, "//items")
-        canvas = find(root.cd, "//canvas")
-        print (canvas.items.size + " drawn circles (after 2.5s)")
-        // FIXME: too soon but why ?
-        // assert (floor (get_double_value (canvas.items.size)) == 3)
     }
 
     Timer wait_3s (3000)
@@ -425,7 +444,7 @@ Component root {
         // assert (Lbl.text == "2.50s")
     }
 
-    na_wait_3s -> na_undo_redo:(root) {
+    na_wait_3s -> (root) {
         canvas = find(root.cd, "//canvas")
         undo = find(root.cd, "//undo")
         redo = find(root.cd, "//redo")
@@ -439,26 +458,6 @@ Component root {
         press_at (250, 800, 1)      // MouseButton::Right
 
         print ("(default) radius of selected circle = " + radius_of_selected.value)
-
-        // activate (undo.click)  // execute undo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 2)
-
-        // activate (undo.click)  // execute undo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 1)
-
-        // print (canvas.items.size + " drawn circles (after 2 undo)")
-
-        // activate (redo.click)  // execute redo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 2)
-
-        // activate (redo.click)  // execute redo action
-        // graph_exec()
-        // assert (floor (get_double_value (canvas.items.size)) == 3)
-
-        // print (canvas.items.size + " drawn circles (after 2 redo)")
     }
 
     Timer wait_3_5s (3500)

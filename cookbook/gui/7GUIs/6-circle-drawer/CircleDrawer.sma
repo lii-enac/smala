@@ -60,7 +60,7 @@ CircleDrawer (Process _frame_width, Process _frame_height)
     undo.click -> undo_redo_manager.undo       // [7GUIs] Clicking undo will undo the last significant change (i.e. circle creation or diameter adjustment).
     redo.click -> undo_redo_manager.redo       // [7GUIs] Clicking redo will reapply the last undoed change unless new changes were made by the user in the meantime.
 
-    canvas.mask.left.press -> (this) {         // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
+    canvas.mask.left.press -> na_canvas_pressed:(this) {         // [7GUIs] Left-clicking inside an empty area inside the canvas will create...
     
         // Properly deselect the previously selected item, if any
         old_selected_item = getRef(&this._selected_item_ref)

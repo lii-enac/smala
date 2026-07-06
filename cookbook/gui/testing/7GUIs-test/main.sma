@@ -539,6 +539,12 @@ Component root {
         assert (floor (get_double_value (radius_of_selected.value)) == 45)
     }
 
+    na_wait_5s -> (root) {
+        print ("\033[32mall tests passed successfully\033[39;49m")
+        deactivate (mainloop) // exit when done
+    }
+
+
 
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2 = 1
     //_DEBUG_SEE_ACTIVATION_SEQUENCE_2_MOVE = 1

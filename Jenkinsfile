@@ -45,6 +45,7 @@ pipeline {
                         make -j
                         make -j lib
                         make -j cookbook_apps
+                        make -j 7GUIs-test_test
                     '''
                 }
             }

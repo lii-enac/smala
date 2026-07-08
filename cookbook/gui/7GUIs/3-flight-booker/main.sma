@@ -131,11 +131,11 @@ Component root {
         (time1 != -1) =:> T1_valid
 
         T1_valid.false -> {
-            #FF0000 =: T1.text_color   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
+            #FF0000 =: T1.bg_color.value   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
         }
 
         T1_valid.true -> {
-            #000000 =: T1.text_color   // ...else...
+            #FFFFFF =: T1.bg_color.value   // ...else...
         }
     }
 
@@ -157,11 +157,11 @@ Component root {
             time2 != -1 =:> T2_valid
 
             T2_valid.false -> {
-                #FF0000 =: T2.text_color    // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
+                #FF0000 =: T2.bg_color.value   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
             }
             
             T2_valid.true -> {
-                #000000 =: T2.text_color    // ...else...
+                #FFFFFF =: T2.bg_color.value    // ...else...
             }
 
             T1_valid && T2_valid && (time1 <= time2) =:> B_valid // [7GUIs] [When C has the value “return flight”] and T2’s date is strictly before T1’s then B is disabled.

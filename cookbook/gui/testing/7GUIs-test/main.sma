@@ -11,8 +11,8 @@
 *     Stephane Conversy <stephane.conversy@enac.fr>
 *     Mathieu Poirier <mathieu.poirier@enac.fr>
 *     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*
 */
-
 use core
 use base
 use display

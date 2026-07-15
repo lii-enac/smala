@@ -1,21 +1,24 @@
 /*
- *	djnn Smala compiler
- *
- *	The copyright holders for the contents of this file are:
- *		Ecole Nationale de l'Aviation Civile, France (2021)
- *	See file "license.terms" for the rights and conditions
- *	defined by copyright holders.
- *
- *
- *	Contributors:
- *		Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
- *
- * 
- * This is an example of how to implement the first 
- * timed automaton found (fig. 3) in the paper:
- * Alur, R. & Dill, D. L., A theory of timed automata, Th. Comp. Sc. 126 (1994)
- *
- */
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2021-2022)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*
+*/
+
+/*
+*  
+* This is an example of how to implement the first 
+* timed automaton found (fig. 3) in the paper:
+* Alur, R. & Dill, D. L., A theory of timed automata, Th. Comp. Sc. 126 (1994)
+*/
 
 use core
 use base

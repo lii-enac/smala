@@ -1,18 +1,19 @@
 /*
- *  djnn Smala compiler
- *
- *  The copyright holders for the contents of this file are:
- *      Ecole Nationale de l'Aviation Civile, France (2017-2018)
- *  See file "license.terms" for the rights and conditions
- *  defined by copyright holders.
- *
- *
- *  Contributors:
- *      Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
- *      Stéphane Conversy <stephane.conversy@enac.fr>
- *
- */
-
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2017-2026)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Stéphane Conversy <stephane.conversy@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*
+*/
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "3.0"
 %defines

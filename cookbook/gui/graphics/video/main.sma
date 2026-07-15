@@ -1,17 +1,17 @@
 /*
- *  djnn Smala compiler
- *
- *  The copyright holders for the contents of this file are:
- *    Ecole Nationale de l'Aviation Civile, France (2020)
- *  See file "license.terms" for the rights and conditions
- *  defined by copyright holders.
- *
- *
- *  Contributors:
- *    Stéphane Conversy <stephane.conversy@enac.fr>
- *
- */
-
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2020-2023)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Stéphane Conversy <stephane.conversy@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*
+*/
 // video capture demonstration with opencv
 // on macos: brew install opencv@3
 //      or libavdevice?: see https://github.com/leixiaohua1020/simplest_ffmpeg_device/blob/master/simplest_ffmpeg_readcamera/simplest_ffmpeg_readcamera.cpp

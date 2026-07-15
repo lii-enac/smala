@@ -1,3 +1,18 @@
+/*
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2022-2025)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
+*     Mathieu Cousy <mathieu.cousy@enac.fr>
+*
+*/
 use core
 use base
 use gui

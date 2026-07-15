@@ -8,10 +8,9 @@
 *
 *
 *  Contributors:
-*    
 *     Mathieu Poirier <mathieu.poirier@enac.fr>
+*
 */
-
 use core
 use base
 use gui

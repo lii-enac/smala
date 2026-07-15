@@ -7,6 +7,7 @@ Examples:
   tools/update_copyright_headers.py --write
   tools/update_copyright_headers.py --write --contributor "Name <email>"
   tools/update_copyright_headers.py --write --insert-missing --contributor "Name <email>"
+  tools/update_copyright_headers.py --add-ignored-commit <sha1>
 
 The script scans src, cookbook and src_lib for source files, excluding any path
 component named "ext" or "gen". By default it only rewrites recognized djnn
@@ -31,14 +32,25 @@ from pathlib import Path
 
 SCAN_DIRS = ("src", "cookbook", "src_lib")
 SOURCE_SUFFIXES = {".cpp", ".h", ".hpp", ".sma", ".l", ".y"}
+EXCLUDED_FILES = {
+    "cookbook/core/template_property/units.h",
+    "cookbook/gui/graphics/geometry/line_circle_intersect/homog2d.h",
+    "cookbook/gui/graphics/geometry/line_intersect/homog2d.h",
+}
 HEADER_RE = re.compile(r"\A(?P<prefix>\ufeff?\s*)(?P<header>/\*.*?\*/\s*)", re.DOTALL)
 YEAR_RE = re.compile(r"Ecole Nationale de l'Aviation Civile, France \((?P<years>\d{4}(?:-\d{4})?)\)")
 CONTRIBUTOR_RE = re.compile(r"^\s*\*\s+(.+?)\s*$")
 EMAIL_RE = re.compile(r"<([^<>@\s]+@[^<>\s]+)>")
+SHA1_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 DEFAULT_CONTRIBUTORS = [
     "Mathieu Poirier <mathieu.poirier@enac.fr>",
     "Stephane Conversy <stephane.conversy@enac.fr>",
 ]
+IGNORED_COMMITS = {
+    # Header-only update commit. It should not make every touched file look like
+    # it was substantively modified in that year/by that author.
+    "ea09eba32d88041fae21ef7048b956098bf9271c",
+}
 
 
 def repo_root() -> Path:
@@ -61,6 +73,8 @@ def source_files(root: Path) -> list[Path]:
             rel = path.relative_to(root)
             if is_excluded_path(rel):
                 continue
+            if rel.as_posix() in EXCLUDED_FILES:
+                continue
             files.append(path)
     return sorted(files)
 
@@ -69,14 +83,20 @@ def git_years(root: Path, path: Path) -> tuple[int, int]:
     rel = path.relative_to(root)
     try:
         out = subprocess.check_output(
-            ["git", "log", "--follow", "--format=%ad", "--date=format:%Y", "--", str(rel)],
+            ["git", "log", "--follow", "--format=%H%x09%ad", "--date=format:%Y", "--", str(rel)],
             cwd=root,
             text=True,
             stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
         out = ""
-    years = [int(line) for line in out.splitlines() if line.strip().isdigit()]
+    years: list[int] = []
+    for line in out.splitlines():
+        commit, _, year = line.partition("\t")
+        if commit in IGNORED_COMMITS:
+            continue
+        if year.strip().isdigit():
+            years.append(int(year))
     if not years:
         year = _datetime.date.today().year
         return year, year
@@ -87,7 +107,7 @@ def git_contributors(root: Path, path: Path) -> list[str]:
     rel = path.relative_to(root)
     try:
         out = subprocess.check_output(
-            ["git", "log", "--follow", "--reverse", "--format=%an <%ae>", "--", str(rel)],
+            ["git", "log", "--follow", "--reverse", "--format=%H%x09%an <%ae>", "--", str(rel)],
             cwd=root,
             text=True,
             stderr=subprocess.DEVNULL,
@@ -96,7 +116,9 @@ def git_contributors(root: Path, path: Path) -> list[str]:
         return []
     contributors: list[str] = []
     for line in out.splitlines():
-        contributor = line.strip()
+        commit, _, contributor = line.strip().partition("\t")
+        if commit in IGNORED_COMMITS:
+            continue
         if contributor.endswith(" <>"):
             continue
         if contributor and contributor not in contributors:
@@ -206,6 +228,28 @@ def ensure_default_contributors(contributors: list[str]) -> None:
     add_contributors(contributors, DEFAULT_CONTRIBUTORS, require_enac=True)
 
 
+def add_ignored_commit_to_script(sha1: str) -> int:
+    sha1 = sha1.lower()
+    if not SHA1_RE.match(sha1):
+        raise ValueError(f"Invalid SHA1: {sha1}")
+
+    script_path = Path(__file__).resolve()
+    text = script_path.read_text()
+    if f'"{sha1}"' in text or f"'{sha1}'" in text:
+        print(f"Ignored commit already present: {sha1}")
+        return 0
+
+    match = re.search(r"(?ms)^IGNORED_COMMITS = \{\n.*?^\}", text)
+    if not match:
+        raise RuntimeError("Could not find IGNORED_COMMITS block in script.")
+
+    insert_at = match.end() - 1
+    new_text = text[:insert_at] + f'    "{sha1}",\n' + text[insert_at:]
+    script_path.write_text(new_text)
+    print(f"Added ignored commit: {sha1}")
+    return 0
+
+
 def update_text(root: Path, path: Path, contributor: str | None, insert_missing: bool) -> tuple[str, str]:
     text = path.read_text()
     parsed = parse_existing_header(text)
@@ -225,7 +269,8 @@ def update_text(root: Path, path: Path, contributor: str | None, insert_missing:
     if not is_smala_header(header):
         return "atypical", text
 
-    start_year = parse_start_year(header) or git_start
+    header_start_year = parse_start_year(header)
+    start_year = min(header_start_year, git_start) if header_start_year is not None else git_start
     contributors = parse_contributors(header)
     add_contributors(contributors, missing_git_contributors)
     add_contributor(contributors, contributor)
@@ -265,10 +310,19 @@ def main() -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="report files that would change")
     mode.add_argument("--write", action="store_true", help="rewrite recognized headers")
+    mode.add_argument("--add-ignored-commit", metavar="SHA1", help="persistently ignore a header-only commit")
     parser.add_argument("--insert-missing", action="store_true", help="with --write, insert missing djnn headers")
     parser.add_argument("--contributor", help='contributor to add, e.g. "Name <email>"')
     parser.add_argument("--no-progress", action="store_true", help="disable one-line progress output")
     args = parser.parse_args()
+
+    if args.add_ignored_commit:
+        if args.insert_missing:
+            parser.error("--insert-missing requires --write")
+        try:
+            return add_ignored_commit_to_script(args.add_ignored_commit)
+        except (RuntimeError, ValueError) as exc:
+            parser.error(str(exc))
 
     if args.insert_missing and not args.write:
         parser.error("--insert-missing requires --write")

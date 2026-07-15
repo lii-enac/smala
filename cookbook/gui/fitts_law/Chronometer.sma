@@ -1,5 +1,5 @@
 /*
-*  djnn Smala compiler
+*  Smala cookbook fitts_law
 *
 *  The copyright holders for the contents of this file are:
 *    Ecole Nationale de l'Aviation Civile, France (2019-2020)

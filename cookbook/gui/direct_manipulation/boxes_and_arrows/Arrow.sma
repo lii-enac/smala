@@ -1,5 +1,5 @@
 /*
-*  djnn Smala compiler
+*  Smala cookbook boxes_and_arrows
 *
 *  The copyright holders for the contents of this file are:
 *    Ecole Nationale de l'Aviation Civile, France (2022-2023)

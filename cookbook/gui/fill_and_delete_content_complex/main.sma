@@ -1,5 +1,5 @@
 /*
-*  djnn Smala compiler
+*  Smala cookbook fill_and_delete_content_complex
 *
 *  The copyright holders for the contents of this file are:
 *    Ecole Nationale de l'Aviation Civile, France (2021-2026)

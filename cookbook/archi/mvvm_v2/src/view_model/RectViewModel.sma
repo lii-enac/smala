@@ -1,5 +1,5 @@
 /*
-*  djnn Smala compiler
+*  Smala cookbook mvvm_v2
 *
 *  The copyright holders for the contents of this file are:
 *    Ecole Nationale de l'Aviation Civile, France (2023-2025)

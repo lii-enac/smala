@@ -51,6 +51,7 @@ IGNORED_COMMITS = {
     # it was substantively modified in that year/by that author.
     "ea09eba32d88041fae21ef7048b956098bf9271c",
     "469810224468496ea68ecc012d1250ea303170e8",
+    "72f7b07dc835c36fdc70c548387b137437402fc8",
 }
 
 
@@ -154,8 +155,42 @@ def parse_existing_header(text: str) -> tuple[str, str, int] | None:
     return match.group("prefix"), match.group("header"), match.end()
 
 
+def cookbook_name_for(root: Path, path: Path) -> str:
+    rel = path.relative_to(root)
+    cookbook_root = root / "cookbook"
+    current = path.parent
+    while current != cookbook_root and cookbook_root in current.parents:
+        if (current / "cookbook_app.mk").exists():
+            return current.name
+        current = current.parent
+
+    parts = rel.parts
+    return parts[1] if len(parts) > 1 else "unknown"
+
+
+def header_title_for(root: Path, path: Path) -> str:
+    rel = path.relative_to(root)
+    if not rel.parts:
+        return "djnn Smala compiler"
+    if rel.parts[0] == "src":
+        return "djnn Smala compiler"
+    if rel.parts[0] == "src_lib":
+        return "Smala Library"
+    if rel.parts[0] == "cookbook":
+        return f"Smala cookbook {cookbook_name_for(root, path)}"
+    return "djnn Smala compiler"
+
+
 def is_smala_header(header: str) -> bool:
-    return "djnn Smala compiler" in header and "The copyright holders for the contents of this file are:" in header
+    known_titles = (
+        "djnn Smala compiler",
+        "Smala Library",
+        "Smala cookbook ",
+    )
+    return (
+        any(title in header for title in known_titles)
+        and "The copyright holders for the contents of this file are:" in header
+    )
 
 
 def parse_start_year(header: str) -> int | None:
@@ -190,10 +225,10 @@ def format_years(start_year: int, end_year: int) -> str:
     return f"{start_year}-{end_year}"
 
 
-def build_header(start_year: int, end_year: int, contributors: list[str]) -> str:
+def build_header(title: str, start_year: int, end_year: int, contributors: list[str]) -> str:
     lines = [
         "/*",
-        "*  djnn Smala compiler",
+        f"*  {title}",
         "*",
         "*  The copyright holders for the contents of this file are:",
         f"*    Ecole Nationale de l'Aviation Civile, France ({format_years(start_year, end_year)})",
@@ -256,6 +291,7 @@ def update_text(root: Path, path: Path, contributor: str | None, insert_missing:
     parsed = parse_existing_header(text)
     git_start, git_end = git_years(root, path)
     missing_git_contributors = git_contributors(root, path)
+    title = header_title_for(root, path)
 
     if parsed is None:
         if not insert_missing:
@@ -264,7 +300,7 @@ def update_text(root: Path, path: Path, contributor: str | None, insert_missing:
         add_contributors(contributors, missing_git_contributors)
         add_contributor(contributors, contributor)
         ensure_default_contributors(contributors)
-        return "updated", build_header(git_start, git_end, contributors) + text
+        return "updated", build_header(title, git_start, git_end, contributors) + text
 
     prefix, header, end = parsed
     if not is_smala_header(header):
@@ -277,7 +313,7 @@ def update_text(root: Path, path: Path, contributor: str | None, insert_missing:
     add_contributor(contributors, contributor)
     ensure_default_contributors(contributors)
 
-    new_header = build_header(start_year, git_end, contributors)
+    new_header = build_header(title, start_year, git_end, contributors)
     new_text = prefix + new_header + text[end:]
     return ("updated" if new_text != text else "ok"), new_text
 

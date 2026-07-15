@@ -1,20 +1,20 @@
 /*
-*  Multitouch touch app
+*  djnn Smala compiler
 *
 *  The copyright holders for the contents of this file are:
-*  Ecole Nationale de l'Aviation Civile, France (2018-2024)
+*    Ecole Nationale de l'Aviation Civile, France (2018-2024)
 *  See file "license.terms" for the rights and conditions
 *  defined by copyright holders.
 *
 *
 *  Contributors:
-*    Sébastien Leriche <sebastien.leriche@enac.fr>
-*    Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
-*    Mathieu Poirier <mathieu.poirier@enac.fr>
-*    Vincent Peyruqeou <vincent.peyruqueou@enac.fr>
+*     Sébastien Leriche <sebastien.leriche@enac.fr>
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*     Vincent Peyruqeou <vincent.peyruqueou@enac.fr>
+*     stephane conversy <stephane.conversy@enac.fr>
 *
 */
-
 use core
 use base
 use display

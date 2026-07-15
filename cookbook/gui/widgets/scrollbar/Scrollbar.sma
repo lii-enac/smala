@@ -1,17 +1,18 @@
 /*
- *	MDPC scrollbar
- *
- *	The copyright holders for the contents of this file are:
- *		Ecole Nationale de l'Aviation Civile, France (2017)
- *	See file "license.terms" for the rights and conditions
- *	defined by copyright holders.
- *
- *
- *	Contributors:
- *		Stéphane Conversy <stephane.conversy@enac.fr>
- *
- */
-
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2019-2023)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Stephane Conversy <stephane.conversy@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*     Magnaudet Mathieu <mathieu.magnaudet@enac.fr>
+*
+*/
 // MDPC scrollbar, or
 // M(t)DP(i)C scrollbar
 // MDPC is a model for interactive graphical objects, which can be considered as a refinement of MVC.

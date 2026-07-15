@@ -1,19 +1,19 @@
 /*
-*  Multitouch drag
+*  djnn Smala compiler
 *
 *  The copyright holders for the contents of this file are:
-*  Ecole Nationale de l'Aviation Civile, France (2017-2024)
+*    Ecole Nationale de l'Aviation Civile, France (2019-2024)
 *  See file "license.terms" for the rights and conditions
 *  defined by copyright holders.
 *
 *
 *  Contributors:
+*     Sébastien Leriche <sebastien.leriche@enac.fr>
 *     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
-*  		Stephane Conversy <stephane.conversy@enac.fr>
-*     Mathieu poirier <mathieu.poirier@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*     Vincent Peyruqeou <vincent.peyruqueou@enac.fr>
 *
 */
-
 use core
 use base
 use display

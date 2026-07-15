@@ -1,4 +1,18 @@
 /*
+*  djnn Smala compiler
+*
+*  The copyright holders for the contents of this file are:
+*    Ecole Nationale de l'Aviation Civile, France (2022-2023)
+*  See file "license.terms" for the rights and conditions
+*  defined by copyright holders.
+*
+*
+*  Contributors:
+*     Mathieu Magnaudet <mathieu.magnaudet@enac.fr>
+*     Mathieu Poirier <mathieu.poirier@enac.fr>
+*
+*/
+/*
  * Adapted from the code explained here: https://dragonman225.js.org/curved-arrows.html
  */
 

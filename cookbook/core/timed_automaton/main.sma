@@ -12,7 +12,6 @@
 *     Mathieu Poirier <mathieu.poirier@enac.fr>
 *
 */
-
 /*
 *  
 * This is an example of how to implement the first 

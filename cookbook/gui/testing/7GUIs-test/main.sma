@@ -366,8 +366,8 @@ Component root {
         graph_exec()
         C6.formula = "=avg(C2:C4)"
         graph_exec()
-        // print ("C6=" + C6.value)
-        assert (C6.value == "66")
+        //print ("C6=" + C6.value)
+        assert (C6.value == "66.666667")
 
         // end
         // deactivate (mainloop) // exit when done

@@ -211,11 +211,11 @@ action_delete_selected_person (Process src, Process self)
 _define_
 PersonsList () {
 
-    List models                         // (Ordered) list of all models
-    ProcessCollector displayed_models   // (Unordered) collection of the displayed models
-
     // TextPrinter tp
     // displayed_models.size + " displayed models among the " + models.size + " persons in the full list" => tp.input
+
+    // -------------------
+    // Layout
 
     // [7GUIs] The layout is to be done like suggested in the screenshot. In particular, L must occupy all the remaining space.
 
@@ -239,8 +239,8 @@ PersonsList () {
         b_all.space = 20
 
         HBox filter {
-            Label L_prefix("Filter prefix:") // [7GUIs] the three labels as seen in the screenshot.
-            UITextField T_prefix             // [7GUIs] a textfield Tprefix
+            Label L_prefix("Filter prefix:")    // [7GUIs] the three labels as seen in the screenshot.
+            UITextField T_prefix                // [7GUIs] a textfield Tprefix
         }
         filter.h_alignment = 0
 
@@ -287,6 +287,7 @@ PersonsList () {
     T_prefix aka b_all.filter.T_prefix
     L aka b_all.data.L
     T_name aka b_all.data.props.name.T_name
+    //T_name_ aka find (b_all, "//T_name")
     T_surname aka b_all.data.props.surname.T_surname
     BC aka b_all.buttons.BC
     BU aka b_all.buttons.BU
@@ -296,10 +297,13 @@ PersonsList () {
     DerefString name_of_selected_item (L.selected_item, "model/name", DJNN_GET_ON_CHANGE)
     DerefString surname_of_selected_item (L.selected_item, "model/surname", DJNN_GET_ON_CHANGE)
 
-    // By default, all buttons are disabled
-    |-> BC.disable, BU.disable, BD.disable
+    // -------------------
+    // List Management with Model and View
 
-    models.$added -> na_model_added_to_all_models:(this) {  // Called when a model is created & added to the ordered list of all models
+    List models                         // (Ordered) list of all models
+    ProcessCollector displayed_models   // (Unordered) collection of the displayed models
+
+    models.$added -> na_model_added_to_all_models:(this) {                 // Called when a model is created & added to the ordered list of all models
         model = getRef (&this.models.$added)
         if (&model != null) {
             // print ("The model '" + model.surname + "' has been added to the list of all " + this.models.size + " models")
@@ -312,7 +316,7 @@ PersonsList () {
         }
     }
 
-    displayed_models.add -> na_model_added_to_displayed_models:(this) {     // Called when a model is added to the unordered list of displayed models (its view should be display)
+    displayed_models.add -> na_model_added_to_displayed_models:(this) {    // Called when a model is added to the unordered list of displayed models (its view should be display)
         model = getRef (&this.displayed_models.add)
         if (&model != null) {
             // Create a view corresponding to the model to display
@@ -323,48 +327,59 @@ PersonsList () {
     na_model_added_to_displayed_models -> L.pack   // Update layout
 
     NativeAction na_model_removed_from_displayed_models (action_model_removed_from_displayed_models, this, 1)
-    displayed_models.rm -> na_model_removed_from_displayed_models           // Called when a model is removed from the unordered list of displayed models (its view should be hide)
+    displayed_models.rm -> na_model_removed_from_displayed_models          // Called when a model is removed from the unordered list of displayed models (its view should be hide)
 
-    (L.selected_item.is_null == 0) && L.selected_item -> {      // [7GUIs] At most one entry can be selected in L at a time.
+
+    // -------------------
+    // Selection & Button state management
+
+    (L.selected_item.is_null == 0) && L.selected_item -> {                 // [7GUIs] At most one entry can be selected in L at a time.
         name_of_selected_item.value =: T_name.init_text
         surname_of_selected_item.value =: T_surname.init_text
     }
-    L.selected_item.is_null.true -> T_name.clear, T_surname.clear     // NO selection -> clear text fields
+    L.selected_item.is_null.true -> T_name.clear, T_surname.clear          // NO selection -> clear text fields
 
-    NativeAction na_filter (action_filter, this, 1)     // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
-    T_prefix.field.content.text -> na_filter            // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
+    NativeAction na_filter (action_filter, this, 1)                        // [7GUIs] By entering a string into Tprefix the user can filter the names whose surname start with the entered prefix
+    T_prefix.field.content.text -> na_filter                               // [7GUIs] —this should happen immediately without having to submit the prefix with enter.
+
+
+    |-> BC.disable, BU.disable, BD.disable // By default, all buttons are disabled
 
     // Flag indicating whether a value is missing: either the name or the surname
     Bool is_missing_value (true)
     
-    // Allow to enable/disable buttons during editing (don't wait to validate a TextField)
+    // enable/disable buttons during editing (don't wait to validate a TextField)
     // (getString (T_name.text) == "") || (getString (T_surname.text) == "") => is_missing_value
     (getString (T_name.field.content.text) == "") || (getString (T_surname.field.content.text) == "") => is_missing_value
-    
     is_missing_value.false -> BC.enable
-    is_missing_value.true -> BC.disable
+    is_missing_value.true  -> BC.disable
 
-    L.selected_item.is_null.false -> BU.enable, BD.enable       // [7GUIs] BU and BD are enabled if an entry in L is selected.
-    L.selected_item.is_null.true -> BU.disable, BD.disable      // [7GUIs] BU and BD are enabled if an entry in L is selected.
+    L.selected_item.is_null.false -> BU.enable,  BD.enable    // [7GUIs] BU and BD are enabled if an entry in L is selected.
+    L.selected_item.is_null.true  -> BU.disable, BD.disable   // [7GUIs] BU and BD are enabled if an entry in L is selected.
 
-    BC.click -> na_create_person:(this) {               // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
+
+    // -------------------
+    // Button actions
+
+    BC.click -> na_create_person:(this) {                     // [7GUIs] Clicking BC will append the resulting name from concatenating the strings in Tname and Tsurname to L.
         addChildrenTo this.models {
             PersonModel _ (getString (this.T_name.text), getString (this.T_surname.text))
         }
     }
     na_create_person -> T_name.clear, T_surname.clear
 
-    T_name.next -> T_surname.activate       // Key "tab" allows to set the focus to next text field (T_name -> T_surname)
-    T_surname.next -> BC.select             // Key "tab" allows to set the focus to next button (T_surname -> BC)
-
-    BU.click -> {       // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
+    BU.click -> {                                             // [7GUIs] In contrast to BC, BU will not append the resulting name but instead replace the selected entry with the new name.
         T_name.text =?: name_of_selected_item.value
         T_surname.text =?: surname_of_selected_item.value
     }
 
     NativeAction na_delete_selected_person (action_delete_selected_person, this, 1)
-    // BD.click -> L.reset_selection               // drawback: we can't do that because we use the ref on selected_item in the native action "delete_selected_person"
-    BD.click -> na_delete_selected_person       // [7GUIs] BD will remove the selected entry.
-    na_delete_selected_person -> L.pack    // Update layout after deletion
+    // BD.click -> L.reset_selection                          // drawback: we can't do that because we use the ref on selected_item in the native action "delete_selected_person"
+    BD.click -> na_delete_selected_person                     // [7GUIs] BD will remove the selected entry.
+    na_delete_selected_person -> L.pack                       // Update layout after deletion
+
+
+    T_name.next -> T_surname.activate                         // Tab key allows to set the focus to next text field (T_name -> T_surname)
+    T_surname.next -> BC.select                               // Tab key allows to set the focus to next button (T_surname -> BC)
 
 }

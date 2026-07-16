@@ -53,7 +53,7 @@ CircleDrawer (Process _frame_width, Process _frame_height)
         FillColor _ (#535353)
         RectangleClip clip (0, 0, 0, 0)
         Rectangle mask (0, 0, 0, 0, 0, 0 )
-        _frame_width - (2 * canvas_offset) =:> mask.width, clip.width
+        _frame_width  - (2 * canvas_offset)                      =:> mask.width,  clip.width
         _frame_height - (2 * canvas_offset) - buttons.min_height =:> mask.height, clip.height
         
         List items
@@ -83,7 +83,7 @@ CircleDrawer (Process _frame_width, Process _frame_height)
 
         addChildrenTo this.canvas.items {
             CircleItem selected_item (this, $this.canvas.mask.press.local_x, $this.canvas.mask.press.local_y ) // [7GUIs] ...circle with a fixed diameter whose center is the left-clicked point.
-            setRef(this._selected_item_ref, &selected_item)
+            setRef (this._selected_item_ref, &selected_item)
         }
         
         /// FIXME: This should be handled by the undo_redo_manager.

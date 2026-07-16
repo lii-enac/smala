@@ -32,7 +32,7 @@ CircleItem (Process root_, int x, int y)
 
     root aka root_
 
-    c.right.press -> {                            // [7GUIs] Right-clicking C will make a popup menu appear with one entry “Adjust diameter..”.
+    c.right.press -> {                      // [7GUIs] Right-clicking C will make a popup menu appear with one entry “Adjust diameter..”.
         c.press.x =: root.menu.x
         c.press.y =: root.menu.y
     }

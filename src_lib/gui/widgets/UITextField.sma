@@ -67,6 +67,8 @@ UITextField () inherits IWidget () {
   text_color aka field.text_color // IntProperty
   text_selected_color aka field.text_selected_color // IntProperty
   selection_color aka field.selection_color // IntProperty
+  read_only aka field.read_only // BoolProperty
+  selectable aka field.selectable // BoolProperty
 
   // Manage when the mouse/cursor is hover our text field or not
   FSM in_out {

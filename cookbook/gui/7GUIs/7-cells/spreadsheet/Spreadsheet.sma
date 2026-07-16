@@ -100,8 +100,8 @@ cpp_parse_formula (Process* c)
             GET_CHILD(List, grid, cells);
             assert (cells);
             for (auto &icell: cells->children()) {
-                GET_CHILD_VALUE(col, Int, c, col);
-                GET_CHILD_VALUE(row, Int, c, row);
+                GET_CHILD_VALUE(col, Int, icell, col);
+                GET_CHILD_VALUE(row, Int, icell, row);
                 if (
                     start_cell_id_col_str <= col &&
                       end_cell_id_col_str >= col &&
@@ -160,20 +160,17 @@ cpp_compute_formula (Process* c)
         if (f.find("sum(", 1) == 1) {
             for (auto* p : input_cells->get_list()) {
                 GET_CHILD_VALUE(in_val, Text, p, value);
-                //std::cerr << in_val << __FL__;
                 if (!in_val.empty()) {
                     res += atof(in_val.c_str());
                 }
             }
         } else
         if (f.find("avg(", 1) == 1) {
-            double res = 0;
             int count = 0;
             for (auto* p : input_cells->get_list()) {
                 GET_CHILD_VALUE(in_val, Text, p, value);
-                //std::cerr << in_val << __FL__;
                 if (!in_val.empty()) {
-                    res += atof(in_val.c_str());
+                    res += atoi(in_val.c_str());
                     count++;
                 }
             }

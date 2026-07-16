@@ -44,21 +44,21 @@ cpp_parse_formula (Process* c)
 
     GET_CHILD(RefProperty, spreadsheet, _current_cell);
     assert (_current_cell);
-    auto * cell = _current_cell->get_value();
-    assert (cell);
-    GET_CHILD(TextProperty, cell, formula);
+    auto * ocell = _current_cell->get_value(); // ocell is output_cell
+    assert (ocell);
+    GET_CHILD(TextProperty, ocell, formula);
     assert (formula);
 
     //debug
-    // std::cerr << cell<< __FL__ << std::endl;
+    // std::cerr << ocell<< __FL__ << std::endl;
     // std::cerr
     //     //<< formula->get_debug_name () << " "
     //     << formula->get_value() << __FL__ << std::endl;
     
-    GET_CHILD(ProcessCollector, cell, input_cells);
+    GET_CHILD(ProcessCollector, ocell, input_cells);
     assert (input_cells);
     input_cells->remove_all ();
-    GET_CHILD(Component, cell, bindings);
+    GET_CHILD(Component, ocell, bindings);
     assert (bindings);
     bindings->clean_up_content ();
 
@@ -99,24 +99,28 @@ cpp_parse_formula (Process* c)
             GET_CHILD(Component, spreadsheet, grid);
             GET_CHILD(List, grid, cells);
             assert (cells);
-            for (auto &c: cells->children()) {
+            for (auto &icell: cells->children()) {
                 GET_CHILD_VALUE(col, Int, c, col);
                 GET_CHILD_VALUE(row, Int, c, row);
                 if (
                     start_cell_id_col_str <= col &&
-                    end_cell_id_col_str   >= col &&
+                      end_cell_id_col_str >= col &&
                     start_cell_id_row_str <= row &&
-                    end_cell_id_row_str   >= row
+                      end_cell_id_row_str >= row
                     )
                 {
-                    //std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;   
-                    input_cells->add_one(c);
-                    new Binding(cell->find_child("bindings"), "b_to_formula", c->find_child("compute_formula"), cell->find_child("compute_formula"));
+                    input_cells->add_one (icell); // retain input cell for future computation
+                    // connect input cell formula computation to output cell's
+                    new Binding (
+                        ocell->find_child("bindings"), "b_to_formula", // make it a child of cell's "bindings"
+                        icell->find_child("compute_formula"), ocell->find_child("compute_formula")
+                    );
                 }
             }
+            //std::cerr << "new Binding " << (char)(col+'A') << " " << row << " " << c << std::endl;   
         }
     } else {
-        GET_CHILD(TextProperty, cell, value);
+        GET_CHILD(TextProperty, ocell, value);
         assert (value);
         value->set_value (f, true);
     }
@@ -141,17 +145,6 @@ cpp_compute_formula (Process* c)
     GET_CHILD(ProcessCollector, cell, input_cells);
     assert (input_cells);
 
-    int res = 0;
-    int count = 0;
-    for (auto* p : input_cells->get_list()) {
-        GET_CHILD_VALUE(in_val, Text, p, value);
-        //std::cerr << in_val << __FL__;
-        if (!in_val.empty()) {
-            res += atoi(in_val.c_str());
-            count++;
-        }
-    }
-
     // std::cerr
     //     << dynamic_cast<TextProperty*>(cell->find_child("col_string"))->get_value()
     //     << dynamic_cast<IntProperty*>(cell->find_child("row"))->get_value()
@@ -161,17 +154,37 @@ cpp_compute_formula (Process* c)
     GET_CHILD(TextProperty, cell, value);
     assert(value);
 
+    double res = 0;
     djnnstl::string final_res = "NaN";
     if (!input_cells->get_list().empty()) {
         if (f.find("sum(", 1) == 1) {
-            final_res = std::to_string(res);
-        } 
-        else if (f.find("avg(", 1) == 1 && count != 0) {
-            final_res = std::to_string(res / count);
+            for (auto* p : input_cells->get_list()) {
+                GET_CHILD_VALUE(in_val, Text, p, value);
+                //std::cerr << in_val << __FL__;
+                if (!in_val.empty()) {
+                    res += atof(in_val.c_str());
+                }
+            }
+        } else
+        if (f.find("avg(", 1) == 1) {
+            double res = 0;
+            int count = 0;
+            for (auto* p : input_cells->get_list()) {
+                GET_CHILD_VALUE(in_val, Text, p, value);
+                //std::cerr << in_val << __FL__;
+                if (!in_val.empty()) {
+                    res += atof(in_val.c_str());
+                    count++;
+                }
+            }
+            res /= count;
         }
     }
+    if (int(res)==res)
+        final_res = std::to_string(int(res));
+    else
+        final_res = std::to_string(res);
     value->set_value(final_res, true);
-    
 }
 
 %}
@@ -263,7 +276,7 @@ Spreadsheet (int row_, int col_, int tx_, int ty_)
 
                         // move the TextField on top of the cell
                         bg.press -> { 
-                            cell =: _current_cell 
+                            cell =: _current_cell
                         }
 
                         Component bindings // Cell bindings that can cause the calculation to refresh
@@ -277,10 +290,12 @@ Spreadsheet (int row_, int col_, int tx_, int ty_)
                 }
             }
         }
+        // a single box_edit that is moved on top of a cell when the user is editing it
         Component box_edit {
             Translation t (-100,-100) // to control the box_edit position
             _col_of_current_cell.value * cell_width => t.tx
             _row_of_current_cell.value * cell_height => t.ty
+
             FillColor edit_bg_color (White)
             settings.cell_color.value =:> edit_bg_color.value
             OutlineColor oc (Red)
@@ -319,7 +334,7 @@ Spreadsheet (int row_, int col_, int tx_, int ty_)
     //     "Value: " + _value_of_current_cell.value =:> value.text
     // }
 
-    // Explicaton component
+    // Explanation component
     Component debug {
         Translation t (0, row_ * cell_height + 3* cell_height)
         FillColor _ (White)

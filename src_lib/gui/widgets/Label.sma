@@ -16,7 +16,6 @@ use base
 use display
 use gui
 
-//import gui.shape.text
 import gui.widgets.IWidget
 
 _define_

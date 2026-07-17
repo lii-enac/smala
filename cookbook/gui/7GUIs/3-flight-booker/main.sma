@@ -26,6 +26,7 @@ import gui.widgets.PushButton
 import gui.widgets.UITextField
 import gui.widgets.VBox
 import gui.widgets.ComboBox
+import gui.widgets.StandAloneSelectableLabel
 
 import Date
 
@@ -111,7 +112,7 @@ Component root {
     Component popup_confirm_order (1) {
         Frame f2 ("", 650, 550, 400, 100)
         FillColor _ (White)
-        Text t (10, 50, "NaN") 
+        StandAloneSelectableLabel t (10, 30, 100, 24, "NaN")
         t.width + 20 =:> f2.width
         t.height + 70 =:> f2.height
     }
@@ -121,7 +122,7 @@ Component root {
         }
         else {                                                      
             root.popup_confirm_order.t.text = "You have booked a " + root.C.value + " on " + root.T1.text   // [7GUIs] ...a message is displayed informing the user of his selection 
-        }    
+        }   
     }
     pre_open_popup_confirm_order -> popup_confirm_order
     popup_confirm_order.f2.close ->! popup_confirm_order  

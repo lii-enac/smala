@@ -12,6 +12,7 @@
 *     Vincent Peyruqueou <vincent.peyruqueou@enac.fr>
 *
 */
+
 // [7GUIs] Flight Booker
 // [7GUIs] https://eugenkiss.github.io/7guis/tasks#flight
 // [7GUIs] Challenge: Constraints.

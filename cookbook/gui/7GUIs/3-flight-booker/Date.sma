@@ -76,10 +76,10 @@ Date(Process T, Process T_valid, Process time) {
     (time != -1) =:> T_valid
 
     T_valid.false -> {
-        #FF0000 =: T.text_color   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
+        #FF0000 =: T.bg_color.value   // [7GUIs] When a non-disabled textfield T has an ill-formatted date then T is colored red
     }
 
     T_valid.true -> {
-        #000000 =: T.text_color   // ...else...
+        #FFFFFF =: T.bg_color.value   // ...else...
     }
 }

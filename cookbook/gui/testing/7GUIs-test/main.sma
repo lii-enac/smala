@@ -110,8 +110,8 @@ get_pixel_color (CoreProcess* frame, int x, int y)
 {
     auto * f = dynamic_cast<Window*>(frame);
     assert(f);
-    auto res = f->get_pixel_color(x,y);
-    //puts(to_string(res).c_str());
+    auto res = f->get_pixel_color(x, y);
+    puts(to_string(res).c_str());
     return res & 0xffffff;
 }
 
@@ -125,7 +125,21 @@ pick_graphical_object(CoreProcess* frame, int x, int y)
     Picking * picking = f->picking_view();
     assert(picking);
     auto * picked = picking->pick(x, y);
-    puts(to_string(picked).c_str());
+    if (picked != nullptr) {
+        // cout << "picked at " << x << " " << y << " = " << picked << endl;
+        string hierarchy_name = get_hierarchy_name (dynamic_cast<CoreProcess*> (picked));
+        cout << "picked at " << x << " " << y << " = " << hierarchy_name << endl;
+
+        // CoreProcess* name = dynamic_cast<CoreProcess*>(picked)->find_child ("../name");
+        // if (name != nullptr) {
+        //     const string& str_name = static_cast<TextProperty*>(name)->get_value ();
+        //     cout << "Name = '" << str_name << "'\n" << endl;
+        // }
+    }
+    else {
+        cout << "Nothing to pick at " << x << " " << y << endl;
+    }
+    // puts(to_string(picked).c_str());
     return dynamic_cast<AbstractGObj*>(picked);
 }
 
@@ -373,12 +387,15 @@ Component root {
         // deactivate (mainloop) // exit when done
         // print ("\033[32mall tests passed successfully\033[39;49m")
     }
-
+    
 
     // -------------------------------------------------------
     // Callbacks
 
     Int nb_press_on_canvas (0)
+    Int frame_header_height (30)
+    Int last_press_x (0)
+    Int last_press_y (0)
 
     na_canvas_pressed = find(root.cd, "//na_canvas_pressed")
     na_canvas_pressed -> na_CD_canvas_pressed:(root) {
@@ -387,6 +404,18 @@ Component root {
         root.nb_press_on_canvas++
         print (root.nb_press_on_canvas + " press on canvas = " + canvas.items.size + " drawn circles ?")
         assert (floor (get_double_value (canvas.items.size)) == root.nb_press_on_canvas)
+        
+        graph_exec ()   // Force exec before pick graphical (interactive) object
+
+        // Too soon to pick, the graphical item is not yet rendered ?
+
+        // Remove frame position to last press
+        int x = root.last_press_x - root.cd.f.x
+        int y = root.last_press_y - root.cd.f.y - root.frame_header_height
+        pick_graphical_object(root.cd.f, x, y)
+        // assert (pick_graphical_object(root.cd.f, x, y) != null) // There must be a Circle Item here
+        // assert (get_pixel_color(root.cd.f, x, y) == 0x000000) // Circle must be black
+        // get_pixel_color (root.cd.f, x, y)
     }
 
 
@@ -412,27 +441,57 @@ Component root {
 
     Timer wait_1_5s (1500)
     wait_1_5s.end -> na_wait_1_5s:(root) {
+        root.last_press_x = 100
+        root.last_press_y = 500     // frame.y (360) + frame_header_height (30) + 110
+
         // Create 1st circle
-        move_mouse_to (100, 500)
-        press_at (100, 500, 0)
+        move_mouse_to ($root.last_press_x, $root.last_press_y)
+        press_at ($root.last_press_x, $root.last_press_y, 0)
     }
 
     Timer wait_2s (2000)
     wait_2s.end -> na_wait_2s:(root) {
+        
+        // Pick first circle
+        // Remove frame position to last press
+        int x = root.last_press_x - root.cd.f.x
+        int y = root.last_press_y - root.cd.f.y - root.frame_header_height
+        assert (pick_graphical_object(root.cd.f, x, y) != null) // There must be a Circle Item here
+
+        root.last_press_x = 250
+        root.last_press_y = 800     // frame.y (360) + frame_header_height (30) + 410
+
         // Create 2nd circle
-        move_mouse_to (250, 800)
-        press_at (250, 800, 0)
+        move_mouse_to ($root.last_press_x, $root.last_press_y)
+        press_at ($root.last_press_x, $root.last_press_y, 0)
     }
 
     Timer wait_2_5s (2500)
     wait_2_5s.end -> na_wait_2_5s:(root) {
+
+        // Pick second circle
+        // Remove frame position to last press
+        int x = root.last_press_x - root.cd.f.x
+        int y = root.last_press_y - root.cd.f.y - root.frame_header_height
+        assert (pick_graphical_object(root.cd.f, x, y) != null) // There must be a Circle Item here
+
+        root.last_press_x = 400
+        root.last_press_y = 650     // frame.y (360) + frame_header_height (30) + 260
+
         // Create 3rd circle
-        move_mouse_to (400, 650)
-        press_at (400, 650, 0)
+        move_mouse_to ($root.last_press_x, $root.last_press_y)
+        press_at ($root.last_press_x, $root.last_press_y, 0)
     }
 
     Timer wait_3s (3000)
     wait_3s.end -> na_wait_3s:(root) {
+
+        // Pick third circle
+        // Remove frame position to last press
+        int x = root.last_press_x - root.cd.f.x
+        int y = root.last_press_y - root.cd.f.y - root.frame_header_height
+        assert (pick_graphical_object(root.cd.f, x, y) != null) // There must be a Circle Item here
+
         // 2,5 sec since we reseted the timer
 
         G = find(root.tmr, "//G")
@@ -539,10 +598,10 @@ Component root {
         assert (floor (get_double_value (radius_of_selected.value)) == 45)
     }
 
-    na_wait_5s -> (root) {
-        print ("\033[32mall tests passed successfully\033[39;49m")
-        deactivate (mainloop) // exit when done
-    }
+    // na_wait_5s -> (root) {
+    //     print ("\033[32mall tests passed successfully\033[39;49m")
+    //     deactivate (mainloop) // exit when done
+    // }
 
 
 

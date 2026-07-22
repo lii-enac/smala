@@ -154,8 +154,9 @@ Component root {
         }
     }
 
-
-    mainloop -> (root) {
+    // wait before launching tests to let the window be displayed
+    Timer wait_1s (1000)
+    wait_1s.end -> (root) {
         print ("PICKING...")
 
         // Picking on rect r11
@@ -198,6 +199,13 @@ Component root {
         assert (get_pixel_color(root.f, 20, 350) == 0x0000FF)
 
         print ("END")
+
+    }
+
+    Timer wait_5s (5000)
+    wait_5s.end -> (root) {
+        print ("\033[32mall tests passed successfully\033[39;49m")
+        deactivate (mainloop) // exit when done
     }
 
 

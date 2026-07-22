@@ -610,12 +610,13 @@ disable_cookbook_apps ?= \
 	gui/direct_manipulation/rotate_resize
 
 ifneq ($(os),Darwin)
-disable_cookbook_apps += gui/testing/7GUIs-test
+disable_cookbook_apps += gui/testing/7GUIs-test gui/testing/picking
 
-7GUIs-test 7GUIs-test_test 7GUIs-test_dbg:
-	@echo "7GUIs-test is only available on Darwin: cppautogui does not have Linux/Windows backends yet."
-
-.PHONY: 7GUIs-test 7GUIs-test_test 7GUIs-test_dbg
+# Règle générique
+$(foreach app,$(disable_cookbook_apps),\
+    $(eval $(app) $(app)_test $(app)_dbg: ; @echo "$(app) is only available on Darwin: cppautogui does not have Linux/Windows backends yet.") \
+    $(eval .PHONY: $(app) $(app)_test $(app)_dbg) \
+)
 endif
 
 cookbook_apps := $(filter-out $(disable_cookbook_apps),$(cookbook_apps))

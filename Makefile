@@ -768,7 +768,7 @@ ifneq ($(PREFIX),)
 	install -m 644 $< $@
 endif
 
-$(smala_install_prefix)/bin/$(bin_name): build/$(bin_name)
+$(smala_install_prefix)/bin/$(bin_name): $(smalac)
 	@mkdir -p $(dir $@)
 	install -m 755 $< $@
 

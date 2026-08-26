@@ -44,7 +44,7 @@ pipeline {
                         export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
                         make -j V=max 
                         make -j V=max lib
-                        make -j V=max cookbook_apps
+                        make V=max cookbook_apps
                         make -j V=max 7GUIs-test_test
                     '''
                 }
@@ -94,7 +94,7 @@ pipeline {
 
                                 make -j8 V=max 
                                 make -j8 V=max lib
-                                make -j8 V=max cookbook_apps
+                                make V=max cookbook_apps
                             '''
                         }
                     }
@@ -137,7 +137,7 @@ pipeline {
                                 )
                                 make -j V=max 
                                 make -j V=max lib
-                                make -j V=max cookbook_apps
+                                make V=max cookbook_apps
                             '''
                         }
                     }
@@ -177,7 +177,7 @@ pipeline {
                                 wsl -- echo "=== Building smala (Windows) WSL build in $(pwd) --"
                                 wsl -- make -j V=max 
                                 wsl -- make -j V=max lib
-                                wsl -- make -j V=max cookbook_apps
+                                wsl -- make V=max cookbook_apps
                             '''
                         }
                     }

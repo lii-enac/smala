@@ -6,6 +6,94 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 smala is strongly linked to djnn-cpp developpement : <https://github.com/lii-enac/djnn-cpp>
 
+## [1.23.0] - 2026-08-26
+
+### compliant with djnn-cpp [1.23.0]
+
+    - please see CHANGELOG.md of djnn-cpp for more in-depth details changes
+
+### NEW
+
+    - NEW SimpleMenu widget with corresponding library support
+    - NEW AltKey manager in the Smala GUI library
+    - NEW ProgressBar widget support
+    - NEW ListBox and ListBoxItem widgets moved into the Smala library
+    - NEW Label, SelectableLabel, StandAloneLabel, and StandAloneSelectableLabel widgets
+    - NEW StandAloneUITextField widget
+    - NEW `=?:>` syntax for lazy connector initialization
+    - NEW `-rmt` compiler option to generate Remotery calls for actions
+    - NEW native cppautogui tool for interactive GUI testing
+    - NEW cookbook recipes for lazy connectors, outline width, text interaction, widget labels, and GUI testing
+
+### Added
+
+    - Added configurable `cxx_version` in Makefile, defaulting to C++20
+    - Added Jenkins CI configuration with separated Windows MSYS and WSL pipelines
+    - Added VSCode debug configurations for Smala cookbooks on macOS and Linux
+    - Added debug variables `_DEBUG_SEE_ACTIVATION_SEQUENCE_2`, `_DEBUG_SEE_ACTIVATION_SEQUENCE_2_MOVE`, and `_DEBUG_SEE_PROP_SET_VALUE`
+    - Added debug location and compiler information generation for native expressions, native actions, and transitions
+    - Added support for optional `smala_pre_include.h` pre-include files
+    - Added `build_break` generation in the C++ builder
+    - Added parser support for slash and parent segments in import paths
+    - Added CRLF handling in Smala import paths
+    - Added cookbook coverage for `Previous::diff_only`
+    - Added 7GUIs testing recipes and interactive test helpers
+    - Added cppautogui documentation, recording, replay, screenshot, and comparison support
+    - Added tooling to update copyright headers
+
+### Changed
+
+    - Improved Makefile organization, build directory handling, rpath handling, cookbook dependencies, and fast compilation support
+    - Improved Windows, Linux, macOS, LLVM, and cookbook runtime build support
+    - Improved cookbook dependency tracking by including cookbook `.d` files
+    - Improved generated C++ code for expressions, regex expressions, template properties, dynamic expression paths, and fake names
+    - Improved native expression action code generation and harmonization
+    - Improved error reporting when constructing a component with an empty parent
+    - Improved editor mode syntax highlighting for recent Smala constructs
+    - Improved Animator with period support and fixed tick/period behavior
+    - Improved PieMenu construction with direct open/close state control
+    - Improved UITextField behavior for selection, double-click, next focus, clearing, and text synchronization
+    - Improved ComboBox size and z-order behavior
+    - Remade Checkbox and CheckboxManager based on the ListBox/ListBoxItem design
+    - Improved HBox, VBox, and widget layout recomputation triggers
+    - Unified UITextField and StandAloneUITextField geometry
+    - Improved TextField cursor metrics usage in text widgets
+    - Improved 7GUIs examples, especially CRUD, Circle Drawer, Flight Booker, Timer, and Cells
+    - Improved debug, regex, fill/delete content, window, and widget cookbooks
+    - Updated cookbook examples to follow djnn-cpp changes around interactive frame background updates
+    - Updated all file headers with recent years and contributor information
+
+### Fixed
+
+    - Fixed Windows and Linux compilation issues in generated C++ code
+    - Fixed standalone ComboBox undefined behavior by replacing C-style casts with `dynamic_cast`
+    - Fixed cookbook compilation paths and runtime paths on Linux and Windows
+    - Fixed Makefile parser generation to avoid repeated `parser.y` compilation with gmake
+    - Fixed cookbook dependencies from the Smala library
+    - Fixed pan and zoom cookbook dependencies
+    - Fixed rpath and `install_name` handling
+    - Fixed unnecessary compiler include paths and cookbook phony dependencies
+    - Fixed expression generation when regex is used
+    - Fixed expression generation when children must be found
+    - Fixed template property code generation
+    - Fixed parser info reset at the end of `define`
+    - Fixed lazy connector cookbook examples
+    - Fixed Animator alternating period and tick behavior
+    - Fixed `UITextField::clear` so it updates the `text` property
+    - Fixed ListViewer, ListBox, CRUD filtering, deletion, and selection behavior
+    - Fixed 7GUIs Cells average computation and related tests
+    - Fixed 7GUIs Circle Drawer popup, selection, undo/redo, and radius changes
+    - Fixed 7GUIs Temp Converter initial values
+    - Fixed cppautogui screenshot comparison and macOS window capture
+    - Fixed 7GUIs test assertions and platform-specific build limitations
+    - Fixed launch configuration paths for VSCode debugging
+
+### Removed
+
+    - Removed unnecessary generated include paths from compiler build rules
+    - Removed duplicated 7GUIs CRUD testing code by extracting shared components
+    - Removed obsolete or redundant code in 7GUIs, TextField, ListBox, and GUI widget examples
+
 ## [1.22.0] - 2025-07-29
 
 ### compliant with djnn-cpp [1.22.0]

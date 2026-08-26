@@ -42,10 +42,10 @@ pipeline {
                         fi
 
                         export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-                        make -j
-                        make -j lib
-                        make -j cookbook_apps
-                        make -j 7GUIs-test_test
+                        make -j V=max 
+                        make -j V=max lib
+                        make -j V=max cookbook_apps
+                        make -j V=max 7GUIs-test_test
                     '''
                 }
             }
@@ -92,9 +92,9 @@ pipeline {
                                     exit 1
                                 fi
 
-                                make -j8
-                                make -j8 lib
-                                make -j8 cookbook_apps
+                                make -j8 V=max 
+                                make -j8 V=max lib
+                                make -j8 V=max cookbook_apps
                             '''
                         }
                     }
@@ -135,9 +135,9 @@ pipeline {
                                     echo Make sure djnn-cpp pipeline ran successfully first.
                                     exit /b 1
                                 )
-                                make -j
-                                make -j lib
-                                make -j cookbook_apps
+                                make -j V=max 
+                                make -j V=max lib
+                                make -j V=max cookbook_apps
                             '''
                         }
                     }
@@ -175,9 +175,9 @@ pipeline {
                             // On passe les commandes via wsl --
                              bat '''
                                 wsl -- echo "=== Building smala (Windows) WSL build in $(pwd) --"
-                                wsl -- make -j
-                                wsl -- make -j lib
-                                wsl -- make V=max cookbook_apps
+                                wsl -- make -j V=max 
+                                wsl -- make -j V=max lib
+                                wsl -- make -j V=max cookbook_apps
                             '''
                         }
                     }

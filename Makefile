@@ -789,10 +789,10 @@ sublime_home = $(shell cygpath -u "$(USERPROFILE)/AppData/Roaming/Sublime Text 3
 endif
 
 install_editor_modes:
-	if [ -d $(vscode_home) ]; then \
+	if [ -d "$(vscode_home)" ]; then \
 		cp -r editor_modes/vscode/smala $(vscode_home); \
 	fi
-	if [ -d $(sublime_home) ]; then \
+	if [ -d "$(sublime_home)" ]; then \
 		cp editor_modes/sublime/smala.sublime-syntax editor_modes/sublime/smala.tmPreferences editor_modes/sublime/Make-color.sublime-build $(sublime_home); \
 	fi
 
